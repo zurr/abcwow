@@ -1,0 +1,20 @@
+<?php
+ini_set('max_execution_time',0);
+mysql_connect("127.0.0.1:3306","root","xxx") or die(mysql_error());
+mysql_select_db("antrix_worlds_abc") or die(mysql_error());
+
+
+$result = mysql_query("SELECT entry as ID,name FROM gameobject_names WHERE type = 3 AND entry NOT IN (SELECT entryid FROM objectloot WHERE entryid=ID) ORDER BY name") or die(mysql_error());
+while ($object = mysql_fetch_row($result)){
+	
+	$result1 = mysql_query("SELECT entry as ID FROM gameobject_names WHERE type = 3 AND entry IN (SELECT entryid FROM objectloot WHERE entryid=ID) AND name = \"$object[1]\"") or die(mysql_error());
+	$filled_id = mysql_fetch_row($result1);
+	
+	$result2 = mysql_query("SELECT itemid, percentchance, heroicpercentchance, mincount, maxcount, ffa_loot FROM objectloot WHERE entryid = '$filled_id[0]'") or die(mysql_error());
+	while ($loot_entry = mysql_fetch_row($result2)){
+		mysql_query("INSERT INTO objectloot (entryid, itemid, percentchance, heroicpercentchance, mincount, maxcount, ffa_loot)
+			VALUES ('$object[0]', '$loot_entry[0]','$loot_entry[1]','$loot_entry[2]','$loot_entry[3]','$loot_entry[4]','$loot_entry[5]')") or die(mysql_error());
+	}
+}
+
+?>
