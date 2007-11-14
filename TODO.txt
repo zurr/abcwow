@@ -1,0 +1,9 @@
+-- Changing stances/froms removes all/some negative auras.
+-- fix talents/idols/totems/librams/equips/set bomuses and all other spells and which actually work but are missing affectedspellgroup[]
+-- clos/vanish/blink/escape artist/pvp trinket do not free from nova...
+-- clos doesn't clear all debuffs (again @.@)
+-- clearcasting
+-- dispel magic/purce/spellsteal/cleanse - "Nothing to dispell"
+
+-- get a gf
+-- keep her from leaving me.
