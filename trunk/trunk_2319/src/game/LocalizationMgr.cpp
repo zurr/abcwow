@@ -343,7 +343,7 @@ void LocalizationMgr::Reload(bool first)
 	{
 		uint32 source_language_id = GetLanguageId(itr->second);
 		uint32 dest_language_id = GetLanguageId(itr->first);
-		ASSERT(source_language_id>0&&dest_language_id>0);
+		//ASSERT(source_language_id>0&&dest_language_id>0);
 
 		/* duplicate the hashmaps (we can save the pointers here) */
 		CopyHashMap<LocalizedItem>(&m_Items[source_language_id], &m_Items[dest_language_id]);

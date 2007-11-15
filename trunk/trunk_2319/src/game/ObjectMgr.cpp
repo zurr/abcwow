@@ -1449,7 +1449,7 @@ void ObjectMgr::LoadTrainers()
 		result2 = WorldDatabase.Query("SELECT * FROM trainer_spells where entry='%u'",entry);
 		if(!result2)
 		{
-			Log.Error("LoadTrainers", "Trainer with no spells, entry %u.", entry);
+			Log.Debug("LoadTrainers", "Trainer with no spells, entry %u.", entry);
 			delete [] tr->UIMessage;
 			delete tr;
 			continue;
@@ -1490,7 +1490,7 @@ void ObjectMgr::LoadTrainers()
 
 				if(ts.pRealSpell == NULL)
 				{
-					Log.Error("LoadTrainers", "Trainer %u contains spell %u which doesn't teach.", entry, CastSpellID);
+					Log.Debug("LoadTrainers", "Trainer %u contains spell %u which doesn't teach.", entry, CastSpellID);
 				}
 				else
 				{
