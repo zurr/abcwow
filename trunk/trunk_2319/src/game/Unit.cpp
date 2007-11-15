@@ -372,6 +372,7 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 
 	//Get Highest Level Player, Calc Xp and give it to each group member
 	Player *pHighLvlPlayer = NULL;
+	Player *pHighLvlPlayerNot70 = NULL;
 	Player *pGroupGuy = NULL;
 	  int active_player_count=0;
 	Player *active_player_list[MAX_GROUP_SIZE_RAID];//since group is small we can afford to do this ratehr then recheck again the whole active player set
@@ -413,13 +414,16 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 				active_player_list[active_player_count]=pGroupGuy;
 				active_player_count++;
 				total_level += pGroupGuy->getLevel();
-				if(pHighLvlPlayer)
-				{
-					if(pGroupGuy->getLevel() > pHighLvlPlayer->getLevel())
-						pHighLvlPlayer = pGroupGuy;
-				}
-				else 
-					pHighLvlPlayer = pGroupGuy;
+				if(pHighLvlPlayerNot70)
+ 				{
+					if(pGroupGuy->getLevel() < 70)
+					{
+						if (pGroupGuy->getLevel() > pHighLvlPlayerNot70->getLevel())
+							pHighLvlPlayerNot70 = pGroupGuy;
+					}
+ 				}
+				else if(pGroupGuy->getLevel() < 70)
+					pHighLvlPlayerNot70 = pGroupGuy;
 			}
 		}
 	}
@@ -444,12 +448,17 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 		}
 		else if(pGroup->GetGroupType() == GROUP_TYPE_RAID)
 			xp_mod=0.5f;
-		if(pHighLvlPlayer == 0) pHighLvlPlayer = pGroup->GetLeader();
+		if(pHighLvlPlayerNot70 == 0 || !pHighLvlPlayerNot70) pHighLvlPlayerNot70 = pGroup->GetLeader();
 
-		xp = CalculateXpToGive(pVictim, pHighLvlPlayer);
+		xp = CalculateXpToGive(pVictim, pHighLvlPlayerNot70);
 		//i'm not sure about this formula is correct or not. Maybe some brackets are wrong placed ?
 		for(int i=0;i<active_player_count;i++)
-			active_player_list[i]->GiveXP( float2int32(((xp*active_player_list[i]->getLevel()) / total_level)*xp_mod), pVictim->GetGUID(), true );
+		{
+			if (active_player_list[i]->getLevel() < 70)
+				active_player_list[i]->GiveXP( float2int32(((xp*active_player_list[i]->getLevel()) / total_level)*xp_mod), pVictim->GetGUID(), true );
+			else
+				active_player_list[i]->GiveXP( 0, pVictim->GetGUID(), true );
+		}
 	}
 		/* old code start before 2007 04 22
 		GroupMembersSet::iterator itr;
@@ -496,7 +505,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 	bool can_delete = !bProcInUse;
 	bProcInUse = true;
 
-	std::list<uint32> remove;
 	std::list<struct ProcTriggerSpell>::iterator itr,itr2;
 	for( itr = m_procSpells.begin();itr != m_procSpells.end();)  // Proc Trigger Spells for Victim
 	{
@@ -577,6 +585,20 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				//these are player talents. Fuckem they pull the emu speed down 
 				if(IsPlayer())
 				{
+					if (itr2->ProcType == 1 && static_cast<Player*>(this)->IsInFeralForm()) 
+					{
+						switch (static_cast<Player*>(this)->GetShapeShift())
+						{
+							case FORM_CAT:	
+							case FORM_BEAR: 
+							case FORM_DIREBEAR:
+								continue;
+								break;
+							default:
+								break;
+						}
+					}
+
 					uint32 talentlevel=0;
 					switch(origId)
 					{
@@ -893,7 +915,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								uint32 AP_owerride=GetAP() + spellInfo->EffectBasePoints[0]+1;
 								uint32 dmg = static_cast<Player*>(this)->GetMainMeleeDamage(AP_owerride);
 								SpellEntry *sp_for_the_logs = dbcSpell.LookupEntry(spellId);
-								Strike(victim,MELEE,sp_for_the_logs,dmg,0,0,true,false);
 								Strike(victim,MELEE,sp_for_the_logs,dmg,0,0,true,false);
 								//nothing else to be done for this trigger
 								continue;

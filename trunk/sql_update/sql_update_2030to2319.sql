@@ -1,6 +1,14 @@
-ALTER TABLE `worldmap_info` CHANGE COLUMN `mapid` `entry` INT(10) NOT NULL DEFAULT 0;
-
+-- non existing crap
 DELETE FROM trainer_spells where cast_spell IN (3983, 4020, 39786);
+
+ALTER TABLE `spell_data_extra` ADD COLUMN `proc_interval` INTEGER UNSIGNED AFTER `dmg_bonus`
+, COMMENT = '';
+ALTER TABLE `spell_data_extra` MODIFY COLUMN `dmg_bonus` INTEGER UNSIGNED,
+ MODIFY COLUMN `proc_interval` INTEGER UNSIGNED;
+
+ALTER TABLE `worldmap_info` CHANGE COLUMN `mapid` `entry` INT(10) NOT NULL DEFAULT 0;
+update worldmap_info set cooldown = 43200 where cooldown = 0 and type = 4;
+
 
 ALTER TABLE `characters` CHANGE COLUMN `bannedReason` `banReason` VARCHAR(255);
 

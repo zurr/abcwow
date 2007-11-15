@@ -39,6 +39,7 @@ enum AreaTriggerFailures
 	AREA_TRIGGER_FAILURE_NO_GROUP		= 7,
 	AREA_TRIGGER_FAILURE_NO_KEY         = 8,
 	AREA_TRIGGER_FAILURE_LEVEL_HEROIC	= 9,
+	AREA_TRIGGER_FAILURE_NO_ATTUNE_ITEM	=10,
 };
 
 const char * AreaTriggerFailureMessages[] = {
@@ -47,11 +48,12 @@ const char * AreaTriggerFailureMessages[] = {
 	"You must have The Burning Crusade Expansion to access this content.",
 	"Heroic mode unavailable for this instance.",
 	"You must be in a raid group to pass through here.",
-	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
+	"You do not have the required attunement quest to pass through here.",
 	"You must be at least level %u to pass through here.",
 	"You must be in a party to pass through here.",
-	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
+	"Heroic Difficulty requires the %s.",
 	"You must be level 70 to enter heroic mode.",
+	"You do not have %s to pass through here.",
 };
 
 inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSession, Player * pPlayer, MapInfo * pMapInfo)
@@ -82,7 +84,7 @@ inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession 
 		return AREA_TRIGGER_FAILURE_NO_ATTUNE;
 
 	if(pMapInfo && pMapInfo->required_item && !pPlayer->GetItemInterface()->GetItemCount(pMapInfo->required_item, true))
-		return AREA_TRIGGER_FAILURE_NO_ATTUNE;
+		return AREA_TRIGGER_FAILURE_NO_ATTUNE_ITEM;
 
 	if (pPlayer->iInstanceType == MODE_HEROIC && 
 		pMapInfo->type == INSTANCE_MULTIMODE && 
@@ -126,15 +128,30 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 				if(reason != AREA_TRIGGER_FAILURE_OK)
 				{
 					const char * pReason = AreaTriggerFailureMessages[reason];
-					WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 50);
+					WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 60);
 					data << uint32(0);
                     
+					MapInfo * pMapInfo = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
+
 					switch (reason)
 					{
 					case AREA_TRIGGER_FAILURE_LEVEL:
 						char msg[50];
 						snprintf(msg,50,pReason,pAreaTrigger->required_level);
 						data << msg;
+						break;
+					case AREA_TRIGGER_FAILURE_NO_ATTUNE_ITEM:
+					case AREA_TRIGGER_FAILURE_NO_KEY:
+						if (pMapInfo && (pMapInfo->heroic_key_1 || pMapInfo->required_item))
+ 						{
+							ItemPrototype *itemProto = ItemPrototypeStorage.LookupEntry(pMapInfo->required_item ? pMapInfo->required_item : pMapInfo->heroic_key_1);
+							if(itemProto)
+							{
+ 								char msg[60];
+ 								snprintf(msg,60,pReason,itemProto->Name1);
+								data << msg;
+ 							} data << pReason;
+ 						}
 						break;
 					default:
 						data << pReason;

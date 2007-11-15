@@ -563,6 +563,7 @@ void Aura::ApplyModifiers(bool apply)
 			pts.procCharges = GetSpellProto()->procCharges;
 			pts.LastTrigger = 0;
 			pts.deleted = false;
+			pts.ProcType = 0;
 			m_target->m_procSpells.push_front(pts);
 		}
 		else
@@ -1073,7 +1074,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			c->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
 			
 			float bonus_damage = (float)c->GetDamageDoneMod(school);
-			bonus_damage += float(m_target->DamageTakenMod[school]);
+			float bonus_damage_victim = (float)(m_target->DamageTakenMod[school]);
 			if(c->IsPlayer())
 			{
 				bonus_damage += static_cast<Player*>(c)->SpellDmgDoneByInt[school] * c->GetUInt32Value(UNIT_FIELD_STAT3);
@@ -1089,10 +1090,18 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			if(GetDuration())
 			{
 				float ticks= float((amp) ? GetDuration()/amp : 0);
-				float fbonus = float(bonus);
-				fbonus += (ticks) ? bonus_damage/ticks : 0;
-				fbonus *= float(GetDuration()) / 15000.0f;
-				bonus = float2int32(fbonus);
+				if (m_spellProto->dmg_bonus && m_spellProto->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
+					m_spellProto->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && m_spellProto->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE )
+				{
+					bonus += (ticks) ? ((bonus_damage*m_spellProto->dmg_bonus*0.01)+bonus_damage_victim)/ticks : 0;
+				}
+				else
+				{
+					bonus += (ticks) ? (bonus_damage+bonus_damage_victim)/ticks : 0;
+					if(!m_spellProto->ChannelInterruptFlags)
+						bonus *= float(GetDuration()) / 15000.0f;
+				}
+				bonus = float2int32(bonus);
 			}
 			else bonus = 0;
 
@@ -1313,6 +1322,7 @@ void Aura::SpellAuraDummy(bool apply)
 			pts.procCharges = GetSpellProto()->procCharges;
 			pts.LastTrigger = 0;
 			pts.deleted = false;
+			pts.ProcType = 0;
 			m_target->m_procSpells.push_front(pts);
 			}
 			else
@@ -1685,6 +1695,7 @@ void Aura::SpellAuraDummy(bool apply)
 				pts.procCharges = GetSpellProto()->procCharges;
 				pts.LastTrigger = 0;
 				pts.deleted = false;
+				pts.ProcType = 0;
 				m_target->m_procSpells.push_front(pts);
 			}
 			else
@@ -1862,6 +1873,7 @@ void Aura::SpellAuraModFear(bool apply)
 		if(p_target)
 		{
 			m_target->setAItoUse(true);
+			static_cast<Player*>(m_target)->EventAttackStop();
 		}
 		//m_target->m_pacified++;
 		m_target->m_special_state |= UNIT_STATE_FEAR;
@@ -1902,6 +1914,7 @@ void Aura::EventPeriodicHeal(uint32 amount)
 	Unit * c = GetUnitCaster();
 
 	int bonus = 0;
+	int bonus_target = 0;
 
 	if(c && c->IsPlayer())
 	{
@@ -1912,7 +1925,7 @@ void Aura::EventPeriodicHeal(uint32 amount)
 		if (static_cast<Player*>(c)->IsInFeralForm() && static_cast<Player*>(c)->GetShapeShift() == FORM_TREE)
 			bonus += float2int32(0.25f*((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT4));
 	}
-	bonus += m_target->HealTakenMod[GetSpellProto()->School];
+	bonus_target += m_target->HealTakenMod[GetSpellProto()->School];
 
 	int amp = m_spellProto->EffectAmplitude[mod->i];
 	if(!amp) 
@@ -1921,8 +1934,16 @@ void Aura::EventPeriodicHeal(uint32 amount)
 	if(GetDuration())
 	{
 		int ticks= (amp) ? GetDuration()/amp : 0;
-		bonus= (ticks) ? bonus/ticks : 0;
-		bonus = float2int32(float(bonus*GetDuration() / 15000.0f));
+		if (!m_spellProto->dmg_bonus)
+		{
+			bonus = (ticks) ? (bonus+bonus_target)/ticks : 0;
+			if(!m_spellProto->ChannelInterruptFlags)
+				bonus = float2int32(float(bonus*GetDuration() / 15000.0f));
+		}
+		else
+		{
+			bonus = (ticks) ? ((bonus*m_spellProto->dmg_bonus/100)+bonus_target)/ticks : 0;
+		}
 	}
 	else bonus = 0;
 
@@ -3467,6 +3488,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 		pts.procCharges = GetSpellProto()->procCharges;
 		pts.LastTrigger = 0;
 		pts.deleted = false;
+		pts.ProcType = 0;
 
 		if(m_spellProto->NameHash == 0xE4573D4A)
 		{

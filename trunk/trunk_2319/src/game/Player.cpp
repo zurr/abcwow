@@ -86,6 +86,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 
 	m_healthfromspell	   = 0;
 	m_manafromspell		 = 0;
+	m_mana_from_base_int = 0;
 	m_healthfromitems	   = 0;
 	m_manafromitems		 = 0;
 
@@ -2921,6 +2922,12 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 
 #undef get_next_field
 
+	LevelInfo * Info = objmgr.GetLevelInfo(getRace(), getClass(), getLevel());
+	LevelInfo * InfoFirst = objmgr.GetLevelInfo(getRace(), getClass(), 1);
+
+	if(Info != 0 && InfoFirst != 0)
+		SetBaseManaFromInt((Info->Stat[3] - InfoFirst->Stat[3])*15);
+	
 	// load properties
 	_LoadTutorials(results[1].result);
 	_LoadItemCooldown(results[2].result);
@@ -3396,6 +3403,7 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 				ts.caster=this->GetGUID();
 				ts.procFlags=PROC_ON_MELEE_ATTACK;
 				ts.deleted = false;
+				ts.ProcType = (item->GetProto()->Class == ITEM_CLASS_WEAPON)? 1 : 2;
 				this->m_procSpells.push_front(ts);			
 			}
 		}
@@ -5230,6 +5238,22 @@ void Player::EventRepeatSpell()
 	}
 }
 
+void Player::removeDeletedSpellByHashName(uint32 hash)
+{
+	SpellSet::iterator it,iter;
+	
+	for(iter= mDeletedSpells.begin();iter != mDeletedSpells.end();)
+	{
+		it = iter++;
+		uint32 SpellID = *it;
+		SpellEntry *e = dbcSpell.LookupEntry(SpellID);
+		if(e->NameHash == hash)
+		{
+			mDeletedSpells.erase(it);
+		}
+	}
+}
+
 void Player::removeSpellByHashName(uint32 hash)
 {
 	SpellSet::iterator it,iter;
@@ -5482,11 +5506,14 @@ void Player::Reset_Talents()
 							//remove higher ranks of this spell too (like earth shield lvl 1 is talent and the rest is thought from trainer) 
 							SpellEntry *spellInfo2;
 							spellInfo2 = dbcSpell.LookupEntry( spellInfo->EffectTriggerSpell[k] );
-							if(spellInfo2)
-								removeSpellByHashName(spellInfo2->NameHash);
-						}
+							if(spellInfo2) {
+ 								removeSpellByHashName(spellInfo2->NameHash);
+								removeDeletedSpellByHashName(spellInfo2->NameHash);
+							}
+ 						}
 					//remove them all in 1 shot
 					removeSpellByHashName(spellInfo->NameHash);
+					removeDeletedSpellByHashName(spellInfo->NameHash);
 				}
 			}
 			else

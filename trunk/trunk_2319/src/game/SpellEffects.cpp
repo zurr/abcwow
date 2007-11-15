@@ -510,6 +510,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 		uint32 damage = m_spellInfo->EffectBasePoints[i]+1;
 		uint32 man = (damage *(100+playerTarget->m_lifetapbonus))/100;
+		if (p_caster->GetUInt32Value(UNIT_FIELD_HEALTH) <= damage) return;
 		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
 		playerTarget->ModUInt32Value(UNIT_FIELD_POWER1,man);
 		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1) > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
@@ -1079,6 +1080,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ILotP.procFlags = PROC_ON_CRIT_ATTACK | PROC_TAGRGET_SELF;
 			ILotP.deleted = false;
 			ILotP.caster = u_caster->GetGUID();
+			ILotP.ProcType = 0;
 			ILotP.LastTrigger = 0;
 			u_caster->m_procSpells.push_back(ILotP);
 		}
