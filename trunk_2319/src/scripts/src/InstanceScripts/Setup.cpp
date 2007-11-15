@@ -8,12 +8,30 @@ extern "C" SCRIPT_DECL uint32 _exp_get_version()
 
 extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)	// Comment any script to disable it
 {
-    SetupDeadmines(mgr);
-    SetupMoltenCore(mgr);
+	SetupDeadmines(mgr);
+	SetupMoltenCore(mgr);
 	SetupZulGurub(mgr);
 	SetupBlackwingLair(mgr);
 	SetupNaxxramas(mgr);
 	SetupOnyxiasLair(mgr);
+	SetupKarazhan(mgr);
+	SetupGruulsLair(mgr);
+	SetupBloodFurnace(mgr);
+	SetupHellfireRamparts(mgr);
+	SetupSethekkHalls(mgr);
+	SetupTheMechanar(mgr);
+	SetupTheSteamvault(mgr);
+	SetupArcatraz(mgr);
+	SetupTheEye(mgr);
+	SetupAuchenaiCrypts(mgr);
+	SetupManaTombs(mgr);
+	SetupShadowLabyrinth(mgr);
+	SetupBotanica(mgr);
+	SetupShadowfangKeep(mgr);
+	SetupScholomance(mgr);
+	SetupTheShatteredHalls(mgr);
+	SetupTheSlavePens(mgr);
+	SetupTheUnderbog(mgr);
 }
 
 #ifdef WIN32
