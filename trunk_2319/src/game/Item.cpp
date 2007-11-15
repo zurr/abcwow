@@ -694,6 +694,7 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 						TS.procChance = Entry->min[c];
 					Log.Debug("Enchant","Setting procChance to %u%%.", TS.procChance);
 					TS.deleted = false;
+					TS.ProcType = (GetProto()->Class == ITEM_CLASS_WEAPON)? 1 : 2;
 					TS.spellId = Entry->spell[c];
 					m_owner->m_procSpells.push_back(TS);
 				}

@@ -350,6 +350,7 @@ struct SpellEntry
 	bool removable_by_immunity;
 	uint32 in_front_status;
 	bool is_melee_spell;
+	uint32 dmg_bonus;
 };
 
 struct ItemExtendedCostEntry

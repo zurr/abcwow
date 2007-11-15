@@ -1322,7 +1322,13 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 
 	if((slot < INVENTORY_SLOT_BAG_END && DstInvSlot == INVENTORY_SLOT_NOT_SET) || (slot >= BANK_SLOT_BAG_START && slot < BANK_SLOT_BAG_END && DstInvSlot == INVENTORY_SLOT_NOT_SET))
 	{
-		if (!ignore_combat && m_pOwner->CombatStatus.IsInCombat())
+		if (!ignore_combat && m_pOwner->CombatStatus.IsInCombat()
+			&& proto->InventoryType != INVTYPE_WEAPON && proto->InventoryType != INVTYPE_WEAPONMAINHAND
+			&& proto->InventoryType != INVTYPE_RANGED && proto->InventoryType != INVTYPE_WEAPONOFFHAND
+			&& proto->InventoryType != INVTYPE_SHIELD && proto->InventoryType != INVTYPE_2HWEAPON
+			&& proto->InventoryType != INVTYPE_AMMO && proto->InventoryType != INVTYPE_THROWN
+			&& proto->InventoryType != INVTYPE_RANGEDRIGHT
+			)
 			return INV_ERR_CANT_DO_IN_COMBAT;
 
 		// Check to see if we have the correct race

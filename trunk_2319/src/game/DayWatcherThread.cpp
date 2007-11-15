@@ -178,6 +178,7 @@ void DayWatcherThread::update_arena()
 	Player * plr;
 	uint32 guid, arenapoints, orig_arenapoints;
 	ArenaTeam * team;
+	uint32 arenapointsPerTeam[3] = {0,0,0};
 	long double X, Y;
 	if(result)
 	{
@@ -246,9 +247,12 @@ void DayWatcherThread::update_arena()
 					}
 					
 					if(Y > 1.0)
-						arenapoints += long2int32(double(ceil(Y)));
+						arenapointsPerTeam[i] += long2int32(double(ceil(Y)));
 				}
 			}
+
+			arenapointsPerTeam[0] = max(arenapointsPerTeam[0],arenapointsPerTeam[1]);
+			arenapoints += max(arenapointsPerTeam[0],arenapointsPerTeam[2]);
 
 			if(orig_arenapoints != arenapoints)
 			{

@@ -2078,6 +2078,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		Unit* caster = (Unit*)(this);
 		caster->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
 		int32 plus_damage = 0;
+		int32 plus_damage_victim = 0;
 		
 		if(caster->IsPlayer())
 		{
@@ -2086,10 +2087,10 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		}
 //------------------------------by school---------------------------------------------------
 		plus_damage += caster->GetDamageDoneMod(school);
-		plus_damage += pVictim->DamageTakenMod[school];
+		plus_damage_victim += pVictim->DamageTakenMod[school];
 //------------------------------by victim type----------------------------------------------
 		if(((Creature*)pVictim)->GetCreatureName() && caster->IsPlayer()&& !pVictim->IsPlayer())
-			plus_damage += static_cast<Player*>(caster)->IncreaseDamageByType[((Creature*)pVictim)->GetCreatureName()->Type];
+			plus_damage_victim += static_cast<Player*>(caster)->IncreaseDamageByType[((Creature*)pVictim)->GetCreatureName()->Type];
 //==========================================================================================
 //==============================+Spell Damage Bonus Modifications===========================
 //==========================================================================================
@@ -2107,6 +2108,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		if (spellInfo->NameHash == 0x695C4940 || spellInfo->NameHash == 0x3DD5C872 || spellInfo->NameHash == 0xddaf1ac7 || spellInfo->NameHash == 0xCB75E5D1)
 			dmgdoneaffectperc *= float (1.0f - (( td / 15000.0f ) / (( td / 15000.0f ) + dmgdoneaffectperc)));
 
+		float dmgdonepercdownrank = 1.0f;
 		if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
 		{
 		   float downrank1 = 1.0f;
@@ -2115,12 +2117,20 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		   float downrank2 = ( float(spellInfo->maxLevel + 5.0f) / float(static_cast<Player*>(this)->getLevel()) );
 		   if (downrank2 >= 1 || downrank2 < 0)
 		         downrank2 = 1.0f;
-			dmgdoneaffectperc *= downrank1 * downrank2;
+			dmgdonepercdownrank *= downrank1 * downrank2;
 		}
 //==========================================================================================
 //==============================Bonus Adding To Main Damage=================================
 //==========================================================================================
-		int32 bonus_damage = float2int32(plus_damage * dmgdoneaffectperc);
+		int32 bonus_damage = 0;
+		if(spellInfo->dmg_bonus)
+		{
+			bonus_damage = float2int32((plus_damage * spellInfo->dmg_bonus * dmgdonepercdownrank)/100);
+			bonus_damage += (int32)(plus_damage_victim * dmgdonepercdownrank);
+		}
+		else
+			bonus_damage = float2int32((plus_damage + plus_damage_victim) * dmgdoneaffectperc * dmgdonepercdownrank);
+
 		bonus_damage +=pVictim->DamageTakenMod[school];
 		if(spellInfo->SpellGroupType)
 		{

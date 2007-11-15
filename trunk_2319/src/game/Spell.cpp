@@ -1259,10 +1259,11 @@ void Spell::cast(bool check)
 								HandleEffects((*i),x);
                             }
 						}
-						else if(m_spellInfo->Effect[x] == SPELL_EFFECT_TELEPORT_UNITS)
-                        {
-							HandleEffects(m_caster->GetGUID(),x);
-                        }
+						else 
+                         {
+							if(m_spellInfo->Effect[x] == SPELL_EFFECT_TELEPORT_UNITS)
+								HandleEffects(m_caster->GetGUID(),x);
+                         }
 					}
 				}
 	
@@ -2007,8 +2008,12 @@ bool Spell::HasPower()
 	int32 cost;
 	if(m_spellInfo->ManaCostPercentage)//Percentage spells cost % of !!!BASE!!! mana
 	{
+		uint32 base_manafrom_int = 0;
+		if(p_caster)
+			base_manafrom_int = p_caster->GetBaseManaFromInt();
+
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/100;
+			cost = ((m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA) - base_manafrom_int)*m_spellInfo->ManaCostPercentage)/100;
 		else
 			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/100;
 	}
@@ -2018,7 +2023,14 @@ bool Spell::HasPower()
 	}
 
 	if(m_spellInfo->powerType==POWER_TYPE_HEALTH)
-		cost -= m_spellInfo->baseLevel;//FIX for life tap	
+	{
+		// For Life Tap don't do repeat damage process
+		if (m_spellInfo->NameHash == 0x0807C866) return true;
+
+		// The caster doesnt have enough health to use this spell...stop casting
+		if (u_caster->GetUInt32Value(UNIT_FIELD_HEALTH) <= (uint32)cost) 
+			return false;
+	}
 	else if(u_caster)
 	{
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
@@ -2105,8 +2117,12 @@ bool Spell::TakePower()
 	int32 cost;
 	if(m_spellInfo->ManaCostPercentage)//Percentage spells cost % of !!!BASE!!! mana
 	{
+		uint32 base_manafrom_int = 0;
+		if(p_caster)
+			base_manafrom_int = p_caster->GetBaseManaFromInt();
+
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/100;
+			cost = ((m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA) - base_manafrom_int)*m_spellInfo->ManaCostPercentage)/100;
 		else
 			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/100;
 	}
@@ -2116,7 +2132,14 @@ bool Spell::TakePower()
 	}
 	
 	if(m_spellInfo->powerType==POWER_TYPE_HEALTH)
-			cost -= m_spellInfo->baseLevel;//FIX for life tap	
+	{
+		// For Life Tap don't do repeat damage process
+		if (m_spellInfo->NameHash == 0x0807C866) return true;
+
+		// The caster doesnt have enough health to use this spell...stop casting
+		if (u_caster->GetUInt32Value(UNIT_FIELD_HEALTH) <= (uint32)cost) 
+			return false;
+	}
 	else if(u_caster)
 	{
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
@@ -3535,7 +3558,10 @@ void Spell::Heal(int32 amount)
 			healdoneaffectperc *= downrank1 * downrank2;
 		}
 
-		amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
+		if(!m_spellInfo->dmg_bonus)
+			amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
+		else
+			amount += float2int32((u_caster->HealDoneMod[m_spellInfo->School]*m_spellInfo->dmg_bonus)/100);
 		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
 		amount += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
 		amount += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);

@@ -1876,6 +1876,37 @@ void ObjectMgr::LoadSpellFixes()
 	} while(result->NextRow());
 	delete result;
 	Log.Notice("ObjectMgr", "%u spell fixes loaded.", fixed_count);
+
+/*##########################################################################################*/
+
+	// Loads data from spell_data_extra table
+	result = WorldDatabase.Query("SELECT * FROM spell_data_extra");
+	if(result == 0) return;
+
+	uint32 override_count = 0;
+	do
+	{
+		Field * fields = result->Fetch();
+		uint32 spell_id = fields[0].GetUInt32();
+		SpellEntry * sp = dbcSpell.LookupEntry(spell_id);
+		if(sp == 0) 
+			continue;
+
+		if (fields[1].GetUInt32() != NULL)
+			sp->dmg_bonus = fields[1].GetUInt32();
+		else
+			sp->dmg_bonus = 0;
+			
+		if(fields[2].GetUInt32() != NULL)
+			sp->proc_interval = fields[2].GetUInt32();
+		else
+			sp->proc_interval = 0;
+
+		override_count++;
+	} while (result->NextRow());
+
+	delete result;
+	Log.Notice("ObjectMgr", "%u spell data extra loaded.", override_count);
 }
 
 void ObjectMgr::LoadSpellOverride()
@@ -2503,8 +2534,12 @@ bool ObjectMgr::HandleInstanceReputationModifiers(Player * pPlayer, Unit * pVict
 			replimit = i->mob_rep_reward;
 		}
 
-		if(!value || (replimit && pPlayer->GetStanding(i->faction[team]) >= replimit))
+		if(!value)
 			continue;
+
+		if (pPlayer->iInstanceType != MODE_HEROIC)
+			if(replimit && pPlayer->GetStanding(i->faction[team]) >= replimit)
+				continue;
 
 		//value *= sWorld.getRate(RATE_KILLREPUTATION);
 		value = float2int32(float(value) * sWorld.getRate(RATE_KILLREPUTATION));

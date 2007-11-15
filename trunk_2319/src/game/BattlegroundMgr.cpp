@@ -252,6 +252,7 @@ void CBattlegroundManager::EventQueueUpdate()
 						tempPlayerVec[0].pop_front();
 						arena->AddPlayer(plr, team);
 						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
+						team = arena->GetFreeTeam();
 					}
 				}
 				else
@@ -385,15 +386,14 @@ void CBattlegroundManager::EventQueueUpdate()
 
 			Arena * ar = ((Arena*)CreateInstance(i,LEVEL_GROUP_70));
 			GroupMembersSet::iterator itx;
-			int32 team;
 			ar->rated_match=true;
 
 			for(itx = group1->GetSubGroup(0)->GetGroupMembersBegin(); itx != group1->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
 			{
 				if(itx->player)
 				{
-					if( (team = ar->GetFreeTeam()) != -1 )
-                        ar->AddPlayer(itx->player, team);
+					if(ar->HasFreeSlots(0))
+                        ar->AddPlayer(itx->player, 0);
 				}
 			}
 
@@ -401,8 +401,8 @@ void CBattlegroundManager::EventQueueUpdate()
 			{
 				if(itx->player)
 				{
-					if( (team = ar->GetFreeTeam()) != -1 )
-						ar->AddPlayer(itx->player, team);
+					if(ar->HasFreeSlots(1))
+						ar->AddPlayer(itx->player, 1);
 				}
 			}
 		}
@@ -683,6 +683,8 @@ void CBattleground::AddPlayer(Player * plr, uint32 team)
 {
 	m_mainLock.Acquire();
 
+	plr->m_bgTeam = team;
+
 	/* This is called when the player is added, not when they port. So, they're essentially still queued, but not inside the bg yet */
 	m_pendPlayers[team].insert(plr->GetGUIDLow());
 
@@ -796,7 +798,7 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 		/* arenas follow a different procedure. */
 		static const uint32 arena_map_ids[3] = { 559, 562, 572 };
 		uint32 mapid = arena_map_ids[sRand.randInt(2)];
-		mapid=562;
+		//mapid=562;
 		uint32 players_per_side;
 		mgr = sInstanceMgr.CreateBattlegroundInstance(mapid);
 		if(mgr == NULL)
@@ -990,7 +992,7 @@ void CBattlegroundManager::SendBattlefieldStatus(Player * plr, uint32 Status, ui
 			data << uint8(0xC);
 			data << uint32(6);
 			data << uint16(0x1F90);
-			data << uint32(11);
+			data << InstanceID;
 			data << uint8(RatedMatch);		// 1 = rated match
 		}
 		else

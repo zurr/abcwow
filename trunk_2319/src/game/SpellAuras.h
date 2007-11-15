@@ -304,7 +304,7 @@ struct ProcTriggerSpell
 //    SpellEntry *ospinfo;
 //    SpellEntry *spinfo;
     uint32 LastTrigger;
-	uint32 ProcType; //0=talents/spells 1=weapon 2=armor  TODO: implement.
+	uint32 ProcType; //0=talents/spells 1=weapon 2=armor
     bool deleted;
 };
 

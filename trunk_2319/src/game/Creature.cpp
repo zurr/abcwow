@@ -840,7 +840,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		ModUInt32Value(UNIT_FIELD_LEVEL, info->lvl_mod_a);
 
 	for(uint32 i = 0; i < 7; ++i)
-		SetUInt32Value(UNIT_FIELD_RESISTANCES+i,proto->Resistances[i]);
+		SetUInt32Value(UNIT_FIELD_RESISTANCES+i,(mode ? (uint32)(proto->Resistances[i]*1.5f)  : proto->Resistances[i]));
 
 	SetUInt32Value(UNIT_FIELD_BASEATTACKTIME,proto->AttackTime);
 	SetFloatValue(UNIT_FIELD_MINDAMAGE, (mode ? proto->MinDamage * 1.5f  : proto->MinDamage));
