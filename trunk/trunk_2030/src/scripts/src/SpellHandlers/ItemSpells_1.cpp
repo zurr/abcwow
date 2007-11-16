@@ -48,7 +48,7 @@ bool NoggenFoggerElixr(uint32 i, Spell * pSpell)
 {
 	if(!pSpell->p_caster) return true;
 
-	uint32 chance = sRand.randInt(3);
+	uint32 chance = sRand.randInt(2);
 
 	switch(chance)
 	{
