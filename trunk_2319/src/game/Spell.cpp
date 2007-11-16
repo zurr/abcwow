@@ -2920,6 +2920,11 @@ uint8 Spell::CanCast(bool rangetolerate)
 
 	if(i_caster) // if the caster is an item
 	{
+		if( i_caster->GetProto()->ZoneNameID && i_caster->GetProto()->ZoneNameID != i_caster->GetZoneId() ) 
+			return SPELL_FAILED_NOT_HERE;
+		if( i_caster->GetProto()->MapID && i_caster->GetProto()->MapID != i_caster->GetMapId() )
+			return SPELL_FAILED_NOT_HERE;
+
 		// *** ITEM CHARGES CHECK - Partha ***
 		if( i_caster->GetProto()->Spells[0].Charges != 0 && ((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) == 0 )
 			return SPELL_FAILED_NO_CHARGES_REMAIN; // Item has no charges left
