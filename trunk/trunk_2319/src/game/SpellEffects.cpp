@@ -1414,6 +1414,7 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			item_count = damage;
 
 		//conjure water ranks 7,8 & 9 and conjure food ranks 7 & 8 have different starting amounts
+		// tailoring specializations get +1 cloth bonus
 		switch(m_spellInfo->Id)
 		{
 		case 27389: //Conjure Food 7
@@ -1421,6 +1422,37 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 		case 37420: //Conjure Water 8
 			item_count += 8;
 			break;
+		case 36686: //Shadowcloth
+			if(p_caster->HasSpell(26801)) item_count++;
+			break;
+		case 26751: // Primal Mooncloth
+			if(p_caster->HasSpell(26798)) item_count++;
+			break;
+		case 31373: //Spellcloth
+			if(p_caster->HasSpell(26797)) item_count++;
+			break;
+		}
+		
+		if (skill && skill->skilline == SKILL_ALCHEMY)
+		{
+			//Potion Master
+			if (strstr(m_itemProto->Name1, "Potion"))
+			{
+				if(p_caster->HasSpell(28675)) 
+					while (Rand(20)) item_count++;
+			}
+			//Elixir Master
+			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
+			{
+				if(p_caster->HasSpell(28677)) 
+					while (Rand(20)) item_count++;
+			}
+			//Transmutation Master
+			if (m_spellInfo->Category == 310)
+			{
+				if(p_caster->HasSpell(28675)) 
+					while (Rand(20)) item_count++;
+			}
 		}
 
 		// item count cannot be more than allowed in a single stack
@@ -2179,6 +2211,76 @@ void Spell::SpellEffectLearnSpell(uint32 i) // Learn Spell
 		playerTarget->addSpell(spellToLearn);
 		//smth is wrong here, first we add this spell to player then we may cast it on player...
 		SpellEntry *spellinfo = dbcSpell.LookupEntry(spellToLearn);
+		//remove specializations
+		switch(m_spellInfo->Id)
+		{
+		case 36686: //Shadoweave Tailoring
+			playerTarget->removeSpellByHashName(0x7EC043B5); //Mooncloth Tailoring
+			playerTarget->removeSpellByHashName(0x965C425F); //Spellfire Tailoring
+			break;
+		case 26751: // Mooncloth Tailoring
+			playerTarget->removeSpellByHashName(0xA397B3A4); //Shadoweave Tailoring
+			playerTarget->removeSpellByHashName(0x965C425F); //Spellfire Tailoring
+			break;
+		case 31373: //Spellfire Tailoring
+			playerTarget->removeSpellByHashName(0xA397B3A4); //Shadoweave Tailoring
+			playerTarget->removeSpellByHashName(0x7EC043B5); //Mooncloth Tailoring
+			break;
+		case 10656: //Dragonscale Leatherworking
+			playerTarget->removeSpellByHashName(0xBF148FEB); //Elemental Leatherworking
+			playerTarget->removeSpellByHashName(0x721EE443); //Tribal Leatherworking
+			break;
+		case 10658: //Elemental Leatherworking
+			playerTarget->removeSpellByHashName(0xC9FBEBA1); //Dragonscale Leatherworking
+			playerTarget->removeSpellByHashName(0x721EE443); //Tribal Leatherworking
+			break;
+		case 10660: //Tribal Leatherworking
+			playerTarget->removeSpellByHashName(0xC9FBEBA1); //Dragonscale Leatherworking
+			playerTarget->removeSpellByHashName(0xBF148FEB); //Elemental Leatherworking
+			break;
+		case 28677: //Elixir Master
+			playerTarget->removeSpellByHashName(0x222408E0); //Potion Master
+			playerTarget->removeSpellByHashName(0x33718135); //Transmutation Maste
+			break;
+		case 28675: //Potion Master
+			playerTarget->removeSpellByHashName(0x0992F12D); //Elixir Master
+			playerTarget->removeSpellByHashName(0x33718135); //Transmutation Maste
+			break;
+		case 28672: //Transmutation Master
+			playerTarget->removeSpellByHashName(0x222408E0); //Potion Master
+			playerTarget->removeSpellByHashName(0x0992F12D); //Elixir Master
+			break;
+		case 20219: //Gnomish Engineer
+			playerTarget->removeSpellByHashName(0xA641C81F); //Goblin Engineer
+			break;
+		case 20222: //Goblin Engineer
+			playerTarget->removeSpellByHashName(0x75E5A14C); //Gnomish Engineer
+			break;
+		case 9788: //Armorsmith
+			playerTarget->removeSpellByHashName(0xF6014134); //Weaponsmith
+			playerTarget->removeSpellByHashName(0x7EB81272); //Master Swordsmith
+			playerTarget->removeSpellByHashName(0x1E06F392); //Master Hammersmith
+			playerTarget->removeSpellByHashName(0x0C10F2B3); //Master Axesmith
+			break;
+		case 9787: //Weaponsmith
+			playerTarget->removeSpellByHashName(0xE7D5B297); //Armorsmith
+			break;
+		case 17041: //Master Axesmith
+			playerTarget->removeSpellByHashName(0xE7D5B297); //Armorsmith
+			playerTarget->removeSpellByHashName(0x1E06F392); //Master Hammersmith
+			playerTarget->removeSpellByHashName(0x7EB81272); //Master Swordsmith
+			break;
+		case 17040: //Master Hammersmith
+			playerTarget->removeSpellByHashName(0xE7D5B297); //Armorsmith
+			playerTarget->removeSpellByHashName(0x7EB81272); //Master Swordsmith
+			playerTarget->removeSpellByHashName(0x0C10F2B3); //Master Axesmith
+			break;
+		case 17039: //Master Swordsmith
+			playerTarget->removeSpellByHashName(0xE7D5B297); //Armorsmith
+			playerTarget->removeSpellByHashName(0x1E06F392); //Master Hammersmith
+			playerTarget->removeSpellByHashName(0x0C10F2B3); //Master Axesmith
+			break;
+		}
 		for(uint32 i=0;i<3;i++)
 			if(spellinfo->Effect[i] == SPELL_EFFECT_WEAPON ||
 			   spellinfo->Effect[i] == SPELL_EFFECT_PROFICIENCY ||
