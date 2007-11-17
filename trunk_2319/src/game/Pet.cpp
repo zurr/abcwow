@@ -53,7 +53,24 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 		/* HunterPet Spells													 */
 		/************************************************************************/
 
-	case 0x7AEB7BEE:		// Claw
+	case 0x0090493C:		// Bite
+	case 0xE30500A1:		// Charge
+ 	case 0x7AEB7BEE:		// Claw
+	case 0x8B2934EB:		// Cower
+	case 0x1A18AD22:		// Dash
+	case 0x17CD7462:		// Dive 
+	case 0x16B96B70:		// Fire Breath
+	case 0x90EAAD86:		// Furious Howl
+	case 0x6599623A:		// Gore
+	case 0x4C14A211:		// Growl
+	case 0x058B5215:		// Lightning Breath
+	case 0x6A92F3A0:		// Poison Spit 
+	case 0x9ED4E983:		// Prowl
+	case 0xC654D8FB:		// Scorpid Poison
+	case 0x5012E285:		// Screech
+	case 0xCC6FB810:		// Shell Shield
+	case 0x039C2632:		// Thunderstomp
+	case 0x52C3FC44:		// Warp 
 		return AUTOCAST_EVENT_ATTACK;
 		break;
 
@@ -1450,29 +1467,26 @@ HappinessState Pet::GetHappinessState()
 }
 void Pet::AddPetSpellToOwner(uint32 spellId)
 {
-	uint32 line = 0;
-	if (objmgr.GetSpellSkill(spellId))
-		line = objmgr.GetSpellSkill(spellId)->skilline;
 	//exit if owner hasn't Beast training ability (id 5149)
-	if(!m_Owner || !m_Owner->HasSpell(5149) || !line)
+	if(!m_Owner || !m_Owner->HasSpell(5149))
 		return;
 	//find appropriate teaching spell...
-/*	vector<TrainerSpell*>* lst = objmgr.GetTrainerPetSpellsForLine(line);
-	TrainerSpell * sp;
-	if(lst)
-		for(vector<TrainerSpell*>::iterator itr = lst->begin(); itr != lst->end(); ++itr)
+	uint32 TeachingSpellID = 0;
+	TeachingSpellID = sWorld.GetTeachingSpell(spellId);
+    if(TeachingSpellID)
+	{
+		if(m_Owner->HasSpell(TeachingSpellID))
+			return;
+		else
 		{
-			sp = *itr;
-			if(spellId==sp->SpellID)
-				if(m_Owner->HasSpell(sp->TeachingSpellID))
-					return;
-				else
-				{
-					//...and add it to pet owner to be able teach other pets
-					m_Owner->addSpell(sp->TeachingSpellID);
-					return;
-				}
-		}*/
+			//...and add it to pet owner to be able teach other pets
+			m_Owner->addSpell(TeachingSpellID);
+			return;
+		}
+	
+	}
+	else
+		sLog.outDebug("WORLD: Could not find teaching spell for spell %u", spellId);
 }
 uint32 Pet::GetHighestRankSpell(uint32 spellId)
 {	
