@@ -816,7 +816,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	//SetUInt32Value(UNIT_FIELD_MAXHEALTH, (mode ? long2int32(proto->Health * 1.5)  : proto->Health));
 	uint32 health = proto->MinHealth + sRand.randInt(proto->MaxHealth - proto->MinHealth);
 	if(mode)
-		health = long2int32(double(health) * 1.5);
+		health = long2int32(double(health) * 2.0f);
 	SetUInt32Value(UNIT_FIELD_HEALTH, health);
 	SetUInt32Value(UNIT_FIELD_MAXHEALTH, health);
 	SetUInt32Value(UNIT_FIELD_BASE_HEALTH, health);
@@ -843,8 +843,8 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		SetUInt32Value(UNIT_FIELD_RESISTANCES+i,(mode ? (uint32)(proto->Resistances[i]*1.5f)  : proto->Resistances[i]));
 
 	SetUInt32Value(UNIT_FIELD_BASEATTACKTIME,proto->AttackTime);
-	SetFloatValue(UNIT_FIELD_MINDAMAGE, (mode ? proto->MinDamage * 1.5f  : proto->MinDamage));
-	SetFloatValue(UNIT_FIELD_MAXDAMAGE, (mode ? proto->MaxDamage * 1.5f  : proto->MaxDamage));
+	SetFloatValue(UNIT_FIELD_MINDAMAGE, (mode ? proto->MinDamage * 2.0f  : proto->MinDamage));
+	SetFloatValue(UNIT_FIELD_MAXDAMAGE, (mode ? proto->MaxDamage * 2.0f  : proto->MaxDamage));
 
 	SetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,proto->RangedAttackTime);
 	SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE,proto->RangedMinDamage);
