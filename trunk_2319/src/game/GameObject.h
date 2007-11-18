@@ -225,8 +225,13 @@ public:
 	void OnRemoveInRangeObject(Object* pObj);
 	void RemoveFromWorld(bool free_guid);
 
-	inline bool CanMine(){return mines_remaining != 1 && mines_remaining > 0;}
+	inline bool CanMine(){return (mines_remaining > 0);}
 	inline void UseMine(){ if(mines_remaining) mines_remaining--;}
+	void CalcMineRemaining(bool force)
+	{
+		if(force || !mines_remaining)
+			mines_remaining = GetInfo()->sound3 + sRand.randInt(GetInfo()->sound5 - GetInfo()->sound4) - 1;
+	}
     bool HasLoot();
 	MapCell * m_respawnCell;
 
