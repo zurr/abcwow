@@ -1440,30 +1440,72 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 	if(!itemguid) 
 	{
 		for (int8 i = 0; i < EQUIPMENT_SLOT_END; i++)
-			  if(_player->GetItemInterface()->GetInventoryItem(i))
+        {
+			if(_player->GetItemInterface()->GetInventoryItem(i))
 			{
-				// maxdurability - currentdurability
-				// it its 0 no durabiliti needs to be set
 				uint32 dDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurabilityMax() - _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
 				if (dDurability)
 				{
-					// the amount of durability that is needed to be added is the amount of money to be payed
-					if (dDurability <= _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
-					{
-						int32 cDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
-					   _player->ModUInt32Value( PLAYER_FIELD_COINAGE , -(int32)dDurability );
-					   _player->GetItemInterface()->GetInventoryItem(i)->SetDurabilityToMax();
-					   _player->GetItemInterface()->GetInventoryItem(i)->m_isDirty = true;
+                    ItemPrototype * ip = ItemPrototypeStorage.LookupEntry(_player->GetItemInterface()->GetInventoryItem(i)->GetEntry());
+                    if(!ip)
+                    {
+                        sLog.outError("Repair: Unknown item entry (%u)", ip);
+                        return;
+                    }
+
+                    DurabilityCostsEntry * dcosts = dbcDurabilityCosts.LookupEntry(ip->ItemLevel);
+                    if(!dcosts)
+                    {
+                        sLog.outError("Repair: Unknown item level (%u)", dcosts);
+                        return;
+                    }
+
+                    DurabilityQualityEntry * dquality = dbcDurabilityQuality.LookupEntry((ip->Quality+1)*2);
+                    if(!dquality)
+                    {
+                        sLog.outError("Repair: Unknown item quality (%u)", dquality);
+                        return;
+                    }
+                    
+                    uint32 dmodifier = dcosts->modifier[ItemClassToDModifierId(ip->Class, ip->SubClass)];
+                    uint32 costs = uint32(dDurability * dmodifier * double(dquality->quality_modifier));
+             
+                    //Reputation discount
+                    Creature *unit = _player->GetMapMgr()->GetCreature((uint32)npcguid);
+                    if(unit)
+                    {
+                        FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(unit->proto->Faction);
+                        switch(_player->GetStanding(factdbc->Faction))
+                        {
+                            case FRIENDLY:
+                                costs = float2int32(float(costs*0.95f));
+                                break;
+                            case HONORED:
+                                costs = float2int32(float(costs*0.9f));
+                                break;
+                            case REVERED:
+                                costs = float2int32(float(costs*0.85f));
+                                break;
+                            case EXALTED:
+                                costs = float2int32(float(costs*0.8f));
+                                break;
+                        }
+                    }     
+
+                    if(costs > _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
+                        return;
+
+                    _player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)costs);
+
+                    int32 cDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
+					_player->GetItemInterface()->GetInventoryItem(i)->SetDurabilityToMax();
+					_player->GetItemInterface()->GetInventoryItem(i)->m_isDirty = true;
 			
-						if (cDurability <= 0)
-						   _player->ApplyItemMods(_player->GetItemInterface()->GetInventoryItem(i), i, true);
-					}
-					else
-					{
-						// not enough money
-					}
-				}
-			}
+					if (cDurability <= 0)
+					    _player->ApplyItemMods(_player->GetItemInterface()->GetInventoryItem(i), i, true);
+                }
+            }
+		}
 	}
 	else 
 	{
@@ -1475,23 +1517,63 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 
 			if (dDurability)
 			{
-				// the amount of durability that is needed to be added is the amount of money to be payed
-				if (dDurability <= _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
-				{
-					int32 cDurability = item->GetDurability();
-					_player->ModUInt32Value( PLAYER_FIELD_COINAGE , -(int32)dDurability );
-					item->SetDurabilityToMax();
-					item->m_isDirty = true;
-					
-					//only apply item mods if they are on char equiped
-	//printf("we are fixing a single item in inventory at bagslot %u and slot %u\n",searchres->ContainerSlot,searchres->Slot);
-					if(cDurability <= 0 && searchres->ContainerSlot==INVALID_BACKPACK_SLOT && searchres->Slot<INVENTORY_SLOT_BAG_END)
-						_player->ApplyItemMods(item, searchres->Slot, true);
-				}
-				else
-				{
-					// not enough money
-				}
+                ItemPrototype * ip = ItemPrototypeStorage.LookupEntry(item->GetEntry());
+                if(!ip)
+                {
+                    sLog.outError("Repair: Unknown item entry (%u)", ip);
+                    return;
+                }
+
+                DurabilityCostsEntry * dcosts = dbcDurabilityCosts.LookupEntry(ip->ItemLevel);
+                if(!dcosts)
+                {
+                    sLog.outError("Repair: Unknown item level (%u)", dcosts);
+                    return;
+                }
+
+                DurabilityQualityEntry * dquality = dbcDurabilityQuality.LookupEntry((ip->Quality+1)*2);
+                if(!dquality)
+                {
+                    sLog.outError("Repair: Unknown item quality (%u)", dquality);
+                    return;
+                }
+                
+                uint32 dmodifier = dcosts->modifier[ItemClassToDModifierId(ip->Class, ip->SubClass)];
+                uint32 costs = uint32(dDurability * dmodifier * double(dquality->quality_modifier));
+                
+                //Reputation discount
+                Creature *unit = _player->GetMapMgr()->GetCreature((uint32)npcguid);
+                if(unit)
+                {
+                    FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(unit->proto->Faction);
+                    switch(_player->GetStanding(factdbc->Faction))
+                    {
+                        case FRIENDLY:
+                            costs = float2int32(float(costs*0.95f));
+                            break;
+                        case HONORED:
+                            costs = float2int32(float(costs*0.9f));
+                            break;
+                        case REVERED:
+                            costs = float2int32(float(costs*0.85f));
+                            break;
+                        case EXALTED:
+                            costs = float2int32(float(costs*0.8f));
+                            break;
+                    }
+                }
+
+                if(costs > _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
+                    return;
+
+                _player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)costs);
+
+                int32 cDurability = item->GetDurability();
+				item->SetDurabilityToMax();
+				item->m_isDirty = true;
+		
+                if (cDurability <= 0 && searchres->ContainerSlot == INVALID_BACKPACK_SLOT && searchres->Slot < INVENTORY_SLOT_BAG_END)
+                    _player->ApplyItemMods(item, searchres->Slot, true);
 			}
 		}
 	}

@@ -560,6 +560,16 @@ struct ItemPrototype
 	GossipScript * gossip_script;
 };
 
+inline uint8 ItemClassToDModifierId(uint32 ItemClass, uint32 ItemSubClass)
+{
+	switch(ItemClass)
+	{
+		case ITEM_CLASS_WEAPON: return ItemSubClass;
+		case ITEM_CLASS_ARMOR:  return ItemSubClass + 21;
+	}
+	return 0;
+}
+
 typedef struct {
 	uint32 setid;
 	uint32 itemscount;
