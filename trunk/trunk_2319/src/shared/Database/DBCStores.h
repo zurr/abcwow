@@ -534,6 +534,18 @@ struct FactionDBC
     //uint32 shit2[16];
 };
 
+struct DurabilityQualityEntry
+{
+    uint32    Id;
+    float     quality_modifier;
+};
+
+struct DurabilityCostsEntry
+{
+    uint32    Itemlvl;
+    uint32    modifier[29];
+};
+
 struct DBCTaxiNode
 {
     uint32 id;
@@ -1082,6 +1094,8 @@ extern SERVER_DECL DBCStorage<SpellRadius> dbcSpellRadius;
 extern SERVER_DECL DBCStorage<SpellCastTime> dbcSpellCastTime;
 extern SERVER_DECL DBCStorage<AreaTable> dbcArea;
 extern SERVER_DECL DBCStorage<FactionTemplateDBC> dbcFactionTemplate;
+extern SERVER_DECL DBCStorage<DurabilityQualityEntry> dbcDurabilityQuality;
+extern SERVER_DECL DBCStorage<DurabilityCostsEntry> dbcDurabilityCosts;
 extern SERVER_DECL DBCStorage<FactionDBC> dbcFaction;
 extern SERVER_DECL DBCStorage<EnchantEntry> dbcEnchant;
 extern SERVER_DECL DBCStorage<RandomProps> dbcRandomProps;
