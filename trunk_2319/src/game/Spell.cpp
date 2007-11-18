@@ -3685,7 +3685,7 @@ void Spell::DetermineSkillUp(uint32 skillid)
 	skilllinespell* skill = objmgr.GetSpellSkill(m_spellInfo->Id);
 	if ((skill) && ((Player*)m_caster)->_HasSkillLine(skill->skilline))
 	{
-		uint32 amt = ((Player*)m_caster)->_GetSkillLineCurrent(skill->skilline);
+		uint32 amt = ((Player*)m_caster)->_GetSkillLineCurrent(skill->skilline, false);
 		uint32 max = ((Player*)m_caster)->_GetSkillLineMax(skill->skilline);
 		if(amt >= max)
 			return;
