@@ -2008,12 +2008,8 @@ bool Spell::HasPower()
 	int32 cost;
 	if(m_spellInfo->ManaCostPercentage)//Percentage spells cost % of !!!BASE!!! mana
 	{
-		uint32 base_manafrom_int = 0;
-		if(p_caster)
-			base_manafrom_int = p_caster->GetBaseManaFromInt();
-
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
-			cost = ((m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA) - base_manafrom_int)*m_spellInfo->ManaCostPercentage)/100;
+			cost = ((m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA))*m_spellInfo->ManaCostPercentage)/100;
 		else
 			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/100;
 	}
@@ -2117,12 +2113,8 @@ bool Spell::TakePower()
 	int32 cost;
 	if(m_spellInfo->ManaCostPercentage)//Percentage spells cost % of !!!BASE!!! mana
 	{
-		uint32 base_manafrom_int = 0;
-		if(p_caster)
-			base_manafrom_int = p_caster->GetBaseManaFromInt();
-
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
-			cost = ((m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA) - base_manafrom_int)*m_spellInfo->ManaCostPercentage)/100;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/100;
 		else
 			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/100;
 	}

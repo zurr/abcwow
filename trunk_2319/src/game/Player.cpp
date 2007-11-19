@@ -86,7 +86,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 
 	m_healthfromspell	   = 0;
 	m_manafromspell		 = 0;
-	m_mana_from_base_int = 0;
 	m_healthfromitems	   = 0;
 	m_manafromitems		 = 0;
 
@@ -2922,12 +2921,6 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 
 #undef get_next_field
 
-	LevelInfo * Info = objmgr.GetLevelInfo(getRace(), getClass(), getLevel());
-	LevelInfo * InfoFirst = objmgr.GetLevelInfo(getRace(), getClass(), 1);
-
-	if(Info != 0 && InfoFirst != 0)
-		SetBaseManaFromInt((Info->Stat[3] - InfoFirst->Stat[3])*15);
-	
 	// load properties
 	_LoadTutorials(results[1].result);
 	_LoadItemCooldown(results[2].result);
