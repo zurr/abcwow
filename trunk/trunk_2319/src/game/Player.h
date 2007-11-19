@@ -1163,10 +1163,8 @@ public:
 	void SetHitFromSpell(float value) { m_hitfromspell = value; }
 	inline uint32 GetHealthFromSpell() { return m_healthfromspell; }
 	inline uint32 GetManaFromSpell() { return m_manafromspell; }
-	inline uint32 GetBaseManaFromInt() { return m_mana_from_base_int; }
 	void SetHealthFromSpell(uint32 value) { m_healthfromspell = value;}
 	void SetManaFromSpell(uint32 value) { m_manafromspell = value;}
-	void SetBaseManaFromInt(uint32 value) { m_mana_from_base_int = value;}
 	uint32 CalcTalentResetCost(uint32 resetnum);
 	void SendTalentResetConfirm();
 	uint32 GetTalentResetTimes() { return m_talentresettimes; }
@@ -1811,7 +1809,6 @@ protected:
 	//stats mods
 	uint32 m_healthfromspell;
 	uint32 m_manafromspell;
-	uint32 m_mana_from_base_int;
 	uint32 m_healthfromitems;
 	uint32 m_manafromitems;
 	
