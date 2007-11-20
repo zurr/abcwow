@@ -463,17 +463,8 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                                     }
                                     else
                                     {
-                                        uint32 DespawnTime = 0;
-
-			                            if(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()))
-				                            DespawnTime = 120000;	   // 5 min for quest GO,
-			                            else
-			                            {
-				                            DespawnTime = 900000;	   // 15 for else
-			                            }
-
 										pGO->CalcMineRemaining(true);
-			                            pGO->Despawn(DespawnTime);
+			                            pGO->Despawn(900000);
 										return;
                                     }
                                 }
