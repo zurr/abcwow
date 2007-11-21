@@ -796,7 +796,7 @@ bool ChatHandler::HandleDeleteWaypoints(const char* args, WorldSession * m_sessi
 		return true;
 	}
 	
-	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE creatureid=%u",cr->GetSQL_id());
+	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE `spawnid`=%u",cr->GetSQL_id());
 
 	cr->GetAIInterface()->deleteWaypoints();
 	SystemMessage(m_session, "Deleted waypoints for %u", cr->GetSQL_id());
