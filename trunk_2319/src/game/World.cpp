@@ -343,7 +343,7 @@ bool World::SetInitialWorldSettings()
 						{
 							printf(" replaced with %u (%s)\n", itr->first, sFactionStore.LookupString(d->Name));
 							sDatabase.WaitExecute("UPDATE creature_proto SET faction = %u WHERE entry = %u", e, itr->second);
-							sDatabase.WaitExecute("UPDATE creature_spawns SET factionid = %u WHERE entry = %u", e, itr->second);
+							sDatabase.WaitExecute("UPDATE creature_spawns SET `faction` = %u WHERE entry = %u", e, itr->second);
 							break;
 						}
 					}

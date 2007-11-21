@@ -48,7 +48,7 @@ void InstanceMgr::Load(TaskList * l)
 		m_InstanceHigh = 1;
 
 	// load each map we have in the database.
-	result = WorldDatabase.Query("SELECT DISTINCT Map FROM creature_spawns");
+	result = WorldDatabase.Query("SELECT DISTINCT `map` FROM creature_spawns");
 	if(result)
 	{
 		do 

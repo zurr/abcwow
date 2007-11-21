@@ -308,7 +308,7 @@ bool ChatHandler::HandleItemRemoveCommand(const char* args, WorldSession *m_sess
 		uint32 guidlow = GUID_LOPART(guid);
 
 		std::stringstream ss;
-		ss << "DELETE FROM vendors WHERE vendorGuid = " << guidlow << " AND itemGuid = " << itemguid << '\0';
+		ss << "DELETE FROM vendors WHERE `entry` = " << guidlow << " AND `item` = " << itemguid << '\0';
 		WorldDatabase.Execute( ss.str().c_str() );
 
 		pCreature->RemoveVendorItem(itemguid);
@@ -1064,7 +1064,7 @@ bool ChatHandler::HandleAddAIAgentCommand(const char* args, WorldSession *m_sess
 	}
 
 	std::stringstream qry;
-	qry << "INSERT INTO ai_agents set entryId = '" << target->GetUInt32Value(OBJECT_FIELD_ENTRY) << "', AI_AGENT = '" << atoi(agent) << "', procEvent = '" << atoi(procEvent)<< "', procChance = '" << atoi(procChance)<< "', procCount = '" << atoi(procCount)<< "', spellId = '" << atoi(spellId)<< "', spellType = '" << atoi(spellType)<< "', spelltargetType = '" << atoi(spelltargetType)<< "', spellCooldown = '" << atoi(spellCooldown)<< "', floatMisc1 = '" << atof(floatMisc1)<< "', Misc2  ='" << atoi(Misc2)<< "'";
+	qry << "INSERT INTO ai_agents set `entry` = '" << target->GetUInt32Value(OBJECT_FIELD_ENTRY) << "', `type` = '" << atoi(agent) << "', `event` = '" << atoi(procEvent)<< "', `chance` = '" << atoi(procChance)<< "', `maxcount` = '" << atoi(procCount)<< "', `spell` = '" << atoi(spellId)<< "', `spelltype` = '" << atoi(spellType)<< "', `targettype` = '" << atoi(spelltargetType)<< "', `cooldown` = '" << atoi(spellCooldown)<< "', floatMisc1 = '" << atof(floatMisc1)<< "', Misc2  ='" << atoi(Misc2)<< "'";
 	WorldDatabase.Execute( qry.str().c_str( ) );
 
 	AI_Spell * sp = new AI_Spell;
@@ -1112,7 +1112,7 @@ bool ChatHandler::HandleDelAIAgentCommand(const char* args, WorldSession *m_sess
 	}
 
 	std::stringstream qry;
-	qry << "DELETE FROM ai_agents where (entryId = '" << target->GetEntry() << "') AND (AI_AGENT = '" << atoi(agent) << "') AND (spellId = '" << atoi(spellId) << "')";
+	qry << "DELETE FROM ai_agents where (`entry` = '" << target->GetEntry() << "') AND (`type` = '" << atoi(agent) << "') AND (`spell` = '" << atoi(spellId) << "')";
 */
 	return true;
 }
@@ -1130,7 +1130,7 @@ bool ChatHandler::HandleListAIAgentCommand(const char* args, WorldSession *m_ses
 	sstext << "agentlist of creature: " << target->GetGUIDLow() << " " << target->GetGUIDHigh() << '\n';
 
 	std::stringstream ss;
-	ss << "SELECT * FROM ai_agents where entryId=" << target->GetUInt32Value(OBJECT_FIELD_ENTRY);
+	ss << "SELECT * FROM ai_agents where `entry`=" << target->GetUInt32Value(OBJECT_FIELD_ENTRY);
 	QueryResult *result = WorldDatabase.Query( ss.str().c_str() );
 
 	if( !result )
