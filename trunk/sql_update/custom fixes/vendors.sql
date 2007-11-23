@@ -1,0 +1,3 @@
+-- delete gems from stormspire and shatt vendors
+-- delete linen/wool/silk from silvermoon city vendor
+-- delete copper/silver/gold/tin ore from ghostlands vendor
