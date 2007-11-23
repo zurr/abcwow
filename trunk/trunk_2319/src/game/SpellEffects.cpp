@@ -1484,6 +1484,19 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			newItem->SetUInt64Value(ITEM_FIELD_CREATOR,m_caster->GetGUID());
 			newItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, item_count);
 
+			if (m_itemProto->RandomPropId)
+			{
+				RandomProps * iRandomProperty = lootmgr.GetRandomProperties(m_itemProto);
+				newItem->SetRandomProperty(iRandomProperty->ID);
+				newItem->ApplyRandomProperties(false);
+			}
+			if (m_itemProto->RandomSuffixId)
+			{
+				ItemRandomSuffixEntry * iRandomSuffix = lootmgr.GetRandomSuffix(m_itemProto);
+				newItem->SetRandomSuffix(iRandomSuffix->id);
+				newItem->ApplyRandomProperties(false);
+			}
+
 			if(p_caster->GetItemInterface()->SafeAddItem(newItem,slotresult.ContainerSlot, slotresult.Slot))
 			{
 				/*WorldPacket data(45);
