@@ -471,6 +471,23 @@ uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 count, uint32 vendorcount
 		}break;
 	}
 
+	FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(unit->proto->Faction);
+	switch(_player->GetStanding(factdbc->Faction))
+	{
+		case FRIENDLY:
+			cost = float2int32(float(cost*0.95f));
+			break;
+		case HONORED:
+			cost = float2int32(float(cost*0.9f));
+			break;
+		case REVERED:
+			cost = float2int32(float(cost*0.85f));
+			break;
+		case EXALTED:
+			cost = float2int32(float(cost*0.8f));
+			break;
+	}
+
 	return cost;
 }
 
