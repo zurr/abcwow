@@ -4453,6 +4453,13 @@ void Spell::SpellEffectEnchantHeldItem(uint32 i)
 	if(!item) return;
 
 	uint32 Duration = 1800; // Needs to be found in dbc.. I guess?
+	switch(m_spellInfo->NameHash)
+	{
+		case 0xABE1EE81: // Windfury Totem Effect
+		{   
+			Duration = 10;
+		}
+	}
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(m_spellInfo->EffectMiscValue[i]);
 	if(!Enchantment) return;
 
