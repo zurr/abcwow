@@ -372,9 +372,10 @@ void WorldSession::HandleMailDelete(WorldPacket & recv_data )
 
 		// deleted_flag prevents it from being shown in the mail list.
 		message->deleted_flag = 1;
+		message->read_flag = 1;
 
 		// update in sql
-		CharacterDatabase.WaitExecute("UPDATE mailbox SET deleted_flag = 1 WHERE message_id = %u", message_id);
+		CharacterDatabase.WaitExecute("UPDATE mailbox SET deleted_flag = 1, read_flag = 1 WHERE message_id = %u", message_id);
 	}
 	else
 	{
