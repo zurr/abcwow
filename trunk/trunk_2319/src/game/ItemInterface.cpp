@@ -1755,11 +1755,9 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount, uint32 seller_fa
 	{
 		int32 itemprice = GetBuyPriceForItem(item, amount, amount);
 
-		FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(seller_faction);
-		if(factdbc)
+		Standing standing = Player::GetReputationRankFromStanding(m_pOwner->GetStanding(seller_faction));
+		switch(standing - 1)
 		{
-			switch(m_pOwner->GetStanding(factdbc->Faction))
-			{
 			case FRIENDLY:
 				itemprice = float2int32(float(itemprice*0.95f));
 			break;
@@ -1772,7 +1770,6 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount, uint32 seller_fa
 			case EXALTED:
 				itemprice = float2int32(float(itemprice*0.8f));
 			break;
-			}
 		}
 
 		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice);
@@ -1829,10 +1826,8 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount, uint32 sell
 	{
 		int32 price = GetBuyPriceForItem(item, amount, amount);
 
-		FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(seller_faction);
-		if(factdbc)
-		{
-			switch(m_pOwner->GetStanding(factdbc->Faction))
+		Standing standing = Player::GetReputationRankFromStanding(m_pOwner->GetStanding(seller_faction));
+			switch(standing - 1)
 			{
 			case FRIENDLY:
 				price = float2int32(float(price*0.95f));
@@ -1847,7 +1842,6 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount, uint32 sell
 				price = float2int32(float(price*0.8f));
 				break;
 			}
-		}
 
 		if((int32)m_pOwner->GetUInt32Value(PLAYER_FIELD_COINAGE) < price)
 		{
