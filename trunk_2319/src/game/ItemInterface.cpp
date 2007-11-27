@@ -1749,11 +1749,32 @@ int8 ItemInterface::CanReceiveItem(ItemPrototype * item, uint32 amount)
 	return (int8)NULL;
 }
 
-void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount)
+void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount, uint32 seller_faction)
 {
 	if(item->BuyPrice)
 	{
 		int32 itemprice = GetBuyPriceForItem(item, amount, amount);
+
+		FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(seller_faction);
+		if(factdbc)
+		{
+			switch(m_pOwner->GetStanding(factdbc->Faction))
+			{
+			case FRIENDLY:
+				itemprice = float2int32(float(itemprice*0.95f));
+			break;
+			case HONORED:
+				itemprice = float2int32(float(itemprice*0.9f));
+			break;
+			case REVERED:
+				itemprice = float2int32(float(itemprice*0.85f));
+			break;
+			case EXALTED:
+				itemprice = float2int32(float(itemprice*0.8f));
+			break;
+			}
+		}
+
 		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice);
 	}
 	ItemExtendedCostEntry *ex = dbcItemExtendedCost.LookupEntry(item->ItemExtendedCost);
@@ -1782,7 +1803,7 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount)
 
 }
 
-int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount)
+int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount, uint32 seller_faction)
 {
 	if(item->ItemExtendedCost)
 	{
@@ -1807,6 +1828,27 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount)
 	if(item->BuyPrice)
 	{
 		int32 price = GetBuyPriceForItem(item, amount, amount);
+
+		FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(seller_faction);
+		if(factdbc)
+		{
+			switch(m_pOwner->GetStanding(factdbc->Faction))
+			{
+			case FRIENDLY:
+				price = float2int32(float(price*0.95f));
+				break;
+			case HONORED:
+				price = float2int32(float(price*0.9f));
+				break;
+			case REVERED:
+				price = float2int32(float(price*0.85f));
+				break;
+			case EXALTED:
+				price = float2int32(float(price*0.8f));
+				break;
+			}
+		}
+
 		if((int32)m_pOwner->GetUInt32Value(PLAYER_FIELD_COINAGE) < price)
 		{
 			return INV_ERR_NOT_ENOUGH_MONEY;
