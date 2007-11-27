@@ -882,7 +882,7 @@ public:
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(CAVE_IN);
-		spells[1].targettype = TARGET_DESTINATION;
+		spells[1].targettype = TARGET_RANDOMDESTINATION;
 		spells[1].instant = true;
 		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
@@ -1012,6 +1012,9 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOMDESTINATION:
+							target = RandomTarget();
+							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
 
 					if (spells[i].speech != "")
@@ -1033,6 +1036,23 @@ public:
 			}
         }
     }
+	Unit *RandomTarget()
+	{
+		uint32 targetsc = _unit->GetAIInterface()->getAITargetsCount();
+		if (targetsc > 0)
+		{
+			TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+			uint32 val;
+			val = (uint32) sRand.randInt(100)%targetsc;
+			TargetMap::iterator itr;
+			uint32 nr = 0;
+			for (itr = targets->begin(); nr < val;nr++)
+			{
+				itr++;
+			}
+			return itr->first;
+		}
+	}
 protected:
 
 	uint32 GrowthCooldown;
