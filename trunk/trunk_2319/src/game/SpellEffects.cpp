@@ -2225,73 +2225,73 @@ void Spell::SpellEffectLearnSpell(uint32 i) // Learn Spell
 		//smth is wrong here, first we add this spell to player then we may cast it on player...
 		SpellEntry *spellinfo = dbcSpell.LookupEntry(spellToLearn);
 		//remove specializations
-		switch(m_spellInfo->Id)
+		switch(spellinfo->Id)
 		{
-		case 36686: //Shadoweave Tailoring
-			playerTarget->removeSpellByHashName(0x7EC043B5); //Mooncloth Tailoring
-			playerTarget->removeSpellByHashName(0x965C425F); //Spellfire Tailoring
+		case 26801: //Shadoweave Tailoring
+			playerTarget->removeSpell(26798,false,false,0); //Mooncloth Tailoring
+			playerTarget->removeSpell(26797,false,false,0); //Spellfire Tailoring
 			break;
-		case 26751: // Mooncloth Tailoring
-			playerTarget->removeSpellByHashName(0xA397B3A4); //Shadoweave Tailoring
-			playerTarget->removeSpellByHashName(0x965C425F); //Spellfire Tailoring
+		case 26798: // Mooncloth Tailoring
+			playerTarget->removeSpell(26801,false,false,0); //Shadoweave Tailoring
+			playerTarget->removeSpell(26797,false,false,0); //Spellfire Tailoring
 			break;
-		case 31373: //Spellfire Tailoring
-			playerTarget->removeSpellByHashName(0xA397B3A4); //Shadoweave Tailoring
-			playerTarget->removeSpellByHashName(0x7EC043B5); //Mooncloth Tailoring
+		case 26797: //Spellfire Tailoring
+			playerTarget->removeSpell(26801,false,false,0); //Shadoweave Tailoring
+			playerTarget->removeSpell(26798,false,false,0); //Mooncloth Tailoring
 			break;
 		case 10656: //Dragonscale Leatherworking
-			playerTarget->removeSpellByHashName(0xBF148FEB); //Elemental Leatherworking
-			playerTarget->removeSpellByHashName(0x721EE443); //Tribal Leatherworking
+			playerTarget->removeSpell(10658,false,false,0); //Elemental Leatherworking
+			playerTarget->removeSpell(10660,false,false,0); //Tribal Leatherworking
 			break;
 		case 10658: //Elemental Leatherworking
-			playerTarget->removeSpellByHashName(0xC9FBEBA1); //Dragonscale Leatherworking
-			playerTarget->removeSpellByHashName(0x721EE443); //Tribal Leatherworking
+			playerTarget->removeSpell(10656,false,false,0); //Dragonscale Leatherworking
+			playerTarget->removeSpell(10660,false,false,0); //Tribal Leatherworking
 			break;
 		case 10660: //Tribal Leatherworking
-			playerTarget->removeSpellByHashName(0xC9FBEBA1); //Dragonscale Leatherworking
-			playerTarget->removeSpellByHashName(0xBF148FEB); //Elemental Leatherworking
+			playerTarget->removeSpell(10656,false,false,0); //Dragonscale Leatherworking
+			playerTarget->removeSpell(10658,false,false,0); //Elemental Leatherworking
 			break;
 		case 28677: //Elixir Master
-			playerTarget->removeSpellByHashName(0x222408E0); //Potion Master
-			playerTarget->removeSpellByHashName(0x33718135); //Transmutation Maste
+			playerTarget->removeSpell(28675,false,false,0); //Potion Master
+			playerTarget->removeSpell(28672,false,false,0); //Transmutation Maste
 			break;
 		case 28675: //Potion Master
-			playerTarget->removeSpellByHashName(0x0992F12D); //Elixir Master
-			playerTarget->removeSpellByHashName(0x33718135); //Transmutation Maste
+			playerTarget->removeSpell(28677,false,false,0); //Elixir Master
+			playerTarget->removeSpell(28672,false,false,0); //Transmutation Maste
 			break;
 		case 28672: //Transmutation Master
-			playerTarget->removeSpellByHashName(0x222408E0); //Potion Master
-			playerTarget->removeSpellByHashName(0x0992F12D); //Elixir Master
+			playerTarget->removeSpell(28675,false,false,0); //Potion Master
+			playerTarget->removeSpell(28677,false,false,0); //Elixir Master
 			break;
 		case 20219: //Gnomish Engineer
-			playerTarget->removeSpellByHashName(0xA641C81F); //Goblin Engineer
+			playerTarget->removeSpell(20222,false,false,0); //Goblin Engineer
 			break;
 		case 20222: //Goblin Engineer
-			playerTarget->removeSpellByHashName(0x75E5A14C); //Gnomish Engineer
+			playerTarget->removeSpell(20219,false,false,0); //Gnomish Engineer
 			break;
 		case 9788: //Armorsmith
-			playerTarget->removeSpellByHashName(0xF6014134); //Weaponsmith
-			playerTarget->removeSpellByHashName(0x7EB81272); //Master Swordsmith
-			playerTarget->removeSpellByHashName(0x1E06F392); //Master Hammersmith
-			playerTarget->removeSpellByHashName(0x0C10F2B3); //Master Axesmith
+			playerTarget->removeSpell(9787,false,false,0); //Weaponsmith
+			playerTarget->removeSpell(17039,false,false,0); //Master Swordsmith
+			playerTarget->removeSpell(17040,false,false,0); //Master Hammersmith
+			playerTarget->removeSpell(17041,false,false,0); //Master Axesmith
 			break;
 		case 9787: //Weaponsmith
-			playerTarget->removeSpellByHashName(0xE7D5B297); //Armorsmith
+			playerTarget->removeSpell(9788,false,false,0); //Armorsmith
 			break;
 		case 17041: //Master Axesmith
-			playerTarget->removeSpellByHashName(0xE7D5B297); //Armorsmith
-			playerTarget->removeSpellByHashName(0x1E06F392); //Master Hammersmith
-			playerTarget->removeSpellByHashName(0x7EB81272); //Master Swordsmith
+			playerTarget->removeSpell(9788,false,false,0); //Armorsmith
+			playerTarget->removeSpell(17040,false,false,0); //Master Hammersmith
+			playerTarget->removeSpell(17039,false,false,0); //Master Swordsmith
 			break;
 		case 17040: //Master Hammersmith
-			playerTarget->removeSpellByHashName(0xE7D5B297); //Armorsmith
-			playerTarget->removeSpellByHashName(0x7EB81272); //Master Swordsmith
-			playerTarget->removeSpellByHashName(0x0C10F2B3); //Master Axesmith
+			playerTarget->removeSpell(9788,false,false,0); //Armorsmith
+			playerTarget->removeSpell(17039,false,false,0); //Master Swordsmith
+			playerTarget->removeSpell(17041,false,false,0); //Master Axesmith
 			break;
 		case 17039: //Master Swordsmith
-			playerTarget->removeSpellByHashName(0xE7D5B297); //Armorsmith
-			playerTarget->removeSpellByHashName(0x1E06F392); //Master Hammersmith
-			playerTarget->removeSpellByHashName(0x0C10F2B3); //Master Axesmith
+			playerTarget->removeSpell(9788,false,false,0); //Armorsmith
+			playerTarget->removeSpell(17040,false,false,0); //Master Hammersmith
+			playerTarget->removeSpell(17041,false,false,0); //Master Axesmith
 			break;
 		}
 		for(uint32 i=0;i<3;i++)
