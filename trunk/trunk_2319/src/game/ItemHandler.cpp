@@ -1279,7 +1279,7 @@ void WorldSession::SendInventoryList(Creature* unit)
 
 				uint32 price = GetBuyPriceForItem(curItem, abs(itr->amount), abs(itr->amount));
 				Standing standing = Player::GetReputationRankFromStanding(_player->GetStanding(unit->m_faction->Faction));
-				switch(standing - 1)
+				switch(standing)
 				{
 					case FRIENDLY:
 						price = float2int32(float(price*0.95f));
@@ -1493,7 +1493,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
                     if(unit)
                     {
 						Standing standing = Player::GetReputationRankFromStanding(_player->GetStanding(unit->m_faction->Faction));
-						switch(standing - 1)
+						switch(standing)
 						{
 							case FRIENDLY:
 								costs = float2int32(float(costs*0.95f));
@@ -1564,7 +1564,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
                 if(unit)
                 {
 					Standing standing = Player::GetReputationRankFromStanding(_player->GetStanding(unit->m_faction->Faction));
-						switch(standing - 1)
+						switch(standing)
 						{
 							case FRIENDLY:
 								costs = float2int32(float(costs*0.95f));
