@@ -1756,7 +1756,7 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount, uint32 seller_fa
 		int32 itemprice = GetBuyPriceForItem(item, amount, amount);
 
 		Standing standing = Player::GetReputationRankFromStanding(m_pOwner->GetStanding(seller_faction));
-		switch(standing - 1)
+		switch(standing)
 		{
 			case FRIENDLY:
 				itemprice = float2int32(float(itemprice*0.95f));
@@ -1827,7 +1827,7 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount, uint32 sell
 		int32 price = GetBuyPriceForItem(item, amount, amount);
 
 		Standing standing = Player::GetReputationRankFromStanding(m_pOwner->GetStanding(seller_faction));
-			switch(standing - 1)
+			switch(standing)
 			{
 			case FRIENDLY:
 				price = float2int32(float(price*0.95f));
