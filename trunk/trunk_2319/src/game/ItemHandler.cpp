@@ -1012,7 +1012,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		return;
 	}
 
-	if((error = _player->GetItemInterface()->CanAffordItem(it,amount*itemd.amount)))
+	if((error = _player->GetItemInterface()->CanAffordItem(it,amount*itemd.amount,unit->proto->Faction)))
 	{
 		SendBuyFailed(srcguid, itemd.itemid, error);
 		return;
@@ -1098,7 +1098,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		SendPacket(&data);*/
 	}
 
-	_player->GetItemInterface()->BuyItem(it,amount*itemd.amount);
+	_player->GetItemInterface()->BuyItem(it,amount*itemd.amount,unit->proto->Faction);
 
 	WorldPacket data(SMSG_BUY_ITEM, 12);
 	data << uint64(srcguid);
@@ -1161,7 +1161,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 		return;
 	}
 
-   if((error = _player->GetItemInterface()->CanAffordItem(it,amount*item.amount)))
+   if((error = _player->GetItemInterface()->CanAffordItem(it,amount*item.amount,unit->proto->Faction)))
    {
       SendBuyFailed(srcguid, itemid, error);
       return;
@@ -1225,7 +1225,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	 data << uint32(itemid) << uint32(amount);
 	 SendPacket( &data );
 		
-	 _player->GetItemInterface()->BuyItem(it,amount);
+	 _player->GetItemInterface()->BuyItem(it,amount,unit->proto->Faction);
 }
 
 void WorldSession::HandleListInventoryOpcode( WorldPacket & recv_data )
@@ -1276,7 +1276,29 @@ void WorldSession::SendInventoryList(Creature* unit)
 				data << curItem->ItemId;
 				data << curItem->DisplayInfoID;
 				data << (int32)(-1); //we dont suport this kind of buy, make them infinite
-				data << GetBuyPriceForItem(curItem, abs(itr->amount), abs(itr->amount));
+
+				uint32 price = GetBuyPriceForItem(curItem, abs(itr->amount), abs(itr->amount));
+
+				FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(unit->proto->Faction);
+				if (factdbc)
+				{
+					switch(_player->GetStanding(factdbc->Faction))
+					{
+					case FRIENDLY:
+						price = float2int32(float(price*0.95f));
+					break;
+					case HONORED:
+						price = float2int32(float(price*0.9f));
+					break;
+					case REVERED:
+						price = float2int32(float(price*0.85f));
+					break;
+					case EXALTED:
+						price = float2int32(float(price*0.8f));
+					break;
+					}
+				}
+				data << price;
 				data << uint32(0x00);
 				data << (int16)itr->amount;
 				data << uint16(0x00);
@@ -1475,21 +1497,24 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
                     if(unit)
                     {
                         FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(unit->proto->Faction);
-                        switch(_player->GetStanding(factdbc->Faction))
-                        {
-                            case FRIENDLY:
-                                costs = float2int32(float(costs*0.95f));
-                                break;
-                            case HONORED:
-                                costs = float2int32(float(costs*0.9f));
-                                break;
-                            case REVERED:
-                                costs = float2int32(float(costs*0.85f));
-                                break;
-                            case EXALTED:
-                                costs = float2int32(float(costs*0.8f));
-                                break;
-                        }
+						if (factdbc)
+						{
+							switch(_player->GetStanding(factdbc->Faction))
+							{
+								case FRIENDLY:
+									costs = float2int32(float(costs*0.95f));
+									break;
+								case HONORED:
+									costs = float2int32(float(costs*0.9f));
+									break;
+								case REVERED:
+									costs = float2int32(float(costs*0.85f));
+									break;
+								case EXALTED:
+									costs = float2int32(float(costs*0.8f));
+									break;
+							}
+						}
                     }     
 
                     if(costs > _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
@@ -1546,21 +1571,24 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
                 if(unit)
                 {
                     FactionTemplateDBC *factdbc = dbcFactionTemplate.LookupEntry(unit->proto->Faction);
-                    switch(_player->GetStanding(factdbc->Faction))
-                    {
-                        case FRIENDLY:
-                            costs = float2int32(float(costs*0.95f));
-                            break;
-                        case HONORED:
-                            costs = float2int32(float(costs*0.9f));
-                            break;
-                        case REVERED:
-                            costs = float2int32(float(costs*0.85f));
-                            break;
-                        case EXALTED:
-                            costs = float2int32(float(costs*0.8f));
-                            break;
-                    }
+					if(factdbc)
+					{
+						switch(_player->GetStanding(factdbc->Faction))
+						{
+							case FRIENDLY:
+								costs = float2int32(float(costs*0.95f));
+								break;
+							case HONORED:
+								costs = float2int32(float(costs*0.9f));
+								break;
+							case REVERED:
+								costs = float2int32(float(costs*0.85f));
+								break;
+							case EXALTED:
+								costs = float2int32(float(costs*0.8f));
+								break;
+						}
+					}
                 }
 
                 if(costs > _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
