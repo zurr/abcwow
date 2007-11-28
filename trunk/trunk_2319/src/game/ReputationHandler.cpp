@@ -41,6 +41,27 @@ Standing Player::GetReputationRankFromStanding(int32 Standing_)
 	return STANDING_EXALTED;
 }
 
+float Player::GetReputationPriceDiscount(uint32 seller_faction)
+{
+	Standing standing = GetReputationRankFromStanding(this->GetStanding(seller_faction));
+	switch(standing)
+	{
+		case FRIENDLY:
+			return 0.95f;
+		break;
+		case HONORED:
+			return 0.90f;
+		break;
+		case REVERED:
+			return 0.85f;
+		break;
+		case EXALTED:
+			return 0.80f;
+		break;
+	}
+	return 1.0f;
+}
+
 inline void SetFlagAtWar(uint8 & flag)
 {
 	if(flag & FACTION_FLAG_AT_WAR)

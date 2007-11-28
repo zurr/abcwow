@@ -913,6 +913,7 @@ public:
 	void                Reputation_OnKilledUnit(Unit * pUnit, bool InnerLoop);
 	void                Reputation_OnTalk(FactionDBC * dbc);
 	static Standing     GetReputationRankFromStanding(int32 Standing_);
+	float			    GetReputationPriceDiscount(uint32 seller_faction);
 	
     /************************************************************************/
     /* Factions                                                             */
