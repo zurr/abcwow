@@ -1278,22 +1278,8 @@ void WorldSession::SendInventoryList(Creature* unit)
 				data << (int32)(-1); //we dont suport this kind of buy, make them infinite
 
 				uint32 price = GetBuyPriceForItem(curItem, abs(itr->amount), abs(itr->amount));
-				Standing standing = Player::GetReputationRankFromStanding(_player->GetStanding(unit->m_faction->Faction));
-				switch(standing)
-				{
-					case FRIENDLY:
-						price = float2int32(float(price*0.95f));
-					break;
-					case HONORED:
-						price = float2int32(float(price*0.9f));
-					break;
-					case REVERED:
-						price = float2int32(float(price*0.85f));
-					break;
-					case EXALTED:
-						price = float2int32(float(price*0.8f));
-					break;
-				}
+				price = float2int32(_player->GetReputationPriceDiscount(unit->m_faction->Faction)*price);
+
 				data << price;
 				data << uint32(0x00);
 				data << (int16)itr->amount;
@@ -1491,24 +1477,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
                     //Reputation discount
                     Creature *unit = _player->GetMapMgr()->GetCreature((uint32)npcguid);
                     if(unit)
-                    {
-						Standing standing = Player::GetReputationRankFromStanding(_player->GetStanding(unit->m_faction->Faction));
-						switch(standing)
-						{
-							case FRIENDLY:
-								costs = float2int32(float(costs*0.95f));
-								break;
-							case HONORED:
-								costs = float2int32(float(costs*0.9f));
-								break;
-							case REVERED:
-								costs = float2int32(float(costs*0.85f));
-								break;
-							case EXALTED:
-								costs = float2int32(float(costs*0.8f));
-								break;
-						}
-                    }     
+						costs = float2int32(_player->GetReputationPriceDiscount(unit->m_faction->Faction)*costs);
 
                     if(costs > _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
                         return;
@@ -1562,24 +1531,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
                 //Reputation discount
                 Creature *unit = _player->GetMapMgr()->GetCreature((uint32)npcguid);
                 if(unit)
-                {
-					Standing standing = Player::GetReputationRankFromStanding(_player->GetStanding(unit->m_faction->Faction));
-						switch(standing)
-						{
-							case FRIENDLY:
-								costs = float2int32(float(costs*0.95f));
-								break;
-							case HONORED:
-								costs = float2int32(float(costs*0.9f));
-								break;
-							case REVERED:
-								costs = float2int32(float(costs*0.85f));
-								break;
-							case EXALTED:
-								costs = float2int32(float(costs*0.8f));
-								break;
-						}
-                }
+					costs = float2int32(_player->GetReputationPriceDiscount(unit->m_faction->Faction)*costs);
 
                 if(costs > _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
                     return;

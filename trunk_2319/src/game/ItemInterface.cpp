@@ -1754,23 +1754,7 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount, uint32 seller_fa
 	if(item->BuyPrice)
 	{
 		int32 itemprice = GetBuyPriceForItem(item, amount, amount);
-
-		Standing standing = Player::GetReputationRankFromStanding(m_pOwner->GetStanding(seller_faction));
-		switch(standing)
-		{
-			case FRIENDLY:
-				itemprice = float2int32(float(itemprice*0.95f));
-			break;
-			case HONORED:
-				itemprice = float2int32(float(itemprice*0.9f));
-			break;
-			case REVERED:
-				itemprice = float2int32(float(itemprice*0.85f));
-			break;
-			case EXALTED:
-				itemprice = float2int32(float(itemprice*0.8f));
-			break;
-		}
+		itemprice = float2int32(m_pOwner->GetReputationPriceDiscount(seller_faction)*itemprice);
 
 		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice);
 	}
@@ -1825,24 +1809,8 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount, uint32 sell
 	if(item->BuyPrice)
 	{
 		int32 price = GetBuyPriceForItem(item, amount, amount);
-
-		Standing standing = Player::GetReputationRankFromStanding(m_pOwner->GetStanding(seller_faction));
-			switch(standing)
-			{
-			case FRIENDLY:
-				price = float2int32(float(price*0.95f));
-				break;
-			case HONORED:
-				price = float2int32(float(price*0.9f));
-				break;
-			case REVERED:
-				price = float2int32(float(price*0.85f));
-				break;
-			case EXALTED:
-				price = float2int32(float(price*0.8f));
-				break;
-			}
-
+		price = float2int32(m_pOwner->GetReputationPriceDiscount(seller_faction)*price);
+		
 		if((int32)m_pOwner->GetUInt32Value(PLAYER_FIELD_COINAGE) < price)
 		{
 			return INV_ERR_NOT_ENOUGH_MONEY;
