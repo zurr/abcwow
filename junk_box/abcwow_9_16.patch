@@ -1,0 +1,506 @@
+Index: realmserver/QueryHandler.cpp
+===================================================================
+--- realmserver/QueryHandler.cpp	(revision 9)
++++ realmserver/QueryHandler.cpp	(revision 16)
+@@ -200,7 +200,7 @@
+ 	data << itemProto->ItemSet;
+ 	data << itemProto->MaxDurability;
+ 	data << itemProto->ZoneNameID;
+-	data << itemProto->Field114;
++	data << itemProto->MapID;
+ 	data << itemProto->BagFamily;
+ 	data << itemProto->ToolCategory;
+ 	data << itemProto->Sockets[0].SocketColor ;
+Index: realmserver/Structures.h
+===================================================================
+--- realmserver/Structures.h	(revision 9)
++++ realmserver/Structures.h	(revision 16)
+@@ -143,7 +143,7 @@
+ 	uint32 ItemSet;
+ 	uint32 MaxDurability;
+ 	uint32 ZoneNameID;
+-	uint32 Field114;
++	uint32 MapID;
+ 	uint32 BagFamily;
+ 	uint32 ToolCategory;
+ 	SocketInfo Sockets[3];
+Index: scripts/src/SpellHandlers/ItemSpells_1.cpp
+===================================================================
+--- scripts/src/SpellHandlers/ItemSpells_1.cpp	(revision 9)
++++ scripts/src/SpellHandlers/ItemSpells_1.cpp	(revision 16)
+@@ -333,10 +333,25 @@
+ 	return true;
+ }
+ 
++// -----------------------------------------------------------------------------
+ 
++bool NighInvulnBelt(uint32 i, Spell *pSpell)
++{
++    if(!pSpell->p_caster) return true;
+ 
++    int chance = sRand.randInt(99)+1;
+ 
++    if(chance > 10) // Buff - Nigh-Invulnerability - 30456
++        pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30456), true);
++    else // Malfunction - Complete Vulnerability - 30457
++        pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30457), true);
+ 
++    return true;
++}
++
++
++
++
+ // ADD NEW FUNCTIONS ABOVE THIS LINE
+ // *****************************************************************************
+ 
+@@ -360,9 +375,9 @@
+ 	mgr->register_dummy_spell(19938, &ForemansBlackjack);  // Lazy Peons Quest
+ 	mgr->register_dummy_spell(39105, &NetherWraithBeacon); // Spellfire Tailor Quest
+ 	mgr->register_dummy_spell( 8593, &SymbolOfLife);       // Paladin's Redemption QuestLine
++	mgr->register_dummy_spell(30458, &NighInvulnBelt);     // Nigh Invulnerability Belt
+ 
+ 
+-
+ // REGISTER NEW DUMMY SPELLS ABOVE THIS LINE
+ // *****************************************************************************
+ }
+Index: game/ItemHandler.cpp
+===================================================================
+--- game/ItemHandler.cpp	(revision 9)
++++ game/ItemHandler.cpp	(revision 16)
+@@ -697,7 +697,7 @@
+ 	data << itemProto->ItemSet;
+ 	data << itemProto->MaxDurability;
+ 	data << itemProto->ZoneNameID;
+-	data << itemProto->Field114;
++	data << itemProto->MapID;
+ 	data << itemProto->BagFamily;
+ 	data << itemProto->ToolCategory;
+ 	data << itemProto->Sockets[0].SocketColor ;
+@@ -1732,7 +1732,7 @@
+ 	{
+ 		if(ColorMatch && (FilledSlots==TargetItem->GetSocketsCount()))
+ 		{
+-			if(TargetItem->HasEnchantment(TargetItem->GetProto()->SocketBonus))
++			if(TargetItem->HasEnchantment(TargetItem->GetProto()->SocketBonus) > 0)
+ 				return;
+ 
+ 			Enchantment = dbcEnchant.LookupEntry(TargetItem->GetProto()->SocketBonus);
+Index: game/World.h
+===================================================================
+--- game/World.h	(revision 9)
++++ game/World.h	(revision 16)
+@@ -458,6 +458,15 @@
+ 	std::map<uint32, AreaTable*> mAreaIDToTable;
+ 	std::map<uint32, AreaTable*> mZoneIDToTable;
+ 
++	std::map<uint32,uint32> TeachingSpellMap;
++	uint32 GetTeachingSpell(uint32 NormalSpellId)
++	{
++		map<uint32,uint32>::iterator i = TeachingSpellMap.find(NormalSpellId);
++		if(i!=TeachingSpellMap.end())
++			return i->second;
++		return 0;
++	}
++
+ 	uint32 AddQueuedSocket(WorldSocket* Socket);
+ 	void RemoveQueuedSocket(WorldSocket* Socket);
+ 	uint32 GetQueuePos(WorldSocket* Socket);
+Index: game/World.cpp
+===================================================================
+--- game/World.cpp	(revision 9)
++++ game/World.cpp	(revision 16)
+@@ -535,6 +535,13 @@
+ 				/* proc spell referencing non-existant spell. create a dummy spell for use w/ it. */
+ 				CreateDummySpell(sp->EffectTriggerSpell[b]);
+ 			}
++			/** Load teaching spells (used for hunters when learning pets wild abilities) */
++			if(sp->Effect[b]==SPELL_EFFECT_LEARN_SPELL && sp->EffectImplicitTargetA[b]==EFF_TARGET_PET)
++			{
++				map<uint32,uint32>::iterator itr = TeachingSpellMap.find(sp->EffectTriggerSpell[b]);
++				if(itr == TeachingSpellMap.end())
++					TeachingSpellMap.insert(make_pair(sp->EffectTriggerSpell[b],sp->Id));
++			}
+ 		}
+ 
+ 		sp->proc_interval = 0;//trigger at each event
+Index: game/ItemPrototype.h
+===================================================================
+--- game/ItemPrototype.h	(revision 9)
++++ game/ItemPrototype.h	(revision 16)
+@@ -545,7 +545,7 @@
+ 	uint32 ItemSet;
+ 	uint32 MaxDurability;
+ 	uint32 ZoneNameID;
+-	uint32 Field114; // ... MapID says I
++	uint32 MapID;
+ 	uint32 BagFamily;
+ 	uint32 ToolCategory;
+ 	SocketInfo Sockets[3];
+Index: game/Player.cpp
+===================================================================
+--- game/Player.cpp	(revision 9)
++++ game/Player.cpp	(revision 16)
+@@ -3110,10 +3110,10 @@
+ 
+ 	SetUInt32Value(UNIT_FIELD_HEALTH, load_health);
+ 	SetUInt32Value(UNIT_FIELD_POWER1, load_mana);
+-	/* Being debugged by Supalosa
+-	if( !GetSession()->HasGMPermissions() ) // Removed map check thingy - /me is an idiot. GM characters are allowed to take items out of the instance though :)
+-	GetItemInterface()->CheckAreaItems(); // Removes items like Devastation when you leave their Field114 (MapID)
+-	*/
++
++	if( !GetSession()->HasGMPermissions() )
++		GetItemInterface()->CheckAreaItems(); 
++
+ }
+ 
+ void Player::ResetHeartbeatCoords()
+@@ -5066,16 +5066,13 @@
+ 					data2 << guid;
+ 					data2 << x;
+ 					data2 << uint32(iter->item.itemproto->ItemId);
+-					data2 << uint32(0);
+-					if(!iter->iRandomProperty)
+-					{
+-						if(iter->iRandomSuffix)
+-							data << uint32(-int32(iter->iRandomSuffix->id));
+-						else
+-							data2 << uint32(0);
+-					}
+-					else
++					data2 << uint32(factor);
++					if(iter->iRandomProperty)
+ 						data2 << uint32(iter->iRandomProperty->ID);
++					else if(iter->iRandomSuffix)
++						data2 << uint32(ipid);
++					else
++						data2 << uint32(0);
+ 
+ 					data2 << uint32(60000); // countdown
+ 				}
+Index: game/SpellAuras.cpp
+===================================================================
+--- game/SpellAuras.cpp	(revision 9)
++++ game/SpellAuras.cpp	(revision 16)
+@@ -1090,17 +1090,17 @@
+ 			if(GetDuration())
+ 			{
+ 				float ticks= float((amp) ? GetDuration()/amp : 0);
+-				if (m_spellProto->dmg_bonus && m_spellProto->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
+-					m_spellProto->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && m_spellProto->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE )
+-				{
+-					bonus += (ticks) ? ((bonus_damage*m_spellProto->dmg_bonus*0.01)+bonus_damage_victim)/ticks : 0;
+-				}
+-				else
+-				{
+-					bonus += (ticks) ? (bonus_damage+bonus_damage_victim)/ticks : 0;
+-					if(!m_spellProto->ChannelInterruptFlags)
+-						bonus *= float(GetDuration()) / 15000.0f;
++				if (m_spellProto->dmg_bonus && m_spellProto->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
++					m_spellProto->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && m_spellProto->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE )
++				{
++					bonus += (ticks) ? ((bonus_damage*m_spellProto->dmg_bonus*0.01)+bonus_damage_victim)/ticks : 0;
+ 				}
++				else
++				{
++					bonus += (ticks) ? (bonus_damage+bonus_damage_victim)/ticks : 0;
++					if(!m_spellProto->ChannelInterruptFlags)
++						bonus *= float(GetDuration()) / 15000.0f;
++				}
+ 				bonus = float2int32(bonus);
+ 			}
+ 			else bonus = 0;
+@@ -1934,16 +1934,16 @@
+ 	if(GetDuration())
+ 	{
+ 		int ticks= (amp) ? GetDuration()/amp : 0;
+-		if (!m_spellProto->dmg_bonus)
+-		{
+-			bonus = (ticks) ? (bonus+bonus_target)/ticks : 0;
+-			if(!m_spellProto->ChannelInterruptFlags)
+-				bonus = float2int32(float(bonus*GetDuration() / 15000.0f));
+-		}
+-		else
+-		{
+-			bonus = (ticks) ? ((bonus*m_spellProto->dmg_bonus/100)+bonus_target)/ticks : 0;
++		if (!m_spellProto->dmg_bonus)
++		{
++			bonus = (ticks) ? (bonus+bonus_target)/ticks : 0;
++			if(!m_spellProto->ChannelInterruptFlags)
++				bonus = float2int32(float(bonus*GetDuration() / 15000.0f));
+ 		}
++		else
++		{
++			bonus = (ticks) ? ((bonus*m_spellProto->dmg_bonus/100)+bonus_target)/ticks : 0;
++		}
+ 	}
+ 	else bonus = 0;
+ 
+@@ -3811,8 +3811,76 @@
+ 		break;
+ 
+ 		case 16739: // Orb of Deception
+-			break;
++		{
++			if (apply)
++			{
++				if(m_target->getRace() == RACE_ORC) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10139);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10140);
++				}
++				if(m_target->getRace() == RACE_TAUREN) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10136);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10147);
++				}
++				if(m_target->getRace() == RACE_TROLL) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10135);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10134);
++				}
++				if(m_target->getRace() == RACE_UNDEAD) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10146);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10145);
++				}
++				if(m_target->getRace() == RACE_BLOODELF) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 17829);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 17830);
++				}
++ 
++				if(m_target->getRace() == RACE_GNOME) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10148);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10149);
++				}
++				if(m_target->getRace() == RACE_DWARF) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10141);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10142);
++				}
++				if(m_target->getRace() == RACE_HUMAN) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10137);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10138);
++				}
++				if(m_target->getRace() == RACE_NIGHTELF) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10143);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10144);
++				}
++				if(m_target->getRace() == RACE_DRAENEI) {
++					if(m_target->getGender() == 0) 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 17827);
++					else 
++						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 17828);
++				}
++			} 
++			else
++				m_target->SetUInt32Value (UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
++			} break;
+ 
++
+ 		case 118://polymorh
+ 		case 851:
+ 		case 5254:
+Index: game/ItemInterface.cpp
+===================================================================
+--- game/ItemInterface.cpp	(revision 9)
++++ game/ItemInterface.cpp	(revision 16)
+@@ -1362,22 +1362,16 @@
+ 		{
+ 			if(!(m_pOwner->GetWeaponProficiency()&(((uint32)(1))<<proto->SubClass)))
+ 				return INV_ERR_NO_REQUIRED_PROFICIENCY;
+-
+ 		}
+-	/*
+-	uint32 SubClassSkill = GetSkillByProto(proto);
+ 
+-	// removed those loops, use the skill lookup functions
+-	if(SubClassSkill)
+-	{
+-	if(!HasSkillLine(SubClassSkill))
+-	return INV_ERR_NO_REQUIRED_PROFICIENCY;
+-	}*/
+-
+ 		if(proto->RequiredSkill)
+ 			if (proto->RequiredSkillRank > m_pOwner->_GetSkillLineCurrent(proto->RequiredSkill,true))
+ 				return INV_ERR_SKILL_ISNT_HIGH_ENOUGH;
+ 
++		if(proto->RequiredSkillSubRank)
++			if (!m_pOwner->HasSpell(proto->RequiredSkillSubRank))
++				return INV_ERR_NO_REQUIRED_PROFICIENCY;
++
+ 		// You are dead !
+ 		if(m_pOwner->getDeathState() == DEAD)
+ 			return INV_ERR_YOU_ARE_DEAD;
+@@ -2711,51 +2705,28 @@
+ 	return false;
+ }
+ 
+-/**********************************
+-* DESCRIPTION:
+-* Prevents items bound to a
+-* specific area ID to leave the 
+-* zone. Actually, it deletes it.
+-* Very similar structure to
+-* ItemInterface::GetItemCount()
+-**********************************/
+ 
+ void ItemInterface::CheckAreaItems()
+ {
+-	/* Being debugged by Supalosa - at the moment it doesn't seem to actually seem to 'find' the items...
+-	sLog.outString( "Checking player %s for zone-specific items:" , GetOwner()->GetNameString());
+-	// Check equipment and backpack first (not inventory)
+-	for( uint32 i = EQUIPMENT_SLOT_START ; i < EQUIPMENT_SLOT_END ; i++ )
++	for(uint32 x = EQUIPMENT_SLOT_START; x < INVENTORY_SLOT_ITEM_END; ++x)
+ 	{
+-		Item *item = GetInventoryItem( i );
+-		if( item )
++		if (m_pItems[x]!= NULL)
+ 		{
+-			// Field114 = MapID
+-			if( item->GetProto()->Field114 != 0 && item->GetProto()->Field114 != GetOwner()->GetMapId() )
++			if(IsBagSlot(x) && m_pItems[x]->IsContainer())
+ 			{
+-				sLog.outString( "    Found %s in slot %u, removing." , item->GetProto()->Name1 , i );
+-				SafeFullRemoveItemByGuid(item->GetGUID());
+-				
+-			}
+-
+-		}
+-	}
+-	// Check inventory
+-	for( uint32 j = INVENTORY_SLOT_BAG_START ; j < INVENTORY_SLOT_BAG_END ; j++ )
+-	{
+-		Container *item = ((Container*)GetInventoryItem( j )); // This will be a container.
+-		if( item && item->GetTypeId() == TYPEID_CONTAINER )
+-		{
+-			for( uint32 h = 0 ; h < item->GetProto()->ContainerSlots ; h++ )
+-			{
+-				Item *innerItem = item->GetItem(h);
+-				if( innerItem && innerItem->GetProto()->Field114 != 0 && innerItem->GetProto()->Field114 != GetOwner()->GetMapId() )
++				Container * bag = (Container*)m_pItems[x];
++ 
++				for(uint32 i = 0; i < bag->GetProto()->ContainerSlots; i++)
+ 				{
+-					sLog.outString( "    Found %s in bag %u, slot %u, removing." , item->GetProto()->Name1 , j , h );
+-					SafeFullRemoveItemByGuid(item->GetGUID());
++					if (bag->GetItem(i) != NULL && bag->GetItem(i)->GetProto() && bag->GetItem(i)->GetProto()->MapID && bag->GetItem(i)->GetProto()->MapID != GetOwner()->GetMapId())
++						bag->SafeFullRemoveItemFromSlot(i);
+ 				}
+ 			}
++			else
++			{
++				if(m_pItems[x]->GetProto() && m_pItems[x]->GetProto()->MapID && m_pItems[x]->GetProto()->MapID != GetOwner()->GetMapId() )
++					SafeFullRemoveItemFromSlot(INVENTORY_SLOT_NOT_SET, x);
++			}
+ 		}
+ 	}
+-	*/
+ }
+Index: game/Spell.cpp
+===================================================================
+--- game/Spell.cpp	(revision 9)
++++ game/Spell.cpp	(revision 16)
+@@ -2920,6 +2920,11 @@
+ 
+ 	if(i_caster) // if the caster is an item
+ 	{
++		if( i_caster->GetProto()->ZoneNameID && i_caster->GetProto()->ZoneNameID != i_caster->GetZoneId() ) 
++			return SPELL_FAILED_NOT_HERE;
++		if( i_caster->GetProto()->MapID && i_caster->GetProto()->MapID != i_caster->GetMapId() )
++			return SPELL_FAILED_NOT_HERE;
++
+ 		// *** ITEM CHARGES CHECK - Partha ***
+ 		if( i_caster->GetProto()->Spells[0].Charges != 0 && ((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) == 0 )
+ 			return SPELL_FAILED_NO_CHARGES_REMAIN; // Item has no charges left
+Index: game/Pet.cpp
+===================================================================
+--- game/Pet.cpp	(revision 9)
++++ game/Pet.cpp	(revision 16)
+@@ -53,7 +53,24 @@
+ 		/* HunterPet Spells													 */
+ 		/************************************************************************/
+ 
+-	case 0x7AEB7BEE:		// Claw
++	case 0x0090493C:		// Bite
++	case 0xE30500A1:		// Charge
++ 	case 0x7AEB7BEE:		// Claw
++	case 0x8B2934EB:		// Cower
++	case 0x1A18AD22:		// Dash
++	case 0x17CD7462:		// Dive 
++	case 0x16B96B70:		// Fire Breath
++	case 0x90EAAD86:		// Furious Howl
++	case 0x6599623A:		// Gore
++	case 0x4C14A211:		// Growl
++	case 0x058B5215:		// Lightning Breath
++	case 0x6A92F3A0:		// Poison Spit 
++	case 0x9ED4E983:		// Prowl
++	case 0xC654D8FB:		// Scorpid Poison
++	case 0x5012E285:		// Screech
++	case 0xCC6FB810:		// Shell Shield
++	case 0x039C2632:		// Thunderstomp
++	case 0x52C3FC44:		// Warp 
+ 		return AUTOCAST_EVENT_ATTACK;
+ 		break;
+ 
+@@ -1450,29 +1467,26 @@
+ }
+ void Pet::AddPetSpellToOwner(uint32 spellId)
+ {
+-	uint32 line = 0;
+-	if (objmgr.GetSpellSkill(spellId))
+-		line = objmgr.GetSpellSkill(spellId)->skilline;
+ 	//exit if owner hasn't Beast training ability (id 5149)
+-	if(!m_Owner || !m_Owner->HasSpell(5149) || !line)
++	if(!m_Owner || !m_Owner->HasSpell(5149))
+ 		return;
+ 	//find appropriate teaching spell...
+-/*	vector<TrainerSpell*>* lst = objmgr.GetTrainerPetSpellsForLine(line);
+-	TrainerSpell * sp;
+-	if(lst)
+-		for(vector<TrainerSpell*>::iterator itr = lst->begin(); itr != lst->end(); ++itr)
++	uint32 TeachingSpellID = 0;
++	TeachingSpellID = sWorld.GetTeachingSpell(spellId);
++    if(TeachingSpellID)
++	{
++		if(m_Owner->HasSpell(TeachingSpellID))
++			return;
++		else
+ 		{
+-			sp = *itr;
+-			if(spellId==sp->SpellID)
+-				if(m_Owner->HasSpell(sp->TeachingSpellID))
+-					return;
+-				else
+-				{
+-					//...and add it to pet owner to be able teach other pets
+-					m_Owner->addSpell(sp->TeachingSpellID);
+-					return;
+-				}
+-		}*/
++			//...and add it to pet owner to be able teach other pets
++			m_Owner->addSpell(TeachingSpellID);
++			return;
++		}
++	
++	}
++	else
++		sLog.outDebug("WORLD: Could not find teaching spell for spell %u", spellId);
+ }
+ uint32 Pet::GetHighestRankSpell(uint32 spellId)
+ {	
