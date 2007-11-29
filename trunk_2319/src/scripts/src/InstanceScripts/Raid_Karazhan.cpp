@@ -524,7 +524,7 @@ protected:
 
 #define REPENTANCE 29511
 #define HOLY_FIRE 29522
-#define HOLY_WRATH 32445
+#define HOLY_WRATH 28883
 #define HOLY_GROUND 29512
 
 class MAIDENOFVIRTUEAI : public CreatureAIScript
@@ -536,8 +536,8 @@ public:
 
     MAIDENOFVIRTUEAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-        //SpellEntry *infoImmunity;
-        nrspells = 3;
+        SpellEntry *infoImmunity;
+        nrspells = 2;
 	for(int i=0;i<nrspells;i++)
 	{
 		m_spellcheck[i] = false;
@@ -551,20 +551,21 @@ public:
 	spells[0].perctrigger = 0.0f;
 	spells[0].attackstoptimer = 1000;
 
-	spells[1].info = dbcSpell.LookupEntry(HOLY_WRATH);
+// emsy: removed, 100yrd range and infinite jumps
+/*	spells[1].info = dbcSpell.LookupEntry(HOLY_WRATH);
 	spells[1].targettype = TARGET_VARIOUS;
 	spells[1].instant = true;
 	spells[1].cooldown = 20;
 	spells[1].perctrigger = 0.0f;
-	spells[1].attackstoptimer = 1000;
+	spells[1].attackstoptimer = 1000; */
 
         // temporary fix for broken spell: cast holy ground every 2 secs since its triggered only once
-	spells[2].info = dbcSpell.LookupEntry(HOLY_GROUND);
-	spells[2].targettype = TARGET_SELF;
-	spells[2].instant = true;
-	spells[2].cooldown = 2;
-	spells[2].perctrigger = 0.0f;
-	spells[2].attackstoptimer = 1000;
+	spells[1].info = dbcSpell.LookupEntry(HOLY_GROUND);
+	spells[1].targettype = TARGET_SELF;
+	spells[1].instant = true;
+	spells[1].cooldown = 3;
+	spells[1].perctrigger = 0.0f;
+	spells[1].attackstoptimer = 1000;
 
 	infoRepentance = dbcSpell.LookupEntry(REPENTANCE);
     }
@@ -695,7 +696,7 @@ public:
             _unit->PlaySoundToSet(sound);
             _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, text);
             _unit->CastSpell(_unit, infoRepentance, true);
-            m_time_repentance = 25 + sRand.randInt(100)%10;
+            m_time_repentance = 25 + sRand.randInt(100)%5;
             return true;
         }
         else
@@ -725,7 +726,7 @@ public:
 
     THEBIGBADWOLFAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-        //SpellEntry *infoImmunity;
+        SpellEntry *infoImmunity;
         nrspells = 3;
 	for(int i=0;i<nrspells;i++)
 	{
@@ -735,21 +736,21 @@ public:
 	spells[0].info = dbcSpell.LookupEntry(TERRIFYING_HOWL);
 	spells[0].targettype = TARGET_VARIOUS;
 	spells[0].instant = true;
-	spells[0].cooldown = 10;
+	spells[0].cooldown = 30;
 	spells[0].perctrigger = 0.0f;
 	spells[0].attackstoptimer = 1000;
 
 	spells[1].info = dbcSpell.LookupEntry(MORPH_LITTLE_RED_RIDING_HOOD);
 	spells[1].targettype = TARGET_ATTACKING;
 	spells[1].instant = true;
-	spells[1].cooldown = 30;
+	spells[1].cooldown = 60;
 	spells[1].perctrigger = 0.0f;
 	spells[1].attackstoptimer = 1000;
 
 	spells[2].info = dbcSpell.LookupEntry(DEBUFF_LITTLE_RED_RIDING_HOOD);
 	spells[2].targettype = TARGET_ATTACKING;
 	spells[2].instant = true;
-	spells[2].cooldown = 30;
+	spells[2].cooldown = 60;
 	spells[2].perctrigger = 0.0f;
 	spells[2].attackstoptimer = 1000;
         spells[2].soundid = 9278;
@@ -944,7 +945,7 @@ public:
             else if(!TimedTrigger())
                 CastBolt();
         }
-        else if(_unit->GetManaPct() > 94)
+        else if(_unit->GetManaPct() > 90)
             evocation = false;
     }
 
@@ -1026,6 +1027,7 @@ protected:
 
 // Astral Flare
 #define ASTRAL_FLARE_PASSIVE 30234
+#define ARCING_SCAR 30325
 #define ASTRAL_FLARE_VISUAL 30237
 
 class ASTRALFLAREAI : public CreatureAIScript
@@ -1043,10 +1045,17 @@ public:
 		m_spellcheck[i] = false;
 	}
 
-	spells[0].info = dbcSpell.LookupEntry(ASTRAL_FLARE_PASSIVE);
+/*	spells[0].info = dbcSpell.LookupEntry(ASTRAL_FLARE_PASSIVE);
 	spells[0].targettype = TARGET_VARIOUS;
 	spells[0].instant = true;
 	spells[0].cooldown = 3;
+	spells[0].perctrigger = 0.0f;
+	spells[0].attackstoptimer = 1000;
+*/
+	spells[0].info = dbcSpell.LookupEntry(ARCING_SCAR);
+	spells[0].targettype = TARGET_VARIOUS;
+	spells[0].instant = true;
+	spells[0].cooldown = 1;
 	spells[0].perctrigger = 0.0f;
 	spells[0].attackstoptimer = 1000;
 
@@ -2174,7 +2183,7 @@ public:
 	spells[3].info = dbcSpell.LookupEntry(BERSERK);
 	spells[3].targettype = TARGET_SELF;
 	spells[3].instant = true;
-	spells[3].cooldown = 60;
+	spells[3].cooldown = 540;
 	spells[3].perctrigger = 0.0f;
 	spells[3].attackstoptimer = 1000;
     }
@@ -2287,10 +2296,10 @@ protected:
 static Coords coords[] =
 {
     { 0, 0, 0, 0 },
-    { -11173.719727f, -1863.993164f, 130.390396f, 5.343079f }, // casting point
-    { -11125.542969f, -1926.884644f, 139.349365f, 3.982360f },
-    { -11166.404297f, -1950.729736f, 114.714726f, 1.537812f },
-    { -11167.497070f, -1922.315918f, 91.473755f, 1.390549f } // landing point
+    { -11173.719727, -1863.993164, 130.390396, 5.343079 }, // casting point
+    { -11125.542969, -1926.884644, 139.349365, 3.982360 },
+    { -11166.404297, -1950.729736, 114.714726, 1.537812 },
+    { -11167.497070, -1922.315918, 91.473755, 1.390549 } // landing point
 };
 
 class NIGHTBANEAI : public CreatureAIScript
