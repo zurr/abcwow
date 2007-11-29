@@ -882,9 +882,9 @@ public:
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(CAVE_IN);
-		spells[1].targettype = TARGET_DESTINATION;
+		spells[1].targettype = TARGET_RANDOMDESTINATION;
 		spells[1].instant = true;
-		spells[1].perctrigger = 10.0f;
+		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(HURTFUL_STRIKE);
@@ -896,7 +896,7 @@ public:
 		spells[3].info = dbcSpell.LookupEntry(REVERBERATION);
 		spells[3].targettype = TARGET_VARIOUS;
 		spells[3].instant = true;
-		spells[3].perctrigger = 6.0f;
+		spells[3].perctrigger = 3.0f;
 		spells[3].attackstoptimer = 1000;
 
 		spells[4].info = dbcSpell.LookupEntry(GROUND_SLAM);
@@ -904,7 +904,7 @@ public:
 		spells[4].instant = false;
 		spells[4].perctrigger = 7.0f;
 		spells[4].attackstoptimer = 2000;
-		spells[4].speech = "Scary!"; // has 2 sounds for one spell :O
+		spells[4].speech = "Scurry!"; // has 2 sounds for one spell :O
 		spells[4].soundid = 11357;
 		//spells[4].speech = ""No escape!; // has 2 sounds for one spell :O
 		//spells[4].soundid = 11356;
@@ -1012,6 +1012,9 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOMDESTINATION:
+							target = RandomTarget();
+							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
 
 					if (spells[i].speech != "")
@@ -1033,6 +1036,24 @@ public:
 			}
         }
     }
+	Unit *RandomTarget()
+	{
+		uint32 targetsc = _unit->GetAIInterface()->getAITargetsCount();
+		if (targetsc > 0)
+		{
+			TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+			uint32 val;
+			val = (uint32) sRand.randInt(100)%targetsc;
+			TargetMap::iterator itr;
+			uint32 nr = 0;
+			for (itr = targets->begin(); nr < val;nr++)
+			{
+				itr++;
+			}
+			return itr->first;
+		}
+		return NULL;
+	}
 protected:
 
 	uint32 GrowthCooldown;

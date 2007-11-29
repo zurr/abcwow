@@ -5184,28 +5184,28 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(GIFT_OF_THE_DOOMSAYER);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
-		spells[0].cooldown = -1;
+		spells[0].cooldown = 10;
 		spells[0].perctrigger = 8.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(WHIRLWIND);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = false;
-		spells[1].cooldown = -1;
+		spells[1].cooldown = 10;
 		spells[1].perctrigger = 15.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(HEAL);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
-		spells[2].cooldown = -1;
+		spells[2].cooldown = 10;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(SHADOW_WAVE);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = false;
-		spells[3].cooldown = -1;
+		spells[3].cooldown = 10;
 		spells[3].perctrigger = 8.0f;
 		spells[3].attackstoptimer = 1000;
 
@@ -5397,35 +5397,35 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(IMMOLATION);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
-		spells[0].cooldown = -1;
+		spells[0].cooldown = 10;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(FELFIRE_SHOCK);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
-		spells[1].cooldown = -1;
+		spells[1].cooldown = 10;
 		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(FELFIRE_LINE_UP);	// ?
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
-		spells[2].cooldown = -1;
+		spells[2].cooldown = 10;
 		spells[2].perctrigger = 8.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(KNOCK_AWAY);
 		spells[3].targettype = TARGET_DESTINATION;	// changed from VARIOUS to prevent crashes and gives it at least half working spell
 		spells[3].instant = true;
-		spells[3].cooldown = -1;
+		spells[3].cooldown = 10;
 		spells[3].perctrigger = 6.0f;
 		spells[3].attackstoptimer = 1000;
 
 		spells[4].info = dbcSpell.LookupEntry(CHARGE);
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = true;
-		spells[4].cooldown = -1;
+		spells[4].cooldown = 10;
 		spells[4].perctrigger = 4.0f;
 		spells[4].attackstoptimer = 1000;
 

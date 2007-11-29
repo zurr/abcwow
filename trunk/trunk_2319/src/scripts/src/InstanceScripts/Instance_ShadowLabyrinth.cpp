@@ -1594,12 +1594,12 @@ class MURMURAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(MURMURAI);
-	SP_AI_Spell spells[5];
-	bool m_spellcheck[5];
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
 
     MURMURAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 5;
+		nrspells = 4;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1608,38 +1608,44 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(SONIC_BOOM);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
+		spells[0].cooldown = 30;
 		spells[0].perctrigger = 7.0f;
 		spells[0].attackstoptimer = 1000;
-
+/*
 		spells[1].info = dbcSpell.LookupEntry(RESONANCE);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
+		spells[1].cooldown = 60;
 		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 1000;
-
-		spells[2].info = dbcSpell.LookupEntry(SHOCKWAVE);
-		spells[2].targettype = TARGET_VARIOUS; 
-		spells[2].instant = true;
-		spells[2].perctrigger = 7.0f;
-		spells[2].attackstoptimer = 1000;
+*/
+		spells[1].info = dbcSpell.LookupEntry(SHOCKWAVE);
+		spells[1].targettype = TARGET_VARIOUS; 
+		spells[1].instant = true;
+		spells[1].cooldown = 30;
+		spells[1].perctrigger = 7.0f;
+		spells[1].attackstoptimer = 1000;
 /*
 		spells[2].info = dbcSpell.LookupEntry(SONIC_SHOCK);
 		spells[2].targettype = TARGET_ATTACKING; 
 		spells[2].instant = true;
+		spells[2].cooldown = 30;
 		spells[2].perctrigger = 7.0f;
 		spells[2].attackstoptimer = 1000;
 */
-		spells[3].info = dbcSpell.LookupEntry(MURMURS_TOUCH);
-		spells[3].targettype = TARGET_VARIOUS;
-		spells[3].instant = false;
-		spells[3].perctrigger = 7.0f;
-		spells[3].attackstoptimer = 1000;
+		spells[2].info = dbcSpell.LookupEntry(MURMURS_TOUCH);
+		spells[2].targettype = TARGET_VARIOUS;
+		spells[2].instant = false;
+		spells[2].cooldown = 60;
+		spells[2].perctrigger = 7.0f;
+		spells[2].attackstoptimer = 1000;
 
-		spells[4].info = dbcSpell.LookupEntry(THUNDERING_STORM);
-		spells[4].targettype = TARGET_VARIOUS;
-		spells[4].instant = true;
-		spells[4].perctrigger = 7.0f;
-		spells[4].attackstoptimer = 2000;
+		spells[3].info = dbcSpell.LookupEntry(THUNDERING_STORM);
+		spells[3].targettype = TARGET_VARIOUS;
+		spells[3].instant = true;
+		spells[3].cooldown = 60;
+		spells[3].perctrigger = 7.0f;
+		spells[3].attackstoptimer = 2000;
 
     }
     
