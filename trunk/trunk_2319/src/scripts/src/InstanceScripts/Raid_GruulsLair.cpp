@@ -743,7 +743,7 @@ public:
 	}
 	void OnCombatStart(Unit* mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "<missing_word> on a real power in Outland!");
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Gronn are the real power in Outland!");
 		_unit->PlaySoundToSet(11367);
         RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
@@ -757,7 +757,7 @@ public:
 
 	void OnDied(Unit * mKiller)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Grull will crash you!");
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Gruul will... crush you!");
 		_unit->PlaySoundToSet(11376);
        RemoveAIUpdateEvent();
     }
@@ -904,7 +904,7 @@ public:
 		spells[4].instant = false;
 		spells[4].perctrigger = 7.0f;
 		spells[4].attackstoptimer = 2000;
-		spells[4].speech = "Scurry!"; // has 2 sounds for one spell :O
+		spells[4].speech = "Scary!"; // has 2 sounds for one spell :O
 		spells[4].soundid = 11357;
 		//spells[4].speech = ""No escape!; // has 2 sounds for one spell :O
 		//spells[4].soundid = 11356;
