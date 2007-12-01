@@ -168,8 +168,6 @@ class HellfireChannelerAI : public CreatureAIScript
 		{
 			dieCount++;
 
-			sLog.outString("[Moon++][Magtheridon]Phase I Channeler dieCount = %u/5" , dieCount );
-
 			if(dieCount >=5)
 			{
 				Magtheridon = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-32.171f, 39.926f, 0.630f, 17257);
@@ -268,7 +266,6 @@ public:
 		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 5000;
 		
-		sLog.outString("[Moon++][Magtheridon]Started");
 		_unit->CastSpell(_unit, BANISH, true);
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
@@ -295,7 +292,6 @@ public:
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Legion... will consume you... all....");
 		_unit->PlaySoundToSet(10258);
-		sLog.outString("[Moon++][Magtheridon]Is now dead.");
        RemoveAIUpdateEvent();
     }
 
@@ -305,7 +301,6 @@ public:
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Did you think me weak? Soft? Who is the weak one now?!");
 			_unit->PlaySoundToSet(10255);
-			sLog.outString("[Moon++][Magtheridon]Killed player");
 		}
 	}
 	
@@ -322,8 +317,6 @@ public:
 		{
 			m_phase = 3;
 		}
-
-		sLog.outString("[Moon++][Magtheridon] AI Update Tick m_phase = %u", m_phase);
 
 		switch(m_phase)
 		{
@@ -367,7 +360,7 @@ public:
 		float val = (float)sRand.rand(100.0f);
 		SpellCast(val);
 		Unit *target = _unit->GetAIInterface()->GetNextTarget();
-		sLog.outString("[Moon++][Magtheridon] Phase II Blast nova = %u / 54", timer_blastNova);
+
 		if(timer_blastNova > 54)
 		{
 			_unit->CastSpell(target, dbcSpell.LookupEntry(BLAST_NOVA), true);
@@ -379,7 +372,6 @@ public:
 		timer_caveIn++;
 		timer_blastNova++;
 
-		sLog.outString("[Moon++][Magtheridon] Phase III Blast nova = %u / 54   Cave In = %u / 60", timer_blastNova, timer_caveIn);
 		float val = (float)sRand.rand(100.0f);
 		SpellCast(val);
 		Unit *target = _unit->GetAIInterface()->GetNextTarget();

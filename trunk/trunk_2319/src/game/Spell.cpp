@@ -3558,7 +3558,7 @@ void Spell::Heal(int32 amount)
 		if(!m_spellInfo->dmg_bonus)
 			amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
 		else
-			amount += float2int32((u_caster->HealDoneMod[m_spellInfo->School]*m_spellInfo->dmg_bonus)/100);
+			amount += (uint32)((u_caster->HealDoneMod[m_spellInfo->School]*m_spellInfo->dmg_bonus)/100);
 		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
 		amount += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
 		amount += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
