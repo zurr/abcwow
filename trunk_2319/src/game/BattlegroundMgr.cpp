@@ -250,6 +250,7 @@ void CBattlegroundManager::EventQueueUpdate()
 					{
 						plr = *tempPlayerVec[0].begin();
 						tempPlayerVec[0].pop_front();
+						plr->m_bgTeam=team;
 						arena->AddPlayer(plr, team);
 						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 						team = arena->GetFreeTeam();
@@ -393,7 +394,10 @@ void CBattlegroundManager::EventQueueUpdate()
 				if(itx->player)
 				{
 					if(ar->HasFreeSlots(0))
+					{
+						itx->player->m_bgTeam = 0;
                         ar->AddPlayer(itx->player, 0);
+					}
 				}
 			}
 
@@ -402,7 +406,10 @@ void CBattlegroundManager::EventQueueUpdate()
 				if(itx->player)
 				{
 					if(ar->HasFreeSlots(1))
+					{
+						itx->player->m_bgTeam = 1;
 						ar->AddPlayer(itx->player, 1);
+					}
 				}
 			}
 		}
@@ -683,8 +690,6 @@ void CBattleground::AddPlayer(Player * plr, uint32 team)
 {
 	m_mainLock.Acquire();
 
-	plr->m_bgTeam = team;
-
 	/* This is called when the player is added, not when they port. So, they're essentially still queued, but not inside the bg yet */
 	m_pendPlayers[team].insert(plr->GetGUIDLow());
 
@@ -730,7 +735,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		return;
 	}
 
-	plr->SetTeam(plr->m_bgTeam);
+	//plr->SetTeam(plr->m_bgTeam);
 	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
 	data << plr->GetGUID();
 	DistributePacketToAll(&data);
@@ -1045,7 +1050,7 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);*/
 
 	// reset team
-	plr->ResetTeam();
+	//plr->ResetTeam();
 
 	/* revive the player if he is dead */
 	if(!plr->isAlive())

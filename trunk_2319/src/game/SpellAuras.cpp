@@ -1063,7 +1063,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 	if(m_target->SchoolImmunityList[GetSpellProto()->School])
 		return;
 	float res = float(amount);
-	int bonus = 0;
+	float bonus = 0;
 	uint32 school = GetSpellProto()->School;
 	Unit * c = GetUnitCaster();
 
@@ -1093,15 +1093,14 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				if (m_spellProto->dmg_bonus && m_spellProto->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
 					m_spellProto->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && m_spellProto->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE )
 				{
-					bonus += (ticks) ? ((bonus_damage*m_spellProto->dmg_bonus*0.01)+bonus_damage_victim)/ticks : 0;
+					bonus += (ticks) ? (float)(((bonus_damage*m_spellProto->dmg_bonus*0.01)+bonus_damage_victim)/ticks) : 0;
 				}
 				else
 				{
 					bonus += (ticks) ? (bonus_damage+bonus_damage_victim)/ticks : 0;
 					if(!m_spellProto->ChannelInterruptFlags)
-						bonus *= float(GetDuration()) / 15000.0f;
+						bonus *= GetDuration() / 15000.0f;
 				}
-				bonus = float2int32(bonus);
 			}
 			else bonus = 0;
 
