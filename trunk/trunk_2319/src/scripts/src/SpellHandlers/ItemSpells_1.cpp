@@ -103,34 +103,15 @@ bool CookedDeviateFish(uint32 i, Spell * pSpell)
 
 	int chance = 0;
 	int newspell = 0;
-
-	if(pSpell->p_caster->getClass() == WARRIOR)
-		chance = sRand.randInt(6);
-	else
-		chance = sRand.randInt(5);
+	chance = sRand.randInt(1);
 
 	switch(chance)
 	{
 	case 0:
-		newspell = 8215; // Rapid Cast (2min)
-		break;
-	case 1:
 		newspell = 8219; // Flip Out (60 min) (turns you into a ninja)
 		break;
-	case 2:
+	case 1:
 		newspell = 8221; // Yaaarrrr (60 min) (turns you into a pirate)
-		break;
-	case 3:
-		newspell = 8223; // Oops (10 sec) (turns you into a pile of goo)
-		break;
-	case 4:
-		newspell = 8224; // Cowardice (10 min) (causes 5sec "Run Away" fear)
-		break;
-	case 5:
-		newspell = 8226; // Fake Death (5 min)
-		break;
-	case 6:
-		newspell = 0;    // +50 Rage (warrior only)
 		break;
 	}
 
@@ -138,13 +119,7 @@ bool CookedDeviateFish(uint32 i, Spell * pSpell)
 	{
 		SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
 		if(!spInfo) return true;
-
 		pSpell->p_caster->CastSpell(pSpell->p_caster, spInfo, true);
-	}
-	else
-	{
-		uint32 val=pSpell->p_caster->GetUInt32Value(UNIT_FIELD_POWER2)+500;
-		pSpell->p_caster->SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
 	}
 	return true;
 }
