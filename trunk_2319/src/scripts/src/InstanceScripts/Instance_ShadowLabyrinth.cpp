@@ -881,6 +881,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(INTIMIDATING_SHOUT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
+		spells[0].cooldown = 30;
 		spells[0].perctrigger = 4.0f;
 		spells[0].attackstoptimer = 1000;
 
