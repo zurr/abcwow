@@ -48,10 +48,15 @@ public:
     void OnCombatStart(Unit* mTarget)
     {
         RegisterAIUpdateEvent(1000);
+		m_phase = 1;
     }
 
     void OnCombatStop(Unit *mTarget)
     {
+		if (_unit->isAlive() && (attumen != NULL))
+		{
+			attumen->Despawn(100, 0);
+		}
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
@@ -111,8 +116,7 @@ public:
                     "Come Midnight, let's disperse this petty rabble!");
 
             attumen->SetUInt32Value(UNIT_FIELD_DISPLAYID , 16040);
-            Creature *midnight = ((Creature*) _unit);
-            midnight->Despawn(0, 0); 
+			_unit->Despawn(100, 0);
 //            _unit->CastSpell(_unit, infoMountAttumen, true);
             m_phase = 3;
         }
@@ -236,12 +240,12 @@ public:
     {
         switch(m_phase)
         {
-	    case 1:
-	        PhaseOne();
-	        break;
-            case 2:
-	        break;
-        default:
+		case 1:
+			PhaseOne();
+			break;
+		case 2:
+			break;
+		default:
                 m_phase = 1;
         };
 	float val = (float)sRand.rand(100.0f);
@@ -254,7 +258,7 @@ public:
         {
             // we've mounted so reset hp
             static_cast<Creature*>(_unit)->RegenerateHealth();
-	    // TODO: reset aggro
+			_unit->GetAIInterface()->WipeHateList();
             m_phase = 2;
         }
         else if(_unit->GetHealthPct() <= 25)
@@ -1184,35 +1188,35 @@ public:
 	}
 
 	spells[0].info = dbcSpell.LookupEntry(FROSTBOLT);
-	spells[0].targettype = TARGET_ATTACKING;
+	spells[0].targettype = TARGET_RANDOM;
 	spells[0].instant = false;
 	spells[0].cooldown = 5;
 	spells[0].perctrigger = 0.0f;
 	spells[0].attackstoptimer = 1000;
 
 	spells[1].info = dbcSpell.LookupEntry(FIREBALL);
-	spells[1].targettype = TARGET_ATTACKING;
+	spells[1].targettype = TARGET_RANDOM;
 	spells[1].instant = false;
 	spells[1].cooldown = 5;
 	spells[1].perctrigger = 0.0f;
 	spells[1].attackstoptimer = 1000;
 
 	spells[2].info = dbcSpell.LookupEntry(ARCMISSLE);
-	spells[2].targettype = TARGET_ATTACKING;
+	spells[2].targettype = TARGET_RANDOM;
 	spells[2].instant = false;
 	spells[2].cooldown = 10;
 	spells[2].perctrigger = 0.0f;
 	spells[2].attackstoptimer = 1000;
 
 	spells[3].info = dbcSpell.LookupEntry(CHAINSOFICE);
-	spells[3].targettype = TARGET_ATTACKING;
+	spells[3].targettype = TARGET_RANDOM;
 	spells[3].instant = true;
 	spells[3].cooldown = 10;
 	spells[3].perctrigger = 0.0f;
 	spells[3].attackstoptimer = 1000;
 
 	spells[4].info = dbcSpell.LookupEntry(DRAGONSBREATH);
-	spells[4].targettype = TARGET_ATTACKING;
+	spells[4].targettype = TARGET_RANDOM;
 	spells[4].instant = true;
 	spells[4].cooldown = 10;
 	spells[4].perctrigger = 0.0f;
@@ -1261,6 +1265,7 @@ public:
         _unit->PlaySoundToSet(sound);
         _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, text);
         _unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+		_unit->GetAIInterface()->disable_melee = true;
         RegisterAIUpdateEvent(1000);
         m_time_enrage = 900;
         m_time_special = 30 + (uint32) sRand.randInt(10)%5;
@@ -1275,6 +1280,8 @@ public:
 
     void OnCombatStop(Unit *mTarget)
     {
+		if (_unit->isAlive())
+			_unit->SetUInt32Value(UNIT_FIELD_POWER1, _unit->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
         CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
@@ -1308,60 +1315,61 @@ public:
         _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, text);
     }
 
-    void AIUpdate()
-    {
-        if(!drinking) 
+	void AIUpdate()
 	{
-	    if(explode)
-	    {
-                if(slow)
-                {
-                    _unit->CastSpell(_unit, info_massslow, true);
-                    slow = false;
-                }
-                else
-                {
-	            _unit->CastSpell(_unit, info_aexplosion, false);
-                    explode = false;
-                }
-	    }
-            else if(!summoned && _unit->GetHealthPct() <= 40)
-            {
-                _unit->CastSpell(_unit, info_summon_elementals, true);
-                _unit->PlaySoundToSet(9251);
-                _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I'm not finished yet! No, I have a few more tricks up me sleeve.");
-                summoned = true;
-            }
-            else if(_unit->GetManaPct() <= 20)
-            {
-                if(!m_time_pyroblast) 
+		if(!drinking) 
 		{
-                    _unit->PlaySoundToSet(9248);
-                    _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Surely you would not deny an old man a replenishing drink? No, no I thought not.");
-                    m_time_pyroblast = 10;
-                    _unit->CastSpell(_unit, info_mass_polymorph, false);
-                }
-                else
-                {
-                    m_time_pyroblast--;
-                    // TODO: conjure spell broken :(
-                    _unit->CastSpell(_unit, info_conjure, false);
-                    drinking = true;
-                }
-            }
-            else
-                SpellTrigger();
-         }
-	 else
-	 {
-             m_time_pyroblast--;
-             if(!m_time_pyroblast)
-             {
-                 _unit->CastSpell(_unit, info_pyroblast, false);
-                 drinking = false;
-             }
-         }
-    }
+			if(explode)
+			{
+				if(slow)
+				{
+					_unit->CastSpell(_unit, info_massslow, true);
+					slow = false;
+				}
+				else
+				{
+					_unit->CastSpell(_unit, info_aexplosion, false);
+					explode = false;
+				}
+			}
+			else if(!summoned && _unit->GetHealthPct() <= 40)
+			{
+				_unit->CastSpell(_unit, info_summon_elementals, true);
+				_unit->PlaySoundToSet(9251);
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I'm not finished yet! No, I have a few more tricks up me sleeve.");
+				summoned = true;
+			}
+			else if(_unit->GetManaPct() <= 20)
+			{
+				if(!m_time_pyroblast) 
+				{
+					_unit->PlaySoundToSet(9248);
+					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Surely you would not deny an old man a replenishing drink? No, no I thought not.");
+					m_time_pyroblast = 10;
+					_unit->CastSpell(_unit, info_mass_polymorph, false);
+				}
+				else
+				{
+					m_time_pyroblast--;
+					// TODO: conjure spell broken :(
+					_unit->CastSpell(_unit, info_conjure, false);
+					drinking = true;
+				}
+			}
+			else
+				SpellTrigger();
+		}
+		else
+		{
+			m_time_pyroblast--;
+			if(!m_time_pyroblast)
+			{
+				_unit->SetUInt32Value(UNIT_FIELD_POWER1, _unit->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+				_unit->CastSpell(_unit, info_pyroblast, false);
+				drinking = false;
+			}
+		}
+	}
 
     void SpellTrigger()
     {
@@ -1443,79 +1451,114 @@ public:
         _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, text);
     }
 
-    void CastSpecial()
-    {
-        uint32 val = (uint32) sRand.randInt(100)%3;
-        switch(val)
-        {
-            case 0:
-                EmoteExplosion();
-		_unit->CastSpell(_unit, info_blink_center, true);
-		_unit->CastSpell(_unit, info_magnetic_pull, true);
-                explode = true;
-                slow = true;
-                break;
-            case 1:
-                EmoteBlizzard();
-		_unit->CastSpell(_unit, info_blizzard, true);
-                break;
-            case 2:
-                EmoteWreath();
-		_unit->CastSpell(_unit, info_flame_wreath, true);
-                break;
-	}
-    }
-
-    void CastTime()
-    {
-	for(int i=0;i<nrspells;i++)
-            spells[i].casttime = spells[i].cooldown;
-    }
-
-    void SpellCast(float val)
-    {
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-	    float comulativeperc = 0;
-	    Unit *target = NULL;
-	    for(int i=0;i<nrspells;i++)
-	    {
-	        spells[i].casttime--;
-		
-		if (m_spellcheck[i])
+	void CastSpecial()
+	{
+		uint32 val = (uint32) sRand.randInt(100)%3;
+		switch(val)
 		{
-		    spells[i].casttime = spells[i].cooldown;
-		    target = _unit->GetAIInterface()->GetNextTarget();
-		    switch(spells[i].targettype)
-		    {
-		        case TARGET_SELF:
-		        case TARGET_VARIOUS:
-			    _unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-		        case TARGET_ATTACKING:
-			    _unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-		        case TARGET_DESTINATION:
-			    _unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-		    }
-
-		    if (spells[i].speech != "")
-		    {
-		        _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-			_unit->PlaySoundToSet(spells[i].soundid); 
-		    }
-
-		    m_spellcheck[i] = false;
-		    return;
+		case 0:
+			EmoteExplosion();
+			_unit->CastSpell(_unit, info_blink_center, true);
+			_unit->CastSpell(_unit, info_magnetic_pull, true);
+			explode = true;
+			slow = true;
+			break;
+		case 1:
+			EmoteBlizzard();
+			_unit->CastSpell(_unit, info_blizzard, true);
+			break;
+		case 2:
+			EmoteWreath();
+			_unit->CastSpell(_unit, info_flame_wreath, true);
+			break;
 		}
-
-		if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
-		{
-		    _unit->setAttackTimer(spells[i].attackstoptimer, false);
-		    m_spellcheck[i] = true;
-		}
-		comulativeperc += spells[i].perctrigger;
-            }
 	}
-    }
+
+	void CastTime()
+	{
+		for(int i=0;i<nrspells;i++)
+			spells[i].casttime = spells[i].cooldown;
+	}
+
+	void SpellCast(float val)
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
+			float comulativeperc = 0;
+			Unit *target = NULL;
+			for(int i=0;i<nrspells;i++)
+			{
+				spells[i].casttime--;
+
+				if (m_spellcheck[i])
+				{
+					spells[i].casttime = spells[i].cooldown;
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+					case TARGET_SELF:
+					case TARGET_VARIOUS:
+						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+					case TARGET_ATTACKING:
+						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+					case TARGET_DESTINATION:
+						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					case TARGET_RANDOM:
+						target = RandomTarget(true, true, spells[i].info->base_range_or_radius_sqr);
+						if (target)
+						{
+							_unit->GetAIInterface()->SetNextTarget(target);
+							_unit->CastSpell(target, spells[i].info, spells[i].instant);
+						}
+						break;
+					}
+
+					if (spells[i].speech != "")
+					{
+						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
+						_unit->PlaySoundToSet(spells[i].soundid); 
+					}
+
+					m_spellcheck[i] = false;
+					return;
+				}
+
+				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+		}
+	}
+
+	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return NULL;
+
+		std::vector<Unit*> targetTable;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		TargetMap::iterator itr;
+		for (itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			Unit *temp = itr->first;
+			if (_unit->GetDistance2dSq(temp) <= dist)
+			{
+				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (!targetTable.size())
+			return NULL;
+
+		uint32 randt = sRand.randInt(100)%targetTable.size();
+		Unit * randomtarget = targetTable[randt];
+		return randomtarget;
+	}
 
 protected:
     bool drinking;
