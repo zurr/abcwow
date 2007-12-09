@@ -10,12 +10,6 @@
 #define SHADOW_BOLT_VOLLEY	39175
 #define DEATH_COIL			41070
 #define RAIN_OF_FIRE		37465
-#define SOUL_TRANSFER       30531
-
-Unit* Channeler;
-Unit* ChannelerTO;
-Unit* Magtheridon;
-int dieCount;
 
 class HellfireWarderAI : public CreatureAIScript
 {
@@ -123,6 +117,7 @@ protected:
 #define SHADOW_BOLT_VOLLEY	39175
 #define DARK_MENDING		30528
 #define BEAM_BLUNDER        1120
+#define SOUL_TRANSFER       30531
 
 class HellfireChannelerAI : public CreatureAIScript
 	{
@@ -166,21 +161,6 @@ class HellfireChannelerAI : public CreatureAIScript
 		
 		void OnDied(Unit * mKiller)
 		{
-			dieCount++;
-
-			if(dieCount >=5)
-			{
-				Magtheridon = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-32.171f, 39.926f, 0.630f, 17257);
-				Magtheridon->GetAIInterface()->SetAllowedToEnterCombat(true);
-				Magtheridon->GetAIInterface()->m_canMove = true;
-				Magtheridon->RemoveAllAuras();
-			}
-			
-			//todo fix the way channelers give eachother the buff
-			/*Channeler = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-32.171f, 39.926f, 0.630f, 17256);
-			ChannelerTO = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-10.171f, 23.926f, 0.630f, 17256);
-			Channeler->CastSpell(ChannelerTO, SOUL_TRANSFER, true);*/
-
 			RemoveAIUpdateEvent();
 		}
 		
@@ -236,11 +216,11 @@ class HellfireChannelerAI : public CreatureAIScript
 // Magtheridon
 #define CN_MAGTHERIDON 17257
 
-#define QUAKE      30571
-#define BLAST_NOVA 30616
-#define CLEAVE     37476
-#define BANISH     31797
-#define CAVE_IN    36240
+#define QUAKE		30571
+#define BLAST_NOVA	30613 // its only one tick but you cant cancel the full spell (30616)
+#define CLEAVE		37476
+#define BANISH		31797
+#define CAVE_IN		36240 // wrong... cant fins something
 
 class MagtheridonAI : public CreatureAIScript
 {
@@ -256,33 +236,46 @@ public:
 		{
 			m_spellcheck[i] = true;
 		} 
-/*
- Draining: "Not again... NOT AGAIN!" //sound id: 10256
- Freed from the draining: (laughs evilly) "I... am... UNLEASHED!!!" //soundid 10253*/
-//		
 		spells[0].info = dbcSpell.LookupEntry(CLEAVE);
 		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = false;
+		spells[0].instant = true;
+		spells[0].cooldown = 12;
 		spells[0].perctrigger = 5.0f;
-		spells[0].attackstoptimer = 5000;
-		
+		spells[0].attackstoptimer = 4000;
+
+		channeler1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, -55.955898f, 2.182940f, 0.630942f, 0.000000f, true, false, 0, 0);
+		channeler2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, -32.171600f, 39.926800f, 0.630921f, 4.940120f, true, false, 0, 0);
+		channeler3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, 10.477100f, 24.445499f, 0.630891f, 3.894760f, true, false, 0, 0);
+		channeler4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, 10.469200f, -19.894800f, 0.630910f, 2.555650f, true, false, 0, 0);
+		channeler5 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER,  -31.861300f, -35.919399f, 0.630945f, 1.314720f, true, false, 0, 0);
+
 		_unit->CastSpell(_unit, BANISH, true);
-		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-		_unit->GetAIInterface()->m_canMove = false;
+		m_phase = 1;
+		RegisterAIUpdateEvent(1000);
 	}
 	void OnCombatStart(Unit* mTarget)
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Thank you for releasing me. Now... die!");
 		_unit->PlaySoundToSet(10254);
 		timer_blastNova = 0;
-		timer_caveIn = 0;
-		
-        RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		timer_quake = 0;
+		timer_enrage = 1200;
+		enrage = 0;
     }
 
     void OnCombatStop(Unit *mTarget)
     {
+		if (_unit->isAlive())
+		{
+			channeler1->Despawn(100, 0);
+			channeler2->Despawn(100, 0);
+			channeler3->Despawn(100, 0);
+			channeler4->Despawn(100, 0);
+			channeler5->Despawn(100, 0);
+			_unit->Despawn(100, 0);
+			_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MAGTHERIDON, -22.657900f, 2.159050f, -0.345542f, 3.159940f, true, false, 0, 0);
+		}
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
@@ -306,14 +299,7 @@ public:
 	
 	void AIUpdate()
     {
-		
-		m_phase = 1;
-
-		if(_unit->GetHealthPct() <= 99 && _unit->GetHealthPct() >= 31)
-		{
-			m_phase = 2;
-		}
-		if(_unit->GetHealthPct() <= 30)
+		if(_unit->GetHealthPct() <= 30 && m_phase == 2)
 		{
 			m_phase = 3;
 		}
@@ -339,56 +325,99 @@ public:
 	
 	void PhaseOne()
 	{
-		//Phase one is handled in the channeler code
-		/*timer_RemoveBanish++;
-		if(timer_RemoveBanish > 100 && dieCount > 1)
+		if (!channeler1->isAlive() && !channeler2->isAlive() && !channeler3->isAlive() && !channeler4->isAlive() && !channeler5->isAlive())
 		{
+			m_phase = 2;
+			_unit->RemoveAura(BANISH);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
-			_unit->GetAIInterface()->m_canMove = true;
-			_unit->RemoveAllAuras();
-			float val = (float)sRand.rand(100.0f);
-			SpellCast(val);
 		}
-		else
-		{
-			sLog.outString("[Moon++][Magtheridon]Banish Countdown = %u & dieCount = %u" , timer_RemoveBanish, dieCount);
-		}*/
 	}
 	void PhaseTwo()
 	{
-		timer_blastNova++;
-		float val = (float)sRand.rand(100.0f);
-		SpellCast(val);
-		Unit *target = _unit->GetAIInterface()->GetNextTarget();
-
-		if(timer_blastNova > 54)
+		if (!timer_enrage && !enrage)
 		{
-			_unit->CastSpell(target, dbcSpell.LookupEntry(BLAST_NOVA), true);
-			timer_blastNova = 0;
+			_unit->DamageDoneModPCT[0] = 2;
+			enrage = 1;
+		}
+		else
+			timer_enrage--;
+		if (!quake)
+		{
+			timer_quake++;
+			timer_blastNova++;
+			float val = (float)sRand.rand(100.0f);
+			SpellCast(val);
+
+			if(timer_blastNova > 54)
+			{
+				_unit->CastSpell(_unit, BLAST_NOVA, true);
+				timer_blastNova = 0;
+
+			}
+			else if (timer_quake > 40)
+			{
+				_unit->setAttackTimer(5000, false);
+				_unit->GetAIInterface()->StopMovement(5000);
+				_unit->CastSpell(_unit, QUAKE, true);
+				timer_quake = 0;
+				quake = 1;
+			}
+		}
+		else
+		{
+			if (quake <= 3)
+			{
+				_unit->CastSpell(_unit, QUAKE, true);
+				quake++;
+			}
+			else
+			{
+				quake = 0;
+			}
 		}
 	}
 	void PhaseThree()
 	{
-		timer_caveIn++;
-		timer_blastNova++;
-
-		float val = (float)sRand.rand(100.0f);
-		SpellCast(val);
-		Unit *target = _unit->GetAIInterface()->GetNextTarget();
-		
-		if(timer_blastNova > 54)
+		if (!timer_enrage && !enrage)
 		{
-			_unit->CastSpell(target, dbcSpell.LookupEntry(BLAST_NOVA), true);
-			timer_blastNova = 0;
+			_unit->DamageDoneModPCT[0] = 2;
+			enrage = 1;
 		}
-		if(timer_caveIn > 60)
+		else
+			timer_enrage--;
+		if (!quake)
 		{
-			Unit *target = _unit->GetAIInterface()->GetNextTarget();
-			_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), dbcSpell.LookupEntry(CAVE_IN), true);
+			timer_quake++;
+			timer_blastNova++;
+			float val = (float)sRand.rand(100.0f);
+			SpellCast(val);
 
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I will not be taken so easily. Let the walls of this prison tremble... and FALL!!!");
-			_unit->PlaySoundToSet(10257);
-			timer_caveIn = 0;
+			if(timer_blastNova > 54)
+			{
+				_unit->CastSpell(_unit, BLAST_NOVA, true);
+				timer_blastNova = 0;
+
+			}
+			else if (timer_quake > 40)
+			{
+				_unit->setAttackTimer(6000, false);
+				_unit->GetAIInterface()->StopMovement(6000);
+				_unit->CastSpell(_unit, QUAKE, true);
+				timer_quake = 0;
+				quake = 1;
+			}
+		}
+		else
+		{
+			if (quake <= 3)
+			{
+				_unit->CastSpell(_unit, QUAKE, true);
+				quake++;
+			}
+			else
+			{
+				quake = 0;
+			}
 		}
 	}
 	
@@ -441,9 +470,18 @@ public:
 protected:
 	int nrspells;
 	int m_phase;
-	int timer_caveIn;
 	int timer_blastNova;
-	int timer_RemoveBanish;
+	//int timer_RemoveBanish;
+	int timer_enrage;
+	int timer_quake;
+	int quake;
+	int enrage;
+
+	Creature *channeler1;
+	Creature *channeler2;
+	Creature *channeler3;
+	Creature *channeler4;
+	Creature *channeler5;
 };
 
 void SetupMagtheridonsLair(ScriptMgr * mgr)
