@@ -45,10 +45,12 @@ public:
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 1000;
 
+		_unit->SetStandState(8);
+
 	}
 	void OnCombatStart(Unit* mTarget)
     {
-        RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+        RegisterAIUpdateEvent(1000);
     }
 
     void OnCombatStop(Unit *mTarget)
@@ -146,14 +148,25 @@ class HellfireChannelerAI : public CreatureAIScript
 			spells[1].instant = true;
 			spells[1].perctrigger = 8.0f;
 			spells[1].attackstoptimer = 1000;
+
+			magtheridon = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-22.657900f, 2.159050f, -0.345542f, 17257);
+			_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, magtheridon->GetGUID());
+			_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 30207);
 		}
 		void OnCombatStart(Unit* mTarget)
 		{
-			RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+			_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+			_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+			RegisterAIUpdateEvent(1000);
 		}
 		
 		void OnCombatStop(Unit *mTarget)
 		{
+			if (_unit->isAlive() && magtheridon->isAlive() && !magtheridon->CombatStatus.IsInCombat())
+			{
+				_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, magtheridon->GetGUID());
+				_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 30207);
+			}
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 			RemoveAIUpdateEvent();
@@ -208,8 +221,8 @@ class HellfireChannelerAI : public CreatureAIScript
 		}
 		
 	protected:
-		
 		int nrspells;
+		Creature *magtheridon;
 	};
 
 
@@ -243,7 +256,7 @@ public:
 		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 4000;
 
-		channeler1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, -55.955898f, 2.182940f, 0.630942f, 0.000000f, true, false, 0, 0);
+		channeler1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, -55.638000f, 1.869050f, 0.630946f, 0.000000f, true, false, 0, 0);
 		channeler2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, -32.171600f, 39.926800f, 0.630921f, 4.940120f, true, false, 0, 0);
 		channeler3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, 10.477100f, 24.445499f, 0.630891f, 3.894760f, true, false, 0, 0);
 		channeler4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, 10.469200f, -19.894800f, 0.630910f, 2.555650f, true, false, 0, 0);
@@ -319,8 +332,6 @@ public:
 				m_phase = 1;
 				break;
 		}
-		float val = (float)sRand.rand(100.0f);
-        SpellCast(val);
     }
 	
 	void PhaseOne()
@@ -356,8 +367,8 @@ public:
 			}
 			else if (timer_quake > 40)
 			{
-				_unit->setAttackTimer(5000, false);
-				_unit->GetAIInterface()->StopMovement(5000);
+				_unit->setAttackTimer(9000, false);
+				_unit->GetAIInterface()->StopMovement(9000);
 				_unit->CastSpell(_unit, QUAKE, true);
 				timer_quake = 0;
 				quake = 1;
@@ -365,7 +376,7 @@ public:
 		}
 		else
 		{
-			if (quake <= 3)
+			if (quake <= 6)
 			{
 				_unit->CastSpell(_unit, QUAKE, true);
 				quake++;
@@ -400,8 +411,8 @@ public:
 			}
 			else if (timer_quake > 40)
 			{
-				_unit->setAttackTimer(6000, false);
-				_unit->GetAIInterface()->StopMovement(6000);
+				_unit->setAttackTimer(8000, false);
+				_unit->GetAIInterface()->StopMovement(8000);
 				_unit->CastSpell(_unit, QUAKE, true);
 				timer_quake = 0;
 				quake = 1;
@@ -409,7 +420,7 @@ public:
 		}
 		else
 		{
-			if (quake <= 3)
+			if (quake <= 6)
 			{
 				_unit->CastSpell(_unit, QUAKE, true);
 				quake++;
