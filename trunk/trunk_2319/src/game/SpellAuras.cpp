@@ -1236,6 +1236,200 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
+	case 32052: //custom
+		{
+			if (apply)
+			{
+				sChatHandler.SystemMessage(_ptarget->GetSession(), "MUHAHAHA ...");
+
+				uint8 race ,class_,gender,powertype/*,skin,face,hairStyle,hairColor,facialHair*/;
+
+				race = _ptarget->getRace();
+				class_ = _ptarget->getClass();
+				gender = _ptarget->getGender();
+				powertype = _ptarget->GetPowerType();
+
+				switch(class_)
+				{
+				case WARRIOR:
+					{
+						switch(race)
+						{
+						case RACE_HUMAN: race = RACE_UNDEAD; break;
+						case RACE_UNDEAD: race = RACE_HUMAN; break;
+						case RACE_ORC: race = RACE_DWARF; break;
+						case RACE_DWARF: race = RACE_ORC; break;
+						case RACE_NIGHTELF: race = RACE_TROLL; break;
+						case RACE_TROLL: race = RACE_NIGHTELF; break;
+						case RACE_TAUREN: race = RACE_GNOME; break;
+						case RACE_GNOME: race = RACE_TAUREN; break;
+						case RACE_DRAENEI: race = RACE_TAUREN; break;
+						}
+					}break;
+				case PALADIN:
+					{
+						switch(race)
+						{
+						case RACE_HUMAN:
+						case RACE_DWARF:
+						case RACE_DRAENEI:
+							race = RACE_BLOODELF; break;
+						case RACE_BLOODELF: race = RACE_HUMAN; break;
+						}
+					}break;
+				case HUNTER:
+					{
+						switch(race)
+						{
+						case RACE_DRAENEI: race = RACE_ORC; break;
+						case RACE_ORC: race = RACE_DRAENEI; break;
+						case RACE_BLOODELF: race = RACE_DWARF; break;
+						case RACE_DWARF: race = RACE_BLOODELF; break;
+						case RACE_NIGHTELF: race = RACE_TROLL; break;
+						case RACE_TROLL: race = RACE_NIGHTELF; break;
+						case RACE_TAUREN: race = RACE_DRAENEI; break;
+						}
+					}break;
+				case ROGUE:
+					{
+						switch(race)
+						{
+						case RACE_HUMAN: race = RACE_UNDEAD; break;
+						case RACE_UNDEAD: race = RACE_HUMAN; break;
+						case RACE_DWARF: race = RACE_ORC; break;
+						case RACE_ORC: race = RACE_DWARF; break;
+						case RACE_NIGHTELF: race = RACE_TROLL; break;
+						case RACE_TROLL: race = RACE_NIGHTELF; break;
+						case RACE_GNOME: race = RACE_BLOODELF; break;
+						case RACE_BLOODELF: race = RACE_GNOME; break;
+						}
+					}break;
+				case PRIEST:
+					{
+						switch(race)
+						{
+						case RACE_HUMAN: race = RACE_UNDEAD; break;
+						case RACE_UNDEAD: race = RACE_HUMAN; break;
+						case RACE_DWARF: race = RACE_BLOODELF; break;
+						case RACE_BLOODELF: race = RACE_DWARF; break;
+						case RACE_NIGHTELF: race = RACE_TROLL; break;
+						case RACE_TROLL: race = RACE_NIGHTELF; break;
+						case RACE_DRAENEI: race = RACE_BLOODELF; break;
+						}
+					}break;
+				case SHAMAN:
+					{
+						switch(race)
+						{
+						case RACE_ORC:
+						case RACE_TAUREN:
+						case RACE_TROLL:
+							race = RACE_DRAENEI; break;
+						case RACE_DRAENEI: race = RACE_ORC; break;
+						}
+					}break;
+				case MAGE:
+					{
+						switch(race)
+						{
+						case RACE_HUMAN: race = RACE_UNDEAD; break;
+						case RACE_UNDEAD: race = RACE_HUMAN; break;
+						case RACE_TROLL: race = RACE_GNOME; break;
+						case RACE_GNOME: race = RACE_TROLL; break;
+						case RACE_DRAENEI: race = RACE_BLOODELF; break;
+						case RACE_BLOODELF: race = RACE_DRAENEI; break;
+						}
+					}break;
+				case WARLOCK:
+					{
+						switch(race)
+						{
+						case RACE_HUMAN: race = RACE_UNDEAD; break;
+						case RACE_UNDEAD: race = RACE_HUMAN; break;
+						case RACE_GNOME: race = RACE_ORC; break;
+						case RACE_ORC: race = RACE_GNOME; break;
+						case RACE_BLOODELF: race = RACE_HUMAN; break;
+						}
+					}break;
+				case DRUID:
+					{
+						switch(race)
+						{
+						case RACE_TAUREN: race = RACE_NIGHTELF; break;
+						case RACE_NIGHTELF: race = RACE_TAUREN; break;
+						}
+					}break;
+				}
+
+				_ptarget->SetTeam( (_ptarget->GetTeam()) ? 0 : 1 );
+				PlayerCreateInfo *info = objmgr.GetPlayerCreateInfo(race, class_);
+				if (!info)
+					break;
+
+				_ptarget->SetFloatValue(OBJECT_FIELD_SCALE_X, ((race==RACE_TAUREN)?1.3f:1.0f));
+				_ptarget->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, info->factiontemplate );	
+				_ptarget->SetUInt32Value(UNIT_FIELD_BYTES_0, ( ( race ) | ( class_ << 8 ) | ( gender << 16 ) | ( powertype << 24 ) ) );
+				if(race != RACE_BLOODELF)
+				{
+					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId + gender );
+					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId + gender );
+				}
+				else
+				{
+					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId - gender );
+					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId - gender );
+				}
+				/* I hope there is 1:1 ratio in skin/face/hairStyle for all races
+				_ptarget->SetUInt32Value(PLAYER_BYTES, ((skin) | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
+				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (facialHair | (0x02 << 24)));
+				_ptarget->SetUInt32Value(PLAYER_BYTES_3, ((gender) | (0x00 << 8) | (0x00 << 16) | (_ptarget->GetPVPRank() << 24)));
+				*/
+	
+				// all reputations from the starting point :)
+				_ptarget->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, 0xEEEEEEEE);
+				_ptarget->_InitialReputation();
+
+				_ptarget->_RemoveLanguages();
+				
+				//quit guild
+				if (_ptarget->GetGuildId())
+				{
+					Guild *pGuild = objmgr.GetGuild( _ptarget->GetGuildId() );
+
+					if(pGuild && pGuild->GetGuildLeaderGuid() != _ptarget->GetGUID() )
+					{
+						_ptarget->SetGuildId(0);
+						_ptarget->SetGuildRank(0);
+						pGuild->DeleteGuildMember(_ptarget->GetGUID());
+
+						WorldPacket data(100);
+						data.Initialize(SMSG_GUILD_EVENT);
+						data << uint8(GUILD_EVENT_LEFT);
+						data << uint8(1);
+						data << _ptarget->GetName();
+						pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
+					}
+				}
+
+				//arena team remove
+				for(uint32 i = 0; i < 3 ; i++)
+				{
+					ArenaTeam * team;
+					if( (team = _ptarget->m_arenaTeams[i]) != NULL )
+						team->RemoveMember(_ptarget->m_playerInfo);
+				}
+
+				//save the changes
+				_ptarget->SaveToDB(false);
+			}
+			else
+			{
+				sChatHandler.SystemMessage(_ptarget->GetSession(), "Signed in blood. There is no going back now ...");
+				sChatHandler.SystemMessage(_ptarget->GetSession(), "Relog ...");
+				//force relog
+				_ptarget->Kick(5000);
+			}
+		}break;
 	case 19977:
 	case 19978:
 	case 19979:

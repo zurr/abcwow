@@ -1356,6 +1356,20 @@ bool World::SetInitialWorldSettings()
 	if(sp && sp->Id==17364)
 		sp->Effect[0]=0;
 
+	//"deal with the devil" custom spell based on unused dummy 
+	sp = dbcSpell.LookupEntry(32052);
+	if(sp)
+	{
+		//maybe we need to add some longer cast time here?
+		sp->DurationIndex = 407;
+		sp->dummy = 1;
+		sp->procFlags = 0;
+		sp->Attributes = 0;
+		sp->AttributesEx = 0;
+		sp->Flags3 = 0;
+		sp->maxstack = 0;
+	}
+
 	//Bloodlust targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntry(2825);
 	if(sp)
