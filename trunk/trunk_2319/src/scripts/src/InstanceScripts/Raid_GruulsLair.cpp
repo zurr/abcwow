@@ -863,13 +863,13 @@ class GruulsTheDragonkillerAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(GruulsTheDragonkillerAI);
-	SP_AI_Spell spells[8];
-	bool m_spellcheck[8];
+	SP_AI_Spell spells[7];
+	bool m_spellcheck[7];
 
     GruulsTheDragonkillerAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
 		GrowthCooldown = 30;
-		nrspells = 8;
+		nrspells = 7;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -909,23 +909,25 @@ public:
 		//spells[4].speech = ""No escape!; // has 2 sounds for one spell :O
 		//spells[4].soundid = 11356;
 
+		/* Dealer: disabled cause it does much more dmg than it should 
 		spells[5].info = dbcSpell.LookupEntry(SHATTER);
 		spells[5].targettype = TARGET_VARIOUS;
 		spells[5].instant = true;
 		spells[5].perctrigger = 6.0f;
 		spells[5].attackstoptimer = 1000;
+		*/
 
-		spells[6].info = dbcSpell.LookupEntry(STONED);
-		spells[6].targettype = TARGET_SELF;
+		spells[5].info = dbcSpell.LookupEntry(STONED);
+		spells[5].targettype = TARGET_SELF;
+		spells[5].instant = true;
+		spells[5].perctrigger = 7.0f;
+		spells[5].attackstoptimer = 1000;
+
+		spells[6].info = dbcSpell.LookupEntry(GRONN_LORDS_GRASP);
+		spells[6].targettype = TARGET_SELF; // <-- not sure to that (description tells it works like that, but should it really be casted on boss?)
 		spells[6].instant = true;
-		spells[6].perctrigger = 7.0f;
+		spells[6].perctrigger = 6.0f;
 		spells[6].attackstoptimer = 1000;
-
-		spells[7].info = dbcSpell.LookupEntry(GRONN_LORDS_GRASP);
-		spells[7].targettype = TARGET_SELF; // <-- not sure to that (description tells it works like that, but should it really be casted on boss?)
-		spells[7].instant = true;
-		spells[7].perctrigger = 6.0f;
-		spells[7].attackstoptimer = 1000;
 
     }
     
