@@ -5978,20 +5978,20 @@ void Aura::SpellAuraModHaste(bool apply)
 void Aura::SpellAuraForceReaction(bool apply)
 {
 	// hackfix for spectacles
-	if(m_spellProto->EffectApplyAuraName[0] == SPELL_AURA_MOD_INVISIBILITY_DETECTION || m_target->GetTypeId() == TYPEID_PLAYER)
+	if(m_spellProto->EffectApplyAuraName[0] == SPELL_AURA_MOD_INVISIBILITY_DETECTION && m_target->GetTypeId() == TYPEID_PLAYER)
 		return;
 
 	if (apply)
 	{
-		//SetCasterFaction(m_target->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 		SetCasterFaction(m_target->_getFaction());
 		SetPositive();
-		m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, mod->m_miscValue);
+		m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,mod->m_miscValue);
 	}
 	else
 	{
 		m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, GetCasterFaction() );
 	}
+
 	m_target->_setFaction();
 	m_target->UpdateOppFactionSet();
 }
