@@ -3128,6 +3128,9 @@ void Player::RemoveFromWorld()
 	if(m_bg)
 		m_bg->RemovePlayer(this, true);
 
+	if(m_Group)
+		m_Group->RemovePlayer(this->m_playerInfo, this, true);
+
 	if(m_tempSummon)
 	{
 		m_tempSummon->RemoveFromWorld(false, true);
