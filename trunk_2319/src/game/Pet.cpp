@@ -444,7 +444,7 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 //			if(sscanf(q, "%u %u", &spellid, &spstate) != 2)
 //				break;
 			spellid = strtol( q, &t, 10 );
-			spstate = strtol( t+1, NULL, 10 );
+			spstate = (uint16)strtol( t+1, NULL, 10 );
 
 			ActionBar[i] = spellid;
 			//SetSpellState(dbcSpell.LookupEntry(spellid), spstate);

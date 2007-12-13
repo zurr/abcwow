@@ -1277,7 +1277,8 @@ void Unit::RegeneratePower(bool isinterrupted)
 			static_cast<Player*>(this)->RegenerateMana(isinterrupted);
 			break;
 		case POWER_TYPE_ENERGY:
-			static_cast<Player*>(this)->RegenerateEnergy();
+			if (!isinterrupted) 
+				static_cast<Player*>(this)->RegenerateEnergy();
 			break;
 		}
 		

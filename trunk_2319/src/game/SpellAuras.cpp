@@ -1294,13 +1294,13 @@ void Aura::SpellAuraDummy(bool apply)
 					{
 						switch(race)
 						{
-						case RACE_HUMAN: race = RACE_UNDEAD; break;
+						case RACE_HUMAN: race = RACE_BLOODELF; break;
 						case RACE_UNDEAD: race = RACE_HUMAN; break;
 						case RACE_DWARF: race = RACE_ORC; break;
 						case RACE_ORC: race = RACE_DWARF; break;
 						case RACE_NIGHTELF: race = RACE_TROLL; break;
 						case RACE_TROLL: race = RACE_NIGHTELF; break;
-						case RACE_GNOME: race = RACE_BLOODELF; break;
+						case RACE_GNOME: race = RACE_UNDEAD; break;
 						case RACE_BLOODELF: race = RACE_GNOME; break;
 						}
 					}break;
