@@ -38,14 +38,6 @@ enum PET_FOOD
 	PET_FOOD_RAW_FISH  // not used in pet diet
 };
 
-/* Pet Diet:
-   taken from http://petopia.brashendeavors.net/html/articles/stats_families.shtml#diet
-   filled with "0" for unknown / non existing creature family's
-   how to use: 
-   value = PetDiet[number_creature_family];
-*/
-static const unsigned char PetDiet[36] = { 0,1,3,1,63,63,3,3,58,48,0,1,52,0,0,0,0,0,0,0,1,178,0,0,48,33,1,14,0,0,227,65,162,60,65,195 };
-
 /*Loyalty and happiness ticks*/
 static const char LoyaltyTicks[3] = {-20, 10, 20};//loyalty_ticks for unhappy, content, happy
 static const unsigned char HappinessTicks[6] = {70, 35, 17, 8, 4, 2};//loose_happiness ticks per loyalty lvl
@@ -144,7 +136,7 @@ public:
 	inline uint32 GetPetState(void) { return m_State; }
 
 	inline void SetPetDiet(uint32 diet) { m_Diet = diet; }
-	inline void SetPetDiet() { m_Diet = PetDiet[this->creature_info->Family]; }
+	inline void SetPetDiet() { m_Diet = myFamily->petdietflags; }
 
 	inline uint32 GetPetDiet(void) { return m_Diet; }
 	
@@ -258,7 +250,7 @@ protected:
 
 #define PET_LOYALTY_UPDATE_TIMER 120000
 #define PET_LOYALTY_LVL_RANGE 300 //range for each layalty lvl, now (300) if pet HAPPY, it will gain higher loyalty lvl in 30 minutes (no idea what is Blizz): 300 / 20 * 120 000 = 1 800 000 ms = 30 min
-#define PET_HAPPINESS_UPDATE_VALUE 350000
+#define PET_HAPPINESS_UPDATE_VALUE 330000
 #define PET_HAPPINESS_UPDATE_TIMER 7500
 #define PET_PARTY_SPELLS_UPDATE_TIMER 10000
 

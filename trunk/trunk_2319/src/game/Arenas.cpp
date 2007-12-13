@@ -363,7 +363,7 @@ void Arena::Finish()
 						// Through investigation, K was estimated to be 30
 						// When used in chess, Elo uses K = 32 ... maybe this would be better? :/
 						double multiplier = (outcome ? 1.0 : 0.0) - winChance;
-						double deltaRating = 30.0 * multiplier;
+						double deltaRating = 32.0 * multiplier;
 						if ( deltaRating < 0 && (-1.0 * deltaRating) > t->m_stat_rating )
 							t->m_stat_rating = 0;
 						else

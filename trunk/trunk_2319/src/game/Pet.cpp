@@ -144,7 +144,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		// These need to be checked.
 		SetUInt32Value(UNIT_FIELD_FLAGS, 0x00080008);
 		SetUInt32Value(UNIT_FIELD_POWER5, PET_HAPPINESS_UPDATE_VALUE / 2);//happiness
-		SetUInt32Value(UNIT_FIELD_MAXPOWER5, PET_HAPPINESS_UPDATE_VALUE * 3);
+		SetUInt32Value(UNIT_FIELD_MAXPOWER5, 1000000);
 		SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
 		SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, GetNextLevelXP(getLevel()));
 		SetUInt32Value(UNIT_FIELD_BYTES_1, 0 | (REBELIOUS << 8));//loyalty level
@@ -432,6 +432,7 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 		char * ab = strdup(mPi->actionbar.c_str());
 		char * p = strchr(ab, ',');
 		char * q = ab;
+		char * t;
 		uint32 spellid;
 		uint16 spstate;
 		uint32 i = 0;
@@ -440,8 +441,10 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 		{
 			*p = 0;
 
-			if(sscanf(q, "%u %u", &spellid, &spstate) != 2)
-				break;
+//			if(sscanf(q, "%u %u", &spellid, &spstate) != 2)
+//				break;
+			spellid = strtol( q, &t, 10 );
+			spstate = strtol( t+1, NULL, 10 );
 
 			ActionBar[i] = spellid;
 			//SetSpellState(dbcSpell.LookupEntry(spellid), spstate);
@@ -524,6 +527,7 @@ void Pet::InitializeMe(bool first)
 			} while(query->NextRow());
 		}
 		delete query;
+		UpdateTP();
 	}
 
 	InitializeSpells();
@@ -785,7 +789,8 @@ void Pet::AddSpell(SpellEntry * sp, bool learning)
 					// replace the action bar
 					for(int i = 0; i < 10; ++i)
 					{
-						if(ActionBar[i] == itr->first->Id)
+//						if(ActionBar[i] == itr->first->Id)
+						if(ActionBar[i] == 0)
 						{
 							ActionBar[i] = sp->Id;
 							break;
@@ -834,6 +839,7 @@ void Pet::AddSpell(SpellEntry * sp, bool learning)
 	
 	if(IsInWorld())
 		SendSpellsToOwner();
+	UpdateTP();
 }
 
 void Pet::SetSpellState(SpellEntry* sp, uint16 State)
@@ -936,6 +942,7 @@ void Pet::RemoveSpell(SpellEntry * sp)
 			}
 		}
 	}
+	UpdateTP();
 }
 
 void Pet::Rename(string NewName)
@@ -1342,7 +1349,7 @@ void Pet::ApplyPetLevelAbilities()
 	//patch from darken
 	double pet_sta_bonus = 0.3 * (double)m_Owner->GetUInt32Value(UNIT_FIELD_STAT2);
 	double pet_arm_bonus = 0.35 * (double)m_Owner->BaseResistance[0];	   // Armor
-	double pet_ap_bonus = 0.22 * (double)m_Owner->GetUInt32Value(UNIT_FIELD_ATTACK_POWER);
+	double pet_ap_bonus = 0.22 * (double)m_Owner->GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER);
 
 	//Base attributes from http://petopia.brashendeavors.net/html/art...ttributes.shtml
 	static double R_pet_base_armor[70] = { 20, 21, 46, 82, 126, 180, 245, 322, 412, 518, 545, 580, 615,650, 685, 721, 756, 791, 826, 861, 897, 932, 967, 1002, 1037, 1072, 1108, 1142, 1177, 1212, 1247, 1283, 1317, 1353, 1387, 1494, 1607, 1724, 1849, 1980, 2117, 2262, 2414, 2574, 2742, 2798, 2853,2907, 2963, 3018, 3072, 3128, 3183, 3237, 3292, 3348, 3402, 3457, 3512, 3814, 4113, 4410, 4708, 5006, 5303, 5601, 5900, 6197, 6495, 6790 };
@@ -1450,7 +1457,7 @@ void Pet::UpdateTP()
 	//update pets TP
 	//formula: TP = level*(loyaltyLvl - 1) - usedTP
 	//http://petopia.brashendeavors.net/html/articles/skills_main.shtml
-	if(!m_Owner) return;
+	if(!m_Owner || Summon) return;
 	int16 pts = getLevel()*(GetLoyaltyLevel()-1)-GetUsedTP();
 	TP = pts;
 	SetUInt32Value(UNIT_TRAINING_POINTS, pts < 0?(-pts & 0xffff):(pts<<16));//uff, works, but has anybody better idea?
