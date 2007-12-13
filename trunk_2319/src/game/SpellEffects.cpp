@@ -3913,11 +3913,10 @@ void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 	- effect is item level and pet level dependent, aura ticks are 35, 17, 8 (*1000) happiness
 	- http://petopia.brashendeavors.net/html/articles/basics_feeding.shtml */
 	int8 deltaLvl = pPet->getLevel() - itemTarget->GetProto()->ItemLevel;
-	if(deltaLvl > 10)
-	{
-		if(deltaLvl <= 20) damage = 17000;
-		else damage = 8000;
-	}
+	damage /= 1000; //damage of Feed pet spell is 35000
+	if(deltaLvl > 10) damage = damage >> 1;//divide by 2
+	if(deltaLvl > 20) damage = damage >> 1;
+	damage *= 1000;
 	SpellEntry *spellInfo = dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]);
 	spellInfo->EffectBasePoints[0] = damage - 1;
 	Spell *sp= new Spell((Object *)p_caster,spellInfo,true,NULL);
