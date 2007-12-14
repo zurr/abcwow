@@ -3128,9 +3128,6 @@ void Player::RemoveFromWorld()
 	if(m_bg)
 		m_bg->RemovePlayer(this, true);
 
-	if(m_Group)
-		m_Group->RemovePlayer(this->m_playerInfo, this, true);
-
 	if(m_tempSummon)
 	{
 		m_tempSummon->RemoveFromWorld(false, true);
@@ -8942,6 +8939,7 @@ void Player::save_ExploreData()
 
 void Player::save_Honor()
 {
+	printf("DEBUG: Saving honor o.O\n");
 	CharacterDatabase.Execute("UPDATE characters SET honorPointsToAdd = %u, killsToday = %u, killsYesterday = %u, killsLifeTime = %u, honorToday = %u, honorYesterday = %u, honorPoints = %u, arenaPoints = %u WHERE guid = %u",
 		m_honorPointsToAdd, m_killsToday, m_killsYesterday, m_killsLifetime, m_honorToday, m_honorYesterday, m_honorPoints, m_arenaPoints, m_uint32Values[OBJECT_FIELD_GUID]);
 }

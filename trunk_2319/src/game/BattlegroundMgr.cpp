@@ -771,13 +771,13 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	UpdatePvPData();
 
 	/* add the player to the group */
-	if(plr->GetGroup())
+	/*if(plr->GetGroup())
 	{
 		// remove them from their group
 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
 	}
 
-	//m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);
+	m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);*/
 
 	if(!m_countdownStage)
 	{
