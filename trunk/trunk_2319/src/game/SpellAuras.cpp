@@ -1386,11 +1386,14 @@ void Aura::SpellAuraDummy(bool apply)
 				*/
 	
 				// all reputations from the starting point :)
+				//TODO: keep the neutral factions
 				_ptarget->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, 0xEEEEEEEE);
 				_ptarget->_InitialReputation();
 
 				_ptarget->_RemoveLanguages();
 				
+				//TODO: Replace racial spells
+
 				//quit guild
 				if (_ptarget->GetGuildId())
 				{
