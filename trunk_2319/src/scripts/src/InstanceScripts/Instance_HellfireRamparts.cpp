@@ -302,7 +302,7 @@ public:
 		spells[1].attackstoptimer = 1000;
 
         spells[2].info = dbcSpell.LookupEntry(FEL_INFUSION);
-		spells[2].targettype = TARGET_VARIOUS;	// why it targets enemy :O
+		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
 		spells[2].cooldown = 25;
 		spells[2].perctrigger = 0.0f;
