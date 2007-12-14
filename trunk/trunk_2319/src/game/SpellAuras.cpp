@@ -4106,6 +4106,10 @@ void Aura::SpellAuraTransform(bool apply)
 			} break;
 
 
+		case 42365:	// murloc costume
+			m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, apply?21723:m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
+			break;
+
 		case 118://polymorh
 		case 851:
 		case 5254:

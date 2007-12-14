@@ -201,9 +201,6 @@ bool Group::AddMember(PlayerInfo * info, Player* pPlayer, int32 subgroupid)
 		BattlegroundManager.RemoveGroupFromQueues(this);
 	}
 
-	if(HasMember(info))
-		RemovePlayer(info, NULL, true); // make it search all subgroups for him
-
 	if(!IsFull())
 	{
 		SubGroup* subgroup = (subgroupid>0) ? m_SubGroups[subgroupid] : FindFreeSubGroup();
