@@ -540,7 +540,6 @@ public:
 
 	MAIDENOFVIRTUEAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		SpellEntry *infoImmunity;
 		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
@@ -730,7 +729,6 @@ public:
 
 	THEBIGBADWOLFAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		SpellEntry *infoImmunity;
 		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
@@ -2339,10 +2337,10 @@ protected:
 static Coords coords[] =
 {
 	{ 0, 0, 0, 0 },
-	{ -11173.719727, -1863.993164, 130.390396, 5.343079 }, // casting point
-	{ -11125.542969, -1926.884644, 139.349365, 3.982360 },
-	{ -11166.404297, -1950.729736, 114.714726, 1.537812 },
-	{ -11167.497070, -1922.315918, 91.473755, 1.390549 } // landing point
+	{ -11173.719727f, -1863.993164f, 130.390396f, 5.343079f }, // casting point
+	{ -11125.542969f, -1926.884644f, 139.349365f, 3.982360f },
+	{ -11166.404297f, -1950.729736f, 114.714726f, 1.537812f },
+	{ -11167.497070f, -1922.315918f, 91.473755f, 1.390549f } // landing point
 };
 
 class NIGHTBANEAI : public CreatureAIScript

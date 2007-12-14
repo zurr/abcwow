@@ -118,7 +118,6 @@ protected:
 
 #define SHADOW_BOLT_VOLLEY	39175
 #define DARK_MENDING		30528
-#define BEAM_BLUNDER        1120
 #define SOUL_TRANSFER       30531
 
 class HellfireChannelerAI : public CreatureAIScript

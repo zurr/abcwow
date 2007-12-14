@@ -1040,7 +1040,7 @@ public:
     }
 	Unit *RandomTarget()
 	{
-		uint32 targetsc = _unit->GetAIInterface()->getAITargetsCount();
+		size_t targetsc = _unit->GetAIInterface()->getAITargetsCount();
 		if (targetsc > 0)
 		{
 			TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
