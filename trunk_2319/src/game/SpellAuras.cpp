@@ -4663,6 +4663,8 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 							}
 					}
 				}
+			if( m_target )
+				m_target->MechanicImmunityMassDispel( (uint32)mod->m_miscValue , -1 , true );
 		}
 		else
 			SetNegative();
