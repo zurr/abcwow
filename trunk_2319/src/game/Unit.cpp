@@ -3443,7 +3443,7 @@ void Unit::VampiricEmbrace(uint32 dmg,Unit* tgt)
 {
 	if(!IsPlayer())
 		return;//just in case
-	int32 perc = 20;
+	int32 perc = 15;
 	SM_FIValue(SM_FSPELL_VALUE,&perc,4);
 	uint32 heal = (dmg*perc) / 100;
 	this->Heal(this,15286,heal);
@@ -3474,7 +3474,7 @@ void Unit::VampiricTouch(uint32 dmg,Unit* tgt)
                 return;//just in case
         
         int32 perc = 5;
-        SM_FIValue(SM_FSPELL_VALUE,&perc,4); // need fixing if required
+        //SM_FIValue(SM_FSPELL_VALUE,&perc,4);
 		if (perc*dmg<0)
 			return;
         uint32 man = (dmg*perc) / 100;
@@ -4799,18 +4799,18 @@ void Unit::Heal(Unit *target, uint32 SpellId, uint32 amount)
 	if (!target || !SpellId || !amount)
 		return;
 
-	uint32 ch=this->GetUInt32Value(UNIT_FIELD_HEALTH);
-	uint32 mh=this->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+	uint32 ch=target->GetUInt32Value(UNIT_FIELD_HEALTH);
+	uint32 mh=target->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
 	if(mh!=ch)
 	{
 		ch += amount;
 		if(ch > mh)
 		{
-			this->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
+			target->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
 			amount += mh-ch;
 		}
 		else 
-			this->SetUInt32Value(UNIT_FIELD_HEALTH, ch);
+			target->SetUInt32Value(UNIT_FIELD_HEALTH, ch);
 
 		WorldPacket data(SMSG_HEALSPELL_ON_PLAYER,25);
 		data << target->GetNewGUID();
@@ -4826,18 +4826,18 @@ void Unit::Energize(Unit* target,uint32 SpellId, uint32 amount,uint32 type)
 	if (!target || !SpellId || !amount)
 		return;
 
-	uint32 cm=this->GetUInt32Value(UNIT_FIELD_POWER1+type);
-	uint32 mm=this->GetUInt32Value(UNIT_FIELD_MAXPOWER1+type);
+	uint32 cm=target->GetUInt32Value(UNIT_FIELD_POWER1+type);
+	uint32 mm=target->GetUInt32Value(UNIT_FIELD_MAXPOWER1+type);
 	if(mm!=cm)
 	{
 		cm += amount;
 		if(cm > mm)
 		{
-			this->SetUInt32Value(UNIT_FIELD_POWER1+type, mm);
+			target->SetUInt32Value(UNIT_FIELD_POWER1+type, mm);
 			amount += mm-cm;
 		}
 		else 
-			this->SetUInt32Value(UNIT_FIELD_POWER1+type, cm);
+			target->SetUInt32Value(UNIT_FIELD_POWER1+type, cm);
 
 		WorldPacket datamr(SMSG_HEALMANASPELL_ON_PLAYER, 30);
 		datamr << target->GetNewGUID();
