@@ -3076,7 +3076,8 @@ int8 Spell::CheckItems()
 							return int8(SPELL_FAILED_BAD_TARGETS);
 				}
 
-				if (m_spellInfo->baseLevel && (m_spellInfo->baseLevel > proto->ItemLevel))
+				if (m_spellInfo->Effect[0] == SPELL_EFFECT_ENCHANT_ITEM && 
+					m_spellInfo->baseLevel && (m_spellInfo->baseLevel > proto->ItemLevel))
 					return int8(SPELL_FAILED_BAD_TARGETS); // maybe there is different err code
 			}
 			if(m_spellInfo->Id == 6991)	//Feed pet
