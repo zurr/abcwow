@@ -2288,7 +2288,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				static_cast<Unit*>(this)->VampiricEmbrace(float2int32(res), pVictim);
 		}
                 //VampiricTouch
-		if(this->GetGUID() == pVictim->VampTchCaster && IsUnit())
+		if(pVictim->VampTchCaster.find(this->GetGUID()) != pVictim->VampTchCaster.end() && IsUnit())
 		{
 			if(static_cast<Unit*>(this)->isAlive())
 				static_cast<Unit*>(this)->VampiricTouch(float2int32(res), pVictim);
