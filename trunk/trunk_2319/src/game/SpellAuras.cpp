@@ -1379,7 +1379,7 @@ void Aura::SpellAuraDummy(bool apply)
 					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId - gender );
 					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId - gender );
 				}
-				/* I hope there is 1:1 ratio in skin/face/hairStyle for all races
+				/* TODO:
 				_ptarget->SetUInt32Value(PLAYER_BYTES, ((skin) | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
 				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (facialHair | (0x02 << 24)));
 				_ptarget->SetUInt32Value(PLAYER_BYTES_3, ((gender) | (0x00 << 8) | (0x00 << 16) | (_ptarget->GetPVPRank() << 24)));
