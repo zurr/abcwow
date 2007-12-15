@@ -5057,3 +5057,35 @@ void CombatStatusHandler::TryToClearAttackTargets()
 		pt->CombatStatus.RemoveAttacker(m_Unit,m_Unit->GetGUID());
 	}
 }
+
+bool Unit::MechanicImmunityMassDispel( uint32 MechanicType , uint32 MaxDispel = -1 , bool HostileOnly = true )
+{
+	uint32 DispelCount = 0;
+	for(uint32 x = ( HostileOnly ? MAX_POSITIVE_AURAS : 0 ) ; x < MAX_AURAS ; x++ ) // If HostileOnly = 1, then we use aura slots 40-56 (hostile). Otherwise, we use 0-56 (all)
+		{
+			if( DispelCount >= MaxDispel && MaxDispel > 0 )
+			return true;
+
+			if( m_auras[x] )
+			{
+				if( m_auras[x]->GetSpellProto()->MechanicsType == MechanicType ) // Remove all mechanics of type MechanicType (my english goen boom)
+				{
+					m_auras[x]->Remove();
+					DispelCount ++;
+				}
+				else if( MechanicType == MECHANIC_ENSNARED ) // if got immunity for slow, remove some that are not in the mechanics
+				{
+					for( int i=0 ; i<3 ; i++ )
+					{
+						// SNARE + ROOT
+						if( m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED || m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
+						{
+							m_auras[x]->Remove();
+							break;
+						}
+					}
+				}
+			}
+		}
+	return ( DispelCount == 0 );
+}
