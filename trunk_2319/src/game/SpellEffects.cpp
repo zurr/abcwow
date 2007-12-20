@@ -406,7 +406,21 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			if(u_caster)
 				u_caster->Strike(unitTarget,dmg_type,m_spellInfo,0,0,dmg, pSpellId==0,true);
 		}
-	}   
+	}
+	if(m_spellInfo->School == SHADOW_DAMAGE)
+	{
+		if (u_caster)
+		{
+			if(unitTarget->VampEmbCaster.find(u_caster->GetGUID()) != unitTarget->VampEmbCaster.end())
+			{
+				u_caster->VampiricEmbrace(dmg, unitTarget);
+			}
+			if(unitTarget->VampTchCaster.find(u_caster->GetGUID()) != unitTarget->VampTchCaster.end())
+			{
+				u_caster->VampiricEmbrace(dmg, unitTarget);
+			}
+		}
+	}
 }
 
 void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)

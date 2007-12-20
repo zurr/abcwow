@@ -232,7 +232,7 @@ class HellfireChannelerAI : public CreatureAIScript
 #define BLAST_NOVA	30613 // its only one tick but you cant cancel the full spell (30616)
 #define CLEAVE		37476
 #define BANISH		31797
-#define CAVE_IN		36240 // wrong... cant fins something
+#define CAVE_IN		36240 // wrong... cant find something
 
 class MagtheridonAI : public CreatureAIScript
 {
@@ -341,6 +341,14 @@ public:
 			_unit->RemoveAura(BANISH);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 		}
+		else if (!timer_speech)
+		{
+			int val = sRand.randInt(100)%20;
+			if (!val)
+				RandomSpeech();
+		}
+		else
+			timer_speech--;
 	}
 	void PhaseTwo()
 	{
@@ -430,6 +438,39 @@ public:
 			}
 		}
 	}
+
+	void RandomSpeech()
+	{
+		timer_speech = 120;
+		int val = sRand.randInt(100)%6;
+		switch (val)
+		{
+		case 0:
+			_unit->PlaySoundToSet(10247);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Wretched, meddling insects! Release me, and perhaps I will grant you a merciful death!");
+			break;
+		case 1:
+			_unit->PlaySoundToSet(10248);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Vermin! Leeches! Take my blood and choke on it!");
+			break;
+		case 2:
+			_unit->PlaySoundToSet(10249);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Illidan is an arrogant fool! I will crush him and reclaim Outland as my own!");
+			break;
+		case 3:
+			_unit->PlaySoundToSet(10250);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Away, you mindless parasites! My blood is my own!");
+			break;
+		case 4:
+			_unit->PlaySoundToSet(10251);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "How long do you believe your pathetic sorcery can hold me?");
+			break;
+		case 5:
+			_unit->PlaySoundToSet(10252);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "My blood will be the end of you!");
+			break;
+		}
+	}
 	
 	void SpellCast(float val)
 	{
@@ -481,7 +522,7 @@ protected:
 	int nrspells;
 	int m_phase;
 	int timer_blastNova;
-	//int timer_RemoveBanish;
+	int timer_speech;
 	int timer_enrage;
 	int timer_quake;
 	int quake;
