@@ -417,7 +417,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			}
 			if(unitTarget->VampTchCaster.find(u_caster->GetGUID()) != unitTarget->VampTchCaster.end())
 			{
-				u_caster->VampiricEmbrace(dmg, unitTarget);
+				u_caster->VampiricTouch(dmg, unitTarget);
 			}
 		}
 	}
