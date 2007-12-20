@@ -1242,113 +1242,160 @@ void Aura::SpellAuraDummy(bool apply)
 			{
 				sChatHandler.SystemMessage(_ptarget->GetSession(), "MUHAHAHA ...");
 
-				uint8 race ,class_,gender,powertype/*,skin,face,hairStyle,hairColor,facialHair*/;
+				uint8 race, race_old, class_,gender,powertype/*,skin,face,hairStyle,hairColor,facialHair*/;
+				uint32 team = _ptarget->GetTeam();
 
-				race = _ptarget->getRace();
+				race_old = race = _ptarget->getRace();
 				class_ = _ptarget->getClass();
 				gender = _ptarget->getGender();
 				powertype = _ptarget->GetPowerType();
-
+				
 				switch(class_)
 				{
 				case WARRIOR:
 					{
-						switch(race)
+						if(!team) //a
 						{
-						case RACE_HUMAN: race = RACE_UNDEAD; break;
-						case RACE_UNDEAD: race = RACE_HUMAN; break;
-						case RACE_ORC: race = RACE_DWARF; break;
-						case RACE_DWARF: race = RACE_ORC; break;
-						case RACE_NIGHTELF: race = RACE_TROLL; break;
-						case RACE_TROLL: race = RACE_NIGHTELF; break;
-						case RACE_TAUREN: race = RACE_GNOME; break;
-						case RACE_GNOME: race = RACE_TAUREN; break;
-						case RACE_DRAENEI: race = RACE_TAUREN; break;
+							switch(sRand.randInt(3))
+							{
+								case 0: race = RACE_UNDEAD; break;
+								case 1: race = RACE_ORC; break;
+								case 2: race = RACE_TROLL; break;
+								case 3: race = RACE_TAUREN; break;
+							}
+						}else{
+							switch(sRand.randInt(4))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_DWARF; break;
+								case 2: race = RACE_NIGHTELF; break;
+								case 3: race = RACE_GNOME; break;
+								case 4: race = RACE_DRAENEI; break;
+							}
 						}
 					}break;
 				case PALADIN:
 					{
-						switch(race)
+						if(!team) //a
 						{
-						case RACE_HUMAN:
-						case RACE_DWARF:
-						case RACE_DRAENEI:
-							race = RACE_BLOODELF; break;
-						case RACE_BLOODELF: race = RACE_HUMAN; break;
+							race = RACE_BLOODELF;
+						}else{
+							switch(sRand.randInt(2))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_DWARF; break;
+								case 2: race = RACE_DRAENEI; break;
+							}
 						}
 					}break;
 				case HUNTER:
 					{
-						switch(race)
+						if(!team) //a
 						{
-						case RACE_DRAENEI: race = RACE_ORC; break;
-						case RACE_ORC: race = RACE_DRAENEI; break;
-						case RACE_BLOODELF: race = RACE_DWARF; break;
-						case RACE_DWARF: race = RACE_BLOODELF; break;
-						case RACE_NIGHTELF: race = RACE_TROLL; break;
-						case RACE_TROLL: race = RACE_NIGHTELF; break;
-						case RACE_TAUREN: race = RACE_DRAENEI; break;
+							switch(sRand.randInt(3))
+							{
+								case 0: race = RACE_ORC; break;
+								case 1: race = RACE_TAUREN; break;
+								case 2: race = RACE_TROLL; break;
+								case 3: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(sRand.randInt(2))
+							{
+								case 0: race = RACE_DWARF; break;
+								case 1: race = RACE_NIGHTELF; break;
+								case 2: race = RACE_DRAENEI; break;
+							}
 						}
 					}break;
 				case ROGUE:
 					{
-						switch(race)
+						if(!team) //a
 						{
-						case RACE_HUMAN: race = RACE_BLOODELF; break;
-						case RACE_UNDEAD: race = RACE_HUMAN; break;
-						case RACE_DWARF: race = RACE_ORC; break;
-						case RACE_ORC: race = RACE_DWARF; break;
-						case RACE_NIGHTELF: race = RACE_TROLL; break;
-						case RACE_TROLL: race = RACE_NIGHTELF; break;
-						case RACE_GNOME: race = RACE_UNDEAD; break;
-						case RACE_BLOODELF: race = RACE_GNOME; break;
+							switch(sRand.randInt(3))
+							{
+								case 0: race = RACE_UNDEAD; break;
+								case 1: race = RACE_ORC; break;
+								case 2: race = RACE_TROLL; break;
+								case 3: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(sRand.randInt(3))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_DWARF; break;
+								case 2: race = RACE_NIGHTELF; break;
+								case 3: race = RACE_GNOME; break;
+							}
 						}
 					}break;
 				case PRIEST:
 					{
-						switch(race)
+						if(!team) //a
 						{
-						case RACE_HUMAN: race = RACE_UNDEAD; break;
-						case RACE_UNDEAD: race = RACE_HUMAN; break;
-						case RACE_DWARF: race = RACE_BLOODELF; break;
-						case RACE_BLOODELF: race = RACE_DWARF; break;
-						case RACE_NIGHTELF: race = RACE_TROLL; break;
-						case RACE_TROLL: race = RACE_NIGHTELF; break;
-						case RACE_DRAENEI: race = RACE_BLOODELF; break;
+							switch(sRand.randInt(2))
+							{
+								case 0: race = RACE_UNDEAD; break;
+								case 1: race = RACE_TROLL; break;
+								case 2: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(sRand.randInt(3))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_DWARF; break;
+								case 2: race = RACE_NIGHTELF; break;
+								case 3: race = RACE_DRAENEI; break;
+							}
 						}
 					}break;
 				case SHAMAN:
 					{
-						switch(race)
+						if(!team) //a
 						{
-						case RACE_ORC:
-						case RACE_TAUREN:
-						case RACE_TROLL:
-							race = RACE_DRAENEI; break;
-						case RACE_DRAENEI: race = RACE_ORC; break;
-						}
+							switch(sRand.randInt(2))
+							{
+								case 0: race = RACE_ORC; break;
+								case 1: race = RACE_TAUREN; break;
+								case 2: race = RACE_TROLL; break;
+							}
+						}else race = RACE_DRAENEI;
 					}break;
 				case MAGE:
 					{
-						switch(race)
+						if(!team) //a
 						{
-						case RACE_HUMAN: race = RACE_UNDEAD; break;
-						case RACE_UNDEAD: race = RACE_HUMAN; break;
-						case RACE_TROLL: race = RACE_GNOME; break;
-						case RACE_GNOME: race = RACE_TROLL; break;
-						case RACE_DRAENEI: race = RACE_BLOODELF; break;
-						case RACE_BLOODELF: race = RACE_DRAENEI; break;
+							switch(sRand.randInt(2))
+							{
+								case 0: race = RACE_UNDEAD; break;
+								case 1: race = RACE_TROLL; break;
+								case 2: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(sRand.randInt(2))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_GNOME; break;
+								case 2: race = RACE_DRAENEI; break;
+							}
 						}
 					}break;
 				case WARLOCK:
 					{
-						switch(race)
+						if(!team) //a
 						{
-						case RACE_HUMAN: race = RACE_UNDEAD; break;
-						case RACE_UNDEAD: race = RACE_HUMAN; break;
-						case RACE_GNOME: race = RACE_ORC; break;
-						case RACE_ORC: race = RACE_GNOME; break;
-						case RACE_BLOODELF: race = RACE_HUMAN; break;
+							switch(sRand.randInt(2))
+							{
+								case 0: race = RACE_ORC ; break;
+								case 1: race = RACE_UNDEAD; break;
+								case 2: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(sRand.randInt(2))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_GNOME; break;
+							}
 						}
 					}break;
 				case DRUID:
@@ -1361,7 +1408,7 @@ void Aura::SpellAuraDummy(bool apply)
 					}break;
 				}
 
-				_ptarget->SetTeam( (_ptarget->GetTeam()) ? 0 : 1 );
+				_ptarget->SetTeam( team ? 0 : 1 );
 				PlayerCreateInfo *info = objmgr.GetPlayerCreateInfo(race, class_);
 				if (!info)
 					break;
@@ -1379,19 +1426,59 @@ void Aura::SpellAuraDummy(bool apply)
 					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId - gender );
 					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId - gender );
 				}
-				/* TODO:
+				// Different races have different number of visuals
+				_ptarget->SetUInt32Value(PLAYER_BYTES, ((sRand.randInt(5))|(sRand.randInt(5)<<8)|(sRand.randInt(5)<<16)|(sRand.randInt(5)<<24)));
+				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (( !gender ? 0 : sRand.randInt(3) ) | (0x02 << 24)));
+				/*
 				_ptarget->SetUInt32Value(PLAYER_BYTES, ((skin) | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
 				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (facialHair | (0x02 << 24)));
 				*/
 				
-				// all reputations from the starting point :)
-				//TODO: keep the neutral factions
 				_ptarget->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, 0xEEEEEEEE);
+				//dump reputation data
+				ReputationMap m_tempRepMap;
+				//store neutral
+				for(uint32 i = 0; i < dbcFaction.GetNumRows(); ++i)
+				{
+					FactionDBC * f = dbcFaction.LookupRow(i);
+					if(f == 0) continue;
+					// dont store side related factions
+					if( f->parentFaction != 67 && f->parentFaction != 469 &&
+						f->parentFaction != 892 && f->parentFaction != 891 && 
+						f->ID != 947 && f->ID != 946 && //HH/thrallmar
+						f->ID != 892 && f->ID != 891 && //h/a Forces
+						f->ID != 941 && f->ID != 978 && //Mag'har / Kurenai
+						f->ID != 922 && //Tranquillien
+						_ptarget->GetStanding(f->ID) )
+					{
+						FactionReputation * rep = new FactionReputation;
+						rep->flag = 0;
+						rep->standing = _ptarget->GetStanding(f->ID);
+						rep->baseStanding = _ptarget->GetBaseStanding(f->ID);
+
+						m_tempRepMap[f->ID] = rep;
+					}
+				}
+				//add all starting fresh flashing
 				_ptarget->_InitialReputation();
+				//add/mod all stored
+				for(ReputationMap::iterator itr = m_tempRepMap.begin(); itr != m_tempRepMap.end(); ++itr)
+				{
+					_ptarget->SetStanding(itr->first, itr->second->standing );
+					delete itr->second;
+				}
 
 				_ptarget->_RemoveLanguages();
 				
-				//TODO: Replace racial spells
+				//remove racial spells along with all starting spells then add them for new race
+				PlayerCreateInfo * old_info = objmgr.GetPlayerCreateInfo(race_old, class_);
+				if (!old_info) break;
+
+				for(std::set<uint32>::iterator sp = old_info->spell_list.begin(); sp!=old_info->spell_list.end(); sp++)
+					if (_ptarget->HasSpell(*sp)) _ptarget->removeSpell((*sp), false, false, 0);
+
+				for(std::set<uint32>::iterator sp = info->spell_list.begin(); sp!=info->spell_list.end(); sp++)
+					_ptarget->addSpell(*sp);
 
 				//quit guild
 				if (_ptarget->GetGuildId())
