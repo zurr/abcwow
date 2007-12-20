@@ -143,6 +143,12 @@ void Player::_InitialReputation()
 	int32 BaseRep = 0;
 	uint32 j;
 	uint32 RaceMask = getRaceMask();
+
+	for(ReputationMap::iterator itr = m_reputation.begin(); itr != m_reputation.end(); ++itr)
+		delete itr->second;
+	for(uint32 i = 0; i < 128; ++i)
+		reputationByListId[i] = NULL;
+
 	for(uint32 i = 0; i < dbcFaction.GetNumRows(); ++i)
 	{
 		f = dbcFaction.LookupRow(i);
