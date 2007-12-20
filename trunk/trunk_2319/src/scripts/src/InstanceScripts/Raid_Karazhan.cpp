@@ -94,7 +94,7 @@ public:
 
 	void PhaseOne()
 	{
-		if(_unit->GetHealthPct() <= 91)
+		if(_unit->GetHealthPct() <= 95)
 		{
 			// summon Attumen
 			attumen = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ATTUMEN,
