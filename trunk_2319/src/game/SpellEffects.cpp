@@ -504,20 +504,19 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 11688:
 	case 11689:
 	case 27222:
-		{//converts base+1 points of health into mana
-		if(!p_caster || !playerTarget)
-			return;
+		{
+			if(!p_caster || !playerTarget)
+				return;
 
-		//m_spellInfo->dmg_bonus says 100% but should be only like 96%?
-		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(m_spellInfo->School)*m_spellInfo->dmg_bonus)/100);
-		if (p_caster->GetUInt32Value(UNIT_FIELD_HEALTH) <= damage)
-			return;
-		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
-		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
-			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
-		else
-			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage);
-		SendHealManaSpellOnPlayer(p_caster, playerTarget, damage, 0);
+			uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(m_spellInfo->School)*m_spellInfo->dmg_bonus)/100);
+			if (p_caster->GetUInt32Value(UNIT_FIELD_HEALTH) <= damage)
+				return;
+			p_caster->DealDamage(playerTarget,damage,0,0,spellId);
+			if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
+				playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+			else
+				playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage);
+			SendHealManaSpellOnPlayer(p_caster, playerTarget, damage, 0);
 		}break;
 	case 14185:
 		{
@@ -1099,7 +1098,7 @@ void Spell::SpellEffectTeleportUnits(uint32 i)  // Teleport Units
 		{
 			/* try to get a selection */
 			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
-			if(!unitTarget)
+			if(!unitTarget || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f))
 				return;
 		}
 
