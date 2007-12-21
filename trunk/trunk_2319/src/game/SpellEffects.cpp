@@ -509,7 +509,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			return;
 
 		//m_spellInfo->dmg_bonus says 100% but should be only like 96%?
-		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((p_caster->GetDamageDoneMod(SHADOW_DAMAGE)*m_spellInfo->dmg_bonus)/100);
+		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(m_spellInfo->School)*m_spellInfo->dmg_bonus)/100);
 		if (p_caster->GetUInt32Value(UNIT_FIELD_HEALTH) <= damage)
 			return;
 		p_caster->DealDamage(playerTarget,damage,0,0,spellId);

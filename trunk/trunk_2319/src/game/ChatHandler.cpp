@@ -427,7 +427,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 {
 	CHECK_PACKET_SIZE(recv_data, 16);
-	if(!_player->IsInWorld())
+	if(!_player->IsInWorld() || !_player->isAlive())
 		return;
 
 	uint64 guid;
@@ -468,21 +468,22 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 	emoteentry *em = dbcEmoteEntry.LookupEntry(text_emote);
 	if(em)
 	{
+
 		WorldPacket data(SMSG_EMOTE, 28 + namelen);
 
 		sHookInterface.OnEmote(_player, (EmoteType)em->textid);
 		if(pUnit)
 			CALL_SCRIPT_EVENT(pUnit,OnEmote)(_player,(EmoteType)em->textid);
 
-        switch(em->textid)
-        {
-            case EMOTE_STATE_SLEEP:
-            case EMOTE_STATE_SIT:
-            case EMOTE_STATE_KNEEL:
-			case EMOTE_STATE_DANCE:
-				{
-					_player->SetUInt32Value(UNIT_NPC_EMOTESTATE, em->textid);
-				}break;
+		switch(em->textid)
+		{
+		case EMOTE_STATE_SLEEP:
+		case EMOTE_STATE_SIT:
+		case EMOTE_STATE_KNEEL:
+		case EMOTE_STATE_DANCE:
+			{
+				_player->SetUInt32Value(UNIT_NPC_EMOTESTATE, em->textid);
+			}break;
 		}
 
 		data << (uint32)em->textid;

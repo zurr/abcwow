@@ -268,11 +268,11 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	if(recvData.rpos() != recvData.wpos())
 		recvData.read((uint8*)lang.data(), 4);
 
-	WorldSession *session = sWorld.FindSession( AccountID );
-	if( session)
+	WorldSession *session = sWorld.FindSession(AccountID);
+	if (session)
 	{
-		// AUTH_FAILED = 0x0D
 		session->Disconnect();
+		sWorld.RemoveSession(AccountID);
 	}
 
 	Sha1Hash sha;
