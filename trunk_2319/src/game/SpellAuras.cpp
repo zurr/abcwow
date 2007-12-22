@@ -1429,10 +1429,8 @@ void Aura::SpellAuraDummy(bool apply)
 				// Different races have different number of visuals
 				_ptarget->SetUInt32Value(PLAYER_BYTES, ((sRand.randInt(5))|(sRand.randInt(5)<<8)|(sRand.randInt(5)<<16)|(sRand.randInt(5)<<24)));
 				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (( !gender ? 0 : sRand.randInt(3) ) | (0x02 << 24)));
-				/*
-				_ptarget->SetUInt32Value(PLAYER_BYTES, ((skin) | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
-				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (facialHair | (0x02 << 24)));
-				*/
+				//_ptarget->SetUInt32Value(PLAYER_BYTES, ((skin) | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
+				//_ptarget->SetUInt32Value(PLAYER_BYTES_2, (facialHair | (0x02 << 24)));
 				
 				_ptarget->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, 0xEEEEEEEE);
 				//dump reputation data
@@ -1443,13 +1441,14 @@ void Aura::SpellAuraDummy(bool apply)
 					FactionDBC * f = dbcFaction.LookupRow(i);
 					if(f == 0) continue;
 					// dont store side related factions
-					if( f->parentFaction != 67 && f->parentFaction != 469 &&
+					if( _ptarget->GetStanding(f->ID) &&
+						f->parentFaction != 67 && f->parentFaction != 469 &&
 						f->parentFaction != 892 && f->parentFaction != 891 && 
 						f->ID != 947 && f->ID != 946 && //HH/thrallmar
 						f->ID != 892 && f->ID != 891 && //h/a Forces
 						f->ID != 941 && f->ID != 978 && //Mag'har / Kurenai
-						f->ID != 922 && //Tranquillien
-						_ptarget->GetStanding(f->ID) )
+						f->ID != 922 //Tranquillien
+						)
 					{
 						FactionReputation * rep = new FactionReputation;
 						rep->flag = 0;
@@ -1465,7 +1464,7 @@ void Aura::SpellAuraDummy(bool apply)
 				for(ReputationMap::iterator itr = m_tempRepMap.begin(); itr != m_tempRepMap.end(); ++itr)
 				{
 					_ptarget->SetStanding(itr->first, itr->second->standing );
-					delete itr->second;
+					//delete itr->second;
 				}
 
 				_ptarget->_RemoveLanguages();
@@ -1508,7 +1507,6 @@ void Aura::SpellAuraDummy(bool apply)
 						team->RemoveMember(_ptarget->m_playerInfo);
 				}
 
-				//save the changes
 				_ptarget->SaveToDB(false);
 			}
 			else
