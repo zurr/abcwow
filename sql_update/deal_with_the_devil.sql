@@ -10,4 +10,5 @@ INSERT INTO quests VALUES (66666, 0, 0, 8, 70, 70, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0,
 And I want ... <The evil One handles you the list> ...
 To gather those you will need help from your friends, Yesss, friends you about to betray.
 Oh, did I mention, I want your soul? Add it to the list.$b
-Come back when you are done.", 'Haste, go gather the required.', 'So you done ... Deal is deal, you keept your word, I must keep mine.Here it is ... Meheheee', 'You changed your mind?', '', '', '', '', '', 23573, 23793, 23571, 23572, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66666, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66666, 0, 0, 0, 1, 0, 0, 0, 0);
+Come back when you are done.", 'Haste, go gather the required.', 'So you done ... Deal is deal, you keept your word, I must keep mine. Here it is.
+... Oh, right for your effort <The Evil One drops a 1 cooper coin on the ground> Buy yourself something nice ... Meheheee', 'You changed your mind?', '', '', '', '', '', 23573, 23793, 23571, 23572, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66666, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66666, 0, 0, 0, 1, 0, 0, 0, 0);
