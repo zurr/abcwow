@@ -2924,7 +2924,7 @@ public:
         spells[3].info = dbcSpell.LookupEntry(SUMMON_SPORE_STRIDER);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
-		spells[3].cooldown = 15;
+		spells[3].cooldown = 30;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
 
