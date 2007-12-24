@@ -2895,7 +2895,10 @@ public:
 
     THEBLACKSTALKERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		if (_unit->GetMapMgr()->iInstanceMode == 0)
+			nrspells = 3;
+		else
+			nrspells = 4;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -2924,7 +2927,7 @@ public:
         spells[3].info = dbcSpell.LookupEntry(SUMMON_SPORE_STRIDER);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
-		spells[3].cooldown = 30;
+		spells[3].cooldown = 12;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
 
