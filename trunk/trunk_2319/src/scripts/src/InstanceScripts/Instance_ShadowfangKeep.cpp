@@ -1,3 +1,21 @@
+/*
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "StdAfx.h"
 #include "Setup.h"
 
@@ -201,7 +219,7 @@ public:
     {		
 		//if((!Mob1->IsInWorld() || !Mob1->isAlive()) && (!Mob2->IsInWorld() || !Mob2->isAlive()) && (!Mob3->IsInWorld() || !Mob3->isAlive()) && (!Mob4->IsInWorld() || !Mob4->isAlive()))
 		//{
-			GameObject *pDoor = _unit->GetMapMgr()->GetInterface()->GetObjectNearestCoords<GameObject, TYPEID_GAMEOBJECT>(18972, -129.034f, 2166.16f, 129.187f);
+			GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-129.034f, 2166.16f, 129.187f, 18972);
 			if(pDoor == 0)
 			return;
 			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
@@ -325,8 +343,7 @@ public:
 
     void OnDied(Unit * mKiller)
     {
-		GameObject *pDoor = _unit->GetMapMgr()->GetInterface()->GetObjectNearestCoords<GameObject, TYPEID_GAMEOBJECT>(
-        18971, -118.11f, 2161.86f, 155.678f);
+		GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-118.11f, 2161.86f, 155.678f, 18971);
 		if(pDoor == 0)
 		return;
 		pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
