@@ -58,9 +58,9 @@ public:
     {
 		m_fdivine = true;
 
-        infodevotion = dbcSpell.LookupEntry(DEVOTION_AURA);
-		infohammer = dbcSpell.LookupEntry(HAMMER_OF_JUSTICE);
-		infodivine = dbcSpell.LookupEntry(DIVINE_PROTECTION);
+        infodevotion = SpellDataStorage.LookupEntry(DEVOTION_AURA);
+		infohammer = SpellDataStorage.LookupEntry(HAMMER_OF_JUSTICE);
+		infodivine = SpellDataStorage.LookupEntry(DIVINE_PROTECTION);
 
     }
     
@@ -129,9 +129,9 @@ public:
     {
 		m_rage1 = m_rage2 = m_rage3 =true;
 
-        infohrage1 = dbcSpell.LookupEntry(HOWLRAGE1);
-		infohrage2 = dbcSpell.LookupEntry(HOWLRAGE2);
-		infohrage3 = dbcSpell.LookupEntry(HOWLRAGE3);
+        infohrage1 = SpellDataStorage.LookupEntry(HOWLRAGE1);
+		infohrage2 = SpellDataStorage.LookupEntry(HOWLRAGE2);
+		infohrage3 = SpellDataStorage.LookupEntry(HOWLRAGE3);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -242,9 +242,9 @@ public:
     ArugalAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
         m_shadownbolt = m_mindcontrol = m_teleport = true;
-        infoshadowbolt = dbcSpell.LookupEntry(SHADOWBOLT);
-		infomindcontrol = dbcSpell.LookupEntry(MINDCONTROL);
-		infoteleport = dbcSpell.LookupEntry(TELEPORT);
+        infoshadowbolt = SpellDataStorage.LookupEntry(SHADOWBOLT);
+		infomindcontrol = SpellDataStorage.LookupEntry(MINDCONTROL);
+		infoteleport = SpellDataStorage.LookupEntry(TELEPORT);
 
     }
     

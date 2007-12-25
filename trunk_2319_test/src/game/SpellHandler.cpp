@@ -73,7 +73,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	if(!spellId)
 		return;
 	// check for spell id
-	SpellEntry *spellInfo = dbcSpell.LookupEntryForced( spellId );
+	SpellEntry *spellInfo = SpellDataStorage.LookupEntry( spellId );
 
 	if(!spellInfo)
 	{
@@ -153,7 +153,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 	if (GetPlayer()->GetOnMeleeSpell() != spellId)
 	{
 		// check for spell id
-		SpellEntry *spellInfo = dbcSpell.LookupEntryForced(spellId );
+		SpellEntry *spellInfo = SpellDataStorage.LookupEntry(spellId );
 
 		if(!spellInfo || !sHookInterface.OnCastSpell(_player, spellInfo))
 		{
@@ -203,7 +203,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 				SpellCastTargets targets(recvPacket,GetPlayer()->GetGUID());
 				if(!targets.m_unitTarget)
 					return;
-				SpellEntry *sp = dbcSpell.LookupEntry(spellid);
+				SpellEntry *sp = SpellDataStorage.LookupEntry(spellid);
 			
 				_player->m_AutoShotSpell = sp;
 				_player->m_AutoShotDuration = duration;
@@ -283,7 +283,7 @@ void WorldSession::HandleAddDynamicTargetOpcode(WorldPacket & recvPacket)
 	uint8 flags;
 	recvPacket >> guid >> spellid >> flags;
 	
-	SpellEntry * sp = dbcSpell.LookupEntry(spellid);
+	SpellEntry * sp = SpellDataStorage.LookupEntry(spellid);
 	// Summoned Elemental's Freeze
     if (spellid == 33395)
     {

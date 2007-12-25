@@ -447,9 +447,9 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 			spstate = (uint16)strtol( t+1, NULL, 10 );
 
 			ActionBar[i] = spellid;
-			//SetSpellState(dbcSpell.LookupEntry(spellid), spstate);
+			//SetSpellState(SpellDataStorage.LookupEntry(spellid), spstate);
 			if(!(ActionBar[i] & 0x4000000) && spellid)
-				mSpells[dbcSpell.LookupEntry(spellid)] = spstate;
+				mSpells[SpellDataStorage.LookupEntry(spellid)] = spstate;
 
 			i++;
 
@@ -519,7 +519,7 @@ void Pet::InitializeMe(bool first)
 			do 
 			{
 				Field * f = query->Fetch();
-				SpellEntry* spell = dbcSpell.LookupEntry(f[2].GetUInt32());
+				SpellEntry* spell = SpellDataStorage.LookupEntry(f[2].GetUInt32());
 				uint16 flags = f[3].GetUInt16();
 				if(mSpells.find(spell) == mSpells.end())
 					mSpells.insert ( make_pair( spell, flags ) );
@@ -722,7 +722,7 @@ void Pet::SetDefaultSpells()
 			it2 = it1->second.begin();
 			for(; it2 != it1->second.end(); ++it2)
 			{
-				AddSpell(dbcSpell.LookupEntry(*it2), false);
+				AddSpell(SpellDataStorage.LookupEntry(*it2), false);
 			}
 		}
 	}
@@ -736,7 +736,7 @@ void Pet::SetDefaultSpells()
 			if(SpellData)
 				for(uint32 i = 0; i < 3; ++i)
 					if(SpellData->Spells[i] != 0)
-						AddSpell(dbcSpell.LookupEntry(SpellData->Spells[i]), false); //add spell to pet
+						AddSpell(SpellDataStorage.LookupEntry(SpellData->Spells[i]), false); //add spell to pet
 		}
 	}
 }
@@ -871,6 +871,29 @@ uint16 Pet::GetSpellState(SpellEntry* sp)
 		return DEFAULT_SPELL_STATE;
 
 	return itr->second;
+}
+
+void Pet::RemoveSpell(uint32 SpellID)
+{
+	SpellEntry * sp = SpellDataStorage.LookupEntry(SpellID);
+	if(sp) RemoveSpell(sp);
+}
+
+void Pet::SetSpellState(uint32 SpellID, uint16 State)
+{
+	SpellEntry * sp = SpellDataStorage.LookupEntry(SpellID);
+	if(sp) SetSpellState(sp, State);
+}
+
+uint16 Pet::GetSpellState(uint32 SpellID)
+{
+	if(SpellID == 0)
+		return DEFAULT_SPELL_STATE;
+
+	SpellEntry * sp = SpellDataStorage.LookupEntry(SpellID);
+	if(sp)
+		return GetSpellState(sp);
+	return DEFAULT_SPELL_STATE;
 }
 
 void Pet::SetDefaultActionbar()
@@ -1498,7 +1521,7 @@ void Pet::AddPetSpellToOwner(uint32 spellId)
 uint32 Pet::GetHighestRankSpell(uint32 spellId)
 {	
 	//get the highest rank of spell from known spells
-	SpellEntry *sp = dbcSpell.LookupEntry(spellId);
+	SpellEntry *sp = SpellDataStorage.LookupEntry(spellId);
 	SpellEntry *tmp = 0;
 	if(sp && mSpells.size() > 0)
 	{

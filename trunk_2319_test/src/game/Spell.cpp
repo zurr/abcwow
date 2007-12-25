@@ -1153,7 +1153,7 @@ void Spell::cast(bool check)
 			if(p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_DELAY_SOME_TRIGGERS))
 			{
 				/* talents procing - don't remove stealth either */
-				if(m_spellInfo->Attributes & 64 || (pSpellId && dbcSpell.LookupEntry(pSpellId)->Attributes & 64))
+				if(m_spellInfo->Attributes & 64 || (pSpellId && SpellDataStorage.LookupEntry(pSpellId)->Attributes & 64))
 				{
 
 				}
@@ -2322,7 +2322,7 @@ void Spell::HandleAddAura(uint64 guid)
 
 	if(spellid && p_caster)
 	{
-		SpellEntry *spellInfo = dbcSpell.LookupEntry( spellid );
+		SpellEntry *spellInfo = SpellDataStorage.LookupEntry( spellid );
 		if(!spellInfo) return;
 		Spell *spell = new Spell(p_caster, spellInfo ,true, NULL);
 		SpellCastTargets targets(Target->GetGUID());

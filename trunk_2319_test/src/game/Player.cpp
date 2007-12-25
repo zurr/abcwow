@@ -974,7 +974,7 @@ void Player::_EventAttack(bool offhand)
 		} 
 		else 
 		{ 
-			SpellEntry *spellInfo = dbcSpell.LookupEntry(GetOnMeleeSpell());
+			SpellEntry *spellInfo = SpellDataStorage.LookupEntry(GetOnMeleeSpell());
 			SetOnMeleeSpell(0);
 			Spell *spell = new Spell(this,spellInfo,true,NULL);
 			SpellCastTargets targets;
@@ -1057,7 +1057,7 @@ void Player::_EventCharmAttack()
 			} 
 			else 
 			{ 
-				SpellEntry *spellInfo = dbcSpell.LookupEntry(m_CurrentCharm->GetOnMeleeSpell());
+				SpellEntry *spellInfo = SpellDataStorage.LookupEntry(m_CurrentCharm->GetOnMeleeSpell());
 				m_CurrentCharm->SetOnMeleeSpell(0);
 				Spell *spell = new Spell(m_CurrentCharm,spellInfo,true,NULL);
 				SpellCastTargets targets;
@@ -1624,7 +1624,7 @@ void Player::_SavePetSpells()
 
 void Player::AddSummonSpell(uint32 Entry, uint32 SpellID)
 {
-	SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
+	SpellEntry * sp = SpellDataStorage.LookupEntry(SpellID);
 	map<uint32, set<uint32> >::iterator itr = SummonSpells.find(Entry);
 	if(itr == SummonSpells.end())
 		SummonSpells[Entry].insert(SpellID);
@@ -1634,7 +1634,7 @@ void Player::AddSummonSpell(uint32 Entry, uint32 SpellID)
 		for(set<uint32>::iterator it2 = itr->second.begin(); it2 != itr->second.end();)
 		{
 			it3 = it2++;
-			if(dbcSpell.LookupEntry(*it3)->NameHash == sp->NameHash)
+			if(SpellDataStorage.LookupEntry(*it3)->NameHash == sp->NameHash)
 				itr->second.erase(it3);
 		}
 		itr->second.insert(SpellID);
@@ -1711,7 +1711,7 @@ void Player::_LoadSpellCoolDownSecurity(QueryResult * result)
 			uint32 SpellID			  = fields[1].GetUInt32();
 			uint32 Timestamp			= fields[2].GetUInt32();
 			uint32 DiffTimestamp		= Timestamp - now();
-			SpellEntry		*spellInfo = dbcSpell.LookupEntry( SpellID );
+			SpellEntry		*spellInfo = SpellDataStorage.LookupEntry( SpellID );
 			
 			if (now() + spellInfo->RecoveryTime > Timestamp && // cooldown did not expired somehow (not taking into care cooldown modifiers!)
 				now() < Timestamp + spellInfo->RecoveryTime )  // cooldown does not starts in future (not taking into care cooldown modifiers!)
@@ -2752,7 +2752,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		if(!end)break;
 		*end=0;
 		//mSpells.insert(atol(start));
-		spProto = dbcSpell.LookupEntryForced(atol(start));
+		spProto = SpellDataStorage.LookupEntry(atol(start));
 		if(spProto)
 			mSpells.insert(spProto->Id);
 		start = end +1;
@@ -2764,7 +2764,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		end = strchr(start,',');
 		if(!end)break;
 		*end=0;
-		spProto = dbcSpell.LookupEntryForced(atol(start));
+		spProto = SpellDataStorage.LookupEntry(atol(start));
 		if(spProto)
 			mDeletedSpells.insert(spProto->Id);
 		start = end +1;
@@ -3253,9 +3253,9 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 			{
 				for(uint32 x=0;x<8;x++)
 				{
-					if(Set->itemscount==set->itemscount[x])
+					if(Set->itemscount==set->itemscount[x] && set->SpellID[x])
 					{//cast new spell
-						SpellEntry *info= dbcSpell.LookupEntry(set->SpellID[x]);
+						SpellEntry *info= SpellDataStorage.LookupEntry(set->SpellID[x]);
 						Spell * spell=new Spell(this,info,true,NULL);
 						SpellCastTargets targets;
 						targets.m_unitTarget = this->GetGUID();
@@ -3376,9 +3376,9 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 
 		for (int k = 0; k < 5;k++)
 		{
-			if (item->GetProto()->Spells[k].Trigger == 1)
+			if (item->GetProto()->Spells[k].Trigger == 1 && item->GetProto()->Spells[k].Id)
 			{
-				SpellEntry* spells = dbcSpell.LookupEntry(item->GetProto()->Spells[k].Id);
+				SpellEntry* spells = SpellDataStorage.LookupEntry(item->GetProto()->Spells[k].Id);
 				Spell *spell = new Spell(this, spells ,true,NULL);
 				SpellCastTargets targets;
 				targets.m_unitTarget = this->GetGUID();
@@ -3552,17 +3552,16 @@ void Player::BuildPlayerRepop()
    
 	if(getRace()==RACE_NIGHTELF)
 	{
-		SpellEntry *inf=dbcSpell.LookupEntry(20584);
+		SpellEntry *inf=SpellDataStorage.LookupEntry(20584);
 		Spell*sp=new Spell(this,inf,true,NULL);
 		sp->prepare(&tgt);
-		inf=dbcSpell.LookupEntry(9036);
+		inf=SpellDataStorage.LookupEntry(9036);
 		sp=new Spell(this,inf,true,NULL);
 		sp->prepare(&tgt);
 	}
 	else
 	{
-	
-		SpellEntry *inf=dbcSpell.LookupEntry(8326);
+		SpellEntry *inf=SpellDataStorage.LookupEntry(8326);
 		Spell*sp=new Spell(this,inf,true,NULL);
 		sp->prepare(&tgt);
 	}
@@ -5129,7 +5128,7 @@ void Player::SendTalentResetConfirm()
 
 bool Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 {
-	SpellEntry *spellinfo = dbcSpell.LookupEntry(spellid);
+	SpellEntry *spellinfo = SpellDataStorage.LookupEntry(spellid);
 	if(!spellinfo)
 		return false;
 	
@@ -5237,7 +5236,7 @@ void Player::removeDeletedSpellByHashName(uint32 hash)
 	{
 		it = iter++;
 		uint32 SpellID = *it;
-		SpellEntry *e = dbcSpell.LookupEntry(SpellID);
+		SpellEntry *e = SpellDataStorage.LookupEntry(SpellID);
 		if(e->NameHash == hash)
 		{
 			mDeletedSpells.erase(it);
@@ -5253,7 +5252,7 @@ void Player::removeSpellByHashName(uint32 hash)
 	{
 		it = iter++;
 		uint32 SpellID = *it;
-		SpellEntry *e = dbcSpell.LookupEntry(SpellID);
+		SpellEntry *e = SpellDataStorage.LookupEntry(SpellID);
 		if(e->NameHash == hash)
 		{
 			if(info->spell_list.find(e->Id) != info->spell_list.end())
@@ -5274,7 +5273,7 @@ void Player::removeSpellByHashName(uint32 hash)
 	{
 		it = iter++;
 		uint32 SpellID = *it;
-		SpellEntry *e = dbcSpell.LookupEntry(SpellID);
+		SpellEntry *e = SpellDataStorage.LookupEntry(SpellID);
 		if(e->NameHash == hash)
 		{
 			if(info->spell_list.find(e->Id) != info->spell_list.end())
@@ -5487,7 +5486,7 @@ void Player::Reset_Talents()
 			{
 				m_SSSPecificSpells.erase(tmpTalent->RankID[j]);
 				SpellEntry *spellInfo;
-				spellInfo = dbcSpell.LookupEntry( tmpTalent->RankID[j] );
+				spellInfo = SpellDataStorage.LookupEntry( tmpTalent->RankID[j] );
 				if(spellInfo)
 				{
 					for(int k=0;k<3;k++)
@@ -5496,7 +5495,7 @@ void Player::Reset_Talents()
 							//removeSpell(spellInfo->EffectTriggerSpell[k], false, 0, 0);
 							//remove higher ranks of this spell too (like earth shield lvl 1 is talent and the rest is thought from trainer) 
 							SpellEntry *spellInfo2;
-							spellInfo2 = dbcSpell.LookupEntry( spellInfo->EffectTriggerSpell[k] );
+							spellInfo2 = SpellDataStorage.LookupEntry( spellInfo->EffectTriggerSpell[k] );
 							if(spellInfo2) {
  								removeSpellByHashName(spellInfo2->NameHash);
 								removeDeletedSpellByHashName(spellInfo2->NameHash);
@@ -6160,7 +6159,7 @@ void Player::ClearCooldownForSpell(uint32 spell_id)
 	GetSession()->SendPacket(&data);
 
 	// remove cooldown data from Server side lists
-	SpellEntry * spe = dbcSpell.LookupEntry(spell_id);
+	SpellEntry * spe = SpellDataStorage.LookupEntry(spell_id);
 	if(!spe) return;
 
 	map<uint32,uint32>::iterator itr;
@@ -7092,7 +7091,7 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 		this->SetInstanceID(InstanceID);
 		//Dismount on instance entering
 		//Commented till NTY
-		/*SpellEntry* spe = dbcSpell.LookupEntry(39998);
+		/*SpellEntry* spe = SpellDataStorage.LookupEntry(39998);
 		SpellCastTargets targets;
 		Spell * dismount=new Spell(this,spe,true,NULL); 
 		dismount->prepare(&targets);*/
@@ -7497,7 +7496,7 @@ void Player::CompleteLoading()
 
 	for (itr = mSpells.begin(); itr != mSpells.end(); ++itr)
 	{
-		info = dbcSpell.LookupEntry(*itr);
+		info = SpellDataStorage.LookupEntry(*itr);
 
 		if(info && (info->Attributes & ATTRIBUTES_PASSIVE)  ) // passive
 		{
@@ -7528,7 +7527,7 @@ void Player::CompleteLoading()
 */
 
 		// this stuff REALLY needs to be fixed - Burlex
-		SpellEntry * sp = dbcSpell.LookupEntry((*i).id);
+		SpellEntry * sp = SpellDataStorage.LookupEntry((*i).id);
 		Aura * a = new Aura(sp,(*i).dur,this,this);
 
 		for(uint32 x =0;x<3;x++)
@@ -7588,7 +7587,7 @@ void Player::CompleteLoading()
 	}
 
 	// useless logon spell
-	Spell *logonspell = new Spell(this, dbcSpell.LookupEntry(836), false, NULL);
+	Spell *logonspell = new Spell(this, SpellDataStorage.LookupEntry(836), false, NULL);
 	logonspell->prepare(&targets);
 
 	// Banned
@@ -7929,7 +7928,7 @@ void Player::SetShapeShift(uint8 ss)
 			uint32 SpellId = *i;
 			if(this->FindAura(SpellId))
 				continue;
-			SpellEntry* spells = dbcSpell.LookupEntry(SpellId);
+			SpellEntry* spells = SpellDataStorage.LookupEntry(SpellId);
 			Spell *spell = new Spell(this, spells ,true,NULL);
 			SpellCastTargets targets;
 			targets.m_unitTarget = this->GetGUID();
@@ -7952,7 +7951,7 @@ void Player::SetShapeShift(uint8 ss)
 				}
 				else //in required form
 				{
-					SpellEntry* spe = dbcSpell.LookupEntry(aura->spellid);
+					SpellEntry* spe = SpellDataStorage.LookupEntry(aura->spellid);
 					if (!spe)
 					return;
 					Spell *spell = new Spell(this, spe ,true,NULL);
@@ -8471,7 +8470,7 @@ void Player::EventStunOrImmobilize(Unit *proc_target)
 	{
 		if(trigger_on_stun_chance<100 && !Rand(trigger_on_stun_chance))
 			return;
-		SpellEntry *spellInfo = dbcSpell.LookupEntry(trigger_on_stun);
+		SpellEntry *spellInfo = SpellDataStorage.LookupEntry(trigger_on_stun);
 		if(!spellInfo)
 			return;
 		Spell *spell = new Spell(this, spellInfo ,true, NULL);

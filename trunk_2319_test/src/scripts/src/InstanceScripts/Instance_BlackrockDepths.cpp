@@ -22,7 +22,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(15573);
+		     spells[0].info = SpellDataStorage.LookupEntry(15573);
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
 		     spells[0].cooldown = 10;
@@ -135,7 +135,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(11661);
+		     spells[0].info = SpellDataStorage.LookupEntry(11661);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -144,7 +144,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(15471);
+		     spells[1].info = SpellDataStorage.LookupEntry(15471);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -256,7 +256,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(13879);
+		     spells[0].info = SpellDataStorage.LookupEntry(13879);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -265,7 +265,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(13895);
+		     spells[1].info = SpellDataStorage.LookupEntry(13895);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -377,7 +377,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(17492);
+		     spells[0].info = SpellDataStorage.LookupEntry(17492);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -386,7 +386,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(24573);
+		     spells[1].info = SpellDataStorage.LookupEntry(24573);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -395,7 +395,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(20691);
+		     spells[2].info = SpellDataStorage.LookupEntry(20691);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_ATTACKING;
 		     spells[2].instant = true;
@@ -507,7 +507,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(14331);
+		     spells[0].info = SpellDataStorage.LookupEntry(14331);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -516,7 +516,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(20741);
+		     spells[1].info = SpellDataStorage.LookupEntry(20741);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -628,7 +628,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(15614);
+		     spells[0].info = SpellDataStorage.LookupEntry(15614);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -637,7 +637,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(13953);
+		     spells[1].info = SpellDataStorage.LookupEntry(13953);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -749,7 +749,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(14099);
+		     spells[0].info = SpellDataStorage.LookupEntry(14099);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -758,7 +758,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(9080);
+		     spells[1].info = SpellDataStorage.LookupEntry(9080);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -767,7 +767,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(20691);
+		     spells[2].info = SpellDataStorage.LookupEntry(20691);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_ATTACKING;
 		     spells[2].instant = true;
@@ -879,7 +879,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(16033);
+		     spells[0].info = SpellDataStorage.LookupEntry(16033);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -888,7 +888,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(16034);
+		     spells[1].info = SpellDataStorage.LookupEntry(16034);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -897,7 +897,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(10432);
+		     spells[2].info = SpellDataStorage.LookupEntry(10432);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_SELF;
 		     spells[2].instant = true;
@@ -1009,7 +1009,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(15589);
+		     spells[0].info = SpellDataStorage.LookupEntry(15589);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -1018,7 +1018,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(24573);
+		     spells[1].info = SpellDataStorage.LookupEntry(24573);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -1130,7 +1130,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(6524);
+		     spells[0].info = SpellDataStorage.LookupEntry(6524);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -1139,7 +1139,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(20691);
+		     spells[1].info = SpellDataStorage.LookupEntry(20691);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -1251,7 +1251,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(15475);
+		     spells[0].info = SpellDataStorage.LookupEntry(15475);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -1260,7 +1260,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(15474);
+		     spells[1].info = SpellDataStorage.LookupEntry(15474);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -1269,7 +1269,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(3609);
+		     spells[2].info = SpellDataStorage.LookupEntry(3609);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_ATTACKING;
 		     spells[2].instant = true;
@@ -1380,7 +1380,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(10894);
+		     spells[0].info = SpellDataStorage.LookupEntry(10894);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -1389,7 +1389,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(8122);
+		     spells[1].info = SpellDataStorage.LookupEntry(8122);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -1398,7 +1398,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(10876);
+		     spells[2].info = SpellDataStorage.LookupEntry(10876);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_ATTACKING;
 		     spells[2].instant = true;
@@ -1509,7 +1509,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(23511);
+		     spells[0].info = SpellDataStorage.LookupEntry(23511);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -1518,7 +1518,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(17153);
+		     spells[1].info = SpellDataStorage.LookupEntry(17153);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -1630,7 +1630,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(17294);
+		     spells[0].info = SpellDataStorage.LookupEntry(17294);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -1639,7 +1639,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(15583);
+		     spells[1].info = SpellDataStorage.LookupEntry(15583);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -1648,7 +1648,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(14099);
+		     spells[2].info = SpellDataStorage.LookupEntry(14099);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_ATTACKING;
 		     spells[2].instant = true;
@@ -1760,7 +1760,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(13899);
+		     spells[0].info = SpellDataStorage.LookupEntry(13899);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -1769,7 +1769,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(13900);
+		     spells[1].info = SpellDataStorage.LookupEntry(13900);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -1778,7 +1778,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(14099);
+		     spells[2].info = SpellDataStorage.LookupEntry(14099);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_ATTACKING;
 		     spells[2].instant = true;
@@ -1890,7 +1890,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(10448);
+		     spells[0].info = SpellDataStorage.LookupEntry(10448);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -1899,7 +1899,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(6524);
+		     spells[1].info = SpellDataStorage.LookupEntry(6524);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -1908,7 +1908,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(10414);
+		     spells[2].info = SpellDataStorage.LookupEntry(10414);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_ATTACKING;
 		     spells[2].instant = true;
@@ -2020,7 +2020,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(13900);
+		     spells[0].info = SpellDataStorage.LookupEntry(13900);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -2029,7 +2029,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(24375);
+		     spells[1].info = SpellDataStorage.LookupEntry(24375);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -2139,7 +2139,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(15453);
+		     spells[0].info = SpellDataStorage.LookupEntry(15453);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -2148,7 +2148,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(15451);
+		     spells[1].info = SpellDataStorage.LookupEntry(15451);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -2259,7 +2259,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(8732);
+		     spells[0].info = SpellDataStorage.LookupEntry(8732);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -2268,7 +2268,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(22425);
+		     spells[1].info = SpellDataStorage.LookupEntry(22425);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -2277,7 +2277,7 @@ public:
 		     m_spellcheck[1] = true;
 
 
-		     spells[2].info = dbcSpell.LookupEntry(14099);
+		     spells[2].info = SpellDataStorage.LookupEntry(14099);
 		     spells[2].cooldown = 10;
 		     spells[2].targettype = TARGET_ATTACKING;
 		     spells[2].instant = true;
@@ -2388,7 +2388,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(10947);
+		     spells[0].info = SpellDataStorage.LookupEntry(10947);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -2397,7 +2397,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(22645);
+		     spells[1].info = SpellDataStorage.LookupEntry(22645);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;
@@ -2508,7 +2508,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		     spells[0].info = dbcSpell.LookupEntry(10448);
+		     spells[0].info = SpellDataStorage.LookupEntry(10448);
 		     spells[0].cooldown = 10;
 		     spells[0].targettype = TARGET_ATTACKING;
 		     spells[0].instant = true;
@@ -2517,7 +2517,7 @@ public:
 		     m_spellcheck[0] = true;
 
 
-		     spells[1].info = dbcSpell.LookupEntry(15095);
+		     spells[1].info = SpellDataStorage.LookupEntry(15095);
 		     spells[1].cooldown = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
 		     spells[1].instant = true;

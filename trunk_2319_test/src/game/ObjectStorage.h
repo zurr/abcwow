@@ -20,6 +20,7 @@
 #ifndef OBJECT_STORAGE_H
 #define OBJECT_STORAGE_H
 
+extern SERVER_DECL SQLStorage<SpellEntry, HashMapStorageContainer<SpellEntry> >					SpellDataStorage;
 extern SERVER_DECL SQLStorage<ItemPrototype, ArrayStorageContainer<ItemPrototype> >				ItemPrototypeStorage;
 extern SERVER_DECL SQLStorage<CreatureInfo, HashMapStorageContainer<CreatureInfo> >				CreatureNameStorage;
 extern SERVER_DECL SQLStorage<GameObjectInfo, HashMapStorageContainer<GameObjectInfo> >			GameObjectNameStorage;

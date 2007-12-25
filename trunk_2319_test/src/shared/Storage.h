@@ -442,6 +442,11 @@ public:
 		return _storage.LookupEntry(Entry);
 	}
 
+	bool SetEntry(uint32 Entry, T * Pointer)
+	{
+		return _storage.SetEntry(Entry, Pointer);
+	}
+
 	/** Reloads the content in this container.
 	 */
     	virtual void Reload() = 0;

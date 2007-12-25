@@ -1206,7 +1206,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 		}break;
 	case GAMEOBJECT_TYPE_CHEST://cast da spell
 		{
-			spellInfo = dbcSpell.LookupEntry( OPEN_CHEST );
+			spellInfo = SpellDataStorage.LookupEntry( OPEN_CHEST );
 			spell = new Spell(plyr, spellInfo, true, NULL);
 			_player->m_currentSpell = spell;
 			targets.m_unitTarget = obj->GetGUID();
@@ -1252,7 +1252,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 		}break;
 	case GAMEOBJECT_TYPE_SPELLCASTER:
 		{
-			SpellEntry *info = dbcSpell.LookupEntry(goinfo->SpellFocus);
+			SpellEntry *info = SpellDataStorage.LookupEntry(goinfo->SpellFocus);
 			if(!info)
 				break;
 			Spell * spell = new Spell(plyr, info, false, NULL);
@@ -1307,7 +1307,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 				{
 					if(!obj->m_ritualtarget)
 						return;
-					info = dbcSpell.LookupEntry(goinfo->sound1);
+					info = SpellDataStorage.LookupEntry(goinfo->sound1);
 					if(!info)
 						break;
 					Player * target = _player->GetMapMgr()->GetPlayer(obj->m_ritualtarget);
@@ -1330,7 +1330,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					if(!psacrifice || !pCaster)
 						return;
 
-					info = dbcSpell.LookupEntry(goinfo->sound4);
+					info = SpellDataStorage.LookupEntry(goinfo->sound4);
 					if(!info)
 						break;
 					spell = new Spell(psacrifice, info, true, NULL);
@@ -1338,7 +1338,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					spell->prepare(&targets);
 					
 					// summons demon		   
-					info = dbcSpell.LookupEntry(goinfo->sound1);
+					info = SpellDataStorage.LookupEntry(goinfo->sound1);
 					spell = new Spell(pCaster, info, true, NULL);
 					SpellCastTargets targets;
 					targets.m_unitTarget = pCaster->GetGUID();
@@ -1354,7 +1354,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					if(!pleader)
 						return;
 
-					info = dbcSpell.LookupEntry(goinfo->sound1);
+					info = SpellDataStorage.LookupEntry(goinfo->sound1);
 					Spell * spell = new Spell(pleader, info, true, 0);
 					SpellCastTargets targets(plr->GetGUID());
 					spell->prepare(&targets);
@@ -1375,7 +1375,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 			SendPacket(&pkt);*/
 
 			/* these are usually scripted effects. but in the case of some, (e.g. orb of translocation) the spellid is located in unknown1 */
-			SpellEntry * sp = dbcSpell.LookupEntryForced(goinfo->Unknown1);
+			SpellEntry * sp = SpellDataStorage.LookupEntry(goinfo->Unknown1);
 			if(sp != NULL)
 				_player->CastSpell(_player,sp,true);
 		}break;
@@ -1541,7 +1541,7 @@ void WorldSession::HandleSelfResurrectOpcode(WorldPacket& recv_data)
 	uint32 self_res_spell = _player->GetUInt32Value(PLAYER_SELF_RES_SPELL);
 	if(self_res_spell)
 	{
-		SpellEntry * sp=dbcSpell.LookupEntry(self_res_spell);
+		SpellEntry * sp=SpellDataStorage.LookupEntry(self_res_spell);
 		Spell *s=new Spell(_player,sp,true,NULL);
 		SpellCastTargets tgt;
 		tgt.m_unitTarget=_player->GetGUID();

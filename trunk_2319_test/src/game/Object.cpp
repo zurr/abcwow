@@ -1742,7 +1742,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
 			if(!self_res_spell && ((Player*)pVictim)->bReincarnation)
 			{
-				SpellEntry *m_reincarnSpellInfo = dbcSpell.LookupEntry(20608);
+				SpellEntry *m_reincarnSpellInfo = SpellDataStorage.LookupEntry(20608);
 				if(((Player*)pVictim)->CanCastDueToCooldown(m_reincarnSpellInfo))
 				{
 					uint32 ankh_count = ((Player*)pVictim)->GetItemInterface()->GetItemCount(17030);
@@ -1790,7 +1790,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		{
 			if(((Player*)pVictim)->HasSpell(20711)) //check for spirit of Redemption
 			{
-				SpellEntry * sorInfo = dbcSpell.LookupEntry(27827);
+				SpellEntry * sorInfo = SpellDataStorage.LookupEntry(27827);
 				if(sorInfo)
 				{
 					Spell *sor = new Spell(pVictim, sorInfo, true, NULL);
@@ -2055,7 +2055,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	if(!pVictim || !pVictim->isAlive())
 		return;
 
-	SpellEntry *spellInfo = dbcSpell.LookupEntry( spellID );
+	SpellEntry *spellInfo = SpellDataStorage.LookupEntry( spellID );
 	if(!spellInfo)
         return;
 

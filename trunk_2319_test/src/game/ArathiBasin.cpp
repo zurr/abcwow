@@ -506,8 +506,8 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 		/* add the marks of honor to all players */
 		m_mainLock.Acquire();
 
-		SpellEntry * winner_spell = dbcSpell.LookupEntry(24953);
-		SpellEntry * loser_spell = dbcSpell.LookupEntry(24952);
+		SpellEntry * winner_spell = SpellDataStorage.LookupEntry(24953);
+		SpellEntry * loser_spell = SpellDataStorage.LookupEntry(24952);
 		for(uint32 i = 0; i < 2; ++i)
 		{
 			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
@@ -631,7 +631,7 @@ void ArathiBasin::HookOnAreaTrigger(Player * plr, uint32 id)
 		sEventMgr.AddEvent(this,&ArathiBasin::SpawnBuff,x,EVENT_AB_RESPAWN_BUFF,AB_BUFF_RESPAWN_TIME,1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
 		// cast the spell on the player
-		SpellEntry * sp = dbcSpell.LookupEntryForced(spellid);
+		SpellEntry * sp = SpellDataStorage.LookupEntry(spellid);
 		if(sp)
 		{
 			Spell * pSpell = new Spell(plr, sp, true, NULL);

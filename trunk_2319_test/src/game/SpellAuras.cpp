@@ -964,7 +964,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 			{
 				if(!pSpellId) //we need a parent spell and should always have one since it procs on it
 					break;
-				SpellEntry * parentsp = dbcSpell.LookupEntry(pSpellId);
+				SpellEntry * parentsp = SpellDataStorage.LookupEntry(pSpellId);
 				if(!parentsp)
 					return;
 				if (c && c->IsPlayer())
@@ -1907,7 +1907,7 @@ void Aura::SpellAuraDummy(bool apply)
 		 {
 			 if(!apply)
 			 {
-				 SpellEntry* spe = dbcSpell.LookupEntry(33763);
+				 SpellEntry* spe = SpellDataStorage.LookupEntry(33763);
 				 if (spe)
 				 {
 					 Spell* spell = new Spell(m_target,spe,false,NULL);
@@ -2682,7 +2682,7 @@ void Aura::SpellAuraModStealth(bool apply)
 				}
 			}
 			if(stealth_id)
-				p_caster->CastSpell(p_caster, dbcSpell.LookupEntry(stealth_id), true);
+				p_caster->CastSpell(p_caster, SpellDataStorage.LookupEntry(stealth_id), true);
 		}
 	}
 
@@ -2856,7 +2856,7 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 		if(target == 0 || !target->IsPlayer())
 			return; //what about creatures ?
 
-		SpellEntry *proto = dbcSpell.LookupEntry( m_spellProto->EffectTriggerSpell[mod->i] );
+		SpellEntry *proto = SpellDataStorage.LookupEntry( m_spellProto->EffectTriggerSpell[mod->i] );
 
 		if(apply)
 			((Player*)target)->AddOnStrikeSpell( proto, m_spellProto->EffectAmplitude[mod->i] );
@@ -2870,7 +2870,7 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 	{
 		//FIXME: positive or negative?
 		uint32 sp = GetSpellProto()->EffectTriggerSpell[mod->i];
-		SpellEntry *spe = dbcSpell.LookupEntry(sp);
+		SpellEntry *spe = SpellDataStorage.LookupEntry(sp);
 		if(!sp || !spe)
 		{
 			//	sp=22845;
@@ -3596,7 +3596,7 @@ void Aura::SpellAuraModShapeshift(bool apply)
 
 				if(furorSpell)
 				{
-					SpellEntry *spellInfo = dbcSpell.LookupEntry(furorSpell);
+					SpellEntry *spellInfo = SpellDataStorage.LookupEntry(furorSpell);
 
 					Spell *sp = new Spell(m_target, spellInfo, true, NULL);
 					SpellCastTargets tgt;
@@ -3622,7 +3622,7 @@ void Aura::SpellAuraModShapeshift(bool apply)
 		if(spellId == 0)
 			return;
 		// check for spell id
-		SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
+		SpellEntry *spellInfo = SpellDataStorage.LookupEntry(spellId );
 		
 		Spell *sp = new Spell(m_target, spellInfo, true, NULL);
 		SpellCastTargets tgt;
@@ -7135,7 +7135,7 @@ void Aura::SpellAuraSpiritOfRedemption(bool apply)
 	{
 		m_target->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.5);
 		m_target->SetUInt32Value(UNIT_FIELD_HEALTH, 1);
-		SpellEntry * sorInfo = dbcSpell.LookupEntry(27792);
+		SpellEntry * sorInfo = SpellDataStorage.LookupEntry(27792);
 		if(!sorInfo) return;
 		Spell * sor = new Spell(m_target, sorInfo, true, NULL);
 		SpellCastTargets targets;

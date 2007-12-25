@@ -687,7 +687,7 @@ int luaUnit_CastSpell(lua_State * L, Unit * ptr)
 	if(sp==0)
 		return 0;
 
-	Spell * spp = new Spell(ptr, dbcSpell.LookupEntry(sp), true, NULL);
+	Spell * spp = new Spell(ptr, SpellDataStorage.LookupEntry(sp), true, NULL);
 	SpellCastTargets tar(ptr->GetGUID());
 	spp->prepare(&tar);
 	return 0;
@@ -701,7 +701,7 @@ int luaUnit_FullCastSpell(lua_State * L, Unit * ptr)
 	if(sp==0)
 		return 0;
 
-	Spell * spp = new Spell(ptr, dbcSpell.LookupEntry(sp), false, NULL);
+	Spell * spp = new Spell(ptr, SpellDataStorage.LookupEntry(sp), false, NULL);
 	SpellCastTargets tar(ptr->GetGUID());
 	spp->prepare(&tar);
 	return 0;
@@ -716,7 +716,7 @@ int luaUnit_CastSpellOnTarget(lua_State * L, Unit * ptr)
 	if(sp==0 || target==NULL)
 		return 0;
 
-	Spell * spp = new Spell(ptr, dbcSpell.LookupEntry(sp), false, NULL);
+	Spell * spp = new Spell(ptr, SpellDataStorage.LookupEntry(sp), false, NULL);
 	SpellCastTargets tar(target->GetGUID());
 	spp->prepare(&tar);
 	return 0;
@@ -731,7 +731,7 @@ int luaUnit_FullCastSpellOnTarget(lua_State * L, Unit * ptr)
 	if(sp==0 || target==NULL)
 		return 0;
 
-	Spell * spp = new Spell(ptr, dbcSpell.LookupEntry(sp), false, NULL);
+	Spell * spp = new Spell(ptr, SpellDataStorage.LookupEntry(sp), false, NULL);
 	SpellCastTargets tar(target->GetGUID());
 	spp->prepare(&tar);
 	return 0;

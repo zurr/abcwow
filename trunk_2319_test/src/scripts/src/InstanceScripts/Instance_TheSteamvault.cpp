@@ -31,14 +31,14 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(BOMB);
+		spells[0].info = SpellDataStorage.LookupEntry(BOMB);
 		spells[0].targettype = TARGET_DESTINATION;
 		spells[0].instant = false;
 		spells[0].cooldown = 10;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(NET);
+		spells[1].info = SpellDataStorage.LookupEntry(NET);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 25;
@@ -160,21 +160,21 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(FROST_SHOCK);
+		spells[0].info = SpellDataStorage.LookupEntry(FROST_SHOCK);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-        spells[1].info = dbcSpell.LookupEntry(SONIC_BURST);
+        spells[1].info = SpellDataStorage.LookupEntry(SONIC_BURST);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-        spells[2].info = dbcSpell.LookupEntry(HEAL);
+        spells[2].info = SpellDataStorage.LookupEntry(HEAL);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
 		spells[2].cooldown = 45;
@@ -294,21 +294,21 @@ public:
 			m_spellcheck[i] = false;
 		}
 /*
-		spells[0].info = dbcSpell.LookupEntry(MORTAL_STRIKE);
+		spells[0].info = SpellDataStorage.LookupEntry(MORTAL_STRIKE);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].cooldown = ;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 */
-		spells[0].info = dbcSpell.LookupEntry(MORTAL_BLOW);
+		spells[0].info = SpellDataStorage.LookupEntry(MORTAL_BLOW);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(BATTLE_SHOUT);	// should affect friends not enemies :S
+		spells[1].info = SpellDataStorage.LookupEntry(BATTLE_SHOUT);	// should affect friends not enemies :S
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].cooldown = 35;
@@ -429,28 +429,28 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(AOE_FEAR);
+		spells[0].info = SpellDataStorage.LookupEntry(AOE_FEAR);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].cooldown = 35;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(LIGHTNING_BOLT);
+		spells[1].info = SpellDataStorage.LookupEntry(LIGHTNING_BOLT);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(ARCANE_FLARE);
+		spells[2].info = SpellDataStorage.LookupEntry(ARCANE_FLARE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 /*
-		spells[2].info = dbcSpell.LookupEntry(MOONFIRE);
+		spells[2].info = SpellDataStorage.LookupEntry(MOONFIRE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = ;
@@ -574,28 +574,28 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(FUNGAL_DECAY);
+		spells[0].info = SpellDataStorage.LookupEntry(FUNGAL_DECAY);
 		spells[0].targettype = TARGET_ATTACKING;	// should be random (as in many other spells)
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(TRAMPLE);
+		spells[1].info = SpellDataStorage.LookupEntry(TRAMPLE);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].cooldown = 10;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(ENRAGE_BOG_OVERLORD);
+		spells[2].info = SpellDataStorage.LookupEntry(ENRAGE_BOG_OVERLORD);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
 		spells[2].cooldown = 55;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(DISEASE_CLOUD);
+		spells[3].info = SpellDataStorage.LookupEntry(DISEASE_CLOUD);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
 		spells[3].cooldown = -1;	// not sure to this and...
@@ -714,21 +714,21 @@ public:
 			m_spellcheck[i] = false;
 		}
 		
-        spells[0].info = dbcSpell.LookupEntry(FROSTBOLT);
+        spells[0].info = SpellDataStorage.LookupEntry(FROSTBOLT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].cooldown = 10;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-        spells[1].info = dbcSpell.LookupEntry(BLIZZARD);
+        spells[1].info = SpellDataStorage.LookupEntry(BLIZZARD);
 		spells[1].targettype = TARGET_DESTINATION;
 		spells[1].instant = false;
 		spells[1].cooldown = 35;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
     
-        spells[2].info = dbcSpell.LookupEntry(FROST_NOVA);
+        spells[2].info = SpellDataStorage.LookupEntry(FROST_NOVA);
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
 		spells[2].cooldown = 25;
@@ -852,56 +852,56 @@ public:
 			m_spellcheck[i] = false;
 		}
 		
-        spells[0].info = dbcSpell.LookupEntry(SHADOW_BOLT);
+        spells[0].info = SpellDataStorage.LookupEntry(SHADOW_BOLT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].cooldown = 15;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(FIRE_BLAST_LEPER);
+		spells[1].info = SpellDataStorage.LookupEntry(FIRE_BLAST_LEPER);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(STRIKE);
+		spells[2].info = SpellDataStorage.LookupEntry(STRIKE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 35;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(FROST_NOVA_LEPER);
+		spells[3].info = SpellDataStorage.LookupEntry(FROST_NOVA_LEPER);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 55;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
 
-		spells[4].info = dbcSpell.LookupEntry(CLEAVE_LEPER);
+		spells[4].info = SpellDataStorage.LookupEntry(CLEAVE_LEPER);
 		spells[4].targettype = TARGET_VARIOUS;	// ?
 		spells[4].instant = true;
 		spells[4].cooldown = 45;
 		spells[4].perctrigger = 0.0f;
 		spells[4].attackstoptimer = 1000;
 
-		spells[5].info = dbcSpell.LookupEntry(HEAL_LEPER);
+		spells[5].info = SpellDataStorage.LookupEntry(HEAL_LEPER);
 		spells[5].targettype = TARGET_SELF;
 		spells[5].instant = false;
 		spells[5].cooldown = 85;
 		spells[5].perctrigger = 0.0f;
 		spells[5].attackstoptimer = 1000;
 
-		spells[6].info = dbcSpell.LookupEntry(SUNDER_ARMOR_LEPER);
+		spells[6].info = SpellDataStorage.LookupEntry(SUNDER_ARMOR_LEPER);
 		spells[6].targettype = TARGET_ATTACKING;
 		spells[6].instant = true;
 		spells[6].cooldown = 95;
 		spells[6].perctrigger = 0.0f;
 		spells[6].attackstoptimer = 1000;
 
-		spells[7].info = dbcSpell.LookupEntry(SHOOT);
+		spells[7].info = SpellDataStorage.LookupEntry(SHOOT);
 		spells[7].targettype = TARGET_ATTACKING;
 		spells[7].instant = true;
 		spells[7].cooldown = -1;	// disabled for now
@@ -1019,14 +1019,14 @@ public:
 			m_spellcheck[i] = false;
 		}
 		
-        spells[0].info = dbcSpell.LookupEntry(GEYSER);
+        spells[0].info = SpellDataStorage.LookupEntry(GEYSER);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;		
 		spells[0].cooldown = 20;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-        spells[1].info = dbcSpell.LookupEntry(ENRAGE_SlAVEMASTER);
+        spells[1].info = SpellDataStorage.LookupEntry(ENRAGE_SlAVEMASTER);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;		
 		spells[1].cooldown = 55;
@@ -1143,14 +1143,14 @@ public:
 			m_spellcheck[i] = false;
 		}
 /*
-        spells[0].info = dbcSpell.LookupEntry(FROSTBOLT_VOLLEY);
+        spells[0].info = SpellDataStorage.LookupEntry(FROSTBOLT_VOLLEY);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;		// Should be false, but doesn't work then
 		spells[0].cooldown = ;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 */
-        spells[0].info = dbcSpell.LookupEntry(WATER_BOLT_WOLLEY);
+        spells[0].info = SpellDataStorage.LookupEntry(WATER_BOLT_WOLLEY);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].cooldown = 10;
@@ -1268,21 +1268,21 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(SWEEPING_STRIKES);
+		spells[0].info = SpellDataStorage.LookupEntry(SWEEPING_STRIKES);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
 		spells[0].cooldown = 25;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(CLEAVE);
+		spells[1].info = SpellDataStorage.LookupEntry(CLEAVE);
 		spells[1].targettype = TARGET_VARIOUS;	// not sure
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(EXECUTE);
+		spells[2].info = SpellDataStorage.LookupEntry(EXECUTE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 35;
@@ -1402,21 +1402,21 @@ public:
 			m_spellcheck[i] = false;
 		}
 /*
-		spells[0].info = dbcSpell.LookupEntry(KNOCKBACK);
+		spells[0].info = SpellDataStorage.LookupEntry(KNOCKBACK);
 		spells[0].targettype = TARGET_ATTACKING; // should be random
 		spells[0].instant = true;
 		spells[0].cooldown = ;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 */
-		spells[0].info = dbcSpell.LookupEntry(WATER_SPOUT);
+		spells[0].info = SpellDataStorage.LookupEntry(WATER_SPOUT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 25;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(FROST_NOVA_SURGER);
+		spells[1].info = SpellDataStorage.LookupEntry(FROST_NOVA_SURGER);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
@@ -1533,7 +1533,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(REPAIR);
+		spells[0].info = SpellDataStorage.LookupEntry(REPAIR);
 		spells[0].targettype = TARGET_SELF;	//Should be mechanical ally =/
 		spells[0].instant = false;
 		spells[0].cooldown = 10;
@@ -1650,7 +1650,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(WATER_BOLT);
+		spells[0].info = SpellDataStorage.LookupEntry(WATER_BOLT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
@@ -1791,28 +1791,28 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
-        spells[0].info = dbcSpell.LookupEntry(SUPER_SHRINK_RAY);
+        spells[0].info = SpellDataStorage.LookupEntry(SUPER_SHRINK_RAY);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 35;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(SAW_BLADE);
+		spells[1].info = SpellDataStorage.LookupEntry(SAW_BLADE);
 		spells[1].targettype = TARGET_ATTACKING; // when killed with VARIOUS (because with that caster attacks also himself) server crashes
 		spells[1].instant = true;
 		spells[1].cooldown = 20;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(ELECTRIFIED_NET);
+		spells[2].info = SpellDataStorage.LookupEntry(ELECTRIFIED_NET);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 25;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(ENRAGE);
+		spells[3].info = SpellDataStorage.LookupEntry(ENRAGE);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
 		spells[3].cooldown = -1;
@@ -2018,21 +2018,21 @@ public:
 			m_spellcheck[i] = false;
 
 		} 
-        spells[0].info = dbcSpell.LookupEntry(ENVELOPING_WINDS);
+        spells[0].info = SpellDataStorage.LookupEntry(ENVELOPING_WINDS);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 25;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(LIGHTNING_CLOUD);
+		spells[1].info = SpellDataStorage.LookupEntry(LIGHTNING_CLOUD);
 		spells[1].targettype = TARGET_DESTINATION;
 		spells[1].instant = true;				
 		spells[1].cooldown = 35;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(LUNG_BURST);
+		spells[2].info = SpellDataStorage.LookupEntry(LUNG_BURST);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 20;
@@ -2189,21 +2189,21 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
-        spells[0].info = dbcSpell.LookupEntry(IMPALE);
+        spells[0].info = SpellDataStorage.LookupEntry(IMPALE);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(HEAD_CRACK);
+		spells[1].info = SpellDataStorage.LookupEntry(HEAD_CRACK);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(WARLORDS_RAGE);
+		spells[2].info = SpellDataStorage.LookupEntry(WARLORDS_RAGE);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
 		spells[2].cooldown = 90;
@@ -2212,7 +2212,7 @@ public:
 		spells[2].soundid = 10391;
 		spells[2].speech = "This is not nearly over!";
 
-		spells[3].info = dbcSpell.LookupEntry(SPELL_REFLECTION);
+		spells[3].info = SpellDataStorage.LookupEntry(SPELL_REFLECTION);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
 		spells[3].cooldown = 20;

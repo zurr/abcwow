@@ -1190,7 +1190,7 @@ void Creature::OnPushToWorld()
 		SpellEntry * sp;
 		for(; itr != proto->start_auras.end(); ++itr)
 		{
-			sp = dbcSpell.LookupEntry((*itr));
+			sp = SpellDataStorage.LookupEntry((*itr));
 			if(sp == 0) continue;
 
 			CastSpell(this, sp, 0);

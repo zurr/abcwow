@@ -36,7 +36,7 @@ for(int i=0;i<nrspells;i++)
             m_spellcheck[i] = false;
         }
 
-spells[0].info = dbcSpell.LookupEntry(ENRAGE);
+spells[0].info = SpellDataStorage.LookupEntry(ENRAGE);
 spells[0].targettype = TARGET_SELF;
 spells[0].instant = true;
 spells[0].perctrigger = 0.0f;
@@ -211,13 +211,13 @@ for(int i=0;i<nrspells;i++)
             m_spellcheck[i] = false;
         }
 
-spells[0].info = dbcSpell.LookupEntry(SHIELD);
+spells[0].info = SpellDataStorage.LookupEntry(SHIELD);
 spells[0].targettype = TARGET_SELF;
 spells[0].instant = true;
 spells[0].perctrigger = 0.0f;
 spells[0].attackstoptimer = 1000;
 
-spells[1].info = dbcSpell.LookupEntry(NOVA);
+spells[1].info = SpellDataStorage.LookupEntry(NOVA);
 spells[1].targettype = TARGET_ATTACKING;
 spells[1].instant = false;
 spells[1].perctrigger = 0.0f;
@@ -225,13 +225,13 @@ spells[1].attackstoptimer = 1000;
 spells[1].soundid = AE;
 spells[1].speech = "Burn in righteous fire!";
 
-spells[2].info = dbcSpell.LookupEntry(POLY);
+spells[2].info = SpellDataStorage.LookupEntry(POLY);
 spells[2].targettype = TARGET_ATTACKING;
 spells[2].instant = false;
 spells[2].perctrigger = 10.0f;
 spells[2].attackstoptimer = 1000;
 
-spells[3].info = dbcSpell.LookupEntry(SILENCE);
+spells[3].info = SpellDataStorage.LookupEntry(SILENCE);
 spells[3].targettype = TARGET_ATTACKING;
 spells[3].instant = false;
 spells[3].perctrigger = 15.0f;
@@ -412,7 +412,7 @@ for(int i=0;i<nrspells;i++)
             m_spellcheck[i] = false;
         }
 
-spells[0].info = dbcSpell.LookupEntry(SHIELD);
+spells[0].info = SpellDataStorage.LookupEntry(SHIELD);
 spells[0].targettype = TARGET_SELF;
 spells[0].instant = true;
 spells[0].perctrigger = 0.0f;
@@ -593,19 +593,19 @@ for(int i=0;i<nrspells;i++)
             m_spellcheck[i] = false;
         }
 
-spells[0].info = dbcSpell.LookupEntry(SHIELD);
+spells[0].info = SpellDataStorage.LookupEntry(SHIELD);
 spells[0].targettype = TARGET_SELF;
 spells[0].instant = true;
 spells[0].perctrigger = 5.0f;
 spells[0].attackstoptimer = 1000;
 
-spells[1].info = dbcSpell.LookupEntry(HAMMER);
+spells[1].info = SpellDataStorage.LookupEntry(HAMMER);
 spells[1].targettype = TARGET_ATTACKING;
 spells[1].instant = true;
 spells[1].perctrigger = 10.0f;
 spells[1].attackstoptimer = 1000;
 
-spells[2].info = dbcSpell.LookupEntry(CRUSADER);
+spells[2].info = SpellDataStorage.LookupEntry(CRUSADER);
 spells[2].targettype = TARGET_ATTACKING;
 spells[2].instant = true;
 spells[2].perctrigger = 30.0f;
@@ -755,19 +755,19 @@ for(int i=0;i<nrspells;i++)
             m_spellcheck[i] = false;
         }
 
-spells[0].info = dbcSpell.LookupEntry(SMITE);
+spells[0].info = SpellDataStorage.LookupEntry(SMITE);
 spells[0].targettype = TARGET_ATTACKING;
 spells[0].instant = false;
 spells[0].perctrigger = 15.0f;
 spells[0].attackstoptimer = 1000;
 
-spells[1].info = dbcSpell.LookupEntry(SLEEP);
+spells[1].info = SpellDataStorage.LookupEntry(SLEEP);
 spells[1].targettype = TARGET_ATTACKING;
 spells[1].instant = true;
 spells[1].perctrigger = 0.0f;
 spells[1].attackstoptimer = 1000;
 
-spells[2].info = dbcSpell.LookupEntry(RESURRECTION);
+spells[2].info = SpellDataStorage.LookupEntry(RESURRECTION);
 spells[2].targettype = TARGET_VARIOUS; //Can't seem to get her to cast it on Mograine...
 spells[2].instant = false;
 spells[2].perctrigger = 0.0f;
@@ -946,13 +946,13 @@ for(int i=0;i<nrspells;i++)
             m_spellcheck[i] = false;
         }
 
-spells[0].info = dbcSpell.LookupEntry(BLOOD);
+spells[0].info = SpellDataStorage.LookupEntry(BLOOD);
 spells[0].targettype = TARGET_ATTACKING;
 spells[0].instant = true;
 spells[0].perctrigger = 15.0f;
 spells[0].attackstoptimer = 1000;
 
-spells[1].info = dbcSpell.LookupEntry(PWS);
+spells[1].info = SpellDataStorage.LookupEntry(PWS);
 spells[1].targettype = TARGET_SELF;
 spells[1].instant = true;
 spells[1].perctrigger = 15.0f;
@@ -1096,7 +1096,7 @@ public:
 		     m_spellcheck[i] = false;
 			}
 
-	spells[0].info = dbcSpell.LookupEntry(WHIRLWINDSPELL); 
+	spells[0].info = SpellDataStorage.LookupEntry(WHIRLWINDSPELL); 
 	spells[0].targettype = TARGET_VARIOUS; 
 	spells[0].instant = true; 
 	spells[0].perctrigger = 10.0f; 
@@ -1104,13 +1104,13 @@ public:
 	spells[0].soundid = WHIRLWIND; 
 	spells[0].speech = "Blades of Light!"; 
 
-	spells[1].info = dbcSpell.LookupEntry(CHARGE);
+	spells[1].info = SpellDataStorage.LookupEntry(CHARGE);
 	spells[1].targettype = TARGET_ATTACKING;
 	spells[1].instant = true;
 	spells[1].perctrigger = 10.0f;
 	spells[1].attackstoptimer = 2000;
 
-	spells[2].info = dbcSpell.LookupEntry(ENRAGESPELL); 
+	spells[2].info = SpellDataStorage.LookupEntry(ENRAGESPELL); 
 	spells[2].targettype = TARGET_SELF; 
 	spells[2].instant = true; 
 	spells[2].perctrigger = 0.0f; 

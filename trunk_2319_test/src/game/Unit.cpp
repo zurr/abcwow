@@ -528,7 +528,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				continue;
 			}
 		}
-		SpellEntry *ospinfo = dbcSpell.LookupEntry(origId );//no need to check if exists or not since we were not able to register this trigger if it would not exist :P
+		SpellEntry *ospinfo = SpellDataStorage.LookupEntry(origId );//no need to check if exists or not since we were not able to register this trigger if it would not exist :P
 		//this requires some specific spell check,not yet implemented
 		if(itr2->procFlags & flag)
 		{
@@ -540,7 +540,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					continue;
 				
 				//this is wrong, dummy is too common to be based on this, we should use spellgroup or something
-				SpellEntry *sp=dbcSpell.LookupEntry(spellId);
+				SpellEntry *sp=SpellDataStorage.LookupEntry(spellId);
 				if(sp->dummy != CastingSpell->dummy)
 				{
 					if(!ospinfo->School)
@@ -820,7 +820,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								}
 								if(!amount)
 									continue;
-								SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
+								SpellEntry *spellInfo = SpellDataStorage.LookupEntry(spellId );
 								if(!spellInfo)
 									continue;
 								Spell *spell = new Spell(this, spellInfo ,true, NULL);
@@ -914,10 +914,10 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									continue;
 								//!! The wierd thing is that we need the spell thet trigegred this enchant spell in order to output logs ..we are using oldspell info too 
 								//we have to recalc the value of this spell
-								SpellEntry *spellInfo = dbcSpell.LookupEntry(origId);
+								SpellEntry *spellInfo = SpellDataStorage.LookupEntry(origId);
 								uint32 AP_owerride=GetAP() + spellInfo->EffectBasePoints[0]+1;
 								uint32 dmg = static_cast<Player*>(this)->GetMainMeleeDamage(AP_owerride);
-								SpellEntry *sp_for_the_logs = dbcSpell.LookupEntry(spellId);
+								SpellEntry *sp_for_the_logs = SpellDataStorage.LookupEntry(spellId);
 								Strike(victim,MELEE,sp_for_the_logs,dmg,0,0,true,false);
 								//nothing else to be done for this trigger
 								continue;
@@ -991,7 +991,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									continue;
 								if (CastingSpell->School!=SCHOOL_FIRE || CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
 									continue;
-								SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
+								SpellEntry *spellInfo = SpellDataStorage.LookupEntry(spellId );
 								Spell *spell = new Spell(this, spellInfo ,true, NULL);
 								spell->forced_basepoints[0] = CastingSpell->manaCost * (ospinfo->EffectBasePoints[0] + 1) / 100;
 								spell->ProcedOnSpell = CastingSpell;
@@ -1072,7 +1072,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				}
 				if(spellId==22858 && isInBack(victim)) //retatliation needs target to be not in front. Can be casted by creatures too
 					continue;
-				SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
+				SpellEntry *spellInfo = SpellDataStorage.LookupEntry(spellId );
 				/* removed by Zack : Check has been made when adding spell to list. This should never ocure unless memory corruption	
 				if(!spellInfo)
 					continue;*/
@@ -1201,7 +1201,7 @@ void Unit::HandleProcDmgShield(uint32 flag, Unit* victim)
 			}
 			else
 			{
-				SpellEntry	*ability=dbcSpell.LookupEntry((*i2).m_spellId);
+				SpellEntry	*ability=SpellDataStorage.LookupEntry((*i2).m_spellId);
 //				victim->Strike(this,(*i2).m_school,ability,0,0,(*i2).m_damage, true);
 				victim->Strike(this,RANGED,ability,0,0,(*i2).m_damage, true,false);
 			}
@@ -3737,7 +3737,7 @@ void Unit::EventSummonPetExpire()
 	{
 		if(summonPet->GetEntry() == 7915)//Goblin Bomb
 		{
-			SpellEntry *spInfo = dbcSpell.LookupEntry(13259);
+			SpellEntry *spInfo = SpellDataStorage.LookupEntry(13259);
 			if(!spInfo)
 				return;
 
@@ -3774,7 +3774,7 @@ void Unit::CastSpell(Unit* Target, SpellEntry* Sp, bool triggered)
 
 void Unit::CastSpell(Unit* Target, uint32 SpellID, bool triggered)
 {
-	SpellEntry * ent = dbcSpell.LookupEntry(SpellID);
+	SpellEntry * ent = SpellDataStorage.LookupEntry(SpellID);
 	if(ent == 0) return;
 
 	CastSpell(Target, ent, triggered);
@@ -3789,7 +3789,7 @@ void Unit::CastSpell(uint64 targetGuid, SpellEntry* Sp, bool triggered)
 
 void Unit::CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered)
 {
-	SpellEntry * ent = dbcSpell.LookupEntry(SpellID);
+	SpellEntry * ent = SpellDataStorage.LookupEntry(SpellID);
 	if(ent == 0) return;
 
 	CastSpell(targetGuid, ent, triggered);
@@ -4017,7 +4017,7 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 							if(m_currentSpell && m_currentSpell->m_spellInfo->NameHash==2272412495UL)
 								continue;
 							//this spell gets removed only when caasting smite
-						    SpellEntry *spi = dbcSpell.LookupEntry(skip);
+						    SpellEntry *spi = SpellDataStorage.LookupEntry(skip);
 							if(spi && spi->NameHash!=2272412495UL)
 								continue;
 						}

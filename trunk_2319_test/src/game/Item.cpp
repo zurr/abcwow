@@ -741,7 +741,7 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 					
 					if(Entry->spell[c] != 0)
 					{
-						sp = dbcSpell.LookupEntry(Entry->spell[c]);
+						sp = SpellDataStorage.LookupEntry(Entry->spell[c]);
 						if(!sp) continue;
 
 						spell = new Spell(m_owner, sp, true, 0);

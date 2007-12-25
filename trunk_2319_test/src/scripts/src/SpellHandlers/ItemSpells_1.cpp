@@ -53,13 +53,13 @@ bool NoggenFoggerElixr(uint32 i, Spell * pSpell)
 	switch(chance)
 	{
 	case 0:
-		pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(16591), true);
+		pSpell->p_caster->CastSpell(pSpell->p_caster, SpellDataStorage.LookupEntry(16591), true);
 		break;
 	case 1:
-		pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(16593), true);
+		pSpell->p_caster->CastSpell(pSpell->p_caster, SpellDataStorage.LookupEntry(16593), true);
 		break;
 	case 2:
-		pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(16595), true);
+		pSpell->p_caster->CastSpell(pSpell->p_caster, SpellDataStorage.LookupEntry(16595), true);
 		break;
 	}
 	return true;
@@ -73,7 +73,7 @@ bool HallowsEndCandy(uint32 i, Spell * pSpell)
 
 	int newspell = 24924 + sRand.randInt(3);
 
-	SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
+	SpellEntry *spInfo = SpellDataStorage.LookupEntry(newspell);
 	if(!spInfo) return true;
 
 	pSpell->p_caster->CastSpell(pSpell->p_caster, spInfo, true);
@@ -88,7 +88,7 @@ bool DeviateFish(uint32 i, Spell * pSpell)
 
 	int newspell = 8064 + sRand.randInt(4);
 
-	SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
+	SpellEntry *spInfo = SpellDataStorage.LookupEntry(newspell);
 	if(!spInfo) return true;
 
 	pSpell->p_caster->CastSpell(pSpell->p_caster, spInfo, true);
@@ -117,7 +117,7 @@ bool CookedDeviateFish(uint32 i, Spell * pSpell)
 
 	if(newspell)
 	{
-		SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
+		SpellEntry *spInfo = SpellDataStorage.LookupEntry(newspell);
 		if(!spInfo) return true;
 		pSpell->p_caster->CastSpell(pSpell->p_caster, spInfo, true);
 	}
@@ -155,7 +155,7 @@ bool NetOMatic(uint32 i, Spell * pSpell)
 	Unit *target = pSpell->GetUnitTarget();
 	if(!pSpell->p_caster || !target) return true;
 
-	SpellEntry *spInfo = dbcSpell.LookupEntry(13099);
+	SpellEntry *spInfo = SpellDataStorage.LookupEntry(13099);
 	if(!spInfo) return true;
 
 	int chance = sRand.randInt(99)+1;
@@ -237,7 +237,7 @@ bool HolyShock(uint32 i, Spell *pSpell)
 		}
 	}
 
-	SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
+	SpellEntry *spInfo = SpellDataStorage.LookupEntry(newspell);
 	if(!spInfo) return true;
 
 	pSpell->p_caster->CastSpell(target, spInfo, true);
@@ -316,9 +316,9 @@ bool NighInvulnBelt(uint32 i, Spell *pSpell)
     int chance = sRand.randInt(99)+1;
 
     if(chance > 10) // Buff - Nigh-Invulnerability - 30456
-        pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30456), true);
+        pSpell->p_caster->CastSpell(pSpell->p_caster, SpellDataStorage.LookupEntry(30456), true);
     else // Malfunction - Complete Vulnerability - 30457
-        pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30457), true);
+        pSpell->p_caster->CastSpell(pSpell->p_caster, SpellDataStorage.LookupEntry(30457), true);
 
     return true;
 }

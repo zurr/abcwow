@@ -101,7 +101,7 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 		if(m_buffs[buffslot] != 0 && m_buffs[buffslot]->IsInWorld())
 		{
 			/* apply the buff */
-			SpellEntry * sp = dbcSpell.LookupEntry(m_buffs[buffslot]->GetInfo()->sound3);
+			SpellEntry * sp = SpellDataStorage.LookupEntry(m_buffs[buffslot]->GetInfo()->sound3);
 			Spell * s = new Spell(plr, sp, true, 0);
 			SpellCastTargets targets(plr->GetGUID());
 			s->prepare(&targets);
@@ -157,8 +157,8 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 
 			m_mainLock.Acquire();
 			/* add the marks of honor to all players */
-			SpellEntry * winner_spell = dbcSpell.LookupEntry(24950);
-			SpellEntry * loser_spell = dbcSpell.LookupEntry(24951);
+			SpellEntry * winner_spell = SpellDataStorage.LookupEntry(24950);
+			SpellEntry * loser_spell = SpellDataStorage.LookupEntry(24951);
 			for(uint32 i = 0; i < 2; ++i)
 			{
 				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
@@ -235,7 +235,7 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 	 */
 	m_dropFlags[plr->GetTeam()]->SetNewGuid(m_mapMgr->GenerateGameobjectGuid());
 	
-	SpellEntry * pSp = dbcSpell.LookupEntry(23333 + (plr->GetTeam() * 2));
+	SpellEntry * pSp = SpellDataStorage.LookupEntry(23333 + (plr->GetTeam() * 2));
 	Spell * sp = new Spell(plr, pSp, true, 0);
 	SpellCastTargets targets(plr->GetGUID());
 	sp->prepare(&targets);
@@ -250,7 +250,7 @@ void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
 		return;
 	}
 
-	SpellEntry * pSp = dbcSpell.LookupEntry(23333 + (plr->GetTeam() * 2));
+	SpellEntry * pSp = SpellDataStorage.LookupEntry(23333 + (plr->GetTeam() * 2));
 	Spell * sp = new Spell(plr, pSp, true, 0);
 	SpellCastTargets targets(plr->GetGUID());
 	sp->prepare(&targets);

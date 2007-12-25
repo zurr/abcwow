@@ -109,8 +109,10 @@ World::~World()
 	delete eventholder;
 
 	Storage_Cleanup();
+	/*
 	for(list<SpellEntry*>::iterator itr = dummyspells.begin(); itr != dummyspells.end(); ++itr)
 		delete *itr;
+	*/
 }
 
 
@@ -217,28 +219,6 @@ bool BasicTaskExecutor::run()
 #endif
 
 	return true;
-}
-
-void CreateDummySpell(uint32 id)
-{
-	const char * name = "Dummy Trigger";
-	SpellEntry * sp = new SpellEntry;
-	memset(sp, 0, sizeof(SpellEntry));
-	sp->Id = id;
-	sp->Attributes = 384;
-	sp->AttributesEx = 268435456;
-	sp->Flags3 = 4;
-	sp->CastingTimeIndex=1;
-	sp->procChance=75;
-	sp->rangeIndex=13;
-	sp->EquippedItemClass=uint32(-1);
-	sp->Effect[0]=3;
-	sp->EffectImplicitTargetA[0]=25;
-	sp->NameHash=crc32((const unsigned char*)name, (unsigned int)strlen(name));
-	sp->dmg_multiplier[0]=1.0f;
-	sp->FH=-1;
-	dbcSpell.SetRow(id,sp);
-	sWorld.dummyspells.push_back(sp);
 }
 
 bool World::SetInitialWorldSettings()
@@ -408,11 +388,12 @@ bool World::SetInitialWorldSettings()
 	/* storage stuff has to be loaded first */
 	tl.wait();
 
+	MAKE_TASK(ObjectMgr, LoadSpellDataExtra);
+	tl.wait();
 	MAKE_TASK(ObjectMgr, LoadCreatureWaypoints);
 	MAKE_TASK(ObjectMgr, LoadTrainers);
 	MAKE_TASK(ObjectMgr, LoadTotemSpells);
 	MAKE_TASK(ObjectMgr, LoadSpellSkills);
-	MAKE_TASK(ObjectMgr, LoadSpellFixes);
 	MAKE_TASK(ObjectMgr, LoadSpellOverride);
 	MAKE_TASK(ObjectMgr, LoadVendors);
 	MAKE_TASK(ObjectMgr, LoadAIThreatToSpellId);
@@ -466,817 +447,24 @@ bool World::SetInitialWorldSettings()
 	LoadNameGenData();
 
 
-	//Updating spell.dbc--this is slow like hell due to we cant read string fields
-	//dbc method will be changed in future
-	DBCFile dbc;
 
-	dbc.open("DBC/Spell.dbc");
-	Log.Notice("World", "Processing %u spells...", dbc.getRecordCount());
-
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_proc_data");
-	map<uint32, pair<uint32, int32> > procMap;
-	if(result)
+/*
+	for EVERY SPELL
 	{
-		do 
-		{
-			pair<uint32,int32> p;
-			p.first = result->Fetch()[1].GetUInt32();
-			p.second = result->Fetch()[2].GetInt32();
-			procMap.insert(make_pair(result->Fetch()[0].GetUInt32(), p));
-		} while(result->NextRow());
-	}
-	uint32 cnt = (uint32)dbc.getRecordCount();
-	uint32 effect;
-	uint32 All_Seal_Groups_Combined=0;
+		if(namehash == 0x56392512)			// seal of light
+			sp->procChance=45;	// this will do 
 
-	map<uint32, uint32> talentSpells;
-	map<uint32,uint32>::iterator talentSpellIterator;
-	unsigned int i,j;
-	for(i = 0; i < dbcTalent.GetNumRows(); ++i)
-	{
-		TalentEntry * tal = dbcTalent.LookupRow(i);
-		for(j = 0; j < 5; ++j)
-			if(tal->RankID[j] != 0)
-				talentSpells.insert(make_pair(tal->RankID[j], tal->TalentTree));
-	}
-
-
-	for(uint32 x=0; x < cnt; x++)
-	{
-		uint32 result = 0;
-		// SpellID
-		uint32 spellid = dbc.getRecord(x).getUInt(0);
-		// Description field
-		char* desc = (char*)dbc.getRecord(x).getString(157); 
-		const char* ranktext = dbc.getRecord(x).getString(140);
-		const char* nametext = dbc.getRecord(x).getString(123);
-
-		uint32 rank = 0;
-		uint32 type = 0;
-		uint32 namehash = 0;
-
-		// get spellentry
-		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
-
-		// hash the name
-		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
-        namehash = crc32((const unsigned char*)nametext, (unsigned int)strlen(nametext));
-		sp->NameHash   = namehash; //need these set before we start processing spells
-
-		float radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[1])));
-		radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[2])),radius);
-		radius=max(GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex)),radius);
-		sp->base_range_or_radius_sqr = radius*radius;
-
-		for(uint32 b=0;b<3;++b)
-		{
-			if(sp->EffectTriggerSpell[b] != 0 && dbcSpell.LookupEntryForced(sp->EffectTriggerSpell[b]) == NULL)
-			{
-				/* proc spell referencing non-existant spell. create a dummy spell for use w/ it. */
-				CreateDummySpell(sp->EffectTriggerSpell[b]);
-			}
-			/** Load teaching spells (used for hunters when learning pets wild abilities) */
-			if(sp->Effect[b]==SPELL_EFFECT_LEARN_SPELL && sp->EffectImplicitTargetA[b]==EFF_TARGET_PET)
-			{
-				map<uint32,uint32>::iterator itr = TeachingSpellMap.find(sp->EffectTriggerSpell[b]);
-				if(itr == TeachingSpellMap.end())
-					TeachingSpellMap.insert(make_pair(sp->EffectTriggerSpell[b],sp->Id));
-			}
-		}
-
-		sp->proc_interval = 0;//trigger at each event
-		sp->c_is_flags = 0;
-
-		talentSpellIterator = talentSpells.find(sp->Id);
-		if(talentSpellIterator == talentSpells.end())
-			sp->talent_tree = 0;
-		else
-			sp->talent_tree = talentSpellIterator->second;
-
-		// parse rank text
-		if(!sscanf(ranktext, "Rank %d", (unsigned int*)&rank))
-			rank = 0;
-
-		if(namehash == 0x56392512)			/* seal of light */
-			sp->procChance=45;	/* this will do */
-
-		//these mostly do not mix so we can use else 
-        // look for seal, etc in name
-        if(strstr(nametext, "Seal"))
-		{
-            type |= SPELL_TYPE_SEAL;
-			All_Seal_Groups_Combined |= sp->SpellGroupType;
-		}
-        else if(strstr(nametext, "Blessing"))
-            type |= SPELL_TYPE_BLESSING;
-        else if(strstr(nametext, "Curse"))
-            type |= SPELL_TYPE_CURSE;
-        else if(strstr(nametext, "Aspect"))
-            type |= SPELL_TYPE_ASPECT;
-        else if(strstr(nametext, "Sting") || strstr(nametext, "sting"))
-            type |= SPELL_TYPE_STING;
-        // don't break armor items!
-        else if(strcmp(nametext, "Armor") && strstr(nametext, "Armor") || strstr(nametext, "Demon Skin"))
-            type |= SPELL_TYPE_ARMOR;
-        else if(strstr(nametext, "Aura"))
-            type |= SPELL_TYPE_AURA;
-		else if(strstr(nametext, "Track")==nametext)
-            type |= SPELL_TYPE_TRACK;
-//		else if(strstr(nametext, "Gift of the Wild") || strstr(nametext, "Mark of the Wild"))
-		else if(namehash==0xF77CAB47 || namehash==0x202F1D74)
-            type |= SPELL_TYPE_MARK_GIFT;
-//		else if(strstr(nametext, "Immolation Trap") || strstr(nametext, "Freezing Trap") || strstr(nametext, "Frost Trap") || strstr(nametext, "Explosive Trap") || strstr(nametext, "Snake Trap"))
-		else if(namehash==0x238FEAF2 || namehash==0x593D7EC7 || namehash==0xF7318BD7 || namehash==0x54B6F3EE || namehash==0xF57361BB)
-            type |= SPELL_TYPE_HUNTER_TRAP;
-//		else if(strstr(nametext, "Arcane Intellect") || strstr(nametext, "Arcane Brilliance"))
-		else if(namehash==0x2F7018BA || namehash==0x9CA89B04)
-            type |= SPELL_TYPE_MAGE_INTEL;
-//		else if(strstr(nametext, "Amplify Magic") || strstr(nametext, "Dampen Magic"))
-		else if(namehash==0x75E2ACFF || namehash==0x3C4E2404)
-            type |= SPELL_TYPE_MAGE_MAGI;
-//		else if(strstr(nametext, "Fire Ward") || strstr(nametext, "Frost Ward"))
-		else if(namehash==0xC83A99CB || namehash==0x80D1ACFF)
-            type |= SPELL_TYPE_MAGE_WARDS;
-//		else if(strstr(nametext, "Shadow Protection") || strstr(nametext, "Prayer of Shadow Protection"))
-		else if(namehash==0xD9948728 || namehash==0xBDA6C77C)
-            type |= SPELL_TYPE_PRIEST_SH_PPROT;
-//		else if(strstr(nametext, "Water Shield") || strstr(nametext, "Earth Shield") || strstr(nametext, "Lightning Shield"))
-		else if(namehash==0xB9DAC27E || namehash==0x0227BA8B || namehash==0x2123CF1E)
-            type |= SPELL_TYPE_SHIELD;
-//		else if(strstr(nametext, "Power Word: Fortitude") || strstr(nametext, "Prayer of Fortitude"))
-		else if(namehash==0x9056D252 || namehash==0x519F97B3)
-            type |= SPELL_TYPE_FORTITUDE;
-//		else if(strstr(nametext, "Divine Spirit") || strstr(nametext, "Prayer of Spirit"))
-		else if(namehash==0xB1792C31 || namehash==0xC8F56DAF)
-            type |= SPELL_TYPE_SPIRIT;
-//		else if(strstr(nametext, "Curse of Weakness") || strstr(nametext, "Curse of Agony") || strstr(nametext, "Curse of Recklessness") || strstr(nametext, "Curse of Tongues") || strstr(nametext, "Curse of the Elements") || strstr(nametext, "Curse of Idiocy") || strstr(nametext, "Curse of Shadow") || strstr(nametext, "Curse of Doom"))
-//		else if(namehash==4129426293 || namehash==885131426 || namehash==626036062 || namehash==3551228837 || namehash==2784647472 || namehash==776142553 || namehash==3407058720 || namehash==202747424)
-//		else if(strstr(nametext, "Curse of "))
-//            type |= SPELL_TYPE_WARLOCK_CURSES;
-		else if(strstr(nametext, "Immolate") || strstr(nametext, "Conflagrate"))
-			type |= SPELL_TYPE_WARLOCK_IMMOLATE;
-		else if(strstr(nametext, "Amplify Magic") || strstr(nametext, "Dampen Magic"))
-			type |= SPELL_TYPE_MAGE_AMPL_DUMP;
-		else if(strstr(desc, "Finishing move")==desc)
-			type |= SPELL_TYPE_FINISHING_MOVE;
-        else if(strstr(desc, "Battle Elixir"))
-            type |= SPELL_TYPE_ELIXIR_BATTLE;
-        else if(strstr(desc, "Guardian Elixir"))
-            type |= SPELL_TYPE_ELIXIR_GUARDIAN;
-        else if(strstr(desc, "Battle and Guardian elixir"))
-            type |= SPELL_TYPE_ELIXIR_FLASK;
-		else if(namehash==0xFF89ABD2)		// hunter's mark
-			type |= SPELL_TYPE_HUNTER_MARK;
-		if(IsDamagingSpell(sp))
-			sp->c_is_flags |= SPELL_FLAG_IS_DAMAGING;
-		if(IsHealingSpell(sp))
-			sp->c_is_flags |= SPELL_FLAG_IS_HEALING;
-		if(IsTargetingStealthed(sp))
-			sp->c_is_flags |= SPELL_FLAG_IS_TARGETINGSTEALTHED;
-
-		//stupid spell ranking problem
-		if(sp->spellLevel==0)
-		{
-			uint32 new_level=0;
-			if(strstr(nametext, "Apprentice "))
-				new_level = 1;
-			else if(strstr(nametext, "Journeyman "))
-				new_level = 2;
-			else if(strstr(nametext, "Expert "))
-				new_level = 3;
-			else if(strstr(nametext, "Artisan "))
-				new_level = 4;
-			else if(strstr(nametext, "Master "))
-				new_level = 5;
-			if(new_level!=0)
-			{
-				uint32 teachspell=0;
-				if(sp->Effect[0]==SPELL_EFFECT_LEARN_SPELL)
-					teachspell = sp->EffectTriggerSpell[0];
-				else if(sp->Effect[1]==SPELL_EFFECT_LEARN_SPELL)
-					teachspell = sp->EffectTriggerSpell[1];
-				else if(sp->Effect[2]==SPELL_EFFECT_LEARN_SPELL)
-					teachspell = sp->EffectTriggerSpell[2];
-				if(teachspell)
-				{
-					SpellEntry *spellInfo = dbcSpell.LookupEntry(teachspell );
-					spellInfo->spellLevel = new_level;
-					sp->spellLevel = new_level;
-				}
-			}
-		}
-
-		/*FILE * f = fopen("C:\\spells.txt", "a");
-		fprintf(f, "case 0x%08X:		// %s\n", namehash, nametext);
-		fclose(f);*/
-
-		// find diminishing status
-		sp->DiminishStatus = GetDiminishingGroup(namehash);
-		sp->buffIndexType=0;
-		switch(namehash)
-		{
-		case 0xFF89ABD2:		// Hunter's mark
-			sp->buffIndexType = SPELL_TYPE_INDEX_MARK;
-			break;
-
-		case 0x2266F1F2:		// Polymorph
-		case 0xB15D524E:		// Polymorph: Chicken
-		case 0xA73086F1:		// Polymorph: Pig
-		case 0xBD6B76DC:		// Polymorph: Sheep
-		case 0x0128F8E9:		// Polymorph: Turtle
-			sp->buffIndexType = SPELL_TYPE_INDEX_POLYMORPH;
-			break;
-
-		case 0x328E44DC:		// Fear
-			sp->buffIndexType = SPELL_TYPE_INDEX_FEAR;
-			break;
-
-		case 0x4219BB33:		// Sap
-			sp->buffIndexType = SPELL_TYPE_INDEX_SAP;
-			break;
-
-		case 0x94675337:		// Scare Beast
-			sp->buffIndexType = SPELL_TYPE_INDEX_SCARE_BEAST;
-			break;
-
-		case 0x898B6207:		// Hibernate
-			sp->buffIndexType = SPELL_TYPE_INDEX_HIBERNATE;
-			break;
-
-		case 0x0227BA8B:		// Earth Shield
-			sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
-			break;
-
-		case 0x73812928:		// Cyclone
-			sp->buffIndexType = SPELL_TYPE_INDEX_CYCLONE;
-			break;
-
-		case 0x3D46465A:		// Banish
-			sp->buffIndexType = SPELL_TYPE_INDEX_BANISH;
-			break;
-		}
-
-		// HACK FIX: Break roots/fear on damage.. this needs to be fixed properly!
-		if(!(sp->AuraInterruptFlags & AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN))
-		{
-			for(uint32 z = 0; z < 3; ++z) {
-				if(sp->EffectApplyAuraName[z] == SPELL_AURA_MOD_FEAR ||
-					sp->EffectApplyAuraName[z] == SPELL_AURA_MOD_ROOT)
-				{
-					sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_UNUSED2;
-					break;
-				}
-
-				if((sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE&&sp->Spell_Dmg_Type==2) || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE || sp->Effect[z] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || sp->Effect[z] == SPELL_EFFECT_DUMMYMELEE)
-					sp->is_melee_spell = true;
-			}
-		}
-
-		// set extra properties
-		sp->buffType   = type;
-		sp->RankNumber = rank;
-
-		uint32 pr=sp->procFlags;
-		for(uint32 y=0;y < 3; y++)
-		{
-			// get the effect number from the spell
-			effect = dbc.getRecord(x).getUInt(64 + y); // spelleffect[0] = 64 // 2.0.1
-
-			//spell group
-			/*if(effect==SPELL_EFFECT_SUMMON_TOTEM_SLOT1||effect==SPELL_EFFECT_SUMMON_TOTEM_SLOT2||
-				effect==SPELL_EFFECT_SUMMON_TOTEM_SLOT3||effect==SPELL_EFFECT_SUMMON_TOTEM_SLOT4)
-			{
-			
-					const char *p=desc;
-					while(p=strstr(p,"$"))
-					{
-						p++;
-						//got $  -> check if spell
-						if(*p>='0' && *p <='9')
-						{//woot this is spell id
-							uint32 tmp=atoi(p);
-							SpellEntry*s=sSpellStore.LookupEntry(tmp);
-							bool ch=false;
-							for(uint32 i=0;i<3;i++)
-								if(s->EffectTriggerSpell[i])
-								{
-									ch=true;
-									result=tmp;
-									break;
-								}
-							if(ch)break;
-							result=tmp;
-							
-						}
-					
-					}
-				
-			}else*/
-			/*if(effect==SPELL_EFFECT_ENCHANT_ITEM)//add inventory type check
-			{
-				result=0;
-				//136--desc field
-				//dirty code
-				if(strstr(desc,"head"))
-					result|=(1<<INVTYPE_HEAD);
-				if(strstr(desc,"leg"))
-					result|=(1<<INVTYPE_LEGS);
-				if(strstr(desc,"neck"))
-					result|=(1<<INVTYPE_NECK);
-				if(strstr(desc,"shoulder"))
-					result|=(1<<INVTYPE_SHOULDERS);
-				if(strstr(desc,"body"))
-					result|=(1<<INVTYPE_BODY);
-				if(strstr(desc,"chest"))
-					result|=((1<<INVTYPE_CHEST)|(1<<INVTYPE_ROBE));
-				if(strstr(desc,"waist"))
-					result|=(1<<INVTYPE_WAIST);
-				if(strstr(desc,"foot")||strstr(desc,"feet")||strstr(desc,"boot"))
-					result|=(1<<INVTYPE_FEET);
-				if(strstr(desc,"wrist")||strstr(desc,"bracer"))
-					result|=(1<<INVTYPE_WRISTS);
-				if(strstr(desc,"hand")||strstr(desc,"glove"))
-					result|=(1<<INVTYPE_HANDS);
-				if(strstr(desc,"finger")||strstr(desc,"ring"))
-					result|=(1<<INVTYPE_FINGER);
-				if(strstr(desc,"trinket"))
-					result|=(1<<INVTYPE_TRINKET);
-				if(strstr(desc,"shield"))
-					result|=(1<<INVTYPE_SHIELD);
-				if(strstr(desc,"cloak"))
-					result|=(1<<INVTYPE_CLOAK);
-				if(strstr(desc,"robe"))
-					result|=(1<<INVTYPE_ROBE);
-				//if(strstr(desc,"two")||strstr(desc,"Two"))
-				//	result|=(1<<INVTYPE_2HWEAPON);<-handled in subclass
-			}
-			else*/
-			if(effect==SPELL_EFFECT_APPLY_AURA)
-			{
-				uint32 aura = dbc.getRecord(x).getUInt(94+y); // 58+30+3 = 91
-				if( aura == SPELL_AURA_PROC_TRIGGER_SPELL ||
-					aura == SPELL_AURA_PROC_TRIGGER_DAMAGE
-					)//search for spellid in description
-				{
-					const char *p=desc;
-					while((p=strstr(p,"$")))
-					{
-						p++;
-						//got $  -> check if spell
-						if(*p>='0' && *p <='9')
-						{//woot this is spell id
-						
-							result=atoi(p);
-						}					
-					}
-					pr=0;
-
-					uint32 len = (uint32)strlen(desc);
-					for(i = 0; i < len; ++i)
-						desc[i] = tolower(desc[i]);
-					//dirty code for procs, if any1 got any better idea-> u are welcome
-					//139944 --- some magic number, it will trigger on all hits etc
-						//for seems to be smth like custom check
-					if(strstr(desc,"takes damage"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc,"attackers when hit"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"character strikes an enemy"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"strike you with a melee attack"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"target casts a spell"))
-						pr|=PROC_ON_CAST_SPELL;
-                    if(strstr(desc,"your harmful spells land"))
-                        pr|=PROC_ON_CAST_SPELL;
-                    if(strstr(desc,"on spell critical hit"))
-                        pr|=PROC_ON_SPELL_CRIT_HIT;
-                    if(strstr(desc,"spell critical strikes"))
-                        pr|=PROC_ON_SPELL_CRIT_HIT;
-                    if(strstr(desc,"being able to resurrect"))
-                        pr|=PROC_ON_DIE;
-					if(strstr(desc,"any damage caused"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc,"the next melee attack against the caster"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"when successfully hit"))
-						pr|=PROC_ON_MELEE_ATTACK ;
-					if(strstr(desc,"an enemy on hit"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"when it hits"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"when successfully hit"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"on a successful hit"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"damage to attacker on hit"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"on a hit"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"strikes you with a melee attack"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"when caster takes damage"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc,"when the caster is using melee attacks"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"when struck in combat"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"successful melee attack"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"chance per attack"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"chance per hit"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"that strikes a party member"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"when hit by a melee attack"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"your critical strikes"))
-						pr|=PROC_ON_CRIT_ATTACK;
-					if(strstr(desc,"whenever you deal ranged damage"))
-						pr|=PROC_ON_RANGED_ATTACK;
-//					if(strstr(desc,"whenever you deal melee damage"))
-					if(strstr(desc,"you deal melee damage"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"your melee attacks"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"damage with your Sword"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"when struck in melee combat"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"any successful spell cast against the priest"))
-						pr|=PROC_ON_SPELL_HIT_VICTIM;
-					if(strstr(desc,"the next melee attack on the caster"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"striking melee or ranged attackers"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM|PROC_ON_RANGED_ATTACK_VICTIM;
-					if(strstr(desc,"when damaging an enemy in melee"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"victim of a critical strike"))
-						pr|=PROC_ON_CRIT_HIT_VICTIM;
-					if(strstr(desc,"on successful melee or ranged attack"))
-						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
-					if(strstr(desc,"enemy that strikes you in melee"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"after getting a critical strike"))
-						pr|=PROC_ON_CRIT_ATTACK;
-					if(strstr(desc,"whenever damage is dealt to you"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc,"when ranged or melee damage is dealt"))
-						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
-					if(strstr(desc,"damaging melee attacks"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"on melee or ranged attack"))
-						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
-					if(strstr(desc,"on a melee swing"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"Chance on melee"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"spell criticals against you"))
-						pr|=PROC_ON_SPELL_CRIT_HIT_VICTIM;
-					if(strstr(desc,"after being struck by a melee or ranged critical hit"))
-						pr|=PROC_ON_CRIT_HIT_VICTIM;
-//					if(strstr(desc,"on a critical hit"))
-					if(strstr(desc,"critical hit"))
-						pr|=PROC_ON_CRIT_ATTACK;
-					if(strstr(desc,"strikes the caster"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"a spell, melee or ranged attack hits the caster"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc,"after dealing a critical strike"))
-						pr|=PROC_ON_CRIT_ATTACK;
-					if(strstr(desc,"each melee or ranged damage hit against the priest"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM|PROC_ON_RANGED_ATTACK_VICTIM;				
-					if(strstr(desc, "a chance to deal additional"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc, "chance to get an extra attack"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc, "melee attacks has"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc, "any damage spell hits a target"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc, "giving each melee attack a chance"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc, "damage when hit"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM; //myabe melee damage ?
-					if(strstr(desc, "gives your"))
-					{
-						if(strstr(desc, "melee"))
-							pr|=PROC_ON_MELEE_ATTACK;
-						else if(strstr(desc,"sinister strike, backstab, gouge and shiv"))
-							pr|=PROC_ON_CAST_SPELL;
-						else if(strstr(desc,"chance to daze the target"))
-							pr|=PROC_ON_CAST_SPELL;
-						else if(strstr(desc,"finishing moves"))
-							pr|=PROC_ON_CAST_SPELL;
-//						else if(strstr(desc,"shadow bolt, shadowburn, soul fire, incinerate, searing pain and conflagrate"))
-//							pr|=PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF;
-						//we should find that specific spell (or group) on what we will trigger
-						else pr|=PROC_ON_CAST_SPECIFIC_SPELL;
-					}
-					if(strstr(desc, "chance to add an additional combo") && strstr(desc, "critical") )
-						pr|=PROC_ON_CRIT_ATTACK;
-					else if(strstr(desc, "chance to add an additional combo"))
-						pr|=PROC_ON_CAST_SPELL;
-					if(strstr(desc, "victim of a melee or ranged critical strike"))
-						pr|=PROC_ON_CRIT_HIT_VICTIM;
-					if(strstr(desc, "getting a critical effect from"))
-						pr|=PROC_ON_SPELL_CRIT_HIT_VICTIM;
-					if(strstr(desc, "damaging attack is taken"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc, "struck by a Stun or Immobilize"))
-						pr|=PROC_ON_SPELL_HIT_VICTIM;
-					if(strstr(desc, "melee critical strike"))
-						pr|=PROC_ON_CRIT_ATTACK;
-					if(strstr(nametext, "Bloodthirst"))
-						pr|=PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
-					if(strstr(desc, "experience or honor"))
-						pr|=PROC_ON_GAIN_EXPIERIENCE;
-					if(strstr(desc,"your next offensive ability"))
-						pr|=PROC_ON_CAST_SPELL;
-					if(strstr(desc,"hit by a melee or ranged attack"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
-					if(strstr(desc,"enemy strikes the caster"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"melee and ranged attacks against you"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
-					if(strstr(desc,"when a block occurs"))
-						pr|=PROC_ON_BLOCK_VICTIM;
-					if(strstr(desc,"dealing a critical strike from a weapon swing, spell, or ability"))
-						pr|=PROC_ON_CRIT_ATTACK|PROC_ON_SPELL_CRIT_HIT;
-					if(strstr(desc,"dealing a critical strike from a weapon swing, spell, or ability"))
-						pr|=PROC_ON_CRIT_ATTACK|PROC_ON_SPELL_CRIT_HIT;
-					if(strstr(desc,"shadow bolt critical strikes increase shadow damage"))
-						pr|=PROC_ON_SPELL_CRIT_HIT;
-					if(strstr(desc,"next offensive ability"))
-						pr|=PROC_ON_CAST_SPELL;
-					if(strstr(desc,"after being hit with a shadow or fire spell"))
-						pr|=PROC_ON_SPELL_HIT_VICTIM;
-					if(strstr(desc,"giving each melee attack"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"each strike has"))
-						pr|=PROC_ON_MELEE_ATTACK;		
-					if(strstr(desc,"your Fire damage spell hits"))
-						pr|=PROC_ON_CAST_SPELL;		//this happens only on hit ;)
-					if(strstr(desc,"corruption, curse of agony, siphon life and seed of corruption spells also cause"))
-						pr|=PROC_ON_CAST_SPELL;
-					if(strstr(desc,"pain, mind flay and vampiric touch spells also cause"))
-						pr|=PROC_ON_CAST_SPELL;
-					if(strstr(desc,"shadow damage spells have"))
-						pr|=PROC_ON_CAST_SPELL;
-					if(strstr(desc,"your spell criticals have"))
-						pr|=PROC_ON_SPELL_CRIT_HIT | PROC_ON_SPELL_CRIT_HIT_VICTIM;
-					if(strstr(desc,"after dodging their attack"))
-					{
-						pr|=PROC_ON_DODGE_VICTIM;
-						if(strstr(desc,"add a combo point"))
-							pr|=PROC_TAGRGET_SELF;
-					}
-					if(strstr(desc,"fully resisting"))
-						pr|=PROC_ON_RESIST_VICTIM;
-					if(strstr(desc,"Your Shadow Word: Pain, Mind Flay and Vampiric Touch spells also cause the target"))
-						pr|=PROC_ON_CAST_SPELL;
-					if(strstr(desc,"your melee and ranged attacks"))
-						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
-//					if(strstr(desc,"chill effect to your Blizzard"))
-//						pr|=PROC_ON_CAST_SPELL;	
-					//////////////////////////////////////////////////
-					//proc dmg flags
-					//////////////////////////////////////////////////
-					if(strstr(desc,"each attack blocked"))
-						pr|=PROC_ON_BLOCK_VICTIM;
-					if(strstr(desc,"into flame, causing an additional"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"victim of a critical melee strike"))
-						pr|=PROC_ON_CRIT_HIT_VICTIM;
-					if(strstr(desc,"damage to melee attackers"))
-						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"target blocks a melee attack"))
-						pr|=PROC_ON_BLOCK_VICTIM;
-					if(strstr(desc,"ranged and melee attacks to deal"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
-					if(strstr(desc,"damage on hit"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc,"after being hit by any damaging attack"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc,"striking melee or ranged attackers"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
-					if(strstr(desc,"damage to attackers when hit"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"striking melee attackers"))
-						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
-					if(strstr(desc,"whenever the caster takes damage"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
-					if(strstr(desc,"damage on every attack"))
-						pr|=PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
-					if(strstr(desc,"chance to reflect Fire spells"))
-						pr|=PROC_ON_SPELL_HIT_VICTIM;
-					if(strstr(desc,"hunter takes on the aspects of a hawk"))
-						pr|=PROC_TAGRGET_SELF | PROC_ON_RANGED_ATTACK;
-					if(strstr(desc,"successful auto shot attacks"))
-						pr|=PROC_ON_AUTO_SHOT_HIT;
-					if(strstr(desc,"after getting a critical effect from your"))
-						pr=PROC_ON_SPELL_CRIT_HIT;
-//					if(strstr(desc,"Your critical strikes from Fire damage"))
-//						pr|=PROC_ON_SPELL_CRIT_HIT;
-				}//end "if procspellaura"
-				//dirty fix to remove auras that should expire on event and they are not
-//				else if(sp->procCharges>0)
-//				{
-					//there are at least 185 spells that should loose charge uppon some event.Be prepared to add more here !
-					// ! watch it cause this might conflict with our custom modified spells like : lighning shield !
-
-					//spells like : Presence of Mind,Nature's Swiftness, Inner Focus,Amplify Curse,Coup de Grace
-					//SELECT * FROM dbc_spell where proc_charges!=0 and (effect_aura_1=108 or effect_aura_2=108 and effect_aura_3=108) and description!=""
-//					if(aura == SPELL_AURA_ADD_PCT_MODIFIER)
-//						sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
-					//most of them probably already have these flags...not sure if we should add to all of them without checking
-/*					if(strstr(desc, "melee"))
-						sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_START_ATTACK;
-					if(strstr(desc, "ranged"))
-						sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_START_ATTACK;*/
-//				}
-			}//end "if aura"
-		}//end "for each effect"
-		sp->procFlags=pr;
-
-		if (strstr(desc, "Must remain seated"))
-		{
-			sp->RecoveryTime = 1000;
-			sp->CategoryRecoveryTime = 1000;
-		}
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-		// procintervals
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-		//omg lighning shield trigger spell id's are all wrong ?
-		//if you are bored you could make thiese by hand but i guess we might find other spells with this problem..and this way it's safe
-		if(strstr(nametext, "Lightning Shield") && sp->EffectTriggerSpell[0])
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "for $");
-			if(startofid)
-			{
-				startofid += strlen("for $");
-				sp->EffectTriggerSpell[0]=atoi(startofid); //get new lightning shield trigger id
-			}
-			sp->proc_interval = 3000; //few seconds
-		}
-		//mage ignite talent should proc only on some chances
-		else if(strstr(nametext, "Ignite") && sp->Id>=11119 && sp->Id<=12848 && sp->EffectApplyAuraName[0]==4)
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "an additional ");
-			if(startofid)
-			{
-				startofid += strlen("an additional ");
-				sp->EffectBasePoints[0]=atoi(startofid); //get new value. This is actually level*8 ;)
-			}
-			sp->Effect[0] = 6; //aura
-			sp->EffectApplyAuraName[0] = 42; //force him to use procspell effect
-			sp->EffectTriggerSpell[0] = 12654; //evil , but this is good for us :D
-			sp->procFlags = PROC_ON_SPELL_CRIT_HIT; //add procflag here since this was not processed with the others !
-		}
-		// Winter's Chill handled by frost school
-		else if(strstr(nametext, "Winter's Chill"))
-		{
-			sp->School = 4;
-		}
-		// Blackout handled by Shadow school
-		else if(strstr(nametext, "Blackout"))
-		{
-			sp->School = 5;
-		}
-		// Shadow Weaving
-		else if(strstr(nametext, "Shadow Weaving"))
-		{
-			sp->School = 5;
-			sp->EffectApplyAuraName[0] = 42;
-			sp->procChance = sp->EffectBasePoints[0] + 1;
-			sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-		}
-		//Improved Aspect of the Hawk
-		else if(strstr(nametext, "Improved Aspect of the Hawk"))
-			sp->EffectSpellGroupRelation[1] = 0x100000;
-		//more triggered spell ids are wrong. I think blizz is trying to outsmart us :S
-		else if( strstr(nametext, "Nature's Guardian"))
-		{
-			sp->EffectTriggerSpell[0]=31616;
-			sp->proc_interval = 5000;
-		}
-		//Chain Heal all ranks %50 heal value (49 + 1)
-		else if( strstr(nametext, "Chain Heal"))
-		{
-			sp->EffectDieSides[0] = 49;
-		}
-		//this starts to be an issue for trigger spell id : Deep Wounds
-		else if(strstr(nametext, "Deep Wounds") && sp->EffectTriggerSpell[0])
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "over $");
-			if(startofid)
-			{
-				startofid += strlen("over $");
-				sp->EffectTriggerSpell[0]=atoi(startofid);
-			}
-		}
-		else if(strstr(nametext, "Holy Shock"))
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "causing $");
-			if(startofid)
-			{
-				startofid += strlen("causing $");
-				sp->EffectTriggerSpell[0]=atoi(startofid);
-			}
-			//check if we can find in the desription
-			startofid=strstr(desc, " or $");
-			if(startofid)
-			{
-				startofid += strlen(" or $");
-				sp->EffectTriggerSpell[1]=atoi(startofid);
-			}
-		}
-		else if(strstr(nametext, "Touch of Weakness"))
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "cause $");
-			if(startofid)
-			{
-				startofid += strlen("cause $");
-				sp->EffectTriggerSpell[0]=atoi(startofid);
-				sp->EffectTriggerSpell[1]=sp->EffectTriggerSpell[0]; //later versions of this spell changed to eff[1] the aura
-				sp->procFlags = uint32(PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF);
-			}
-		}
-		else if(strstr(nametext, "Firestone Passive"))
-		{
-			//Enchants the main hand weapon with fire, granting each attack a chance to deal $17809s1 additional fire damage.
-			//check if we can find in the desription
-			char * startofid=strstr(desc, "to deal $");
-			if(startofid)
-			{
-				startofid += strlen("to deal $");
-				sp->EffectTriggerSpell[0]=atoi(startofid);
-				sp->EffectApplyAuraName[0]=42;
-				sp->procFlags = PROC_ON_MELEE_ATTACK;
-				sp->procChance = 50;
-			}
-		}
-		//some procs trigger at intervals
-		else if(strstr(nametext, "Water Shield"))
-		{
-			sp->proc_interval = 3000; //few seconds
-			sp->procFlags |= PROC_TAGRGET_SELF;
-		}
-		else if(strstr(nametext, "Earth Shield"))
-			sp->proc_interval = 3000; //few seconds
-		else if(strstr(nametext, "Shadowguard"))
-			sp->proc_interval = 3000; //few seconds
-		else if(strstr(nametext, "Poison Shield"))
-			sp->proc_interval = 3000; //few seconds
-		else if(strstr(nametext, "Infused Mushroom"))
-			sp->proc_interval = 10000; //10 seconds
-		else if(strstr(nametext, "Aviana's Purpose"))
-			sp->proc_interval = 10000; //10 seconds
-//		else if(strstr(nametext, "Illumination"))
-//			sp->EffectTriggerSpell[0]=20272;
-		//sp->dummy=result;
-/*		//if there is a proc spell and has 0 as charges then it's probably going to triger infinite times. Better not save these
-		if(sp->procCharges==0)
-			sp->procCharges=-1;*/
-
-		//Set Silencing spells mech.
-		if (sp->EffectApplyAuraName[0] == 27 || 
-			sp->EffectApplyAuraName[1] == 27 ||
-			sp->EffectApplyAuraName[2] == 27)
-			sp->MechanicsType = MECHANIC_SILENCED;
-		//Set Stunning spells mech.
-		if (sp->EffectApplyAuraName[0] == 12 || 
-			sp->EffectApplyAuraName[1] == 12 ||
-			sp->EffectApplyAuraName[2] == 12)
-			sp->MechanicsType = MECHANIC_STUNNED;
-		//Set Fearing spells mech
-		if (sp->EffectApplyAuraName[0] == 7 || 
-			sp->EffectApplyAuraName[1] == 7 ||
-			sp->EffectApplyAuraName[2] == 7)
-			sp->MechanicsType = MECHANIC_FLEEING;
-
-
-		if(sp->proc_interval!=0)
-			sp->procFlags |= PROC_REMOVEONUSE;
-
-		/* Seal of Command - Proc Chance */
+		// Seal of Command - Proc Chance 
 		if(sp->NameHash == 0xC5C30B39)
 		{
 			sp->procChance = 25;
 			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
 			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
 		}
-		/* Seal of Jusice - Proc Chance */
+		// Seal of Jusice - Proc Chance 
 		else if(sp->NameHash == 0xCC6D4182)
 			sp->procChance = 25;
-		/* Decapitate */
+		// Decapitate 
 		else if(sp->NameHash == 0xB6C3243C)
 			sp->procChance = 30;
 		//shaman - shock, has no spellgroup.very dangerous move !
@@ -1291,10 +479,7 @@ bool World::SetInitialWorldSettings()
 		else if(sp->NameHash==0x9840A1A6 || sp->NameHash == 0x1513B967 || sp->NameHash==0x204D568D)
 			sp->MechanicsType=25;
 
-		if(sp->Id==25771 || sp->Id == 11196 || sp->Id == 6788)
-			sp->removable_by_immunity = false;
-
-		/* Backlash */
+		//Backlash 
 		if(sp->NameHash == 0x5965939A)
 		{
 			sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM;
@@ -1302,18 +487,8 @@ bool World::SetInitialWorldSettings()
 			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 		}
 
-		/* hackfix for this - FIX ME LATER - Burlex */
 		if(namehash==3238263755UL)
 			sp->procFlags=0;
-
-		map<uint32,pair<uint32,int32> >::iterator itr = procMap.find(namehash);
-		if(itr != procMap.end())
-		{
-			if(itr->second.second > 0)
-				sp->procFlags = (uint32)itr->second.second;
-			if(itr->first != 0)
-				sp->procChance = itr->first;
-		}
 
 		if(namehash==0x8D4A2E9F)		// warlock - intensity
 		{
@@ -1335,29 +510,32 @@ bool World::SetInitialWorldSettings()
 			// shred
 			sp->in_front_status = 2;
 		}
-
-//junk code to get me has :P 
-//if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
-//	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);
 	}
+*/
+
+
+
+	//TODO: RESOLVE IT
+	uint32 All_Seal_Groups_Combined = 0;
+
 	//this is so lame : shamanistic rage triggers a new spell which borrows it's stats from parent spell :S
-	SpellEntry * parentsp = dbcSpell.LookupEntry(30823);
-	SpellEntry * triggersp = dbcSpell.LookupEntry(30824);
+	SpellEntry * parentsp = SpellDataStorage.LookupEntry(30823);
+	SpellEntry * triggersp = SpellDataStorage.LookupEntry(30824);
 	if(parentsp && triggersp) 
 		triggersp->EffectBasePoints[0] = parentsp->EffectBasePoints[0];
 
-	SpellEntry * sp = dbcSpell.LookupEntry(16164);
+	SpellEntry * sp = SpellDataStorage.LookupEntry(16164);
 	SpellEntry * sp2;
 	if(sp && sp->Id==16164)
 		sp->procFlags=PROC_ON_SPELL_CRIT_HIT_VICTIM;
 
-	sp = dbcSpell.LookupEntry(17364);
+	sp = SpellDataStorage.LookupEntry(17364);
 	//remove stormstrike effect 0
 	if(sp && sp->Id==17364)
 		sp->Effect[0]=0;
 
 	//"deal with the devil" custom spell based on unused dummy 
-	sp = dbcSpell.LookupEntry(32052);
+	sp = SpellDataStorage.LookupEntry(32052);
 	if(sp)
 	{
 		//maybe we need to add some longer cast time here?
@@ -1371,7 +549,7 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//Bloodlust targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(2825);
+	sp = SpellDataStorage.LookupEntry(2825);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
@@ -1382,7 +560,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 	//Heroism targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(32182);
+	sp = SpellDataStorage.LookupEntry(32182);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
@@ -1393,7 +571,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 	// Drums of war targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(35475);
+	sp = SpellDataStorage.LookupEntry(35475);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
@@ -1404,7 +582,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 	// Symbol of Hope targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(32548);
+	sp = SpellDataStorage.LookupEntry(32548);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
@@ -1415,7 +593,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 	// Drums of Battle targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(35476);
+	sp = SpellDataStorage.LookupEntry(35476);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
@@ -1426,7 +604,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 	// Drums of Panic targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(35474);
+	sp = SpellDataStorage.LookupEntry(35474);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
@@ -1437,7 +615,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 	// Drums of Restoration targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(35478);
+	sp = SpellDataStorage.LookupEntry(35478);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
@@ -1448,7 +626,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 	// Drums of Speed targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(35477);
+	sp = SpellDataStorage.LookupEntry(35477);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
@@ -1460,31 +638,31 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//paladin - Blessing of Light. Changed to scripted because it needs to mod target and should not influence holy nova
-	sp = dbcSpell.LookupEntry(19977);
+	sp = SpellDataStorage.LookupEntry(19977);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 4;
 		sp->EffectApplyAuraName[1] = 4;
 	}
-	sp = dbcSpell.LookupEntry(19978);
+	sp = SpellDataStorage.LookupEntry(19978);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 4;
 		sp->EffectApplyAuraName[1] = 4;
 	}
-	sp = dbcSpell.LookupEntry(19979);
+	sp = SpellDataStorage.LookupEntry(19979);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 4;
 		sp->EffectApplyAuraName[1] = 4;
 	}
-	sp = dbcSpell.LookupEntry(27144);
+	sp = SpellDataStorage.LookupEntry(27144);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 4;
 		sp->EffectApplyAuraName[1] = 4;
 	}
-	sp = dbcSpell.LookupEntry(32770);
+	sp = SpellDataStorage.LookupEntry(32770);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 4;
@@ -1492,35 +670,35 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//shaman - Lightning Overload 
-	sp = dbcSpell.LookupEntry(30675); 
+	sp = SpellDataStorage.LookupEntry(30675); 
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
 		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(30678); 
+	sp = SpellDataStorage.LookupEntry(30678); 
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
 		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(30679); 
+	sp = SpellDataStorage.LookupEntry(30679); 
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
 		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(30680); 
+	sp = SpellDataStorage.LookupEntry(30680); 
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
 		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(30681); 
+	sp = SpellDataStorage.LookupEntry(30681); 
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
@@ -1529,7 +707,7 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//shaman - Elemental mastery 
-	sp = dbcSpell.LookupEntry(16166); 
+	sp = SpellDataStorage.LookupEntry(16166); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=0xFFFFFFFF;//nature+fire+frost is all that shaman can do
@@ -1537,96 +715,96 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//shaman - Improved Lightning shield 
-	sp = dbcSpell.LookupEntry(324);//shaman - Lightning Shield.
+	sp = SpellDataStorage.LookupEntry(324);//shaman - Lightning Shield.
 	uint32 ILS_grouprelation;
 	if(sp)
 		ILS_grouprelation = sp->SpellGroupType;
 	else ILS_grouprelation=0;
 	//shaman - Improved Lightning shield r1
-	sp = dbcSpell.LookupEntry(16261); 
+	sp = SpellDataStorage.LookupEntry(16261); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
-	sp = dbcSpell.LookupEntry(16290); 
+	sp = SpellDataStorage.LookupEntry(16290); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
-	sp = dbcSpell.LookupEntry(16291); 
+	sp = SpellDataStorage.LookupEntry(16291); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
 
 	//shaman - Tidal focus . Add more heal spells here if i forgot any :P
 	uint32 TF_grouprelation;
-	sp = dbcSpell.LookupEntry(25357);//shaman - Healing Wave.
+	sp = SpellDataStorage.LookupEntry(25357);//shaman - Healing Wave.
 	if(sp)
 		TF_grouprelation = sp->SpellGroupType;
 	else TF_grouprelation=0;
-	sp = dbcSpell.LookupEntry(25420);//shaman - Lesser Healing Wave.
+	sp = SpellDataStorage.LookupEntry(25420);//shaman - Lesser Healing Wave.
 	if(sp)
 		TF_grouprelation = sp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(1064);//shaman - Chain Heal.
+	sp = SpellDataStorage.LookupEntry(1064);//shaman - Chain Heal.
 	if(sp)
 		TF_grouprelation = sp->SpellGroupType;
 	//shaman - Tidal focus r1
-	sp = dbcSpell.LookupEntry(16179); 
+	sp = SpellDataStorage.LookupEntry(16179); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
-	sp = dbcSpell.LookupEntry(16214); 
+	sp = SpellDataStorage.LookupEntry(16214); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
-	sp = dbcSpell.LookupEntry(16215); 
+	sp = SpellDataStorage.LookupEntry(16215); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
-	sp = dbcSpell.LookupEntry(16216); 
+	sp = SpellDataStorage.LookupEntry(16216); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
-	sp = dbcSpell.LookupEntry(16217); 
+	sp = SpellDataStorage.LookupEntry(16217); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
 
 	//shaman - Enhancing Totems r1
-	sp = dbcSpell.LookupEntry(16259); 
+	sp = SpellDataStorage.LookupEntry(16259); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=65536 | 131072; //Strength of Earth and Grace of Air Totem effects
-	sp = dbcSpell.LookupEntry(16295); 
+	sp = SpellDataStorage.LookupEntry(16295); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=65536 | 131072;
 
 	//shaman - Elemental Fury - ! Not finished !
-	sp = dbcSpell.LookupEntry(16089); 
+	sp = SpellDataStorage.LookupEntry(16089); 
 	if(sp)
 //		sp->EffectSpellGroupRelation[0]=1073741824 | 32 | 1048576 | 1 | ... ; //Searing/Magma/Fire Nova Totem effects and Fire,Frost,Nature spells
 		sp->EffectSpellGroupRelation[0]=0xFFFFFFFF ; //damn, what other spells do there remain after that list ? Maybe later :P
 
 	//shaman - Restorative Totems r1
-	sp = dbcSpell.LookupEntry(16259); 
+	sp = SpellDataStorage.LookupEntry(16259); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
-	sp = dbcSpell.LookupEntry(16205); 
+	sp = SpellDataStorage.LookupEntry(16205); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
-	sp = dbcSpell.LookupEntry(16206); 
+	sp = SpellDataStorage.LookupEntry(16206); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
-	sp = dbcSpell.LookupEntry(16207); 
+	sp = SpellDataStorage.LookupEntry(16207); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
-	sp = dbcSpell.LookupEntry(16208); 
+	sp = SpellDataStorage.LookupEntry(16208); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
 	
 	//shaman - Healing Way
-	sp = dbcSpell.LookupEntry(29202); 
+	sp = SpellDataStorage.LookupEntry(29202); 
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->EffectApplyAuraName[0] = 42;
 	}
-	sp = dbcSpell.LookupEntry(29205); 
+	sp = SpellDataStorage.LookupEntry(29205); 
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->EffectApplyAuraName[0] = 42;
 	}
-	sp = dbcSpell.LookupEntry(29206); 
+	sp = SpellDataStorage.LookupEntry(29206); 
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
@@ -1634,35 +812,35 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//shaman - Elemental Devastation
-	sp = dbcSpell.LookupEntry(29179); 
+	sp = SpellDataStorage.LookupEntry(29179); 
 	if(sp)
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	sp = dbcSpell.LookupEntry(29180); 
+	sp = SpellDataStorage.LookupEntry(29180); 
 	if(sp)
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	sp = dbcSpell.LookupEntry(30160); 
+	sp = SpellDataStorage.LookupEntry(30160); 
 	if(sp)
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 
 	//shaman - Ancestral healing
-	sp = dbcSpell.LookupEntry(16176); 
+	sp = SpellDataStorage.LookupEntry(16176); 
 	if(sp)
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	sp = dbcSpell.LookupEntry(16235); 
+	sp = SpellDataStorage.LookupEntry(16235); 
 	if(sp)
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
-	sp = dbcSpell.LookupEntry(16240); 
+	sp = SpellDataStorage.LookupEntry(16240); 
 	if(sp)
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 
 	//shaman - Mental Quickness. ! these are only a part (18 spells have no grouping)
-	sp = dbcSpell.LookupEntry(30812); 
+	sp = SpellDataStorage.LookupEntry(30812); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
-	sp = dbcSpell.LookupEntry(30813); 
+	sp = SpellDataStorage.LookupEntry(30813); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
-	sp = dbcSpell.LookupEntry(30814); 
+	sp = SpellDataStorage.LookupEntry(30814); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
 
@@ -1673,124 +851,124 @@ bool World::SetInitialWorldSettings()
 	All_totems_grouprelation |= 524288;
 	All_totems_grouprelation |= 4096;
 	//shaman - Totemic focus r1
-	sp = dbcSpell.LookupEntry(16173); 
+	sp = SpellDataStorage.LookupEntry(16173); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
-	sp = dbcSpell.LookupEntry(16222); 
+	sp = SpellDataStorage.LookupEntry(16222); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
-	sp = dbcSpell.LookupEntry(16223); 
+	sp = SpellDataStorage.LookupEntry(16223); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
-	sp = dbcSpell.LookupEntry(16224); 
+	sp = SpellDataStorage.LookupEntry(16224); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
-	sp = dbcSpell.LookupEntry(16225); 
+	sp = SpellDataStorage.LookupEntry(16225); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
 
 	//shaman - Call of Thunder 
-	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt.
+	sp = SpellDataStorage.LookupEntry(403);//shaman - Lightning Bolt.
 	uint32 Cthunder_grouprelation;
 	if(sp)
 		Cthunder_grouprelation = sp->SpellGroupType;
 	else Cthunder_grouprelation=0;
-	sp = dbcSpell.LookupEntry(421);//shaman - Chain Lightning 
+	sp = SpellDataStorage.LookupEntry(421);//shaman - Chain Lightning 
 	if(sp)
 		Cthunder_grouprelation |= sp->SpellGroupType;
 	//shaman - Call of Thunder r1
-	sp = dbcSpell.LookupEntry(16041); 
+	sp = SpellDataStorage.LookupEntry(16041); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
-	sp = dbcSpell.LookupEntry(16117); 
+	sp = SpellDataStorage.LookupEntry(16117); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
-	sp = dbcSpell.LookupEntry(16118); 
+	sp = SpellDataStorage.LookupEntry(16118); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
-	sp = dbcSpell.LookupEntry(16119); 
+	sp = SpellDataStorage.LookupEntry(16119); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
-	sp = dbcSpell.LookupEntry(16120); 
+	sp = SpellDataStorage.LookupEntry(16120); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
 
 	//shaman - COnvection
-	sp = dbcSpell.LookupEntry(28159);//shaman - shock. !!! we manually set this before. Might create conflicts later 
+	sp = SpellDataStorage.LookupEntry(28159);//shaman - shock. !!! we manually set this before. Might create conflicts later 
 	uint32 convection_grouprelation;
 	if(sp)
 		convection_grouprelation = sp->SpellGroupType;
 	else convection_grouprelation=0;
-	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt 
+	sp = SpellDataStorage.LookupEntry(403);//shaman - Lightning Bolt 
 	if(sp)
 		convection_grouprelation |= sp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(421);//shaman - Chain Lightning 
+	sp = SpellDataStorage.LookupEntry(421);//shaman - Chain Lightning 
 	if(sp)
 		convection_grouprelation |= sp->SpellGroupType;
 	//shaman - COnvection r1
-	sp = dbcSpell.LookupEntry(16039); 
+	sp = SpellDataStorage.LookupEntry(16039); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
-	sp = dbcSpell.LookupEntry(16109); 
+	sp = SpellDataStorage.LookupEntry(16109); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
-	sp = dbcSpell.LookupEntry(16110); 
+	sp = SpellDataStorage.LookupEntry(16110); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
-	sp = dbcSpell.LookupEntry(16111); 
+	sp = SpellDataStorage.LookupEntry(16111); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
-	sp = dbcSpell.LookupEntry(16112); 
+	sp = SpellDataStorage.LookupEntry(16112); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
 
 	//rogue - Elusiveness
-	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
+	sp = SpellDataStorage.LookupEntry(2094);//rogue - blind 
 	uint32 Elusiveness_grouprelation;
 	if(sp)
 		Elusiveness_grouprelation = sp->SpellGroupType;
 	else Elusiveness_grouprelation=0;
-	sp = dbcSpell.LookupEntry(1856);//rogue - vanish 
+	sp = SpellDataStorage.LookupEntry(1856);//rogue - vanish 
 	if(sp)
 		Elusiveness_grouprelation |= sp->SpellGroupType;
 	//rogue - Elusiveness r1
-	sp = dbcSpell.LookupEntry(13981); 
+	sp = SpellDataStorage.LookupEntry(13981); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Elusiveness_grouprelation;
-	sp = dbcSpell.LookupEntry(14066); 
+	sp = SpellDataStorage.LookupEntry(14066); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Elusiveness_grouprelation;
 
 	//rogue - Improved Expose Armor
-	sp = dbcSpell.LookupEntry(14168); 
+	sp = SpellDataStorage.LookupEntry(14168); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=524288;
-	sp = dbcSpell.LookupEntry(14169); 
+	sp = SpellDataStorage.LookupEntry(14169); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=524288;
 
 	//rogue - Dirty Tricks 
-	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
+	sp = SpellDataStorage.LookupEntry(2094);//rogue - blind 
 	uint32 DT_grouprelation;
 	if(sp)
 		DT_grouprelation = sp->SpellGroupType;
 	else DT_grouprelation=0;
-	sp = dbcSpell.LookupEntry(2070);//rogue - sap 
+	sp = SpellDataStorage.LookupEntry(2070);//rogue - sap 
 	if(sp)
 	{
 		DT_grouprelation |= sp->SpellGroupType;
-		sp2 = dbcSpell.LookupEntry(30980);//rogue - sap - this one is missing the value :S
+		sp2 = SpellDataStorage.LookupEntry(30980);//rogue - sap - this one is missing the value :S
 		if(sp2)
 			sp2->SpellGroupType = sp->SpellGroupType;
 	}
 	//rogue - Dirty Tricks  r1
-	sp = dbcSpell.LookupEntry(14076); 
+	sp = SpellDataStorage.LookupEntry(14076); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=DT_grouprelation;
 		sp->EffectSpellGroupRelation[1]=DT_grouprelation;
 	}
-	sp = dbcSpell.LookupEntry(14094); 
+	sp = SpellDataStorage.LookupEntry(14094); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=DT_grouprelation;
@@ -1798,30 +976,30 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//rogue - Dirty Deeds
-	sp = dbcSpell.LookupEntry(1833);//rogue - Cheap Shot 
+	sp = SpellDataStorage.LookupEntry(1833);//rogue - Cheap Shot 
 	uint32 DD_grouprelation;
 	if(sp)
 		DD_grouprelation = sp->SpellGroupType;
 	else DD_grouprelation=0;
-	sp = dbcSpell.LookupEntry(703);//rogue - Garrote 
+	sp = SpellDataStorage.LookupEntry(703);//rogue - Garrote 
 	if(sp)
 		DD_grouprelation |= sp->SpellGroupType;
 	//rogue - Dirty Deeds r1
-	sp = dbcSpell.LookupEntry(14082); 
+	sp = SpellDataStorage.LookupEntry(14082); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=DD_grouprelation;
-	sp = dbcSpell.LookupEntry(14083); 
+	sp = SpellDataStorage.LookupEntry(14083); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=DD_grouprelation;
 
 	//rogue - Shadowstep
 	uint32 ss_grouprelation = 512;//rogue - ambush (only a part of the whole group since it would affect other spells too)
 	ss_grouprelation |= 4;//rogue - Backstab (only a part of the whole group since it would affect other spells too)
-	sp = dbcSpell.LookupEntry(703);//rogue - Garrote 
+	sp = SpellDataStorage.LookupEntry(703);//rogue - Garrote 
 	if(sp)
 		ss_grouprelation |= sp->SpellGroupType;
 	//rogue - Shadowstep
-	sp = dbcSpell.LookupEntry(36563); 
+	sp = SpellDataStorage.LookupEntry(36563); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[1] = ss_grouprelation;
@@ -1836,106 +1014,106 @@ bool World::SetInitialWorldSettings()
 	L_grouprelation |= 33554432;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
 	L_grouprelation |= 536870912;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
 	L_grouprelation |= 1073741824;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
-	sp = dbcSpell.LookupEntry(14128); 
+	sp = SpellDataStorage.LookupEntry(14128); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=L_grouprelation;
-	sp = dbcSpell.LookupEntry(14132); 
+	sp = SpellDataStorage.LookupEntry(14132); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=L_grouprelation;
-	sp = dbcSpell.LookupEntry(14135); 
+	sp = SpellDataStorage.LookupEntry(14135); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=L_grouprelation;
-	sp = dbcSpell.LookupEntry(14136); 
+	sp = SpellDataStorage.LookupEntry(14136); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=L_grouprelation;
-	sp = dbcSpell.LookupEntry(14137); 
+	sp = SpellDataStorage.LookupEntry(14137); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=L_grouprelation;
 
 	//rogue - Endurance 
-	sp = dbcSpell.LookupEntry(2983);//rogue - Sprint 
+	sp = SpellDataStorage.LookupEntry(2983);//rogue - Sprint 
 	uint32 ED_grouprelation;
 	if(sp)
 		ED_grouprelation = sp->SpellGroupType;
 	else ED_grouprelation=0;
-	sp = dbcSpell.LookupEntry(5277);//rogue - Evasion 
+	sp = SpellDataStorage.LookupEntry(5277);//rogue - Evasion 
 	if(sp)
 		ED_grouprelation |= sp->SpellGroupType;
 	//rogue - Endurance  r1
-	sp = dbcSpell.LookupEntry(13742); 
+	sp = SpellDataStorage.LookupEntry(13742); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=ED_grouprelation;
-	sp = dbcSpell.LookupEntry(13872); 
+	sp = SpellDataStorage.LookupEntry(13872); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=ED_grouprelation;
 
 	//priest - Focused Mind 
-	sp = dbcSpell.LookupEntry(8092);//priest - Mind Blast 
+	sp = SpellDataStorage.LookupEntry(8092);//priest - Mind Blast 
 	uint32 MF_grouprelation;
 	if(sp)
 		MF_grouprelation = sp->SpellGroupType;
 	else MF_grouprelation=0;
-	sp = dbcSpell.LookupEntry(605);//priest - Mind Control 
+	sp = SpellDataStorage.LookupEntry(605);//priest - Mind Control 
 	if(sp)
 		MF_grouprelation |= sp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(16568);//priest - Mind Flay 
+	sp = SpellDataStorage.LookupEntry(16568);//priest - Mind Flay 
 	if(sp)
 		MF_grouprelation |= sp->SpellGroupType;
 	//priest - Focused Mind  r1
-	sp = dbcSpell.LookupEntry(33213); 
+	sp = SpellDataStorage.LookupEntry(33213); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=MF_grouprelation;
-	sp = dbcSpell.LookupEntry(33214); 
+	sp = SpellDataStorage.LookupEntry(33214); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=MF_grouprelation;
-	sp = dbcSpell.LookupEntry(33215); 
+	sp = SpellDataStorage.LookupEntry(33215); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=MF_grouprelation;
 
 	//priest - Absolution 
-	sp = dbcSpell.LookupEntry(33167); 
+	sp = SpellDataStorage.LookupEntry(33167); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648;
-	sp = dbcSpell.LookupEntry(33171); 
+	sp = SpellDataStorage.LookupEntry(33171); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648;
-	sp = dbcSpell.LookupEntry(33172); 
+	sp = SpellDataStorage.LookupEntry(33172); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648;
 	//priest - Abolish Disease - does not have a group type 
-	sp = dbcSpell.LookupEntry(552); 
+	sp = SpellDataStorage.LookupEntry(552); 
 	if(sp)
 		sp->SpellGroupType=2147483648;
 	//priest - Mass Dispel - does not have a group type 
-	sp = dbcSpell.LookupEntry(32375); 
+	sp = SpellDataStorage.LookupEntry(32375); 
 	if(sp)
 		sp->SpellGroupType=2147483648;
 
 	//priest - Mental Agility - all instant spells. I wonder if it conflicts with any other spells 
-	sp = dbcSpell.LookupEntry(14520); 
+	sp = SpellDataStorage.LookupEntry(14520); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
-	sp = dbcSpell.LookupEntry(14780); 
+	sp = SpellDataStorage.LookupEntry(14780); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
-	sp = dbcSpell.LookupEntry(14781); 
+	sp = SpellDataStorage.LookupEntry(14781); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
-	sp = dbcSpell.LookupEntry(14782); 
+	sp = SpellDataStorage.LookupEntry(14782); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
-	sp = dbcSpell.LookupEntry(14783); 
+	sp = SpellDataStorage.LookupEntry(14783); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
 
 	//priest - Focused Power
-	sp = dbcSpell.LookupEntry(33186); 
+	sp = SpellDataStorage.LookupEntry(33186); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=2147483648;
 		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648;
 	}
-	sp = dbcSpell.LookupEntry(33190); 
+	sp = SpellDataStorage.LookupEntry(33190); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=2147483648;
@@ -1943,61 +1121,61 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//priest - Shadow Reach 
-	sp = dbcSpell.LookupEntry(17322); 
+	sp = SpellDataStorage.LookupEntry(17322); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
-	sp = dbcSpell.LookupEntry(17323); 
+	sp = SpellDataStorage.LookupEntry(17323); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
 
 	//priest - Shadow Focus 
-	sp = dbcSpell.LookupEntry(15260); 
+	sp = SpellDataStorage.LookupEntry(15260); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=67108864 | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
-	sp = dbcSpell.LookupEntry(15327); 
+	sp = SpellDataStorage.LookupEntry(15327); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=67108864 | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
-	sp = dbcSpell.LookupEntry(15328); 
+	sp = SpellDataStorage.LookupEntry(15328); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=67108864 | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
-	sp = dbcSpell.LookupEntry(15329); 
+	sp = SpellDataStorage.LookupEntry(15329); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
-	sp = dbcSpell.LookupEntry(15330); 
+	sp = SpellDataStorage.LookupEntry(15330); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
 
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
-	sp = dbcSpell.LookupEntry(27116);
+	sp = SpellDataStorage.LookupEntry(27116);
 	if (sp) procchance = sp->procChance;
-	sp = dbcSpell.LookupEntry(20166);if (sp) sp->procChance = procchance;
-	sp = dbcSpell.LookupEntry(20356);if (sp) sp->procChance = procchance;
-	sp = dbcSpell.LookupEntry(20357);if (sp) sp->procChance = procchance;
-	sp = dbcSpell.LookupEntry(27166);if (sp) sp->procChance = procchance;
+	sp = SpellDataStorage.LookupEntry(20166);if (sp) sp->procChance = procchance;
+	sp = SpellDataStorage.LookupEntry(20356);if (sp) sp->procChance = procchance;
+	sp = SpellDataStorage.LookupEntry(20357);if (sp) sp->procChance = procchance;
+	sp = SpellDataStorage.LookupEntry(27166);if (sp) sp->procChance = procchance;
 	//Druid: Frenzied Regeneration
-	sp = dbcSpell.LookupEntry(22842);
+	sp = SpellDataStorage.LookupEntry(22842);
 	if(sp)
 	{
 		sp->Effect[0] = 6;
 		sp->EffectApplyAuraName[0] = 23;
 		sp->EffectTriggerSpell[0] = 22845;
 	}
-	sp = dbcSpell.LookupEntry(22895);
+	sp = SpellDataStorage.LookupEntry(22895);
 	if(sp)
 	{
 		sp->Effect[0] = 6;
 		sp->EffectApplyAuraName[0] = 23;
 		sp->EffectTriggerSpell[0] = 22845;
 	}
-	sp = dbcSpell.LookupEntry(22896);
+	sp = SpellDataStorage.LookupEntry(22896);
 	if(sp)
 	{
 		sp->Effect[0] = 6;
 		sp->EffectApplyAuraName[0] = 23;
 		sp->EffectTriggerSpell[0] = 22845;
 	}
-	sp = dbcSpell.LookupEntry(26999);
+	sp = SpellDataStorage.LookupEntry(26999);
 	if(sp)
 	{
 		sp->Effect[0] = 6;
@@ -2006,31 +1184,31 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//Druid - Ferocity. Swipe, mangle and possibly the rest have only partial affects since they are missing groups
-	sp = dbcSpell.LookupEntry(16934); 
+	sp = SpellDataStorage.LookupEntry(16934); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=33554432;
 		sp->EffectSpellGroupRelation[1]=4096;
 	}
-	sp = dbcSpell.LookupEntry(16935); 
+	sp = SpellDataStorage.LookupEntry(16935); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=33554432;
 		sp->EffectSpellGroupRelation[1]=4096;
 	}
-	sp = dbcSpell.LookupEntry(16936); 
+	sp = SpellDataStorage.LookupEntry(16936); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=33554432;
 		sp->EffectSpellGroupRelation[1]=4096;
 	}
-	sp = dbcSpell.LookupEntry(16937); 
+	sp = SpellDataStorage.LookupEntry(16937); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=33554432;
 		sp->EffectSpellGroupRelation[1]=4096;
 	}
-	sp = dbcSpell.LookupEntry(16938); 
+	sp = SpellDataStorage.LookupEntry(16938); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=33554432;
@@ -2038,14 +1216,14 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//paladin - seal of blood
-	sp = dbcSpell.LookupEntry(31892);
+	sp = SpellDataStorage.LookupEntry(31892);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31893;
 	}
-	sp = dbcSpell.LookupEntry(38008);
+	sp = SpellDataStorage.LookupEntry(38008);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
@@ -2053,14 +1231,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 31893;
 	}
 	//paladin - Spiritual Attunement 
-	sp = dbcSpell.LookupEntry(31785);
+	sp = SpellDataStorage.LookupEntry(31785);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TAGRGET_SELF ;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
-	sp = dbcSpell.LookupEntry(33776);
+	sp = SpellDataStorage.LookupEntry(33776);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TAGRGET_SELF;
@@ -2068,25 +1246,25 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 31786;
 	}
 	//Druid: Leader of the Pack
-	sp = dbcSpell.LookupEntry(24932);
+	sp = SpellDataStorage.LookupEntry(24932);
 	if (sp)
 	{
 		sp->Effect[1] = 0;
 		sp->Effect[2] = 0; //removing strange effects.
 	}
 	//Druid: Improved Leader of the Pack
-	sp = dbcSpell.LookupEntry(34299); if (sp) sp->proc_interval = 6000;//6 secs
+	sp = SpellDataStorage.LookupEntry(34299); if (sp) sp->proc_interval = 6000;//6 secs
 
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
-	sp = dbcSpell.LookupEntry(27962);
+	sp = SpellDataStorage.LookupEntry(27962);
 	if(sp)
 		sp->EffectMiscValue[0] = 2998;
-	sp = dbcSpell.LookupEntry(36285);
+	sp = SpellDataStorage.LookupEntry(36285);
 	if(sp)
 		sp->EffectMiscValue[0] = 2998;
 
 	//muhaha, rewriting Retaliation spell as old one :D
-	sp = dbcSpell.LookupEntry(20230);
+	sp = SpellDataStorage.LookupEntry(20230);
 	if(sp)
 	{
 		sp->Effect[0] = 6; //aura
@@ -2096,106 +1274,106 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//"bloodthirst" new version is ok but old version is wrong from now on :(
-	sp = dbcSpell.LookupEntry(23881);
+	sp = SpellDataStorage.LookupEntry(23881);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //cast on us, it is good
 		sp->EffectTriggerSpell[1] = 23885; //evil , but this is good for us :D
 	}
-	sp = dbcSpell.LookupEntry(23892);
+	sp = SpellDataStorage.LookupEntry(23892);
 	if(sp)
 	{
 		sp->Effect[1] = 64;
 		sp->EffectTriggerSpell[1] = 23886; //evil , but this is good for us :D
 	}
-	sp = dbcSpell.LookupEntry(23893);
+	sp = SpellDataStorage.LookupEntry(23893);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //
 		sp->EffectTriggerSpell[1] = 23887; //evil , but this is good for us :D
 	}
-	sp = dbcSpell.LookupEntry(23894);
+	sp = SpellDataStorage.LookupEntry(23894);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //
 		sp->EffectTriggerSpell[1] = 23888; //evil , but this is good for us :D
 	}
-	sp = dbcSpell.LookupEntry(25251);
+	sp = SpellDataStorage.LookupEntry(25251);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //aura
 		sp->EffectTriggerSpell[1] = 25252; //evil , but this is good for us :D
 	}
-	sp = dbcSpell.LookupEntry(30335);
+	sp = SpellDataStorage.LookupEntry(30335);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //aura
 		sp->EffectTriggerSpell[1] = 30339; //evil , but this is good for us :D
 	}
 	// Hunter - Master Tactician
-	sp = dbcSpell.LookupEntry(34506);
+	sp = SpellDataStorage.LookupEntry(34506);
 	if(sp)
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
-	sp = dbcSpell.LookupEntry(34507);
+	sp = SpellDataStorage.LookupEntry(34507);
 	if(sp)
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
-	sp = dbcSpell.LookupEntry(34508);
+	sp = SpellDataStorage.LookupEntry(34508);
 	if(sp)
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
-	sp = dbcSpell.LookupEntry(34838);
+	sp = SpellDataStorage.LookupEntry(34838);
 	if(sp)
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
-	sp = dbcSpell.LookupEntry(34839);
+	sp = SpellDataStorage.LookupEntry(34839);
 	if(sp)
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
 
 	// Shaman - Storm Reach
-	sp = dbcSpell.LookupEntry(28999);
+	sp = SpellDataStorage.LookupEntry(28999);
 	if(sp)
 	{
-		SpellEntry * tsp = dbcSpell.LookupEntry(421); // Chain Lightning
+		SpellEntry * tsp = SpellDataStorage.LookupEntry(421); // Chain Lightning
 		if(tsp)
 			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
-		tsp = dbcSpell.LookupEntry(403); // Lightning Bolt
+		tsp = SpellDataStorage.LookupEntry(403); // Lightning Bolt
 		if(tsp)
 			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
 	}
-	sp = dbcSpell.LookupEntry(29000);
+	sp = SpellDataStorage.LookupEntry(29000);
 	if(sp)
 	{
-		SpellEntry * tsp = dbcSpell.LookupEntry(421); // Chain Lightning
+		SpellEntry * tsp = SpellDataStorage.LookupEntry(421); // Chain Lightning
 		if(tsp)
 			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
-		tsp = dbcSpell.LookupEntry(403); // Lightning Bolt
+		tsp = SpellDataStorage.LookupEntry(403); // Lightning Bolt
 		if(tsp)
 			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
 	}
 	//Rogue: Seal Fate
-	sp = dbcSpell.LookupEntry(14186);
+	sp = SpellDataStorage.LookupEntry(14186);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 20;
 	}
-	sp = dbcSpell.LookupEntry(14190);
+	sp = SpellDataStorage.LookupEntry(14190);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 40;
 	}
-	sp = dbcSpell.LookupEntry(14193);
+	sp = SpellDataStorage.LookupEntry(14193);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 60;
 	}
-	sp = dbcSpell.LookupEntry(14194);
+	sp = SpellDataStorage.LookupEntry(14194);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 80;
 	}
-	sp = dbcSpell.LookupEntry(14195);
+	sp = SpellDataStorage.LookupEntry(14195);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
@@ -2203,59 +1381,59 @@ bool World::SetInitialWorldSettings()
 	}
 	//Druid: Primal Fury (2 parts)
 	//Blood Frenzy
-	sp = dbcSpell.LookupEntry(16954);
+	sp = SpellDataStorage.LookupEntry(16954);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 100;
 	}
-	sp = dbcSpell.LookupEntry(16952);
+	sp = SpellDataStorage.LookupEntry(16952);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 50;
 	}
 	//Primal Fury
-	sp = dbcSpell.LookupEntry(16961);
+	sp = SpellDataStorage.LookupEntry(16961);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 100;
 	}
-	sp = dbcSpell.LookupEntry(16958);
+	sp = SpellDataStorage.LookupEntry(16958);
 	if(sp) 
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 50;
 	}
 	//Druid:Intensity
-	sp = dbcSpell.LookupEntry(17106);
+	sp = SpellDataStorage.LookupEntry(17106);
 	if(sp)
 	{
 	   sp->EffectApplyAuraName[1] = 42;
 	   sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(17107);
+	sp = SpellDataStorage.LookupEntry(17107);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[1] = 42;
 		 sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(17108);
+	sp = SpellDataStorage.LookupEntry(17108);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[1] = 42;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
     //Improved Sprint
-	sp = dbcSpell.LookupEntry(13743);
+	sp = SpellDataStorage.LookupEntry(13743);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 		sp->procChance = 50;
 	}
-	sp = dbcSpell.LookupEntry(13875);
+	sp = SpellDataStorage.LookupEntry(13875);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
@@ -2264,7 +1442,7 @@ bool World::SetInitialWorldSettings()
 	//warlock: Shadow Mastery
 	for (uint32 i=0;i<5;i++)
 	{
-		sp  = dbcSpell.LookupEntry(18271+i);
+		sp  = SpellDataStorage.LookupEntry(18271+i);
 		if (sp)
 		{
 			sp->EffectSpellGroupRelation[0]=33562624;
@@ -2272,7 +1450,7 @@ bool World::SetInitialWorldSettings()
 		}
 	}
 	//mage: Arcane Power
-	/*sp  = dbcSpell.LookupEntry(12042);
+	/*sp  = SpellDataStorage.LookupEntry(12042);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=5775504;
@@ -2280,21 +1458,21 @@ bool World::SetInitialWorldSettings()
 	}*/
 
 	//Mage - Improved Blizzard
-	sp = dbcSpell.LookupEntry(11185);
+	sp = SpellDataStorage.LookupEntry(11185);
 	if(sp)
 	{    
 		sp->EffectApplyAuraName[0]=42;
 		sp->EffectTriggerSpell[0]=12484;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(12487);
+	sp = SpellDataStorage.LookupEntry(12487);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;
 		sp->EffectTriggerSpell[0]=12485;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(12488);
+	sp = SpellDataStorage.LookupEntry(12488);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;
@@ -2303,31 +1481,31 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//mage: Fire Power
-	sp  = dbcSpell.LookupEntry(11124);
+	sp  = SpellDataStorage.LookupEntry(11124);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
-	sp  = dbcSpell.LookupEntry(12398);
+	sp  = SpellDataStorage.LookupEntry(12398);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
-	sp  = dbcSpell.LookupEntry(12399);
+	sp  = SpellDataStorage.LookupEntry(12399);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
-	sp  = dbcSpell.LookupEntry(12400);
+	sp  = SpellDataStorage.LookupEntry(12400);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
-	sp  = dbcSpell.LookupEntry(12378);
+	sp  = SpellDataStorage.LookupEntry(12378);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
@@ -2335,61 +1513,61 @@ bool World::SetInitialWorldSettings()
 	}
 	
 	//mage - Burning Soul
-	sp  = dbcSpell.LookupEntry(11083);
+	sp  = SpellDataStorage.LookupEntry(11083);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
-	sp  = dbcSpell.LookupEntry(12351);
+	sp  = SpellDataStorage.LookupEntry(12351);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 
 	//mage - Combustion
-	sp  = dbcSpell.LookupEntry(28682);
+	sp  = SpellDataStorage.LookupEntry(28682);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 4194304 | 1;
 
 	//mage - Empowered Fireball
-	sp  = dbcSpell.LookupEntry(31656);
+	sp  = SpellDataStorage.LookupEntry(31656);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
-	sp  = dbcSpell.LookupEntry(31657);
+	sp  = SpellDataStorage.LookupEntry(31657);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
-	sp  = dbcSpell.LookupEntry(31658);
+	sp  = SpellDataStorage.LookupEntry(31658);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
-	sp  = dbcSpell.LookupEntry(31659);
+	sp  = SpellDataStorage.LookupEntry(31659);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
-	sp  = dbcSpell.LookupEntry(31660);
+	sp  = SpellDataStorage.LookupEntry(31660);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
 
 	//mage - Empowered Frostbolt
-	sp  = dbcSpell.LookupEntry(31682);
+	sp  = SpellDataStorage.LookupEntry(31682);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=524288;
 		sp->EffectSpellGroupRelation[1]=524288;
 	}
-	sp  = dbcSpell.LookupEntry(31683);
+	sp  = SpellDataStorage.LookupEntry(31683);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=524288;
 		sp->EffectSpellGroupRelation[1]=524288;
 	}
-	sp  = dbcSpell.LookupEntry(31684);
+	sp  = SpellDataStorage.LookupEntry(31684);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=524288;
 		sp->EffectSpellGroupRelation[1]=524288;
 	}
-	sp  = dbcSpell.LookupEntry(31685);
+	sp  = SpellDataStorage.LookupEntry(31685);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=524288;
 		sp->EffectSpellGroupRelation[1]=524288;
 	}
-	sp  = dbcSpell.LookupEntry(31686);
+	sp  = SpellDataStorage.LookupEntry(31686);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=524288;
@@ -2397,21 +1575,21 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//mage - Master of Elements
-	sp  = dbcSpell.LookupEntry(29074);
+	sp  = SpellDataStorage.LookupEntry(29074);
 	if (sp)
 	{
 		sp->EffectApplyAuraName[0]=42;
 		sp->EffectTriggerSpell[0] = 29077;
 		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
 	}
-	sp  = dbcSpell.LookupEntry(29075);
+	sp  = SpellDataStorage.LookupEntry(29075);
 	if (sp)
 	{
 		sp->EffectApplyAuraName[0]=42;
 		sp->EffectTriggerSpell[0] = 29077;
 		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
 	}
-	sp  = dbcSpell.LookupEntry(29076);
+	sp  = SpellDataStorage.LookupEntry(29076);
 	if (sp)
 	{
 		sp->EffectApplyAuraName[0]=42;
@@ -2420,68 +1598,68 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//mage: Blazing Speed
-	sp = dbcSpell.LookupEntry(31641); 
+	sp = SpellDataStorage.LookupEntry(31641); 
 	if(sp)	sp->EffectTriggerSpell[0]=31643;
-	sp = dbcSpell.LookupEntry(31642);
+	sp = SpellDataStorage.LookupEntry(31642);
 	if(sp)	sp->EffectTriggerSpell[0]=31643;
 
 	//mage talent "frostbyte". we make it to be dummy
-	sp = dbcSpell.LookupEntry(11071);
+	sp = SpellDataStorage.LookupEntry(11071);
 	if(sp)	sp->EffectApplyAuraName[0]=4;
-	sp = dbcSpell.LookupEntry(12496);
+	sp = SpellDataStorage.LookupEntry(12496);
 	if(sp)	sp->EffectApplyAuraName[0]=4;
-	sp = dbcSpell.LookupEntry(12497);
+	sp = SpellDataStorage.LookupEntry(12497);
 	if(sp)	sp->EffectApplyAuraName[0]=4;
 	//rogue-shiv -> add 1 combo point
-	sp = dbcSpell.LookupEntry(5938);
+	sp = SpellDataStorage.LookupEntry(5938);
 	if(sp)	sp->Effect[1]=80;
 
 	//warlock - Amplify Curse
-	sp = dbcSpell.LookupEntry(18288);
+	sp = SpellDataStorage.LookupEntry(18288);
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024;
 		sp->EffectSpellGroupRelation[1]=4194304;
 	}
 	//warlock - Curse of Doom. Has missign group type
-	sp = dbcSpell.LookupEntry(603);
+	sp = SpellDataStorage.LookupEntry(603);
 	if(sp)
 		sp->SpellGroupType=1024;
-	sp = dbcSpell.LookupEntry(30910);
+	sp = SpellDataStorage.LookupEntry(30910);
 	if(sp)
 		sp->SpellGroupType=1024;
 
 	//warlock - Improved Howl of Terror
-	sp = dbcSpell.LookupEntry(30054);
+	sp = SpellDataStorage.LookupEntry(30054);
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=4096;
-	sp = dbcSpell.LookupEntry(30057);
+	sp = SpellDataStorage.LookupEntry(30057);
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=4096;
 	//warlock - Howl of Terror. Has missign group type
-	sp = dbcSpell.LookupEntry(5484);
+	sp = SpellDataStorage.LookupEntry(5484);
 	if(sp)
 		sp->SpellGroupType=4096;
-	sp = dbcSpell.LookupEntry(17928);
+	sp = SpellDataStorage.LookupEntry(17928);
 	if(sp)
 		sp->SpellGroupType=4096;
 
 	//warlock - Soul Fire. Has missign group type
-	sp = dbcSpell.LookupEntry(6353);
+	sp = SpellDataStorage.LookupEntry(6353);
 	if(sp)
 		sp->SpellGroupType=4;
-	sp = dbcSpell.LookupEntry(17924);
+	sp = SpellDataStorage.LookupEntry(17924);
 	if(sp)
 		sp->SpellGroupType=4;
-	sp = dbcSpell.LookupEntry(27211);
+	sp = SpellDataStorage.LookupEntry(27211);
 	if(sp)
 		sp->SpellGroupType=4;
-	sp = dbcSpell.LookupEntry(30545);
+	sp = SpellDataStorage.LookupEntry(30545);
 	if(sp)
 		sp->SpellGroupType=4;
 
 	//warlock - soul leech
-	sp = dbcSpell.LookupEntry(30293);
+	sp = SpellDataStorage.LookupEntry(30293);
 	if(sp)
 	{
 		sp->Effect[0] = 6; //aura
@@ -2489,7 +1667,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 30294;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
-	sp = dbcSpell.LookupEntry(30295);
+	sp = SpellDataStorage.LookupEntry(30295);
 	if(sp)
 	{
 		sp->Effect[0] = 6; //aura
@@ -2497,7 +1675,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 30294;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
-	sp = dbcSpell.LookupEntry(30296);
+	sp = SpellDataStorage.LookupEntry(30296);
 	if(sp)
 	{
 		sp->Effect[0] = 6; //aura
@@ -2507,7 +1685,7 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//warlock - Pyroclasm
-	sp = dbcSpell.LookupEntry(18073);
+	sp = SpellDataStorage.LookupEntry(18073);
 	if(sp)
 	{
 		sp->Effect[0] = 0; //delete this owerride effect :P
@@ -2515,7 +1693,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags=PROC_ON_CAST_SPELL;
 		sp->procChance = 13; //god, save us from fixed values !
 	}
-	sp = dbcSpell.LookupEntry(18096);
+	sp = SpellDataStorage.LookupEntry(18096);
 	if(sp)
 	{
 		sp->Effect[0] = 0; //delete this owerride effect :P
@@ -2525,19 +1703,19 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//improved scorch
-	sp = dbcSpell.LookupEntry(11095);
+	sp = SpellDataStorage.LookupEntry(11095);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42; 
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(12872);
+	sp = SpellDataStorage.LookupEntry(12872);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42; 
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntry(12873);
+	sp = SpellDataStorage.LookupEntry(12873);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42; 
@@ -2545,7 +1723,7 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//Nature's Grasp
-	sp = dbcSpell.LookupEntry(16689);
+	sp = SpellDataStorage.LookupEntry(16689);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -2555,7 +1733,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = dbcSpell.LookupEntry(16810);
+	sp = SpellDataStorage.LookupEntry(16810);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -2565,7 +1743,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = dbcSpell.LookupEntry(16811);
+	sp = SpellDataStorage.LookupEntry(16811);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -2575,7 +1753,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = dbcSpell.LookupEntry(16812);
+	sp = SpellDataStorage.LookupEntry(16812);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -2585,7 +1763,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = dbcSpell.LookupEntry(16813);
+	sp = SpellDataStorage.LookupEntry(16813);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -2595,7 +1773,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = dbcSpell.LookupEntry(17329);
+	sp = SpellDataStorage.LookupEntry(17329);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -2605,7 +1783,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = dbcSpell.LookupEntry(27009);
+	sp = SpellDataStorage.LookupEntry(27009);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -2616,7 +1794,7 @@ bool World::SetInitialWorldSettings()
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
 	//wrath of air totem targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntry(2895);
+	sp = SpellDataStorage.LookupEntry(2895);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=EFF_TARGET_SELF;
@@ -2628,81 +1806,81 @@ bool World::SetInitialWorldSettings()
 	}
 //-----BLEED effects----- (setting mech to BLEED)
 	//garrot
-	sp = dbcSpell.LookupEntry(14179);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(8631);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(8632);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(8633);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(11289);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(11290);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(26839);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(26884);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(14179);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(8631);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(8632);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(8633);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(11289);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(11290);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(26839);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(26884);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	//pounce
-	sp = dbcSpell.LookupEntry(9007);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(9824);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(9826);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(27007);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(14179);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9007);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9824);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9826);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(27007);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(14179);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	//rend
-	sp = dbcSpell.LookupEntry(772);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(6546);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(6547);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(6548);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(11572);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(11573);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(11574);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(25208);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(772);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(6546);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(6547);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(6548);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(11572);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(11573);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(11574);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(25208);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	//rip
-	sp = dbcSpell.LookupEntry(1079);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(9492);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(9493);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(9752);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(9894);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(9896);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(27008);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(1079);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9492);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9493);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9752);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9894);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9896);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(27008);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	//rupture
-	sp = dbcSpell.LookupEntry(1943);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(8639);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(8640);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(11273);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(11274);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(11275);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(26867);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(1943);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(8639);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(8640);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(11273);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(11274);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(11275);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(26867);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	//rake
-	sp = dbcSpell.LookupEntry(1822);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(1823);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(1824);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(9904);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(27003);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(1822);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(1823);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(1824);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(9904);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(27003);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	//lacerate
-	sp = dbcSpell.LookupEntry(33745);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = SpellDataStorage.LookupEntry(33745);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 //-------------------------------
 	//Druid: Natural Shapeshifter
-	sp = dbcSpell.LookupEntry(16833);if (sp) sp->DurationIndex = 0;
-	sp = dbcSpell.LookupEntry(16834);if (sp) sp->DurationIndex = 0;
-	sp = dbcSpell.LookupEntry(16835);if (sp) sp->DurationIndex = 0;
+	sp = SpellDataStorage.LookupEntry(16833);if (sp) sp->DurationIndex = 0;
+	sp = SpellDataStorage.LookupEntry(16834);if (sp) sp->DurationIndex = 0;
+	sp = SpellDataStorage.LookupEntry(16835);if (sp) sp->DurationIndex = 0;
 	//Priest: Shadow Power
-	sp = dbcSpell.LookupEntry(15310);
+	sp = SpellDataStorage.LookupEntry(15310);
 	if(sp)
 	{
 		uint32 group = sp->EffectSpellGroupRelation[0];
-		sp = dbcSpell.LookupEntry(33221);
+		sp = SpellDataStorage.LookupEntry(33221);
 		if(sp)
 			sp->EffectSpellGroupRelation[0]=group;
-		sp = dbcSpell.LookupEntry(33222);
+		sp = SpellDataStorage.LookupEntry(33222);
 		if(sp)
 			sp->EffectSpellGroupRelation[0]=group;
-		sp = dbcSpell.LookupEntry(33223);
+		sp = SpellDataStorage.LookupEntry(33223);
 		if(sp)
 			sp->EffectSpellGroupRelation[0]=group;
-		sp = dbcSpell.LookupEntry(33224);
+		sp = SpellDataStorage.LookupEntry(33224);
 		if(sp)
 			sp->EffectSpellGroupRelation[0]=group;
-		sp = dbcSpell.LookupEntry(33225);
+		sp = SpellDataStorage.LookupEntry(33225);
 		if(sp)
 			sp->EffectSpellGroupRelation[0]=group;
 	}
 	//Relentless Strikes
-	sp = dbcSpell.LookupEntry(14179);
+	sp = SpellDataStorage.LookupEntry(14179);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;//proc spell
@@ -2710,13 +1888,13 @@ bool World::SetInitialWorldSettings()
 		sp->EffectBasePoints[1] = 20; //client showes 20% chance but whe do not have it ? :O
 	}
 	//priest - surge of light
-	sp = dbcSpell.LookupEntry(33150);
+	sp = SpellDataStorage.LookupEntry(33150);
 	if(sp)
 		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_TAGRGET_SELF);
-	sp = dbcSpell.LookupEntry(33154);
+	sp = SpellDataStorage.LookupEntry(33154);
 	if(sp)
 		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_TAGRGET_SELF);
-	sp = dbcSpell.LookupEntry(33151);
+	sp = SpellDataStorage.LookupEntry(33151);
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=128;
@@ -2725,59 +1903,59 @@ bool World::SetInitialWorldSettings()
 		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
 	}
 	//Seal of Justice -lowered proc chance (experimental values !)
-	sp = dbcSpell.LookupEntry(20164);
+	sp = SpellDataStorage.LookupEntry(20164);
 	if(sp)
 		sp->procChance = 20;
-	sp = dbcSpell.LookupEntry(31895);
+	sp = SpellDataStorage.LookupEntry(31895);
 	if(sp)
 		sp->procChance = 20;
 	//make Berserking a simple spell 
-	sp = dbcSpell.LookupEntry(20554);
+	sp = SpellDataStorage.LookupEntry(20554);
 	if(sp)
 	{
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 26635;
 	}
-	sp = dbcSpell.LookupEntry(26296);
+	sp = SpellDataStorage.LookupEntry(26296);
 	if(sp)
 	{
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 26635;
 	}
-	sp = dbcSpell.LookupEntry(26297);
+	sp = SpellDataStorage.LookupEntry(26297);
 	if(sp)
 	{
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 26635;
 	}
 	//rogue - intiative
-	sp = dbcSpell.LookupEntry(13976);
+	sp = SpellDataStorage.LookupEntry(13976);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
-	sp = dbcSpell.LookupEntry(13979);
+	sp = SpellDataStorage.LookupEntry(13979);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
-	sp = dbcSpell.LookupEntry(13980);
+	sp = SpellDataStorage.LookupEntry(13980);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
 	//this an on equip item spell(2824) :  ice arrow(29501)
-	sp = dbcSpell.LookupEntry(29501);
+	sp = SpellDataStorage.LookupEntry(29501);
 	if(sp)
 	{
 		sp->procChance = 30;//some say it is triggered every now and then
 		sp->procFlags = PROC_ON_RANGED_ATTACK;
 	}
 	//warrior - berserker rage is missing 1 effect = regenerate rage
-	sp = dbcSpell.LookupEntry(18499);
+	sp = SpellDataStorage.LookupEntry(18499);
 	if(sp)
 	{
 		sp->Effect[2] = 6;
@@ -2786,61 +1964,61 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
 	}
 	//warrior - improved berserker rage
-	sp = dbcSpell.LookupEntry(20500);
+	sp = SpellDataStorage.LookupEntry(20500);
 	if(sp)
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
-	sp = dbcSpell.LookupEntry(20501);
+	sp = SpellDataStorage.LookupEntry(20501);
 	if(sp)
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
 	//warrior - Rampage
-	sp = dbcSpell.LookupEntry(29801);
+	sp = SpellDataStorage.LookupEntry(29801);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
-	sp = dbcSpell.LookupEntry(30030);
+	sp = SpellDataStorage.LookupEntry(30030);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
-	sp = dbcSpell.LookupEntry(30033);
+	sp = SpellDataStorage.LookupEntry(30033);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	// priest - Reflective Shield
-	sp = dbcSpell.LookupEntry(33201);
+	sp = SpellDataStorage.LookupEntry(33201);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
-	sp = dbcSpell.LookupEntry(33202);
+	sp = SpellDataStorage.LookupEntry(33202);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
-	sp = dbcSpell.LookupEntry(33203);
+	sp = SpellDataStorage.LookupEntry(33203);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
-	sp = dbcSpell.LookupEntry(33204);
+	sp = SpellDataStorage.LookupEntry(33204);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
-	sp = dbcSpell.LookupEntry(33205);
+	sp = SpellDataStorage.LookupEntry(33205);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
@@ -2848,14 +2026,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
 	// mage - Frost Warding
-	sp = dbcSpell.LookupEntry(11189);
+	sp = SpellDataStorage.LookupEntry(11189);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 33554432;
-	sp = dbcSpell.LookupEntry(28332);
+	sp = SpellDataStorage.LookupEntry(28332);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 33554432;
 	//Gnomish Poultryizer trinket - Poultryizer
-	sp = dbcSpell.LookupEntry(30507);
+	sp = SpellDataStorage.LookupEntry(30507);
 	if(sp)
 	{
 		sp->Effect[0] = 6;
@@ -2863,66 +2041,43 @@ bool World::SetInitialWorldSettings()
 	}
 	// paladin - benediction
 	uint32 judgement_group=0;
-	SpellEntry * tsp = dbcSpell.LookupEntry(20271); //judgement
+	SpellEntry * tsp = SpellDataStorage.LookupEntry(20271); //judgement
 	if(tsp)
 		judgement_group = tsp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(20101);
+	sp = SpellDataStorage.LookupEntry(20101);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
-	sp = dbcSpell.LookupEntry(20102);
+	sp = SpellDataStorage.LookupEntry(20102);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
-	sp = dbcSpell.LookupEntry(20103);
+	sp = SpellDataStorage.LookupEntry(20103);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
-	sp = dbcSpell.LookupEntry(20104);
+	sp = SpellDataStorage.LookupEntry(20104);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
-	sp = dbcSpell.LookupEntry(20105);
+	sp = SpellDataStorage.LookupEntry(20105);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
-/*	// paladin - Improved Hammer of Justice
-	uint32 Hammer_of_Justice_group=0;
-	tsp = dbcSpell.LookupEntry(853); //Hammer of Justice
-	if(tsp)
-		Hammer_of_Justice_group = tsp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(20487);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
-	sp = dbcSpell.LookupEntry(20488);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
-	sp = dbcSpell.LookupEntry(20489);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
-	sp = dbcSpell.LookupEntry(24188);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group; 
-	// paladin - Improved Judgement
-	sp = dbcSpell.LookupEntry(25956);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = judgement_group;
-	sp = dbcSpell.LookupEntry(25957);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = judgement_group; */
+
 	// paladin - Improved Sanctity Aura
 	uint32 Sanctity_group=0;
-	tsp = dbcSpell.LookupEntry(20218); //Sanctity Aura
+	tsp = SpellDataStorage.LookupEntry(20218); //Sanctity Aura
 	if(tsp)
 		Sanctity_group = tsp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(31869);
+	sp = SpellDataStorage.LookupEntry(31869);
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0] = Sanctity_group;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 	}
-	sp = dbcSpell.LookupEntry(31870);
+	sp = SpellDataStorage.LookupEntry(31870);
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0] = Sanctity_group;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 	}
-    sp = dbcSpell.LookupEntry(20608); //Reincarnation
+    sp = SpellDataStorage.LookupEntry(20608); //Reincarnation
     if(sp)
     {
         for(uint32 i=0;i<8;i++)
@@ -2935,66 +2090,13 @@ bool World::SetInitialWorldSettings()
         }
     }
 
-///////////////////////////////
-/*	// druid - Improved Mark of the Wild
-	uint32 imarkofthv_group=0;
-	tsp = dbcSpell.LookupEntry(1126); //Mark of the wild
-	if(tsp)
-		imarkofthv_group = tsp->SpellGroupType;
-	tsp = dbcSpell.LookupEntry(21849); //Gift of the Wild
-	if(tsp)
-		imarkofthv_group |= tsp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(17050);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	sp = dbcSpell.LookupEntry(17051);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	sp = dbcSpell.LookupEntry(17053);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	sp = dbcSpell.LookupEntry(17054);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	sp = dbcSpell.LookupEntry(17055);
-	if(sp)
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	//rogue - initiative
-	sp = dbcSpell.LookupEntry(13976);
-	if(sp)
-		sp->procChance = 25;
-	sp = dbcSpell.LookupEntry(13979);
-	if(sp)
-		sp->procChance = 50;
-	sp = dbcSpell.LookupEntry(13980);
-	if(sp)
-		sp->procChance = 75;*/
 //---------ITEMS-----------------
-	sp = dbcSpell.LookupEntry(33758);
+	sp = SpellDataStorage.LookupEntry(33758);
 	if(sp)
 		sp->proc_interval = 10000; //10 seconds.
-	sp = dbcSpell.LookupEntry(33759);
+	sp = SpellDataStorage.LookupEntry(33759);
 	if(sp)
 		sp->proc_interval = 10000; //10 seconds.
-//--------FACTIONS----------------
-/*	FactionTemplateDBC* fe = dbcFactionTemplate.LookupEntry(1719);
-	if(fe)
-	{
-		for (uint32 x = 0;x<4;x++)
-			printf(" ! %d !F %d ",fe->EnemyFactions[x],fe->FriendlyFactions[x]);
-		printf("FM %d HM %d\n",fe->FriendlyMask,fe->HostileMask);
-		fe->EnemyFactions[0]=1720;
-		fe->FriendlyFactions[0]=1719;
-	}
-	fe = dbcFactionTemplate.LookupEntry(1720);
-	if(fe)
-	{
-		for (uint32 x = 0;x<4;x++)
-			printf(" = %d =F %d ",fe->EnemyFactions[x],fe->FriendlyFactions[x]);
-		printf("FM %d HM %d \n",fe->FriendlyMask,fe->HostileMask);
-		fe->EnemyFactions[0]=1719;
-		fe->FriendlyFactions[0]=1720;
-	} */
 
 		
 
@@ -3003,7 +2105,7 @@ bool World::SetInitialWorldSettings()
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33757; //this is actually good
-		sp = dbcSpell.LookupEntry(33757);
+		sp = SpellDataStorage.LookupEntry(33757);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -3015,7 +2117,7 @@ bool World::SetInitialWorldSettings()
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33756; 
-		sp = dbcSpell.LookupEntry(33756);
+		sp = SpellDataStorage.LookupEntry(33756);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -3027,7 +2129,7 @@ bool World::SetInitialWorldSettings()
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33755; 
-		sp = dbcSpell.LookupEntry(33755);
+		sp = SpellDataStorage.LookupEntry(33755);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -3039,7 +2141,7 @@ bool World::SetInitialWorldSettings()
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33754; 
-		sp = dbcSpell.LookupEntry(33754);
+		sp = SpellDataStorage.LookupEntry(33754);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -3051,7 +2153,7 @@ bool World::SetInitialWorldSettings()
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33727; 
-		sp = dbcSpell.LookupEntry(33727);
+		sp = SpellDataStorage.LookupEntry(33727);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -3060,7 +2162,7 @@ bool World::SetInitialWorldSettings()
 		}
 	}
 	//for test only
-	sp = dbcSpell.LookupEntry(32796);
+	sp = SpellDataStorage.LookupEntry(32796);
 	if(sp)
 	{
 //		printf("!!!!!!hash %u \n",sp->NameHash);
@@ -3079,23 +2181,23 @@ bool World::SetInitialWorldSettings()
 
 	//fix for Predatory Strikes
 	uint32 mm=(1<<(FORM_BEAR-1))|(1<<(FORM_DIREBEAR-1))|(1<<(FORM_MOONKIN-1))|(1<<(FORM_CAT-1));
-	dbcSpell.LookupEntry(16972)->RequiredShapeShift = mm;
-	dbcSpell.LookupEntry(16974)->RequiredShapeShift = mm;
-	dbcSpell.LookupEntry(16975)->RequiredShapeShift = mm;
-	dbcSpell.LookupEntry(20134)->procChance = 50;
+	SpellDataStorage.LookupEntry(16972)->RequiredShapeShift = mm;
+	SpellDataStorage.LookupEntry(16974)->RequiredShapeShift = mm;
+	SpellDataStorage.LookupEntry(16975)->RequiredShapeShift = mm;
+	SpellDataStorage.LookupEntry(20134)->procChance = 50;
 
 	/* aspect of the pack - change to AA */
-	dbcSpell.LookupEntry(13159)->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
-	dbcSpell.LookupEntry(13159)->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
+	SpellDataStorage.LookupEntry(13159)->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
+	SpellDataStorage.LookupEntry(13159)->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
 	
 	/* shadowstep - change proc flags */
-	dbcSpell.LookupEntry(36563)->procFlags = 0;
+	SpellDataStorage.LookupEntry(36563)->procFlags = 0;
 
 	/* thrown - add a 1.6 second cooldown */
 	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL,SPELL_RANGED_THROW,SPELL_RANGED_WAND, 26679, 27084, 29436, 37074, 41182, 41346, 0};
-	for(i = 0; thrown_spells[i] != 0; ++i)
+	for(uint32 i = 0; thrown_spells[i] != 0; ++i)
 	{
-		sp = dbcSpell.LookupEntry(thrown_spells[i]);
+		sp = SpellDataStorage.LookupEntry(thrown_spells[i]);
 		if(sp->RecoveryTime==0 && sp->StartRecoveryTime == 0)
 			sp->RecoveryTime = 1600;
 	}
@@ -3867,7 +2969,7 @@ void World::CleanupCheaters()
 			end = strchr(start,',');
 			if(!end)break;
 			*end=0;
-			sp = dbcSpell.LookupEntry(atol(start));
+			sp = SpellDataStorage.LookupEntry(atol(start));
 			start = end +1;
 
 			if(sp->talent_tree)

@@ -27,19 +27,19 @@ public:
 
 		} 
 
-		spells[0].info = dbcSpell.LookupEntry(SHADOW_BOLT_VOLLEY);
+		spells[0].info = SpellDataStorage.LookupEntry(SHADOW_BOLT_VOLLEY);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 9.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(DEATH_COIL);
+		spells[1].info = SpellDataStorage.LookupEntry(DEATH_COIL);
 		spells[1].targettype = TARGET_VARIOUS;	
 		spells[1].instant = true;
 		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(RAIN_OF_FIRE);
+		spells[2].info = SpellDataStorage.LookupEntry(RAIN_OF_FIRE);
 		spells[2].targettype = TARGET_VARIOUS; // Needs checking
 		spells[2].instant = false;
 		spells[2].perctrigger = 5.0f;
@@ -136,13 +136,13 @@ class HellfireChannelerAI : public CreatureAIScript
 				
 			} 
 			
-			spells[0].info = dbcSpell.LookupEntry(SHADOW_BOLT_VOLLEY);
+			spells[0].info = SpellDataStorage.LookupEntry(SHADOW_BOLT_VOLLEY);
 			spells[0].targettype = TARGET_VARIOUS;
 			spells[0].instant = false;
 			spells[0].perctrigger = 9.0f;
 			spells[0].attackstoptimer = 1000;
 			
-			spells[1].info = dbcSpell.LookupEntry(DARK_MENDING);
+			spells[1].info = SpellDataStorage.LookupEntry(DARK_MENDING);
 			spells[1].targettype = TARGET_VARIOUS;	
 			spells[1].instant = true;
 			spells[1].perctrigger = 8.0f;
@@ -248,7 +248,7 @@ public:
 		{
 			m_spellcheck[i] = true;
 		} 
-		spells[0].info = dbcSpell.LookupEntry(CLEAVE);
+		spells[0].info = SpellDataStorage.LookupEntry(CLEAVE);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 12;
