@@ -140,7 +140,7 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 	case PET_ACTION_SPELL:
 		{
 			// misc == spellid
-			SpellEntry *entry = dbcSpell.LookupEntry(misc);
+			SpellEntry *entry = SpellDataStorage.LookupEntry(misc);
 			if(!entry) 
 				return;
 

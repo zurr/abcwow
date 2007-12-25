@@ -21,6 +21,7 @@
 
 /** Table formats converted to strings
  */
+const char * gSpellDataFormat							= "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffffffuuuuuuuuuuuuuuuuuuuuufffuuuuuuuuuuuufffuuuuuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxuuuuuuuuuuufffuuuuuu";
 const char * gItemPrototypeFormat						= "uuuussssuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffuffuffuffuffuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuusuuuuuuuuuuuuuuuuuuuuuuuuuuu";
 const char * gCreatureNameFormat						= "ussuuuuuuuuuuffcc";
 const char * gGameObjectNameFormat						= "uuusuuuuuuuuuuuuuuuuuuuuuuuu";
@@ -39,6 +40,7 @@ const char * gZoneGuardsFormat							= "uuu";
 
 /** SQLStorage symbols
  */
+SERVER_DECL SQLStorage<SpellEntry, HashMapStorageContainer<SpellEntry> >					SpellDataStorage;
 SERVER_DECL SQLStorage<ItemPrototype, ArrayStorageContainer<ItemPrototype> >				ItemPrototypeStorage;
 SERVER_DECL SQLStorage<CreatureInfo, HashMapStorageContainer<CreatureInfo> >				CreatureNameStorage;
 SERVER_DECL SQLStorage<GameObjectInfo, HashMapStorageContainer<GameObjectInfo> >			GameObjectNameStorage;
@@ -133,7 +135,7 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 		sp->agent = fields[1].GetUInt16();
 		sp->procChance = fields[3].GetUInt32();
 		sp->procCount = fields[4].GetUInt32();
-		sp->spell = dbcSpell.LookupEntryForced(fields[5].GetUInt32());
+		sp->spell = SpellDataStorage.LookupEntry(fields[5].GetUInt32());
 		sp->spellType = fields[6].GetUInt32();
 		sp->spelltargetType = fields[7].GetUInt32();
 		sp->cooldown = fields[8].GetUInt32();
@@ -244,7 +246,7 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 			Field * fields = result->Fetch();
 			uint32 id = fields[0].GetUInt32();
 			uint32 flags = fields[1].GetUInt32();
-			SpellEntry * sp = dbcSpell.LookupEntryForced(id);
+			SpellEntry * sp = SpellDataStorage.LookupEntry(id);
 			if(!sp)
 				continue;
 
@@ -320,6 +322,7 @@ void ObjectMgr::LoadExtraItemStuff()
 
 void Storage_FillTaskList(TaskList & tl)
 {
+	make_task(SpellDataStorage, SpellEntry, HashMapStorageContainer, "spell_data", gSpellDataFormat);
 	make_task(ItemPrototypeStorage, ItemPrototype, ArrayStorageContainer, "items", gItemPrototypeFormat);
 	make_task(CreatureNameStorage, CreatureInfo, HashMapStorageContainer, "creature_names", gCreatureNameFormat);
 	make_task(GameObjectNameStorage, GameObjectInfo, HashMapStorageContainer, "gameobject_names", gGameObjectNameFormat);
@@ -352,6 +355,7 @@ void Storage_Cleanup()
 		}
 		itr->Destruct();
 	}
+	SpellDataStorage.Cleanup();
 	ItemPrototypeStorage.Cleanup();
 	CreatureNameStorage.Cleanup();
 	GameObjectNameStorage.Cleanup();
@@ -374,6 +378,8 @@ bool Storage_ReloadTable(const char * TableName)
 		ItemPrototypeStorage.Reload();
 	else if(!stricmp(TableName, "creature_proto"))		// Creature Proto
 		CreatureProtoStorage.Reload();
+	else if(!stricmp(TableName, "spell_data"))			// spells
+		SpellDataStorage.Reload();
 	else if(!stricmp(TableName, "creature_names"))		// Creature Names
 		CreatureNameStorage.Reload();
 	else if(!stricmp(TableName, "gameobject_names"))	// GO Names

@@ -66,7 +66,7 @@ bool HandleDummyAura(uint32 i, Aura* pAura, bool apply)
         break;
     }
 
-    SpellEntry * m_spellInfo = dbcSpell.LookupEntry(applyId);
+    SpellEntry * m_spellInfo = SpellDataStorage.LookupEntry(applyId);
     
     if(apply == true)
     {

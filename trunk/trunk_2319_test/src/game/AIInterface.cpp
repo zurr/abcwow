@@ -887,7 +887,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 								float his_facing=m_nextTarget->GetOrientation();
 								if(fabs(our_facing-his_facing)<CREATURE_DAZE_TRIGGER_ANGLE && !m_nextTarget->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
 								{
-									SpellEntry *info = dbcSpell.LookupEntry(CREATURE_SPELL_TO_DAZE);
+									SpellEntry *info = SpellDataStorage.LookupEntry(CREATURE_SPELL_TO_DAZE);
 									Spell *sp = new Spell(m_Unit, info, false, NULL);
 									SpellCastTargets targets;
 									targets.m_unitTarget = m_nextTarget->GetGUID();
@@ -948,7 +948,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						if(infront)
 						{
 							m_Unit->setAttackTimer(0, false);
-							SpellEntry *info = dbcSpell.LookupEntry(SPELL_RANGED_GENERAL);
+							SpellEntry *info = SpellDataStorage.LookupEntry(SPELL_RANGED_GENERAL);
 							if(info)
 							{
 								Spell *sp = new Spell(m_Unit, info, false, NULL);
@@ -2621,7 +2621,7 @@ void AIInterface::CastSpell(Unit* caster, SpellEntry *spellInfo, SpellCastTarget
 
 SpellEntry *AIInterface::getSpellEntry(uint32 spellId)
 {
-	SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
+	SpellEntry *spellInfo = SpellDataStorage.LookupEntry(spellId );
 
 	if(!spellInfo)
 	{

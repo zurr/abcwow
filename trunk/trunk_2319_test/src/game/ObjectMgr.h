@@ -457,7 +457,8 @@ public:
 	set<SpellEntry*>* GetDefaultPetSpells(uint32 Entry);
 	uint32 GetPetSpellCooldown(uint32 SpellId);
 	void LoadPetSpellCooldowns();
-	void LoadSpellFixes();
+	void CreateDummySpell(uint32 id);
+	void LoadSpellDataExtra();
 	WayPointMap * GetWayPointMap(uint32 spawnid);
 	void LoadSpellOverride();
 

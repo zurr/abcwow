@@ -1125,7 +1125,7 @@ void ObjectMgr::LoadTotemSpells()
 	{
 		Field *fields = result->Fetch();
 		spellid = fields[1].GetUInt32();
-		sp = dbcSpell.LookupEntry(spellid);
+		sp = SpellDataStorage.LookupEntry(spellid);
 		if(!spellid || !sp) continue;
 
 		m_totemSpells.insert( TotemSpellMap::value_type( fields[0].GetUInt32(), sp ));
@@ -1461,7 +1461,7 @@ void ObjectMgr::LoadTrainers()
 				fields2 = result2->Fetch();
 				uint32 CastSpellID=fields2[1].GetUInt32();
 
-				SpellEntry *spellInfo = dbcSpell.LookupEntryForced(CastSpellID );
+				SpellEntry *spellInfo = SpellDataStorage.LookupEntry(CastSpellID );
 				if(!spellInfo)
 				{
 					Log.Error("LoadTrainers", "Trainer %u with non-existant spell %u.", entry, CastSpellID);
@@ -1483,7 +1483,7 @@ void ObjectMgr::LoadTrainers()
 				{
 					if(spellInfo->Effect[k]==SPELL_EFFECT_LEARN_SPELL)
 					{
-						ts.pRealSpell = dbcSpell.LookupEntry(spellInfo->EffectTriggerSpell[k]);
+						ts.pRealSpell = SpellDataStorage.LookupEntry(spellInfo->EffectTriggerSpell[k]);
 						break;
 					}
 				}
@@ -1763,7 +1763,7 @@ void ObjectMgr::LoadDefaultPetSpells()
 			Field * f = result->Fetch();
 			uint32 Entry = f[0].GetUInt32();
 			uint32 spell = f[1].GetUInt32();
-			SpellEntry * sp = dbcSpell.LookupEntry(spell);
+			SpellEntry * sp = SpellDataStorage.LookupEntry(spell);
 
 			if(spell && Entry && sp)
 			{
@@ -1828,86 +1828,722 @@ uint32 ObjectMgr::GetPetSpellCooldown(uint32 SpellId)
 	if(itr != mPetSpellCooldowns.end())
 		return itr->second;
 
-	SpellEntry * sp = dbcSpell.LookupEntry(SpellId);
+	SpellEntry * sp = SpellDataStorage.LookupEntry(SpellId);
 	return sp->RecoveryTime + sp->StartRecoveryTime;
 }
 
-void ObjectMgr::LoadSpellFixes()
+void ObjectMgr::CreateDummySpell(uint32 id)
+ {
+	const char * name = "Dummy Trigger";
+	SpellEntry * sp = new SpellEntry;
+	memset(sp, 0, sizeof(SpellEntry));
+	sp->Id = id;
+	sp->Attributes = 384;
+	sp->AttributesEx = 268435456;
+	sp->Flags3 = 4;
+	sp->CastingTimeIndex = 1;
+	sp->procChance = 75;
+	sp->rangeIndex = 13;
+	sp->EquippedItemClass = uint32(-1);
+	sp->Effect[0] = 3;
+	sp->EffectImplicitTargetA[0] = 25;
+	sp->NameHash = (uint32)crc32((const unsigned char*)name, (uint32)strlen(name));
+	sp->dmg_multiplier[0] = 1.0f;
+	sp->FH = -1;
+	SpellDataStorage.SetEntry(id, sp);
+	//sWorld.dummyspells.push_back(sp);
+}
+
+
+void ObjectMgr::LoadSpellDataExtra()
 {
-	// Loads data from stored 1.12 dbc to fix spells that have had spell data removed in 2.0.
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spells112");
+	uint32 count = 0;
+	uint32 i,j;
+
+	map<uint32, uint32> talentSpells;
+	map<uint32,uint32>::iterator talentSpellIterator;
+	for(i = 0; i < dbcTalent.GetNumRows(); ++i)
+ 	{
+		TalentEntry * tal = dbcTalent.LookupRow(i);
+		for(j = 0; j < 5; ++j)
+			if(tal->RankID[j] != 0)
+				talentSpells.insert(make_pair(tal->RankID[j], tal->TalentTree));
+	}
+
+
+	QueryResult * result = WorldDatabase.Query("SELECT entry, Name, Rank, Description, dmg_bonus, proc_interval FROM spell_data LEFT JOIN spell_data_extra ON spell_data.entry = spell_data_extra.spellid");
 	if(result == 0) return;
-
-//	uint32 count = result->GetRowCount();
-//	uint32 counter = 0;
-	uint32 fixed_count = 0;
-	uint32 proc_chance;
-	do 
-	{
-		Field * fields = result->Fetch();
-		uint32 entry = fields[0].GetUInt32();
-		SpellEntry * sp = dbcSpell.LookupEntry(entry);
-		if(sp == 0) continue;
-
-		// FIX SPELL GROUP RELATIONS
-		{
-			uint32 sgr[3];
-			sgr[0] = fields[103].GetUInt32();
-			sgr[1] = fields[104].GetUInt32();
-			sgr[2] = fields[105].GetUInt32();
-			proc_chance = fields[25].GetUInt32();
-
-			for(uint32 i = 0; i < 3; ++i)
-			{
-				if(sgr[i] && sp->EffectSpellGroupRelation[i] == 0)
-				{
-					//string name = fields[120].GetString();
-					//printf("%s[%u] %u->%u\n", name.c_str(),i, sp->EffectSpellGroupRelation[i], sgr[i]);
-					sp->EffectSpellGroupRelation[i] = sgr[i];
-					++fixed_count;
-				}
-			}
-
-			sp->procChance = min(proc_chance, sp->procChance);			
-		}
-
-		// FIX OTHER STUFF.. we'll find out..
-
-	} while(result->NextRow());
-	delete result;
-	Log.Notice("ObjectMgr", "%u spell fixes loaded.", fixed_count);
-
-/*##########################################################################################*/
-
-	// Loads data from spell_data_extra table
-	result = WorldDatabase.Query("SELECT * FROM spell_data_extra");
-	if(result == 0) return;
-
-	uint32 override_count = 0;
 	do
 	{
-		Field * fields = result->Fetch();
-		uint32 spell_id = fields[0].GetUInt32();
-		SpellEntry * sp = dbcSpell.LookupEntry(spell_id);
-		if(sp == 0) 
-			continue;
-
-		if (fields[1].GetUInt32() != NULL)
-			sp->dmg_bonus = fields[1].GetUInt32();
+ 		Field * fields = result->Fetch();
+		uint32 Id = fields[0].GetUInt32();
+		SpellEntry * sp = SpellDataStorage.LookupEntry(Id);
+ 		if(sp == 0) continue;
+ 
+		//dmg_bonus
+		if (fields[4].GetUInt32() != NULL)
+			sp->dmg_bonus = fields[4].GetUInt32();
 		else
 			sp->dmg_bonus = 0;
-			
-		if(fields[2].GetUInt32() != NULL)
-			sp->proc_interval = fields[2].GetUInt32();
+
+		char* desc = (char*)fields[3].GetString();
+
+		//c_is_flags
+		sp->c_is_flags = 0;
+		if(IsDamagingSpell(sp))
+			sp->c_is_flags |= SPELL_FLAG_IS_DAMAGING;
+		if(IsHealingSpell(sp))
+			sp->c_is_flags |= SPELL_FLAG_IS_HEALING;
+		if(IsTargetingStealthed(sp))
+			sp->c_is_flags |= SPELL_FLAG_IS_TARGETINGSTEALTHED;
+
+		//base_range_or_radius_sqr
+		float radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[1])));
+		radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[2])),radius);
+		radius=max(GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex)),radius);
+		sp->base_range_or_radius_sqr = radius*radius;
+
+		//NameHash
+		const char* nametext = fields[1].GetString();
+		uint32 namehash = (uint32)crc32((const unsigned char*)nametext, (uint32)strlen(nametext));
+		sp->NameHash = namehash;
+
+		//RankNumber
+		uint32 rank;
+		const char* ranktext = fields[2].GetString();
+		if(!sscanf(ranktext, "Rank %d", (unsigned int*)&rank))
+			rank = 0;
+		sp->RankNumber = rank;
+
+		//spellLevel overload
+		if(sp->spellLevel==0)
+ 		{
+			uint32 new_level=0;
+			if(strstr(nametext, "Apprentice "))
+				new_level = 1;
+			else if(strstr(nametext, "Journeyman "))
+				new_level = 2;
+			else if(strstr(nametext, "Expert "))
+				new_level = 3;
+			else if(strstr(nametext, "Artisan "))
+				new_level = 4;
+			else if(strstr(nametext, "Master "))
+				new_level = 5;
+			if(new_level!=0)
+ 			{
+				uint32 teachspell = 0;
+				if(sp->Effect[0]==SPELL_EFFECT_LEARN_SPELL)
+					teachspell = sp->EffectTriggerSpell[0];
+				else if(sp->Effect[1]==SPELL_EFFECT_LEARN_SPELL)
+					teachspell = sp->EffectTriggerSpell[1];
+				else if(sp->Effect[2]==SPELL_EFFECT_LEARN_SPELL)
+					teachspell = sp->EffectTriggerSpell[2];
+				if(teachspell)
+ 				{
+					SpellEntry *spellInfo = SpellDataStorage.LookupEntry(teachspell);
+					spellInfo->spellLevel = new_level;
+					sp->spellLevel = new_level;
+ 				}
+ 			}
+		}
+ 		
+		//talent_tree
+		talentSpellIterator = talentSpells.find(sp->Id);
+		if(talentSpellIterator == talentSpells.end())
+			sp->talent_tree = 0;
+		else
+			sp->talent_tree = talentSpellIterator->second;
+
+
+		// find diminishing status
+		sp->DiminishStatus = GetDiminishingGroup(namehash);
+		sp->buffIndexType=0;
+		switch(namehash)
+		{
+		case 0xFF89ABD2:		// Hunter's mark
+			sp->buffIndexType = SPELL_TYPE_INDEX_MARK;
+			break;
+		case 0x2266F1F2:		// Polymorph
+		case 0xB15D524E:		// Polymorph: Chicken
+		case 0xA73086F1:		// Polymorph: Pig
+		case 0xBD6B76DC:		// Polymorph: Sheep
+		case 0x0128F8E9:		// Polymorph: Turtle
+			sp->buffIndexType = SPELL_TYPE_INDEX_POLYMORPH;
+			break;
+		case 0x328E44DC:		// Fear
+			sp->buffIndexType = SPELL_TYPE_INDEX_FEAR;
+			break;
+		case 0x4219BB33:		// Sap
+			sp->buffIndexType = SPELL_TYPE_INDEX_SAP;
+			break;
+		case 0x94675337:		// Scare Beast
+			sp->buffIndexType = SPELL_TYPE_INDEX_SCARE_BEAST;
+			break;
+		case 0x898B6207:		// Hibernate
+			sp->buffIndexType = SPELL_TYPE_INDEX_HIBERNATE;
+			break;
+		case 0x0227BA8B:		// Earth Shield
+			sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
+			break;
+		case 0x73812928:		// Cyclone
+			sp->buffIndexType = SPELL_TYPE_INDEX_CYCLONE;
+			break;
+		case 0x3D46465A:		// Banish
+			sp->buffIndexType = SPELL_TYPE_INDEX_BANISH;
+			break;
+ 		}
+ 
+		//buffType
+		uint32 type = 0;
+ 
+        if(strstr(nametext, "Seal"))
+		{
+            type |= SPELL_TYPE_SEAL;
+			//All_Seal_Groups_Combined |= sp->SpellGroupType;
+		}
+        else if(strstr(nametext, "Blessing"))
+            type |= SPELL_TYPE_BLESSING;
+        else if(strstr(nametext, "Curse"))
+            type |= SPELL_TYPE_CURSE;
+        else if(strstr(nametext, "Aspect"))
+            type |= SPELL_TYPE_ASPECT;
+        else if(strstr(nametext, "Sting") || strstr(nametext, "sting"))
+            type |= SPELL_TYPE_STING;
+        else if(strcmp(nametext, "Armor") && strstr(nametext, "Armor") || strstr(nametext, "Demon Skin"))
+            type |= SPELL_TYPE_ARMOR;
+        else if(strstr(nametext, "Aura"))
+            type |= SPELL_TYPE_AURA;
+		else if(strstr(nametext, "Track")==nametext)
+            type |= SPELL_TYPE_TRACK;
+		else if(namehash==0xF77CAB47 || namehash==0x202F1D74) //Gift of the Wild / Mark of the Wild
+            type |= SPELL_TYPE_MARK_GIFT;
+		else if(namehash==0xB1792C31 || namehash==0xC8F56DAF) //	Divine Spirit / Prayer of Spirit
+            type |= SPELL_TYPE_SPIRIT;
+		else if(namehash==0xD9948728 || namehash==0xBDA6C77C) // Shadow Protection / Prayer of Shadow Protection
+            type |= SPELL_TYPE_PRIEST_SH_PPROT;
+		else if(namehash==0x9056D252 || namehash==0x519F97B3) // Power Word: Fortitude/ Prayer of Fortitude
+            type |= SPELL_TYPE_FORTITUDE;
+		// Immolation Trap/Freezing Trap/Frost Trap/Explosive Trap/Snake Trap
+		else if(namehash==0x238FEAF2 || namehash==0x593D7EC7 || namehash==0xF7318BD7 || namehash==0x54B6F3EE || namehash==0xF57361BB)
+            type |= SPELL_TYPE_HUNTER_TRAP;
+		else if(namehash==0x2F7018BA || namehash==0x9CA89B04) // Arcane Intellect / Arcane Brilliance
+            type |= SPELL_TYPE_MAGE_INTEL;
+		else if(namehash==0x75E2ACFF || namehash==0x3C4E2404) //Amplify Magic / Dampen Magic
+            type |= SPELL_TYPE_MAGE_MAGI;
+		else if(namehash==0xC83A99CB || namehash==0x80D1ACFF) // Fire Ward / Frost Ward
+            type |= SPELL_TYPE_MAGE_WARDS;
+		//	Water Shield / Earth Shield / Lightning Shield
+		else if(namehash==0xB9DAC27E || namehash==0x0227BA8B || namehash==0x2123CF1E)
+            type |= SPELL_TYPE_SHIELD;
+		else if(strstr(nametext, "Immolate") || strstr(nametext, "Conflagrate"))
+			type |= SPELL_TYPE_WARLOCK_IMMOLATE;
+		else if(strstr(nametext, "Amplify Magic") || strstr(nametext, "Dampen Magic"))
+			type |= SPELL_TYPE_MAGE_AMPL_DUMP;
+		else if(strstr(desc, "Finishing move")==desc)
+			type |= SPELL_TYPE_FINISHING_MOVE;
+        else if(strstr(desc, "Battle Elixir"))
+            type |= SPELL_TYPE_ELIXIR_BATTLE;
+        else if(strstr(desc, "Guardian Elixir"))
+            type |= SPELL_TYPE_ELIXIR_GUARDIAN;
+        else if(strstr(desc, "Battle and Guardian elixir"))
+            type |= SPELL_TYPE_ELIXIR_FLASK;
+		else if(namehash==0xFF89ABD2)		// hunter's mark
+			type |= SPELL_TYPE_HUNTER_MARK;
+
+		sp->buffType = type;
+
+		//seated RecoveryTime hack
+		if (strstr(desc, "Must remain seated"))
+		{
+			sp->RecoveryTime = 1000;
+			sp->CategoryRecoveryTime = 1000;
+		}
+
+		// proc spell referencing non-existant spell. create a dummy spell for use w/ it. 
+		for(uint32 b=0; b<3; ++b)
+		{
+			if(sp->EffectTriggerSpell[b] != 0 && SpellDataStorage.LookupEntry(sp->EffectTriggerSpell[b]) == NULL)
+				CreateDummySpell(sp->EffectTriggerSpell[b]);
+
+			// Load teaching spells (used for hunters when learning pets wild abilities) 
+			if(sp->Effect[b]==SPELL_EFFECT_LEARN_SPELL && sp->EffectImplicitTargetA[b]==EFF_TARGET_PET)
+			{
+				map<uint32,uint32>::iterator itr = sWorld.TeachingSpellMap.find(sp->EffectTriggerSpell[b]);
+				if(itr == sWorld.TeachingSpellMap.end())
+					sWorld.TeachingSpellMap.insert(make_pair(sp->EffectTriggerSpell[b],sp->Id));
+			}
+		}
+
+		// Break roots/fear on damage.. this needs to be fixed properly!
+		if(!(sp->AuraInterruptFlags & AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN))
+		{
+			for(uint32 z = 0; z < 3; ++z) {
+				if(sp->EffectApplyAuraName[z] == SPELL_AURA_MOD_FEAR ||
+					sp->EffectApplyAuraName[z] == SPELL_AURA_MOD_ROOT)
+				{
+					sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_UNUSED2;
+					break;
+				}
+
+				if((sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE&&sp->Spell_Dmg_Type==2) || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE || sp->Effect[z] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || sp->Effect[z] == SPELL_EFFECT_DUMMYMELEE)
+					sp->is_melee_spell = true;
+			}
+		}
+
+
+		// TEMP - UNTIL PROC FLAGS REMADE
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// PROC_FLAGS
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		uint32 pr = sp->procFlags;
+		for(uint32 y=0;y < 3; y++)
+		{
+			uint32 effect = sp->Effect[y];
+
+			if(effect==SPELL_EFFECT_APPLY_AURA)
+			{
+				uint32 aura = sp->EffectApplyAuraName[y];
+
+				if( aura == SPELL_AURA_PROC_TRIGGER_SPELL || aura == SPELL_AURA_PROC_TRIGGER_DAMAGE )
+				{
+					pr = 0;
+
+					for(i = 0; i < (uint32)strlen(desc); ++i)
+						desc[i] = tolower(desc[i]);
+					//139944 --- some magic number, it will trigger on all hits etc
+					if(strstr(desc,"takes damage"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"attackers when hit"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"character strikes an enemy"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"strike you with a melee attack"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"target casts a spell"))
+						pr|=PROC_ON_CAST_SPELL;
+                    if(strstr(desc,"your harmful spells land"))
+                        pr|=PROC_ON_CAST_SPELL;
+                    if(strstr(desc,"on spell critical hit"))
+                        pr|=PROC_ON_SPELL_CRIT_HIT;
+                    if(strstr(desc,"spell critical strikes"))
+                        pr|=PROC_ON_SPELL_CRIT_HIT;
+                    if(strstr(desc,"being able to resurrect"))
+                        pr|=PROC_ON_DIE;
+					if(strstr(desc,"any damage caused"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"the next melee attack against the caster"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"when successfully hit"))
+						pr|=PROC_ON_MELEE_ATTACK ;
+					if(strstr(desc,"an enemy on hit"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"when it hits"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"when successfully hit"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"on a successful hit"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"damage to attacker on hit"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"on a hit"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"strikes you with a melee attack"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"when caster takes damage"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"when the caster is using melee attacks"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"when struck in combat"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"successful melee attack"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"chance per attack"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"chance per hit"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"that strikes a party member"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"when hit by a melee attack"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"your critical strikes"))
+						pr|=PROC_ON_CRIT_ATTACK;
+					if(strstr(desc,"whenever you deal ranged damage"))
+						pr|=PROC_ON_RANGED_ATTACK;
+//					if(strstr(desc,"whenever you deal melee damage"))
+					if(strstr(desc,"you deal melee damage"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"your melee attacks"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"damage with your Sword"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"when struck in melee combat"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"any successful spell cast against the priest"))
+						pr|=PROC_ON_SPELL_HIT_VICTIM;
+					if(strstr(desc,"the next melee attack on the caster"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"striking melee or ranged attackers"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM|PROC_ON_RANGED_ATTACK_VICTIM;
+					if(strstr(desc,"when damaging an enemy in melee"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"victim of a critical strike"))
+						pr|=PROC_ON_CRIT_HIT_VICTIM;
+					if(strstr(desc,"on successful melee or ranged attack"))
+						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
+					if(strstr(desc,"enemy that strikes you in melee"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"after getting a critical strike"))
+						pr|=PROC_ON_CRIT_ATTACK;
+					if(strstr(desc,"whenever damage is dealt to you"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"when ranged or melee damage is dealt"))
+						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
+					if(strstr(desc,"damaging melee attacks"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"on melee or ranged attack"))
+						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
+					if(strstr(desc,"on a melee swing"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"Chance on melee"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"spell criticals against you"))
+						pr|=PROC_ON_SPELL_CRIT_HIT_VICTIM;
+					if(strstr(desc,"after being struck by a melee or ranged critical hit"))
+						pr|=PROC_ON_CRIT_HIT_VICTIM;
+//					if(strstr(desc,"on a critical hit"))
+					if(strstr(desc,"critical hit"))
+						pr|=PROC_ON_CRIT_ATTACK;
+					if(strstr(desc,"strikes the caster"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"a spell, melee or ranged attack hits the caster"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"after dealing a critical strike"))
+						pr|=PROC_ON_CRIT_ATTACK;
+					if(strstr(desc,"each melee or ranged damage hit against the priest"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM|PROC_ON_RANGED_ATTACK_VICTIM;				
+					if(strstr(desc, "a chance to deal additional"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc, "chance to get an extra attack"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc, "melee attacks has"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc, "any damage spell hits a target"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc, "giving each melee attack a chance"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc, "damage when hit"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM; //myabe melee damage ?
+					if(strstr(desc, "gives your"))
+					{
+						if(strstr(desc, "melee"))
+							pr|=PROC_ON_MELEE_ATTACK;
+						else if(strstr(desc,"sinister strike, backstab, gouge and shiv"))
+							pr|=PROC_ON_CAST_SPELL;
+						else if(strstr(desc,"chance to daze the target"))
+							pr|=PROC_ON_CAST_SPELL;
+						else if(strstr(desc,"finishing moves"))
+							pr|=PROC_ON_CAST_SPELL;
+//						else if(strstr(desc,"shadow bolt, shadowburn, soul fire, incinerate, searing pain and conflagrate"))
+//							pr|=PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF;
+						//we should find that specific spell (or group) on what we will trigger
+						else pr|=PROC_ON_CAST_SPECIFIC_SPELL;
+					}
+					if(strstr(desc, "chance to add an additional combo") && strstr(desc, "critical") )
+						pr|=PROC_ON_CRIT_ATTACK;
+					else if(strstr(desc, "chance to add an additional combo"))
+						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc, "victim of a melee or ranged critical strike"))
+						pr|=PROC_ON_CRIT_HIT_VICTIM;
+					if(strstr(desc, "getting a critical effect from"))
+						pr|=PROC_ON_SPELL_CRIT_HIT_VICTIM;
+					if(strstr(desc, "damaging attack is taken"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc, "struck by a Stun or Immobilize"))
+						pr|=PROC_ON_SPELL_HIT_VICTIM;
+					if(strstr(desc, "melee critical strike"))
+						pr|=PROC_ON_CRIT_ATTACK;
+					if(strstr(nametext, "Bloodthirst"))
+						pr|=PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+					if(strstr(desc, "experience or honor"))
+						pr|=PROC_ON_GAIN_EXPIERIENCE;
+					if(strstr(desc,"your next offensive ability"))
+						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc,"hit by a melee or ranged attack"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+					if(strstr(desc,"enemy strikes the caster"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"melee and ranged attacks against you"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+					if(strstr(desc,"when a block occurs"))
+						pr|=PROC_ON_BLOCK_VICTIM;
+					if(strstr(desc,"dealing a critical strike from a weapon swing, spell, or ability"))
+						pr|=PROC_ON_CRIT_ATTACK|PROC_ON_SPELL_CRIT_HIT;
+					if(strstr(desc,"dealing a critical strike from a weapon swing, spell, or ability"))
+						pr|=PROC_ON_CRIT_ATTACK|PROC_ON_SPELL_CRIT_HIT;
+					if(strstr(desc,"shadow bolt critical strikes increase shadow damage"))
+						pr|=PROC_ON_SPELL_CRIT_HIT;
+					if(strstr(desc,"next offensive ability"))
+						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc,"after being hit with a shadow or fire spell"))
+						pr|=PROC_ON_SPELL_HIT_VICTIM;
+					if(strstr(desc,"giving each melee attack"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"each strike has"))
+						pr|=PROC_ON_MELEE_ATTACK;		
+					if(strstr(desc,"your Fire damage spell hits"))
+						pr|=PROC_ON_CAST_SPELL;		//this happens only on hit ;)
+					if(strstr(desc,"corruption, curse of agony, siphon life and seed of corruption spells also cause"))
+						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc,"pain, mind flay and vampiric touch spells also cause"))
+						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc,"shadow damage spells have"))
+						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc,"your spell criticals have"))
+						pr|=PROC_ON_SPELL_CRIT_HIT | PROC_ON_SPELL_CRIT_HIT_VICTIM;
+					if(strstr(desc,"after dodging their attack"))
+					{
+						pr|=PROC_ON_DODGE_VICTIM;
+						if(strstr(desc,"add a combo point"))
+							pr|=PROC_TAGRGET_SELF;
+					}
+					if(strstr(desc,"fully resisting"))
+						pr|=PROC_ON_RESIST_VICTIM;
+					if(strstr(desc,"Your Shadow Word: Pain, Mind Flay and Vampiric Touch spells also cause the target"))
+						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc,"your melee and ranged attacks"))
+						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
+//					if(strstr(desc,"chill effect to your Blizzard"))
+//						pr|=PROC_ON_CAST_SPELL;	
+					//////////////////////////////////////////////////
+					//proc dmg flags
+					//////////////////////////////////////////////////
+					if(strstr(desc,"each attack blocked"))
+						pr|=PROC_ON_BLOCK_VICTIM;
+					if(strstr(desc,"into flame, causing an additional"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"victim of a critical melee strike"))
+						pr|=PROC_ON_CRIT_HIT_VICTIM;
+					if(strstr(desc,"damage to melee attackers"))
+						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc,"target blocks a melee attack"))
+						pr|=PROC_ON_BLOCK_VICTIM;
+					if(strstr(desc,"ranged and melee attacks to deal"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+					if(strstr(desc,"damage on hit"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"after being hit by any damaging attack"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"striking melee or ranged attackers"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+					if(strstr(desc,"damage to attackers when hit"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"striking melee attackers"))
+						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
+					if(strstr(desc,"whenever the caster takes damage"))
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"damage on every attack"))
+						pr|=PROC_ON_MELEE_ATTACK | PROC_ON_RANGED_ATTACK;
+					if(strstr(desc,"chance to reflect Fire spells"))
+						pr|=PROC_ON_SPELL_HIT_VICTIM;
+					if(strstr(desc,"hunter takes on the aspects of a hawk"))
+						pr|=PROC_TAGRGET_SELF | PROC_ON_RANGED_ATTACK;
+					if(strstr(desc,"successful auto shot attacks"))
+						pr|=PROC_ON_AUTO_SHOT_HIT;
+					if(strstr(desc,"after getting a critical effect from your"))
+						pr=PROC_ON_SPELL_CRIT_HIT;
+//					if(strstr(desc,"Your critical strikes from Fire damage"))
+//						pr|=PROC_ON_SPELL_CRIT_HIT;
+				}//end "if procspellaura"
+
+			}
+		}
+		sp->procFlags = pr;
+
+		if (strstr(desc, "Must remain seated"))
+		{
+			sp->RecoveryTime = 1000;
+			sp->CategoryRecoveryTime = 1000;
+		}
+
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// PROC_INTERVALS
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		//omg lighning shield trigger spell id's are all wrong ?
+		//if you are bored you could make thiese by hand but i guess we might find other spells with this problem..and this way it's safe
+		if(strstr(nametext, "Lightning Shield") && sp->EffectTriggerSpell[0])
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "for $");
+			if(startofid)
+			{
+				startofid += strlen("for $");
+				sp->EffectTriggerSpell[0]=atoi(startofid); //get new lightning shield trigger id
+			}
+			sp->proc_interval = 3000; //few seconds
+		}
+		//mage ignite talent should proc only on some chances
+		else if(strstr(nametext, "Ignite") && sp->Id>=11119 && sp->Id<=12848 && sp->EffectApplyAuraName[0]==4)
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "an additional ");
+			if(startofid)
+			{
+				startofid += strlen("an additional ");
+				sp->EffectBasePoints[0]=atoi(startofid); //get new value. This is actually level*8 ;)
+			}
+			sp->Effect[0] = 6; //aura
+			sp->EffectApplyAuraName[0] = 42; //force him to use procspell effect
+			sp->EffectTriggerSpell[0] = 12654; //evil , but this is good for us :D
+			sp->procFlags = PROC_ON_SPELL_CRIT_HIT; //add procflag here since this was not processed with the others !
+		}
+		// Winter's Chill handled by frost school
+		else if(strstr(nametext, "Winter's Chill"))
+		{
+			sp->School = 4;
+		}
+		// Blackout handled by Shadow school
+		else if(strstr(nametext, "Blackout"))
+		{
+			sp->School = 5;
+		}
+		// Shadow Weaving
+		else if(strstr(nametext, "Shadow Weaving"))
+		{
+			sp->School = 5;
+			sp->EffectApplyAuraName[0] = 42;
+			sp->procChance = sp->EffectBasePoints[0] + 1;
+			sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
+		}
+		//Improved Aspect of the Hawk
+		else if(strstr(nametext, "Improved Aspect of the Hawk"))
+			sp->EffectSpellGroupRelation[1] = 0x100000;
+		//more triggered spell ids are wrong. I think blizz is trying to outsmart us :S
+		else if( strstr(nametext, "Nature's Guardian"))
+		{
+			sp->EffectTriggerSpell[0]=31616;
+			sp->proc_interval = 5000;
+		}
+		//Chain Heal all ranks %50 heal value (49 + 1)
+		else if( strstr(nametext, "Chain Heal"))
+		{
+			sp->EffectDieSides[0] = 49;
+		}
+		//this starts to be an issue for trigger spell id : Deep Wounds
+		else if(strstr(nametext, "Deep Wounds") && sp->EffectTriggerSpell[0])
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "over $");
+			if(startofid)
+			{
+				startofid += strlen("over $");
+				sp->EffectTriggerSpell[0]=atoi(startofid);
+			}
+		}
+		else if(strstr(nametext, "Holy Shock"))
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "causing $");
+			if(startofid)
+			{
+				startofid += strlen("causing $");
+				sp->EffectTriggerSpell[0]=atoi(startofid);
+			}
+			//check if we can find in the desription
+			startofid=strstr(desc, " or $");
+			if(startofid)
+			{
+				startofid += strlen(" or $");
+				sp->EffectTriggerSpell[1]=atoi(startofid);
+			}
+		}
+		else if(strstr(nametext, "Touch of Weakness"))
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "cause $");
+			if(startofid)
+			{
+				startofid += strlen("cause $");
+				sp->EffectTriggerSpell[0]=atoi(startofid);
+				sp->EffectTriggerSpell[1]=sp->EffectTriggerSpell[0]; //later versions of this spell changed to eff[1] the aura
+				sp->procFlags = uint32(PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF);
+			}
+		}
+		else if(strstr(nametext, "Firestone Passive"))
+		{
+			//Enchants the main hand weapon with fire, granting each attack a chance to deal $17809s1 additional fire damage.
+			//check if we can find in the desription
+			char * startofid=strstr(desc, "to deal $");
+			if(startofid)
+			{
+				startofid += strlen("to deal $");
+				sp->EffectTriggerSpell[0]=atoi(startofid);
+				sp->EffectApplyAuraName[0]=42;
+				sp->procFlags = PROC_ON_MELEE_ATTACK;
+				sp->procChance = 50;
+			}
+		}
+		//some procs trigger at intervals
+		else if(strstr(nametext, "Water Shield"))
+		{
+			sp->proc_interval = 3000; //few seconds
+			sp->procFlags |= PROC_TAGRGET_SELF;
+		}
+		else if(strstr(nametext, "Earth Shield"))
+			sp->proc_interval = 3000; //few seconds
+		else if(strstr(nametext, "Shadowguard"))
+			sp->proc_interval = 3000; //few seconds
+		else if(strstr(nametext, "Poison Shield"))
+			sp->proc_interval = 3000; //few seconds
+		else if(strstr(nametext, "Infused Mushroom"))
+			sp->proc_interval = 10000; //10 seconds
+		else if(strstr(nametext, "Aviana's Purpose"))
+			sp->proc_interval = 10000; //10 seconds
+//		else if(strstr(nametext, "Illumination"))
+//			sp->EffectTriggerSpell[0]=20272;
+		//sp->dummy=result;
+
+		//Set Silencing spells mech.
+		if (sp->EffectApplyAuraName[0] == 27 || 
+			sp->EffectApplyAuraName[1] == 27 ||
+			sp->EffectApplyAuraName[2] == 27)
+			sp->MechanicsType = MECHANIC_SILENCED;
+		//Set Stunning spells mech.
+		if (sp->EffectApplyAuraName[0] == 12 || 
+			sp->EffectApplyAuraName[1] == 12 ||
+			sp->EffectApplyAuraName[2] == 12)
+			sp->MechanicsType = MECHANIC_STUNNED;
+		//Set Fearing spells mech
+		if (sp->EffectApplyAuraName[0] == 7 || 
+			sp->EffectApplyAuraName[1] == 7 ||
+			sp->EffectApplyAuraName[2] == 7)
+			sp->MechanicsType = MECHANIC_FLEEING;
+
+
+		//proc_interval from DB
+		if(fields[5].GetUInt32() != NULL)
+			sp->proc_interval = fields[5].GetUInt32();
 		else
 			sp->proc_interval = 0;
 
-		override_count++;
-	} while (result->NextRow());
+		if(sp->proc_interval != 0)
+			sp->procFlags |= PROC_REMOVEONUSE;
 
-	delete result;
-	Log.Notice("ObjectMgr", "%u spell data extra loaded.", override_count);
-}
+
+
+		if(sp->Id==25771 || sp->Id == 11196 || sp->Id == 6788)
+			sp->removable_by_immunity = false;
+
+
+
+		count++;
+
+ 	} while(result->NextRow());
+
+ 	delete result;
+	Log.Notice("ObjectMgr", "%u Spell Data Extra loaded.", count);
+ }
+
 
 void ObjectMgr::LoadSpellOverride()
 {
@@ -1939,7 +2575,7 @@ void ObjectMgr::LoadSpellOverride()
 			{
 				Field *fieldsIn = resultIn->Fetch();
 				spellid = fieldsIn[0].GetUInt32();
-				sp = dbcSpell.LookupEntry(spellid);
+				sp = SpellDataStorage.LookupEntry(spellid);
 				if(!spellid || !sp) 
 					continue;
 				list->push_back(sp);

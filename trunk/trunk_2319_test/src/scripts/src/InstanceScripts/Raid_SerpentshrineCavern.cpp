@@ -34,7 +34,7 @@ public:
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 
-		spells[0].info = dbcSpell.LookupEntry(PURIFY_ELEMENTAL);
+		spells[0].info = SpellDataStorage.LookupEntry(PURIFY_ELEMENTAL);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].perctrigger = 10.0f;
@@ -42,7 +42,7 @@ public:
 		spells[0].speech = "Casting PURIFY_ELEMENTAL";
 		m_spellcheck[0] = true;
 
-		spells[1].info = dbcSpell.LookupEntry(MARK_OF_HYDROSS);
+		spells[1].info = SpellDataStorage.LookupEntry(MARK_OF_HYDROSS);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
@@ -50,7 +50,7 @@ public:
 		spells[1].attackstoptimer = 2000; // 2sec
 		spells[1].speech = "Casting MARK_OF_HYDROSS";
 
-		spells[2].info = dbcSpell.LookupEntry(WATER_TOMB);
+		spells[2].info = SpellDataStorage.LookupEntry(WATER_TOMB);
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].cooldown = 7;
 		spells[2].instant = true;
@@ -58,7 +58,7 @@ public:
 		spells[2].attackstoptimer = 2000; // 2sec
 		spells[2].speech = "Casting WATER_TOMB";
 
-		spells[3].info = dbcSpell.LookupEntry(MARK_OF_CORRUPTION);
+		spells[3].info = SpellDataStorage.LookupEntry(MARK_OF_CORRUPTION);
 		spells[3].targettype = TARGET_VARIOUS;
 		spells[3].cooldown = 15;
 		spells[3].instant = true;
@@ -66,7 +66,7 @@ public:
 		spells[3].attackstoptimer = 2000; // 2sec
 		spells[3].speech = "Casting MARK_OF_CORRUPTION";
 
-		spells[4].info = dbcSpell.LookupEntry(VILE_SLUDGE);
+		spells[4].info = SpellDataStorage.LookupEntry(VILE_SLUDGE);
 		spells[4].targettype = TARGET_VARIOUS;
 		spells[4].cooldown = 15;
 		spells[4].instant = true;
@@ -184,7 +184,7 @@ public:
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 
-		spells[0].info = dbcSpell.LookupEntry(WHIRL);
+		spells[0].info = SpellDataStorage.LookupEntry(WHIRL);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 30;
@@ -192,21 +192,21 @@ public:
 		spells[0].attackstoptimer = 1000; // 1sec
 		m_spellcheck[0] = true;
 
-		spells[1].info = dbcSpell.LookupEntry(GEYSER);
+		spells[1].info = SpellDataStorage.LookupEntry(GEYSER);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].cooldown = 10;
 		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 2000; // 2sec
 
-		spells[2].info = dbcSpell.LookupEntry(SPOUT);
+		spells[2].info = SpellDataStorage.LookupEntry(SPOUT);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = false;
 		spells[2].cooldown = 60;
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 2000; // 2sec
 
-		spells[3].info = dbcSpell.LookupEntry(SUBMERGE);
+		spells[3].info = SpellDataStorage.LookupEntry(SUBMERGE);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
 		spells[3].cooldown = 120;
@@ -319,20 +319,20 @@ public:
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 		
-        spells[0].info = dbcSpell.LookupEntry(WHIRLWINDLEO);
+        spells[0].info = SpellDataStorage.LookupEntry(WHIRLWINDLEO);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
 		spells[0].cooldown = 20;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(INSIDIOUS_WHISPER);
+		spells[1].info = SpellDataStorage.LookupEntry(INSIDIOUS_WHISPER);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].perctrigger = 2.0f;
 		spells[1].attackstoptimer = 2000;
 
-		spells[2].info = dbcSpell.LookupEntry(CHAOS_BLAST);
+		spells[2].info = SpellDataStorage.LookupEntry(CHAOS_BLAST);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].perctrigger = 2.0f;
@@ -442,7 +442,7 @@ public:
 		if(_unit->GetHealthPct() <= 20 && enrage != 1)
 		{
 		enrage = 1;
-		_unit->CastSpell(_unit, dbcSpell.LookupEntry(LEO_ENRAGE), true);
+		_unit->CastSpell(_unit, SpellDataStorage.LookupEntry(LEO_ENRAGE), true);
 		}
 		if (_unit->GetHealthPct() <= 90 && sumh == 0)
 		{
@@ -636,7 +636,7 @@ public:
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 
-		spells[0].info = dbcSpell.LookupEntry(CATACLYSMIC_BOLT);
+		spells[0].info = SpellDataStorage.LookupEntry(CATACLYSMIC_BOLT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 10;
@@ -766,7 +766,7 @@ public:
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 
-		spells[0].info = dbcSpell.LookupEntry(TIDAL_WAVE);
+		spells[0].info = SpellDataStorage.LookupEntry(TIDAL_WAVE);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 10;
@@ -774,7 +774,7 @@ public:
 		spells[0].attackstoptimer = 1000; // 1sec
 		m_spellcheck[0] = true;
 
-		spells[1].info = dbcSpell.LookupEntry(WATERY_GRAVE);
+		spells[1].info = SpellDataStorage.LookupEntry(WATERY_GRAVE);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 10;
@@ -782,7 +782,7 @@ public:
 		spells[1].attackstoptimer = 1000; // 1sec
 		m_spellcheck[1] = true;
 
-		spells[2].info = dbcSpell.LookupEntry(EARTHQUAKE);
+		spells[2].info = SpellDataStorage.LookupEntry(EARTHQUAKE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 10;
@@ -790,7 +790,7 @@ public:
 		spells[2].attackstoptimer = 1000; // 1sec
 		m_spellcheck[2] = true;
 
-		spells[3].info = dbcSpell.LookupEntry(SUMMON_WATER_GLOBULE);
+		spells[3].info = SpellDataStorage.LookupEntry(SUMMON_WATER_GLOBULE);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 10;
@@ -982,42 +982,42 @@ class VashjAI : public CreatureAIScript
 			
 			// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 			
-			spells[0].info = dbcSpell.LookupEntry(SHOOT);
+			spells[0].info = SpellDataStorage.LookupEntry(SHOOT);
 			spells[0].targettype = TARGET_VARIOUS;
 			spells[0].instant = true;
 			spells[0].perctrigger = 10.0f;
 			spells[0].attackstoptimer = 1000; // 1sec
 			m_spellcheck[0] = true;
 			
-			spells[1].info = dbcSpell.LookupEntry(ENTANGLE);
+			spells[1].info = SpellDataStorage.LookupEntry(ENTANGLE);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = true;
 			spells[1].cooldown = 15;
 			spells[1].perctrigger = 10.0f;
 			spells[1].attackstoptimer = 2000; // 2sec
 			
-			spells[2].info = dbcSpell.LookupEntry(SPAWN_ELEMENTAL);
+			spells[2].info = SpellDataStorage.LookupEntry(SPAWN_ELEMENTAL);
 			spells[2].targettype = TARGET_VARIOUS;
 			spells[2].cooldown = 7;
 			spells[2].instant = true;
 			spells[2].perctrigger = 5.0f;
 			spells[2].attackstoptimer = 2000; // 2sec
 			
-			spells[3].info = dbcSpell.LookupEntry(MULTI_SHOT);
+			spells[3].info = SpellDataStorage.LookupEntry(MULTI_SHOT);
 			spells[3].targettype = TARGET_VARIOUS;
 			spells[3].instant = true;
 			spells[3].perctrigger = 10.0f;
 			spells[3].attackstoptimer = 1000; // 1sec
 			spells[3].speech = "Seek your mark!";
 			
-			spells[4].info = dbcSpell.LookupEntry(STATIC_CHARGE);
+			spells[4].info = SpellDataStorage.LookupEntry(STATIC_CHARGE);
 			spells[4].targettype = TARGET_VARIOUS;
 			spells[4].instant = true;
 			spells[4].cooldown = 15;
 			spells[4].perctrigger = 10.0f;
 			spells[4].attackstoptimer = 2000; // 2sec
 			
-			spells[5].info = dbcSpell.LookupEntry(FORKED_LIGHTNING);
+			spells[5].info = SpellDataStorage.LookupEntry(FORKED_LIGHTNING);
 			spells[5].targettype = TARGET_VARIOUS;
 			spells[5].cooldown = 7;
 			spells[5].instant = true;
@@ -1091,7 +1091,7 @@ class VashjAI : public CreatureAIScript
 		{
 			if(phaseSetup == 2)
 			{
-				_unit->CastSpell(_unit, dbcSpell.LookupEntry(VASHJ_SHIELD), true); // Cast her shield
+				_unit->CastSpell(_unit, SpellDataStorage.LookupEntry(VASHJ_SHIELD), true); // Cast her shield
 				_unit->GetAIInterface()->MoveTo(29.798161f, -923.358276f, 42.900517f, 0.0f); //Move to center
 				_unit->GetAIInterface()->m_canMove = false;
 				phaseSetup = 3;
@@ -1099,7 +1099,7 @@ class VashjAI : public CreatureAIScript
 			timer_fork++;
 			if(timer_fork > 6)
 			{
-				_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(), dbcSpell.LookupEntry(FORKED_LIGHTNING), false);
+				_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(), SpellDataStorage.LookupEntry(FORKED_LIGHTNING), false);
 				timer_fork = 0;
 			}
 			spawncreatures();
@@ -1274,7 +1274,7 @@ class ToxicSporeBatAI : public CreatureAIScript
 				m_spellcheck[i] = false;
 			}
 			
-			spells[0].info = dbcSpell.LookupEntry(TOXIC_SPORES);
+			spells[0].info = SpellDataStorage.LookupEntry(TOXIC_SPORES);
 			spells[0].targettype = TARGET_VARIOUS;
 			spells[0].instant = true;
 			spells[0].cooldown = -1;
@@ -1697,7 +1697,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(CA_MULTI_SHOT); //+
+		spells[0].info = SpellDataStorage.LookupEntry(CA_MULTI_SHOT); //+
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].cooldown = 10;
@@ -1818,13 +1818,13 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(SHADOW_BOLT); //+
+		spells[0].info = SpellDataStorage.LookupEntry(SHADOW_BOLT); //+
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 2.0f;
 		spells[0].attackstoptimer = 1000;
 
-        spells[1].info = dbcSpell.LookupEntry(WHIRLWIND_KNOCKBACK); //+
+        spells[1].info = SpellDataStorage.LookupEntry(WHIRLWIND_KNOCKBACK); //+
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = false;
 		spells[1].perctrigger = 2.0f;
@@ -1942,7 +1942,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(CLEAVE);
+		spells[0].info = SpellDataStorage.LookupEntry(CLEAVE);
 		spells[0].targettype = TARGET_DESTINATION;
 		spells[0].instant = false;
 		spells[0].perctrigger = 3.0f;
@@ -2063,19 +2063,19 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(HOLY_NOVA); //+
+		spells[0].info = SpellDataStorage.LookupEntry(HOLY_NOVA); //+
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 2.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(SMITE); //+
+		spells[1].info = SpellDataStorage.LookupEntry(SMITE); //+
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
 		spells[1].perctrigger = 1.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(SPIRIT_OF_REDEMPTION); //+
+		spells[2].info = SpellDataStorage.LookupEntry(SPIRIT_OF_REDEMPTION); //+
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
 		spells[2].perctrigger = 2.0f;
@@ -2198,37 +2198,37 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(ACID_GEYSER); //
+		spells[0].info = SpellDataStorage.LookupEntry(ACID_GEYSER); //
 		spells[0].targettype = TARGET_DESTINATION;
 		spells[0].instant = true;
 		spells[0].perctrigger = 2.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(ATROPIC_BLOW);//+
+		spells[1].info = SpellDataStorage.LookupEntry(ATROPIC_BLOW);//+
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].perctrigger = 1.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(SPORE_QUAKE); //++
+		spells[2].info = SpellDataStorage.LookupEntry(SPORE_QUAKE); //++
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
 		spells[2].perctrigger = 2.0f;
 		spells[2].attackstoptimer = 1000;
 		
-		spells[3].info = dbcSpell.LookupEntry(TOXIC_POOL); //++
+		spells[3].info = SpellDataStorage.LookupEntry(TOXIC_POOL); //++
 		spells[3].targettype = TARGET_VARIOUS;
 		spells[3].instant = true;
 		spells[3].perctrigger = 1.0f;
 		spells[3].attackstoptimer = 1000;
 		
-		spells[4].info = dbcSpell.LookupEntry(FRENZY); //++
+		spells[4].info = SpellDataStorage.LookupEntry(FRENZY); //++
 		spells[4].targettype = TARGET_ATTACKING; 
 		spells[4].instant = true;
 		spells[4].perctrigger = 1.0f;
 		spells[4].attackstoptimer = 1000;
 		
-		spells[5].info = dbcSpell.LookupEntry(RAMPANT_INFECTION); //
+		spells[5].info = SpellDataStorage.LookupEntry(RAMPANT_INFECTION); //
 		spells[5].targettype = TARGET_VARIOUS; 
 		spells[5].instant = true;
 		spells[5].perctrigger = 1.0f;
@@ -2336,19 +2336,19 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(TW_CLEAVE); //
+		spells[0].info = SpellDataStorage.LookupEntry(TW_CLEAVE); //
 		spells[0].targettype = TARGET_DESTINATION;
 		spells[0].instant = false;
 		spells[0].perctrigger = 1.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(TW_BLOODTHIRST);
+		spells[1].info = SpellDataStorage.LookupEntry(TW_BLOODTHIRST);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].perctrigger = 1.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(TW_FRENZY); //++
+		spells[2].info = SpellDataStorage.LookupEntry(TW_FRENZY); //++
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = false;
 		spells[2].perctrigger = 2.0f;
@@ -2455,19 +2455,19 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(CSERP_CLEAVE); //
+		spells[0].info = SpellDataStorage.LookupEntry(CSERP_CLEAVE); //
 		spells[0].targettype = TARGET_DESTINATION;
 		spells[0].instant = false;
 		spells[0].perctrigger = 1.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(CSERP_REFLECTION); //+
+		spells[1].info = SpellDataStorage.LookupEntry(CSERP_REFLECTION); //+
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = true;
 		spells[1].perctrigger = 0.5f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(CSERP_DEVOTION); //
+		spells[2].info = SpellDataStorage.LookupEntry(CSERP_DEVOTION); //
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
 		spells[2].perctrigger = 1.0f;
@@ -2574,7 +2574,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(CSHATT_ARMOR); //++
+		spells[0].info = SpellDataStorage.LookupEntry(CSHATT_ARMOR); //++
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 2.0f;
@@ -2680,7 +2680,7 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(CSTRID_SCREAM); //
+		spells[0].info = SpellDataStorage.LookupEntry(CSTRID_SCREAM); //
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].perctrigger = 2.0f;
@@ -2787,19 +2787,19 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(FGCARIB_WATER_BOLT); //++
+		spells[0].info = SpellDataStorage.LookupEntry(FGCARIB_WATER_BOLT); //++
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 2.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(FGCARIB_WHIRLWIND);//++
+		spells[1].info = SpellDataStorage.LookupEntry(FGCARIB_WHIRLWIND);//++
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = true;
 		spells[1].perctrigger = 1.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(FGCARIB_TIDAL); //
+		spells[2].info = SpellDataStorage.LookupEntry(FGCARIB_TIDAL); //
 		spells[2].targettype = TARGET_DESTINATION;
 		spells[2].instant = false;
 		spells[2].perctrigger = 2.0f;

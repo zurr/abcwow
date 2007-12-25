@@ -209,7 +209,7 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 		{
 			GetPlayer( )->addSpell(spellid);			
 	
-			SpellEntry *spellInfo = dbcSpell.LookupEntry( spellid );	 
+			SpellEntry *spellInfo = SpellDataStorage.LookupEntry( spellid );	 
 			
 			if(requested_rank > 0 )
 			{

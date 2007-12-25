@@ -178,7 +178,7 @@ void HonorHandler::OnPlayerKilledUnit(Player *pPlayer, Unit* pVictim)
                         if(pPlayer->GetZoneId() == 3518)
                         {
                             // Add Halaa Battle Token
-                            SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 33004 : 33005);
+                            SpellEntry * halaa_spell = SpellDataStorage.LookupEntry(gPlayer->GetTeam()? 33004 : 33005);
                             gPlayer->CastSpell(gPlayer, halaa_spell, true);
                         }
                     }
@@ -210,7 +210,7 @@ void HonorHandler::OnPlayerKilledUnit(Player *pPlayer, Unit* pVictim)
             if(pPlayer->GetZoneId() == 3518)
             {
                 // Add Halaa Battle Token
-                SpellEntry * halaa_spell = dbcSpell.LookupEntry(pPlayer->GetTeam()? 33004 : 33005);
+                SpellEntry * halaa_spell = SpellDataStorage.LookupEntry(pPlayer->GetTeam()? 33004 : 33005);
                 pPlayer->CastSpell(pPlayer, halaa_spell, true);
             }
         }

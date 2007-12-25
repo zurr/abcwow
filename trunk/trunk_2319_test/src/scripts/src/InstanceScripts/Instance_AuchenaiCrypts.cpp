@@ -36,19 +36,19 @@ public:
 			m_spellcheck[i] = false;
 		} 
 
-        spells[0].info = dbcSpell.LookupEntry(INHIBIT_MAGIC);
+        spells[0].info = SpellDataStorage.LookupEntry(INHIBIT_MAGIC);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
 		spells[0].perctrigger = 7.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(CARNIVOROUS_BITE);
+		spells[1].info = SpellDataStorage.LookupEntry(CARNIVOROUS_BITE);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;				
 		spells[1].perctrigger = 15.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(FOCUS_FIRE);
+		spells[2].info = SpellDataStorage.LookupEntry(FOCUS_FIRE);
 		spells[2].targettype = TARGET_DESTINATION;   // changed from attack as it wasn't working anyway
 		spells[2].instant = false;				
 		spells[2].perctrigger = 8.0f;
@@ -157,13 +157,13 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
-        spells[0].info = dbcSpell.LookupEntry(SOUL_SCREAM);
+        spells[0].info = SpellDataStorage.LookupEntry(SOUL_SCREAM);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(SOUL_CLEAVE);
+		spells[1].info = SpellDataStorage.LookupEntry(SOUL_CLEAVE);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
 		spells[1].perctrigger = 10.0f;
@@ -171,13 +171,13 @@ public:
 		spells[1].soundid = 10511;
 		spells[1].speech = "Stare into the darkness of your soul!"; // not sure if it's really "stand"
 
-		spells[2].info = dbcSpell.LookupEntry(SUMMON_AVATAR_OF_THE_MARTYR);
+		spells[2].info = SpellDataStorage.LookupEntry(SUMMON_AVATAR_OF_THE_MARTYR);
 		spells[2].targettype = TARGET_SELF; // ?
 		spells[2].instant = false;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(SUMMON_DARK_SIDE);
+		spells[3].info = SpellDataStorage.LookupEntry(SUMMON_DARK_SIDE);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = false;
 		spells[3].perctrigger = 0.0f;

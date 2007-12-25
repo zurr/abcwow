@@ -24,7 +24,6 @@
 SERVER_DECL DBCStorage<GemPropertyEntry> dbcGemProperty;
 SERVER_DECL DBCStorage<ItemSetEntry> dbcItemSet;
 SERVER_DECL DBCStorage<Lock> dbcLock;
-SERVER_DECL DBCStorage<SpellEntry> dbcSpell;
 SERVER_DECL DBCStorage<SpellDuration> dbcSpellDuration;
 SERVER_DECL DBCStorage<SpellRange> dbcSpellRange;
 SERVER_DECL DBCStorage<emoteentry> dbcEmoteEntry;
@@ -59,7 +58,6 @@ const char * skilllinespellFormat = "uuuxxxxxuuuuxxu";
 const char * EnchantEntrYFormat = "uuuuuuuuuuuuuxxxxxxxxxxxxxxxxxuuuu";
 const char * GemPropertyEntryFormat = "uuuuu";
 const char * skilllineentrYFormat = "uuuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-const char * spellentrYFormat = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuiuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffffffiiiiiiuuuuuuuuuuuuuuufffuuuuuuuuuuuufffuuuuuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxuuuuuuuuuuifffuuuuuu";
 const char * itemextendedcostFormat = "uuuuuuuuuuuuu";
 const char * talententryFormat = "uuuuuuuuuxxxxuxxuxxxx";
 const char * spellcasttimeFormat = "uuxx";
@@ -101,7 +99,6 @@ bool LoadDBCs()
 	LOAD_DBC("DBC/SpellItemEnchantment.dbc", EnchantEntrYFormat, true, dbcEnchant);
 	LOAD_DBC("DBC/GemProperties.dbc", GemPropertyEntryFormat, true, dbcGemProperty);
 	LOAD_DBC("DBC/SkillLine.dbc", skilllineentrYFormat, true, dbcSkillLine);
-	LOAD_DBC("DBC/Spell.dbc", spellentrYFormat, true, dbcSpell);
 	LOAD_DBC("DBC/ItemExtendedCost.dbc", itemextendedcostFormat, true, dbcItemExtendedCost);
 	LOAD_DBC("DBC/Talent.dbc", talententryFormat, true, dbcTalent);
 	LOAD_DBC("DBC/SpellCastTimes.dbc", spellcasttimeFormat, true, dbcSpellCastTime);

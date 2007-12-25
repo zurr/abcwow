@@ -27,19 +27,19 @@ public:
 
 		} 
 
-		spells[0].info = dbcSpell.LookupEntry(MORTALSTRIKE);
+		spells[0].info = SpellDataStorage.LookupEntry(MORTALSTRIKE);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].perctrigger = 9.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(CLEAVE);
+		spells[1].info = SpellDataStorage.LookupEntry(CLEAVE);
 		spells[1].targettype = TARGET_ATTACKING;	
 		spells[1].instant = true;
 		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(CHARGE);
+		spells[2].info = SpellDataStorage.LookupEntry(CHARGE);
 		spells[2].targettype = TARGET_ATTACKING; // Needs checking
 		spells[2].instant = true;
 		spells[2].perctrigger = 5.0f;
@@ -135,19 +135,19 @@ public:
 
 		} 
 
-		spells[0].info = dbcSpell.LookupEntry(PSYCHICSCREAM);
+		spells[0].info = SpellDataStorage.LookupEntry(PSYCHICSCREAM);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(RENEW);
+		spells[1].info = SpellDataStorage.LookupEntry(RENEW);
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = true;
 		spells[1].perctrigger = 6.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(HEAL_GRONN_PRIEST);
+		spells[2].info = SpellDataStorage.LookupEntry(HEAL_GRONN_PRIEST);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
 		spells[2].perctrigger = 5.0f;
@@ -250,26 +250,26 @@ public:
 
 		} 
 
-		spells[0].info = dbcSpell.LookupEntry(LIGHTNING_BOLT);
+		spells[0].info = SpellDataStorage.LookupEntry(LIGHTNING_BOLT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 12.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(GREATER_POLYMORPH);
+		spells[1].info = SpellDataStorage.LookupEntry(GREATER_POLYMORPH);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(ARCANE_EXPLOSION);
+		spells[2].info = SpellDataStorage.LookupEntry(ARCANE_EXPLOSION);
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
 		spells[2].perctrigger = 12.0f;
 		spells[2].attackstoptimer = 1000; 
 
 
-		spells[3].info = dbcSpell.LookupEntry(ARCANE_SHOCK);
+		spells[3].info = SpellDataStorage.LookupEntry(ARCANE_SHOCK);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].perctrigger = 8.0f;
@@ -372,19 +372,19 @@ public:
 
 		} 
 
-		spells[0].info = dbcSpell.LookupEntry(PRAYER_OF_HEALING);
+		spells[0].info = SpellDataStorage.LookupEntry(PRAYER_OF_HEALING);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(GREAT_POWER_WORD_SHIELD);
+		spells[1].info = SpellDataStorage.LookupEntry(GREAT_POWER_WORD_SHIELD);
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = true;
 		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(HEAL);
+		spells[2].info = SpellDataStorage.LookupEntry(HEAL);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
 		spells[2].perctrigger = 5.0f;
@@ -478,25 +478,25 @@ public:
 
 		} 
 
-		spells[0].info = dbcSpell.LookupEntry(DEATH_COIL);
+		spells[0].info = SpellDataStorage.LookupEntry(DEATH_COIL);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].perctrigger = 7.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(SUMMON_WILD_FEL_STALKER);
+		spells[1].info = SpellDataStorage.LookupEntry(SUMMON_WILD_FEL_STALKER);
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = false;
 		spells[1].perctrigger = 2.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(DARK_DECAY);
+		spells[2].info = SpellDataStorage.LookupEntry(DARK_DECAY);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].perctrigger = 10.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(HEAL_OLM);
+		spells[3].info = SpellDataStorage.LookupEntry(HEAL_OLM);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = false;
 		spells[3].perctrigger = 10.0f;
@@ -592,19 +592,19 @@ public:
 
 		} 
 
-		spells[0].info = dbcSpell.LookupEntry(GREAT_FIREBALL);
+		spells[0].info = SpellDataStorage.LookupEntry(GREAT_FIREBALL);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 20.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(BALST_WAVE);
+		spells[1].info = SpellDataStorage.LookupEntry(BALST_WAVE);
 		spells[1].targettype = TARGET_DESTINATION;
 		spells[1].instant = true;
 		spells[1].perctrigger = 15.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(FIRE_WARD);
+		spells[2].info = SpellDataStorage.LookupEntry(FIRE_WARD);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
 		spells[2].perctrigger = 0.0f;
@@ -715,25 +715,25 @@ public:
 
 		} 
 
-		spells[0].info = dbcSpell.LookupEntry(ARCINGSMASH);
+		spells[0].info = SpellDataStorage.LookupEntry(ARCINGSMASH);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].perctrigger = 15.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(MIGHTYBLOW);
+		spells[1].info = SpellDataStorage.LookupEntry(MIGHTYBLOW);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(WHIRLWIND);
+		spells[2].info = SpellDataStorage.LookupEntry(WHIRLWIND);
 		spells[2].targettype = TARGET_VARIOUS; // Should attk party member with second the highest aggro in melee range
 		spells[2].instant = true;
 		spells[2].perctrigger = 9.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(ENRAGE);
+		spells[3].info = SpellDataStorage.LookupEntry(ENRAGE);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
 		spells[3].perctrigger = 5.0f;
@@ -875,31 +875,31 @@ public:
 			m_spellcheck[i] = false;
 
 		} 
-		spells[0].info = dbcSpell.LookupEntry(GROWTH);
+		spells[0].info = SpellDataStorage.LookupEntry(GROWTH);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(CAVE_IN);
+		spells[1].info = SpellDataStorage.LookupEntry(CAVE_IN);
 		spells[1].targettype = TARGET_RANDOMDESTINATION;
 		spells[1].instant = true;
 		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(HURTFUL_STRIKE);
+		spells[2].info = SpellDataStorage.LookupEntry(HURTFUL_STRIKE);
 		spells[2].targettype = TARGET_ATTACKING; // Should attk party member with second the highest aggro in melee range
 		spells[2].instant = true;
 		spells[2].perctrigger = 3.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(REVERBERATION);
+		spells[3].info = SpellDataStorage.LookupEntry(REVERBERATION);
 		spells[3].targettype = TARGET_VARIOUS;
 		spells[3].instant = true;
 		spells[3].perctrigger = 3.0f;
 		spells[3].attackstoptimer = 1000;
 
-		spells[4].info = dbcSpell.LookupEntry(GROUND_SLAM);
+		spells[4].info = SpellDataStorage.LookupEntry(GROUND_SLAM);
 		spells[4].targettype = TARGET_DESTINATION;
 		spells[4].instant = false;
 		spells[4].perctrigger = 7.0f;
@@ -910,20 +910,20 @@ public:
 		//spells[4].soundid = 11356;
 
 		/* Dealer: disabled cause it does much more dmg than it should 
-		spells[5].info = dbcSpell.LookupEntry(SHATTER);
+		spells[5].info = SpellDataStorage.LookupEntry(SHATTER);
 		spells[5].targettype = TARGET_VARIOUS;
 		spells[5].instant = true;
 		spells[5].perctrigger = 6.0f;
 		spells[5].attackstoptimer = 1000;
 		*/
 
-		spells[5].info = dbcSpell.LookupEntry(STONED);
+		spells[5].info = SpellDataStorage.LookupEntry(STONED);
 		spells[5].targettype = TARGET_SELF;
 		spells[5].instant = true;
 		spells[5].perctrigger = 7.0f;
 		spells[5].attackstoptimer = 1000;
 
-		spells[6].info = dbcSpell.LookupEntry(GRONN_LORDS_GRASP);
+		spells[6].info = SpellDataStorage.LookupEntry(GRONN_LORDS_GRASP);
 		spells[6].targettype = TARGET_SELF; // <-- not sure to that (description tells it works like that, but should it really be casted on boss?)
 		spells[6].instant = true;
 		spells[6].perctrigger = 6.0f;

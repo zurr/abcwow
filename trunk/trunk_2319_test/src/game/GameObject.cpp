@@ -400,7 +400,7 @@ void GameObject::InitAI()
 	if(!spellid || spellid == 22247)
 		return;
 
-	SpellEntry *sp= dbcSpell.LookupEntry(spellid);
+	SpellEntry *sp= SpellDataStorage.LookupEntry(spellid);
 	if(!sp)
 	{
 		spell = NULL;

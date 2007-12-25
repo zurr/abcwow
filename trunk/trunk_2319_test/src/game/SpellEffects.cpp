@@ -265,7 +265,7 @@ void Spell::SpellEffectInstantKill(uint32 i)
 		//now caster gains this buff
 		if (spellid1 && spellid1 != 0)
 		{
-			u_caster->CastSpell(u_caster, dbcSpell.LookupEntry(spellid1), true);
+			u_caster->CastSpell(u_caster, SpellDataStorage.LookupEntry(spellid1), true);
 		}
 	}
 
@@ -538,7 +538,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 32594:
 		{
 			if(!pSpellId) return;
-			SpellEntry *spellInfo = dbcSpell.LookupEntry(pSpellId);
+			SpellEntry *spellInfo = SpellDataStorage.LookupEntry(pSpellId);
 			if(!spellInfo) return;
 			uint32 heal32 = CalculateEffect(i,u_caster);
 			unitTarget=u_caster; // Should heal caster :p
@@ -675,7 +675,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 27172: //Judgement of Command
 		{
 			uint32 SpellID = m_spellInfo->EffectBasePoints[i]+1;
-			Spell * spell=new Spell(m_caster,dbcSpell.LookupEntry(SpellID),true,NULL);
+			Spell * spell=new Spell(m_caster,SpellDataStorage.LookupEntry(SpellID),true,NULL);
 			SpellCastTargets targets;
 			targets.m_unitTarget = unitTarget->GetGUID();
 			spell->prepare(&targets);
@@ -802,7 +802,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 			SpellCastTargets tgt;
 			tgt.m_unitTarget = playerTarget->GetGUID();
-			SpellEntry * inf =dbcSpell.LookupEntry(23782);
+			SpellEntry * inf =SpellDataStorage.LookupEntry(23782);
 			Spell * spe = new Spell(u_caster,inf,true,NULL);
 			spe->prepare(&tgt);
 
@@ -813,7 +813,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				break;
 			SpellCastTargets tgt;
 			tgt.m_unitTarget = playerTarget->GetGUID();
-			SpellEntry * inf =dbcSpell.LookupEntry(12976);
+			SpellEntry * inf =SpellDataStorage.LookupEntry(12976);
 			Spell * spe = new Spell(u_caster,inf,true,NULL);
 			spe->prepare(&tgt);
 
@@ -1284,7 +1284,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 				if(unitTarget && unitTarget->IsPlayer() && pSpellId && unitTarget->GetHealthPct()<30)
 				{
 					//check for that 10 second cooldown
-					SpellEntry *spellInfo = dbcSpell.LookupEntry(pSpellId );
+					SpellEntry *spellInfo = SpellDataStorage.LookupEntry(pSpellId );
 					if(spellInfo)
 					{
 						//heal value is receivad by the level of current active talent :s
@@ -1759,8 +1759,8 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 		summon->SetInstanceID(m_caster->GetInstanceID());
 		summon->CreateAsSummon(m_spellInfo->EffectMiscValue[i], ci, NULL, p_caster, m_spellInfo, 1, 45000);
 		summon->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
-		summon->AddSpell(dbcSpell.LookupEntry(31707), true);
-		summon->AddSpell(dbcSpell.LookupEntry(33395), true);
+		summon->AddSpell(SpellDataStorage.LookupEntry(31707), true);
+		summon->AddSpell(SpellDataStorage.LookupEntry(33395), true);
        summon->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, p_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
        summon->_setFaction();
 	}
@@ -1851,14 +1851,14 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 	//paladin illumination
 	else if(m_spellInfo->Id==20272 && ProcedOnSpell)
 	{
-		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
+		SpellEntry *motherspell=SpellDataStorage.LookupEntry(pSpellId);
 		if(motherspell)
 			modEnergy = (motherspell->EffectBasePoints[0]+1)*ProcedOnSpell->manaCost/100;
 	}
 	//paladin - Spiritual Attunement 
 	else if(m_spellInfo->Id==31786 && ProcedOnSpell)
 	{
-		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
+		SpellEntry *motherspell=SpellDataStorage.LookupEntry(pSpellId);
 		if(motherspell)
 		{
 			//heal amount from procspell (we only proced on a heal spell)
@@ -1919,7 +1919,7 @@ void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
 	if(spellid == 0)
 		return;
 
-	SpellEntry *spInfo = dbcSpell.LookupEntry(spellid);
+	SpellEntry *spInfo = SpellDataStorage.LookupEntry(spellid);
 	if(!spInfo)
 		return;
 
@@ -2079,7 +2079,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 					return;
 
 			uint32 spellid = !gameObjTarget->GetInfo()->Unknown1 ? 23932 : gameObjTarget->GetInfo()->Unknown1;
-			SpellEntry*en=dbcSpell.LookupEntry(spellid);
+			SpellEntry*en=SpellDataStorage.LookupEntry(spellid);
 			Spell *sp=new Spell(p_caster,en,true,NULL);
 			SpellCastTargets tgt;
 			tgt.m_unitTarget=gameObjTarget->GetGUID();
@@ -2224,7 +2224,7 @@ void Spell::SpellEffectLearnSpell(uint32 i) // Learn Spell
 		uint32 spellToLearn = m_spellInfo->EffectTriggerSpell[i];
 		playerTarget->addSpell(spellToLearn);
 		//smth is wrong here, first we add this spell to player then we may cast it on player...
-		SpellEntry *spellinfo = dbcSpell.LookupEntry(spellToLearn);
+		SpellEntry *spellinfo = SpellDataStorage.LookupEntry(spellToLearn);
 		//remove specializations
 		switch(spellinfo->Id)
 		{
@@ -2335,12 +2335,12 @@ void Spell::SpellEffectLearnPetSpell(uint32 i)
 		if(pPet->IsSummon())
 		{
 			p_caster->AddSummonSpell(unitTarget->GetEntry(), m_spellInfo->EffectTriggerSpell[i]);
-			pPet->AddSpell(dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]), true);
+			pPet->AddSpell(SpellDataStorage.LookupEntry(m_spellInfo->EffectTriggerSpell[i]), true);
 		}
 		else
 		{
 			if(pPet->CanLearnSpellTP(m_spellInfo->EffectTriggerSpell[i]))
-				pPet->AddSpell(dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]), true);
+				pPet->AddSpell(SpellDataStorage.LookupEntry(m_spellInfo->EffectTriggerSpell[i]), true);
 			else
 			{
 				SendCastResult(SPELL_FAILED_TRAINING_POINTS);
@@ -2950,7 +2950,7 @@ void Spell::SpellEffectTriggerSpell(uint32 i) // Trigger Spell
 	if(!unitTarget)
 		return;
 
-	Spell*sp=new Spell(m_caster,dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]),true,NULL);
+	Spell*sp=new Spell(m_caster,SpellDataStorage.LookupEntry(m_spellInfo->EffectTriggerSpell[i]),true,NULL);
 	SpellCastTargets tgt(unitTarget->GetGUID());
 	sp->prepare(&tgt);
 
@@ -3398,7 +3398,7 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 		{
 			if(!unitTarget || !p_caster) return;
 
-			SpellEntry*en=dbcSpell.LookupEntry(p_caster->judgespell);
+			SpellEntry*en=SpellDataStorage.LookupEntry(p_caster->judgespell);
 			Spell *sp=new Spell(p_caster,en,true,NULL);
 			SpellCastTargets tgt;
 			tgt.m_unitTarget=unitTarget->GetGUID();
@@ -3937,7 +3937,7 @@ void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 	if(deltaLvl > 10) damage = damage >> 1;//divide by 2
 	if(deltaLvl > 20) damage = damage >> 1;
 	damage *= 1000;
-	SpellEntry *spellInfo = dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]);
+	SpellEntry *spellInfo = SpellDataStorage.LookupEntry(m_spellInfo->EffectTriggerSpell[i]);
 	spellInfo->EffectBasePoints[0] = damage - 1;
 	Spell *sp= new Spell((Object *)p_caster,spellInfo,true,NULL);
 	SpellCastTargets tgt;
@@ -4051,7 +4051,7 @@ void Spell::SpellEffectDestroyAllTotems(uint32 i)
 		if(p_caster->m_TotemSlots[x])
 		{
 			uint32 SpellID = p_caster->m_TotemSlots[x]->GetUInt32Value(UNIT_CREATED_BY_SPELL);
-			SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
+			SpellEntry * sp = SpellDataStorage.LookupEntry(SpellID);
 			if (!sp)
 				continue;
 
@@ -4102,7 +4102,7 @@ void Spell::SpellEffectSummonDemon(uint32 i)
 	//Create Enslave Aura if its inferno spell
 	if(m_spellInfo->Id == 1122)
 	{
-		SpellEntry *spellInfo = dbcSpell.LookupEntry(11726);
+		SpellEntry *spellInfo = SpellDataStorage.LookupEntry(11726);
 		
 		Spell *sp=new Spell((Object *)pPet,spellInfo,true,NULL);
 		SpellCastTargets tgt;
