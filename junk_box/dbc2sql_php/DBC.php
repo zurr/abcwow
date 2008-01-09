@@ -77,7 +77,7 @@ class DBC2SQL {
                 };
                 $query .= endl;
             };
-        $query .= tabl.'PRIMARY KEY (`id`)'.endl;
+        $query .= tabl.'PRIMARY KEY (`entry`)'.endl;
         $query .= ") COMMENT='Export of ".$this->dbcName.".dbc';";
         $this->output($query.endl.endl);
 		$this->output('INSERT INTO `dbc_'.strtolower($this->dbcName).'` VALUES '.endl);
