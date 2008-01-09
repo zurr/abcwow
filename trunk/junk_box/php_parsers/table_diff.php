@@ -1,8 +1,6 @@
 <?php
-
-ini_set('max_execution_time',0);
-mysql_connect("127.0.0.1:3306","root","xxx") or die(mysql_error());
-
+require_once('config.php');
+mysql_connect($db['addr'],$db['user'],$db['pass']) or die(mysql_error());
 
 $table_arr = array(
   array("ai_threattospellid","spell",0),

@@ -1,7 +1,7 @@
 <?php
-ini_set('max_execution_time',0);
-mysql_connect("127.0.0.1:3306","root","xxx") or die(mysql_error());
-mysql_select_db("antrix_worlds_abc") or die(mysql_error());
+require_once('config.php');
+mysql_connect($db['addr'],$db['user'],$db['pass']) or die(mysql_error());
+mysql_select_db($db['name']) or die(mysql_error());
 
 $heroic_instances = array(552, 554, 553, 540, 542, 543, 547, 546, 545, 560, 269, 556, 555, 557, 558);
 
