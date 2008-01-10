@@ -1,5 +1,5 @@
 # Preserving S1 and S2 cost as of 2.2
-# SELECT entry,name1,ItemExtendedCost FROM `items` WHERE name1 LIKE "Gladiator's%" OR name1 LIKE "Merciless Gladiator's%" AND quality=4;
+# SELECT entry,name1,ItemExtendedCost FROM `items` WHERE name1 LIKE "Gladiator's%" OR name1 LIKE "Merciless Gladiator's%" OR entry IN (33945,33942,28355,33936,28356,33948,33939,33951,28357,33076,33943,33946,33949,33077,33937,33078,33952,33940) AND quality=4;
 
 UPDATE `items` set ItemExtendedCost=42 WHERE entry=24544; # Gladiator's Plate Chestpiece
 UPDATE `items` set ItemExtendedCost=44 WHERE entry=24545; # Gladiator's Plate Helm
@@ -81,6 +81,9 @@ UPDATE `items` set ItemExtendedCost=153 WHERE entry=28333; # Gladiator's Chain S
 UPDATE `items` set ItemExtendedCost=154 WHERE entry=28334; # Gladiator's Chain Armor
 UPDATE `items` set ItemExtendedCost=155 WHERE entry=28335; # Gladiator's Chain Gauntlets
 UPDATE `items` set ItemExtendedCost=159 WHERE entry=28346; # Gladiator's Endgame
+UPDATE `items` set ItemExtendedCost=156 WHERE entry=28355; # Idol of Tenacity
+UPDATE `items` set ItemExtendedCost=157 WHERE entry=28356; # Libram of Justice
+UPDATE `items` set ItemExtendedCost=158 WHERE entry=28357; # Totem of the Third Wind
 UPDATE `items` set ItemExtendedCost=160 WHERE entry=28358; # Gladiator's Shield Wall
 UPDATE `items` set ItemExtendedCost=193 WHERE entry=28476; # Gladiator's Maul
 UPDATE `items` set ItemExtendedCost=1389 WHERE entry=30186; # Gladiator's Felweave Amice
@@ -221,6 +224,9 @@ UPDATE `items` set ItemExtendedCost=1995 WHERE entry=32961; # Merciless Gladiato
 UPDATE `items` set ItemExtendedCost=1996 WHERE entry=32962; # Merciless Gladiator's Touch of Defeat
 UPDATE `items` set ItemExtendedCost=1997 WHERE entry=32963; # Merciless Gladiator's Gavel
 UPDATE `items` set ItemExtendedCost=1998 WHERE entry=32964; # Merciless Gladiator's Salvation
+UPDATE `items` set ItemExtendedCost=2036 WHERE entry=33076; # Idol of Perseverence
+UPDATE `items` set ItemExtendedCost=2037 WHERE entry=33077; # Libram of Vengeance
+UPDATE `items` set ItemExtendedCost=2038 WHERE entry=33078; # Totem of the Fourth Wave
 UPDATE `items` set ItemExtendedCost=2043 WHERE entry=33309; # Merciless Gladiator's Redoubt
 UPDATE `items` set ItemExtendedCost=2044 WHERE entry=33313; # Merciless Gladiator's Barrier
 
