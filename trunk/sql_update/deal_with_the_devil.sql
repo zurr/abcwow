@@ -5,7 +5,7 @@ INSERT INTO npc_gossip_textid VALUES (66666, 66666);
 INSERT INTO npc_text VALUES (66666, 100, 'Spirits told me you are about to arive, come closer $N.', 'Spirits told me you are about to arive, come closer $N.', 0, 0, 0, 0, 0, 0, 0, 100, 'Spirits told me you are about to arive, come closer $N.', 'Spirits told me you are about to arive, come closer $N.', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '' , '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0);
 INSERT INTO creature_quest_starter VALUES (66666, 66666);
 INSERT INTO creature_quest_finisher VALUES (66666, 66666);
-INSERT INTO quests VALUES (66666, 0, 0, 8, 70, 70, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 'The Deal with The devil', " You look rather surpriced. Why? Did you expect bid bad demon standing in my place? Didn't they told you evil comes in all shapes and sizes?$b
+INSERT INTO quests VALUES (66666, 0, 0, 8, 70, 70, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 'The Deal with The devil', " You look rather surpriced. Why? Did you expect big bad demon standing in my place? Didn't they told you evil comes in all shapes and sizes?$b
  I know why you are here, let's talk busness. You want something from me, as I from you. You want to become a member of opposite faction, isn't that right?
 And I want ... <The evil One handles you the list> ...
 To gather those you will need help from your friends, Yesss, friends you about to betray.
