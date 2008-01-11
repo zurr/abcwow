@@ -1015,6 +1015,23 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell->NameHash != SPELL_HASH_SCORCH ) //Scorch
 									continue;
 							}break;
+						//mage - Combustion
+						case 28682:
+							{
+								if( !CastingSpell )
+									continue;//this should not ocur unless we made a fuckup somewhere
+								//only trigger effect for specified spells
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)
+									|| CastingSpell->School != SCHOOL_FIRE )
+									continue;
+								if( flag & PROC_ON_SPELL_CRIT_HIT )
+								{
+									itr2->procCharges++;
+									if( itr2->procCharges >= 6 ) //whatch that number cause it depends on original stack count !
+										RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION );
+									continue;
+								}
+							}break;
 						//priest - Misery
 						case 33200:
 						case 33199:
@@ -1363,7 +1380,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 		iter2=iter++;
 		if(iter2->second.count)
 		{
-			if((iter2->second.ProcFlag&flag))
+			if((iter2->second.ProcFlag & flag))
 			{
 				//Fixes for spells that dont lose charges when dmg is absorbd
 				if(iter2->second.ProcFlag==680&&dmg==0) continue;
@@ -1400,6 +1417,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						{
 							if(victim==this || isFriendly(this, victim))
 								continue;
+						}break;
+					case 28682: //remove charge only for spell crit
+						{
+							continue; //this is useless, on 1 hand we are increasing this and the other hand we are decreasing it...that results in no action
 						}break;
 					}
 				}
@@ -2362,6 +2383,10 @@ else
 				{
 					hit_status |= HITSTATUS_CRICTICAL;
 					int32 dmgbonus = dmg.full_damage;
+					//sLog.outString( "DEBUG: Critical Strike! Full_damage: %u" , dmg.full_damage );
+					
+					// Supalosa - who took out this line? :P
+					dmg.full_damage += dmgbonus;
 					if(ability && ability->SpellGroupType)
 					{
 						SM_FIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
@@ -2377,7 +2402,7 @@ else
 						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritRangedDamageTakenPctMod[dmg_school]) / 100;
 					else 
 						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritMeleeDamageTakenPctMod[dmg_school]) / 100;
-
+					//sLog.outString( "DEBUG: After CritMeleeDamageTakenPctMod: %u" , dmg.full_damage );
 					if(IsPlayer())
 					{
 						if(damage_type != RANGED)
@@ -2387,6 +2412,7 @@ else
 						}
 						if(!pVictim->IsPlayer())
 							dmg.full_damage += float2int32(dmg.full_damage*static_cast<Player*>(this)->IncreaseCricticalByTypePCT[((Creature*)pVictim)->GetCreatureName() ? ((Creature*)pVictim)->GetCreatureName()->Type : 0]);
+					//sLog.outString( "DEBUG: After IncreaseCricticalByTypePCT: %u" , dmg.full_damage );
 					}
 					if(pVictim->IsPlayer())
 					{
@@ -2401,6 +2427,7 @@ else
 						if( dmg_reduction_pct > 1.0f )
 							dmg_reduction_pct = 1.0f; //we cannot resist more then he is criticalling us, there is no point of the critical then :P
 						dmg.full_damage = float2int32( dmg.full_damage - dmg.full_damage*dmg_reduction_pct );
+						//sLog.outString( "DEBUG: After Resilience check: %u" , dmg.full_damage );
 					}
 					
 					pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
