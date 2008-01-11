@@ -465,7 +465,7 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 
 void LootMgr::FillCreatureLoot(Loot * loot,uint32 loot_id, bool heroic)
 {
-	loot->items.clear ();
+	loot->items.clear();
 	loot->gold =0;
 	
 	LootStore::iterator tab =CreatureLoot.find(loot_id);
