@@ -118,71 +118,31 @@ void AddItemFromDisenchant(ItemPrototype *proto,Player*owner)
 	}
 }
 
-/*
-Dusts usually are extracted from armors, but also occasionally found from weapons. 
-
-Strange Dust - Disenchanted from level 1 to 20 items [10940]
-Soul Dust - Disenchanted from level 21 to 30 items [11083]
-Vision Dust - Disenchanted from level 31 to 40 items [11137]
-Dream Dust - Disenchanted from level 41 to 50 items [11176]
-Illusion Dust - Disenchanted from level 51 to 60 items [16204]
-
-
-Essences usually are extracted from weapons, but also occasionally found from armors. 
-
-Lesser Magic Essence - Disenchanted from level 1 to 10 items [10938]
-Greater Magic Essence - Disenchanted from level 11 to 15 items [10939]
-Lesser Astral Essence - Disenchanted from level 16 to 20 items [10998]
-Greater Astral Essence - Disenchanted from level 21 to 25 items [11082]
-Lesser Mystic Essence - Disenchanted from level 26 to 30 items [11134]
-Greater Mystic Essence - Disenchanted from level 31 to 35 items [11135]
-Lesser Nether Essence - Disenchanted from level 36 to 40 items [11174]
-Greater Nether Essence - Disenchanted from level 41 to 45 items [11175]
-Lesser Eternal Essence - Disenchanted from level 46 to 50 items [16202]
-Greater Eternal Essence - Disenchanted from level 51 to 60 items [16203]
-
-
-Shards are normally disenchanted from blue or better items, but have a small chance of coming from green items. 
-
-Small Glimmering Shard - Disenchanted from level 1 to 20 items [10978]
-Large Glimmering Shard - Disenchanted from level 21 to 25 items [11084]
-Small Glowing Shard - Disenchanted from level 26 to 30 items [11138]
-Large Glowing Shard - Disenchanted from level 31 to 35 items [11139]
-Small Radiant Shard - Disenchanted from level 36 to 40 items [11177]
-Large Radiant Shard - Disenchanted from level 41 to 45 items [11178]
-Small Brilliant Shard - Disenchanted from level 46 to 50 items [14343]
-Large Brilliant Shard - Disenchanted from level 51 to 60 items [14344]
-
-Nexus Crystals are obtained by disenchanting Epic (purple) items, and sometimes come from Rare (blue) items also. 
-
-Nexus Crystal - Disenchanted from level 51-60 items [20725]
-*/
 
 void AddItemFromProspecting(uint32 loot_id,Player*owner)
 {
 	LootStore::iterator tab =lootmgr.ProspectingLoot.find(loot_id);
 	if( lootmgr.ProspectingLoot.end()==tab)
 		return;
-	StoreLootList *list=&(tab->second);
 
-	for(uint32 x =0,pass=0; x<list->count; x++,pass++)
+	StoreLootList *list = &(tab->second);
+
+	uint32 count;
+	for( uint32 x = 0; x < list->count; x++ )
 	{
-		if(list->items[x].item.itemproto)// this check is needed until loot DB is fixed
+		if( list->items[x].item.itemproto )
 		{
-			if(Rand(list->items[x].chance)) 
-		    {
-				ItemPrototype *itemproto = list->items[x].item.itemproto;
-				if(!itemproto)
-					return;
-				uint32 count = 1;
-				if(list->count != (x - 1))
-				{
-					for(uint32 z = (x + 1); z < list->count; z++)
-						if(itemproto->MaxCount && (count == itemproto->MaxCount))
-							break;
-						else if(list->items[x].item.itemproto == list->items[z].item.itemproto && Rand(list->items[x].chance))
-							count++;
-				}
+			float chance = list->items[x].chance;
+			if(chance == 0.0f) continue;
+			
+			ItemPrototype *itemproto = list->items[x].item.itemproto;
+			if( Rand( chance * sWorld.getRate( RATE_DROP0 + itemproto->Quality ) ) )
+			{
+				if( list->items[x].mincount == list->items[x].maxcount )
+					count = list->items[x].maxcount;
+				else
+					count = RandomUInt(list->items[x].maxcount - list->items[x].mincount) + list->items[x].mincount;
+
 				Item *add;
 				SlotResult slotresult;
 				add = owner->GetItemInterface()->FindItemLessMax(list->items[x].item.itemproto->ItemId, count, false);
@@ -205,5 +165,5 @@ void AddItemFromProspecting(uint32 loot_id,Player*owner)
 				}
 			}
 		}
- 	}
+	}
 }
