@@ -1146,7 +1146,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				float summaryPCTmod = 1.0f;
 				if( m_target->IsPlayer() )//resilience
 				{
-					float dmg_reduction_pct = static_cast<Player*>(m_target)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 150.0f;
+					float dmg_reduction_pct = static_cast<Player*>(m_target)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
 					if( dmg_reduction_pct > 1.0f )
 						dmg_reduction_pct = 1.0f;
 					summaryPCTmod -= dmg_reduction_pct;
@@ -2158,19 +2158,19 @@ void Aura::SpellAuraModCharm(bool apply)
 
 		target->SetEnslaveCount(target->GetEnslaveCount() + 1);
 
-		WorldPacket data(SMSG_PET_SPELLS, 500);
-		data << target->GetGUID();
-		data << uint32(0) << uint32(0x1000);
-		data << uint32(PET_SPELL_ATTACK);
-		data << uint32(PET_SPELL_FOLLOW);
-		data << uint32(PET_SPELL_STAY);
-		for(int i = 0; i < 4; i++)
-			data << uint32(0);
-		data << uint32(PET_SPELL_AGRESSIVE);
-		data << uint32(PET_SPELL_DEFENSIVE);
-		data << uint32(PET_SPELL_PASSIVE);
 		if( caster->GetSession() ) // crashfix
 		{
+			WorldPacket data(SMSG_PET_SPELLS, 500);
+			data << target->GetGUID();
+			data << uint32(0) << uint32(0x1000);
+			data << uint32(PET_SPELL_ATTACK);
+			data << uint32(PET_SPELL_FOLLOW);
+			data << uint32(PET_SPELL_STAY);
+			for(int i = 0; i < 4; i++)
+				data << uint32(0);
+			data << uint32(PET_SPELL_AGRESSIVE);
+			data << uint32(PET_SPELL_DEFENSIVE);
+			data << uint32(PET_SPELL_PASSIVE);
 			caster->GetSession()->SendPacket(&data);
 			target->SetEnslaveSpell(m_spellProto->Id);
 		}
@@ -2187,10 +2187,13 @@ void Aura::SpellAuraModCharm(bool apply)
 		m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
 		caster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
 
-		WorldPacket data(SMSG_PET_SPELLS, 8);
-		data << uint64(0);
-		caster->GetSession()->SendPacket(&data);
-		target->SetEnslaveSpell(0);
+		if( caster->GetSession() ) // crashfix
+		{
+			WorldPacket data(SMSG_PET_SPELLS, 8);
+			data << uint64(0);
+			caster->GetSession()->SendPacket(&data);
+			target->SetEnslaveSpell(0);
+		}
 	}
 }
 
@@ -3875,7 +3878,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 				Item * itm = ((Player*)m_target)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
 				if(itm)
 					weapspeed = float(itm->GetProto()->Delay);
-				pts.procChance = FL2UINT( float(7.0f / (60.0f / weapspeed)) );
+				pts.procChance = FL2UINT( float(7.0f / (600.0f / weapspeed)) );
 				if(pts.procChance >= 50)
 					pts.procChance = 50;
 			}

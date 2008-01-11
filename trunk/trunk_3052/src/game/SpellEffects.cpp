@@ -572,7 +572,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 28730: //Arcane Torrent (Mana)
 		{
 			// for each mana tap, gives you (2.17*level+9.136) mana
-			if(!unitTarget) return;
+			if( !unitTarget || !p_caster) 
+				return;
 
 			uint32 count = 0;
 			for(uint32 x = 0; x < MAX_AURAS; ++x)
@@ -1169,13 +1170,13 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 	{
 		/* this is rather tricky actually. we have to calculate the orientation of the creature/player, and then calculate a little bit of distance behind that. */
 		float ang;
-		if( unitTarget == m_caster )
+		if(unitTarget == m_caster)
 		{
 			/* try to get a selection */
-			if( (unitTarget == NULL ) || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f))
+			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+			if(unitTarget == NULL || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f))
 				return;
 		}
-
 		if( unitTarget->GetTypeId() == TYPEID_UNIT )
 		{
 			if( unitTarget->GetUInt64Value( UNIT_FIELD_TARGET ) != 0 )
@@ -1204,8 +1205,7 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 		float new_y = unitTarget->GetPositionY() - (shadowstep_distance * sinf(ang));
 		
 		/* Send a movement packet to "charge" at this target. Similar to warrior charge. */
-		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, (unitTarget->GetPositionZ() + 0.1f), unitTarget->GetOrientation()));
-		
+		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, (unitTarget->GetPositionZ() + 0.15f), unitTarget->GetOrientation()));
 		return;
 	}
 
@@ -4606,15 +4606,15 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		damage = damage*sunder_count;
 	}
 
+	//hemorage
+	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
+		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
+
 	if( m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
 	{
 		add_damage = (uint32)(damage * 1.5);
 		return;
 	}
-
-	//hemorage
-	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
-		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
 
 	//rogue - mutilate ads dmg if target is poisoned
 	if(	m_spellInfo->NameHash == SPELL_HASH_MUTILATE && unitTarget->IsPoisoned() )
