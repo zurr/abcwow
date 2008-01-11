@@ -7433,7 +7433,6 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 		m_session->SendPacket(&msg);
 		return false;
 	}
-
 	_Relocate(MapID, vec, true, instance, InstanceID);
 	return true;
 #endif
