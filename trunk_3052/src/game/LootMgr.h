@@ -146,6 +146,7 @@ public:
 	LootStore	GOLoot;
 	LootStore	ItemLoot;
 	LootStore	ProspectingLoot;
+	LootStore	DisenchantingLoot;
 	LootStore	PickpocketingLoot;
 	std::map<uint32, std::set<uint32> > quest_loot_go;
 
