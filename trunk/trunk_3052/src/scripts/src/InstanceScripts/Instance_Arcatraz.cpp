@@ -264,7 +264,7 @@ protected:
 };
 
 // Arcatraz WarderAI
-
+// SPELL CASTING TO REWRITE (spell ids are correct)
 #define CN_ARCATRAZ_WARDER 20859
 
 #define ARCANE_SHOT 36609
@@ -315,8 +315,6 @@ public:
 		spells[3].cooldown = -1;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -441,7 +439,7 @@ protected:
 };
 
 // Blackwing DrakonaarAI
-
+// SIMPLE_TELEPORT should be used when creature is summoned during Skyriss encounter
 #define CN_BLACKWING_DRAKONAAR 20911
 
 #define SIMPLE_TELEPORT 12980
@@ -463,6 +461,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SIMPLE_TELEPORT);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
@@ -490,14 +489,12 @@ public:
 		spells[3].cooldown = -1;
 		spells[3].perctrigger = 6.0f;
 		spells[3].attackstoptimer = 1000;
-
     }
     
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -506,22 +503,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
 		CastTime();
-        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-        RemoveAIUpdateEvent();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -617,9 +610,9 @@ public:
     }
     
     void OnCombatStart(Unit* mTarget)
-    {
-		CastTime();
+    {		
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -628,22 +621,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -750,9 +739,9 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
+		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 		MarkApplied = 0;
 		CastTime();
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
 	void CastTime()
@@ -761,24 +750,20 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		MarkApplied = 0;
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		MarkApplied = 0;
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		MarkApplied = 0;
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -848,7 +833,7 @@ protected:
 };
 
 // Defender CorpseAI
-
+// Seems to be ok, but not sure if I won't mess with this script a bit
 #define CN_DEFENDER_CORPSE 21303
 
 #define CORPSE_BURST 36593
@@ -887,10 +872,10 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->CastSpell(_unit, spells[1].info, spells[1].instant);
-		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
+		_unit->CastSpell(_unit, spells[1].info, spells[1].instant);
+		CastTime();
     }
 
 	void CastTime()
@@ -899,22 +884,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1004,8 +985,8 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -1014,16 +995,12 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
@@ -1092,7 +1069,7 @@ protected:
 
 #define CN_ENTROPIC_EYE 20868
 
-#define WAVERING_WILL 36699	// not sure if this is right one (I mean spell, not ID)
+#define WAVERING_WILL 36699			// not sure if this is right one (I mean spell, not ID)
 #define PIERCING_SHADOW 36698		// this "smaller" list must be rechecked =S
 #define HEX 36700
 #define TANTACLE_CLEAVE_EYE 36664
@@ -1160,8 +1137,8 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -1170,22 +1147,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1293,8 +1266,8 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -1303,22 +1276,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1394,7 +1363,7 @@ public:
 
     EredarSoulEaterAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1423,8 +1392,8 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -1433,22 +1402,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1548,8 +1513,8 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -1558,22 +1523,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1678,8 +1639,8 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -1688,22 +1649,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1809,8 +1766,8 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		CastTime();
     }
 
 	void CastTime()
@@ -1819,22 +1776,18 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+		CastTime();
     }
 
     void OnDied(Unit * mKiller)
     {
+		RemoveAIUpdateEvent();
 		CastTime();
-       RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1942,10 +1895,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -2017,7 +1966,7 @@ protected:
 };
 
 // Greater Fire ElementalAI
-
+// FIX ME: Mark of death
 #define CN_GREATER_FIRE_ELEMENTAL 15438
 
 #define FIRE_SHIELD_GFE 13376
@@ -2082,10 +2031,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -2158,7 +2103,7 @@ protected:
 };
 
 // IronjawAI	// spells verification, coz some of those are for sure pet spells? :| :| :|
-
+// Comment says all ---^
 #define CN_IRONJAW 18670
 // I couldn't force Ironjaw to cast spells with "?"
 #define FURIOUS_HOWL 24597	// ?
@@ -2270,10 +2215,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -2345,7 +2286,7 @@ protected:
 };
 
 // Millhouse ManastormAI
-
+// Probably should be rewritten and is part of Skyriss encounter 
 #define CN_MILLHOUSE_MANASTORM 20977
 
 #define SIMPLE_TELEPORT_MM 12980
@@ -2468,10 +2409,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {/*
 		CastTime();
@@ -2550,9 +2487,9 @@ protected:
 };
 
 // Negaton ScreamerAI	// this one needs some more work for dmg taken dmg type, but I don't have time for it...
-
+// Add missing function ------------------------------ look below
 #define CN_NEGATON_SCREAMER 20875		// I need to add missing about 15 mobs (w00t? More? =() and to this script
-										// OnDamageTaken function with check of spell dmg type and correc spell casts in diff cases
+										// OnDamageTaken function with check of spell dmg type and correct spell casts in diff cases
 #define PSYCHIC_SCREAM 13704
 #define DAMAGE_REDUCTION_SHADOW 34338
 #define DAMAGE_REDUCTION_FROST 34334
@@ -2738,10 +2675,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -2832,13 +2765,13 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SUMMON_NEGATION_FIELD);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = false;
 		spells[0].cooldown = -1;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -2852,10 +2785,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -2928,7 +2857,7 @@ protected:
 };
 
 // Negaton FieldAI
-
+// Not sure if shouldn't be rewritten.
 #define CN_NEGATON_FIELD 21414
 
 #define NEGATION_FIELD 36728 // DBC: 36728, 36729;
@@ -2968,10 +2897,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -3044,7 +2969,7 @@ protected:
 };
 
 // Phase-HunterAI
-
+// This unit is part of Skyriss encounter and it's teleport skill should be used during that encounter
 #define CN_PHASE_HUNTER 20906
 
 #define SIMPLE_TELEPORT_PH 12980
@@ -3097,7 +3022,6 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
 		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
@@ -3107,10 +3031,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -3230,10 +3150,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -3362,10 +3278,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -3437,7 +3349,7 @@ protected:
 };
 
 // Sulfuron Magma-ThrowerAI
-
+// Part of Skyriss encounter (so same thing to teleport stuff)
 #define CN_SULFURON_MAGMA_THROWER 20909
 
 #define SIMPLE_TELEPORT_SMT 12980
@@ -3459,6 +3371,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SIMPLE_TELEPORT_SMT);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
@@ -3491,7 +3404,6 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
 		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
@@ -3501,10 +3413,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -3599,6 +3507,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SHADOW_BOLT_ST);
 		spells[0].targettype = TARGET_DESTINATION;	// not sure DESTINATION or ATTACKING
 		spells[0].instant = false;
@@ -3640,10 +3549,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -3738,6 +3643,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SIGHTLESS_EYE);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = false;
@@ -3780,10 +3686,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -3878,6 +3780,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SLIME_SPRAY);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
@@ -3912,10 +3815,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -4010,6 +3909,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(CHASTISE);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
@@ -4062,9 +3962,9 @@ public:
 
     void OnCombatStop(Unit *mTarget)
     {
+		CastTime();
 		FIRST_ATTACK = 1;
 		_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
@@ -4073,9 +3973,8 @@ public:
     void OnDied(Unit * mKiller)
     {
 		FIRST_ATTACK = 1;
-		_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -4186,10 +4085,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -4318,10 +4213,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -4441,10 +4332,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -4516,12 +4403,12 @@ protected:
 };
 
 // Unchained DoombringerAI
-
+// TO DO: Look at charge note
 #define CN_UNCHAINED_DOOMBRINGER 20900	
 
 #define AGONIZING_ARMOR 36836
 #define WAR_STOMP 36835
-#define BERSEKER_CHARGE 36833	// should charge the farthest enemy
+#define BERSEKER_CHARGE 36833	// should charge the furthest enemy
 
 class UnchainedDoombringerAI : public CreatureAIScript
 {
@@ -4571,10 +4458,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -4698,10 +4581,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -4773,7 +4652,7 @@ protected:
 };
 
 // Sargeron ArcherAI
-
+// Probably to rewrite
 #define CN_SARGERON_ARCHER 20901
 
 #define FROST_ARROW	35964 //DBC: 35965, 35964;
@@ -4852,10 +4731,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -4989,7 +4864,7 @@ protected:
 /*****************************/
 
 // Zereketh the UnboundAI
-
+// TO DO: Void Zone
 #define CN_ZEREKETH_THE_UNBOUND 20870	
 
 #define SEED_OF_CORRUPTION 36123	//32865, 36123
@@ -5081,7 +4956,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Void... beckons.");
 		_unit->PlaySoundToSet(11255);
     }
@@ -5174,7 +5049,6 @@ public:
 
     DalliahTheDoomsayerAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-
 		nrspells = 4;
 		for(int i=0;i<nrspells;i++)
 		{
@@ -5184,28 +5058,28 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(GIFT_OF_THE_DOOMSAYER);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
-		spells[0].cooldown = 10;
+		spells[0].cooldown = -1;
 		spells[0].perctrigger = 8.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(WHIRLWIND);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = false;
-		spells[1].cooldown = 10;
+		spells[1].cooldown = -1;
 		spells[1].perctrigger = 15.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(HEAL);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
-		spells[2].cooldown = 10;
+		spells[2].cooldown = -1;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(SHADOW_WAVE);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = false;
-		spells[3].cooldown = 10;
+		spells[3].cooldown = -1;
 		spells[3].perctrigger = 8.0f;
 		spells[3].attackstoptimer = 1000;
 
@@ -5256,7 +5130,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Now I'm really angry...");	// verification needed
 		_unit->PlaySoundToSet(11093);
     }
@@ -5366,7 +5240,7 @@ protected:
 };
 
 // Wrath-Scryer SoccothratesAI
-
+// TO DO: Add moar sounds
 #define CN_WRATH_SCRYER_SOCCOTHRATES 20886	
 
 #define IMMOLATION 35959 // DBC: 36051, 35959
@@ -5387,7 +5261,6 @@ public:
 
     WrathScryerSoccothratesAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-
 		nrspells = 5;
 		for(int i=0;i<nrspells;i++)
 		{
@@ -5397,38 +5270,37 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(IMMOLATION);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
-		spells[0].cooldown = 10;
+		spells[0].cooldown = -1;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(FELFIRE_SHOCK);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
-		spells[1].cooldown = 10;
+		spells[1].cooldown = -1;
 		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(FELFIRE_LINE_UP);	// ?
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
-		spells[2].cooldown = 10;
+		spells[2].cooldown = -1;
 		spells[2].perctrigger = 8.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(KNOCK_AWAY);
 		spells[3].targettype = TARGET_DESTINATION;	// changed from VARIOUS to prevent crashes and gives it at least half working spell
 		spells[3].instant = true;
-		spells[3].cooldown = 10;
+		spells[3].cooldown = -1;
 		spells[3].perctrigger = 6.0f;
 		spells[3].attackstoptimer = 1000;
 
 		spells[4].info = dbcSpell.LookupEntry(CHARGE);
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = true;
-		spells[4].cooldown = 10;
+		spells[4].cooldown = -1;
 		spells[4].perctrigger = 4.0f;
 		spells[4].attackstoptimer = 1000;
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -5476,7 +5348,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "<missing_text>");	// verification needed
 		_unit->PlaySoundToSet(11243);
     }
@@ -5538,7 +5410,7 @@ protected:
 };
 
 // Harbinger SkyrissAI
-
+// Full event must be scripted for this gay.
 #define CN_HARBRINGER_SKYRISS 20912	
 
 #define MIND_REND 36924 // DBC: 36859, 36924;
@@ -5914,7 +5786,6 @@ protected:
 */
 void SetupArcatraz(ScriptMgr * mgr)
 {
-
 	mgr->register_creature_script(CN_ARCATRAZ_DEFENDER, &ArcatrazDefenderAI::Create);
 	mgr->register_creature_script(CN_ARCATRAZ_SENTINEL, &ArcatrazSentinelAI::Create);
 	mgr->register_creature_script(CN_ARCATRAZ_WARDER, &ArcatrazWarderAI::Create);
@@ -5961,5 +5832,3 @@ void SetupArcatraz(ScriptMgr * mgr)
 
 // Note: Don't have infos about: Akkiris Lightning-Waker, Nathan, Third Fragment Guardian, Udalo, Whisper and 
 // Twilight Drakonaar; some of those mobs aren't aggresive.
-//
-

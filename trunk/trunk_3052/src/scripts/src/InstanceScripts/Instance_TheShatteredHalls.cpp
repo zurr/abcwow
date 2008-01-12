@@ -10,18 +10,18 @@
 #define CN_FEL_ORC_CONVERT 17083
 
 #define HEMORRHAGE 30478
-#define DAZED_CONVERT 1604
+//#define DAZED_CONVERT 1604
 
 class FELORCCONVERTAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(FELORCCONVERTAI);
-	SP_AI_Spell spells[2];
-	bool m_spellcheck[2];
+	SP_AI_Spell spells[1];
+	bool m_spellcheck[1];
 
     FELORCCONVERTAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 2;
+		nrspells = 1;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -32,14 +32,14 @@ public:
 		spells[0].cooldown = 25;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
-
+/*
         spells[1].info = dbcSpell.LookupEntry(DAZED_CONVERT);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -134,18 +134,18 @@ protected:
 
 #define BLOODTHIRST 30474 // 30475
 #define ENRAGE_HEATHEN 30485	// those should be correct, but still not sure
-#define DAZED_HEATHEN 1604
+//#define DAZED_HEATHEN 1604
 
 class SHATTEREDHANDHEATHENAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHATTEREDHANDHEATHENAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     SHATTEREDHANDHEATHENAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -163,14 +163,14 @@ public:
 		spells[1].cooldown = 70;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_HEATHEN);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -267,18 +267,18 @@ protected:
 #define AURA_OF_DISCIPLINE 30472
 #define PUMMEL 15615	// should be all good (Idk if those are all spells [summon/spawn spell?])
 #define ENRAGE 30485
-#define DAZED_HAND_LEGIONNAIRE 1604
+//#define DAZED_HAND_LEGIONNAIRE 1604
 
 class SHATTEREDHANDLEGIONNAIREAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHATTEREDHANDLEGIONNAIREAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     SHATTEREDHANDLEGIONNAIREAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -303,14 +303,14 @@ public:
 		spells[2].cooldown = 70;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+/*
         spells[3].info = dbcSpell.LookupEntry(DAZED_HAND_LEGIONNAIRE);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 15;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -407,18 +407,18 @@ protected:
 #define SLICE_AND_DICE 30470
 #define ENRAGE_SAVAGE 30485
 #define DEATHBLOW 36023
-#define DAZED_SAVAGE 1604
+//#define DAZED_SAVAGE 1604
 
 class SHATTEREDHANDSAVAGEAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHATTEREDHANDSAVAGEAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     SHATTEREDHANDSAVAGEAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -443,14 +443,14 @@ public:
 		spells[2].cooldown = 25;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+/*
         spells[3].info = dbcSpell.LookupEntry(DAZED_SAVAGE);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 15;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -549,7 +549,7 @@ protected:
 #define POWER_WORD_SHIELD 35944 // 41373, 29408, 36052, 35944, 32595
 #define MIND_BLAST 31516 //26048 //38259 // ofc not sure (and this one can be really overpowered)
 #define RESIST_SHADOW 30479	// not sure to those both
-#define DAZED_ACOLYTE 1604 // not sure if it uses it
+//#define DAZED_ACOLYTE 1604 // not sure if it uses it
 //#define PRAYER_OF_HEALING 15585	// crashes server
 //#define 105 resist shadow buff?
 // Self Visual - Sleep Until Cancelled (DND) 16093 ?
@@ -557,12 +557,12 @@ class SHADOWMOONACOLYTEAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHADOWMOONACOLYTEAI);
-	SP_AI_Spell spells[5];
-	bool m_spellcheck[5];
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
 
     SHADOWMOONACOLYTEAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 5;
+		nrspells = 4;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -594,14 +594,14 @@ public:
 		spells[3].cooldown = 65;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+/*
         spells[4].info = dbcSpell.LookupEntry(DAZED_ACOLYTE);
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = true;
 		spells[4].cooldown = 15;
 		spells[4].perctrigger = 0.0f;
 		spells[4].attackstoptimer = 1000;
-/*
+
         spells[5].info = dbcSpell.LookupEntry(PRAYER_OF_HEALING);
 		spells[5].targettype = TARGET_VARIOUS;
 		spells[5].instant = false;
@@ -1216,18 +1216,18 @@ protected:
 #define CLEAVE_REAVER 15754 //34995 // no idea if this is good id
 #define UPPERCUT 30471 // 32055, 34014, 34996, 39069, 41388, 30471
 #define ENRAGE 30485 // 34624, 37023, 37648, 38046, 41305, 34670, 34970, 34971, 36992, 38947, 41447 and many others =/
-#define DAZED_HAND_REAVER 1604 // not sure if it uses it
+//#define DAZED_HAND_REAVER 1604 // not sure if it uses it
 
 class SHATTEREDHANDREAVERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHATTEREDHANDREAVERAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     SHATTEREDHANDREAVERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1252,14 +1252,14 @@ public:
 		spells[2].cooldown = 70;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+/*
         spells[3].info = dbcSpell.LookupEntry(DAZED_HAND_REAVER);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 15;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1480,18 +1480,18 @@ protected:
 #define IMMOLATION_ARROW 35932 // same here (Idk if it uses it for sure)
 #define SHOT 15620 // must find way to force mob to cast this only when dist > xx
 #define INCENDIARY_SHOT 30481 // not sure to these
-#define DAZED_SHARPSHOOTER 1604
+//#define DAZED_SHARPSHOOTER 1604
 
 class SHATTEREDHANDSHARPSHOOTERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHATTEREDHANDSHARPSHOOTERAI);
-	SP_AI_Spell spells[5];
-	bool m_spellcheck[5];
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
 
     SHATTEREDHANDSHARPSHOOTERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 5;
+		nrspells = 4;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1523,14 +1523,14 @@ public:
 		spells[3].cooldown = 35;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+/*
         spells[4].info = dbcSpell.LookupEntry(DAZED_SHARPSHOOTER);
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = false;
 		spells[4].cooldown = 15;
 		spells[4].perctrigger = 0.0f;
 		spells[4].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1625,7 +1625,7 @@ protected:
 
 #define CURSE_OF_THE_SHATTERED_HAND 36020 //36020
 #define KICK 36033 // no idea about these spells
-#define DAZED_HAND_BRAWLER 1604
+//#define DAZED_HAND_BRAWLER 1604
 #define TRASH 3391 // W00T? doesn't work (maybe lack of core support?)
 // Self Visual - Sleep Until Cancelled (DND) 16093 ?
 
@@ -1633,12 +1633,12 @@ class SHATTEREDHANDBRAWLERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHATTEREDHANDBRAWLERAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     SHATTEREDHANDBRAWLERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1656,20 +1656,20 @@ public:
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_HAND_BRAWLER);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
-        spells[3].info = dbcSpell.LookupEntry(TRASH);
-		spells[3].targettype = TARGET_SELF;
-		spells[3].instant = true;
-		spells[3].cooldown = 20;
-		spells[3].perctrigger = 0.0f;
-		spells[3].attackstoptimer = 1000;
+*/
+        spells[2].info = dbcSpell.LookupEntry(TRASH);
+		spells[2].targettype = TARGET_SELF;
+		spells[2].instant = true;
+		spells[2].cooldown = 20;
+		spells[2].perctrigger = 0.0f;
+		spells[2].attackstoptimer = 1000;
 
     }
     

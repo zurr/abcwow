@@ -1,9 +1,6 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
-#ifdef WIN32
-#pragma warning(disable:4305)		// warning C4305: 'argument' : truncation from 'double' to 'float'
-#endif
 /************************************************************************/
 /* Instance_HellfireRamparts.cpp Script		                            */
 /************************************************************************/
@@ -14,18 +11,18 @@
 
 #define MULTI_SHOT 18651
 #define AIMED_SHOT 30614
-#define DAZED 1604
+//#define DAZED 1604
 
 class BLEEDINGHOLLOWARCHERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(BLEEDINGHOLLOWARCHERAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     BLEEDINGHOLLOWARCHERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -43,14 +40,14 @@ public:
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -302,7 +299,7 @@ public:
 		spells[1].attackstoptimer = 1000;
 
         spells[2].info = dbcSpell.LookupEntry(FEL_INFUSION);
-		spells[2].targettype = TARGET_SELF;
+		spells[2].targettype = TARGET_SELF;	// why it targets enemy :O
 		spells[2].instant = true;
 		spells[2].cooldown = 25;
 		spells[2].perctrigger = 0.0f;
@@ -403,18 +400,18 @@ protected:
 
 #define BATTLE_SHOUT 30635
 #define UPPERCUT 10966		// not sure to any spell
-#define DAZED_BEASTMASTER 1604
+//#define DAZED_BEASTMASTER 1604
 // in a certain ammount of time he calls in about 2-4 more dogs.
 class BONECHEWERBEASTMASTERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(BONECHEWERBEASTMASTERAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     BONECHEWERBEASTMASTERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -432,14 +429,14 @@ public:
 		spells[1].cooldown = 30;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_BEASTMASTER);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -536,18 +533,18 @@ protected:
 #define MORTAL_STRIKE 15708
 #define KNOCK_AWAY 10101
 #define SWEEPING_STRIKES 18765	// 12723
-#define DAZED_DESTROYER 1604 // it's same everywhere, but I will keep it separated as they are connected with diff creatures
+//#define DAZED_DESTROYER 1604 // it's same everywhere, but I will keep it separated as they are connected with diff creatures
 
 class BONECHEWERDESTROYERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(BONECHEWERDESTROYERAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     BONECHEWERDESTROYERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -572,14 +569,14 @@ public:
 		spells[2].cooldown = 40;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+/*
         spells[3].info = dbcSpell.LookupEntry(DAZED_DESTROYER);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 15;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -675,18 +672,18 @@ protected:
 #define DEMORALIZING_SHOUT 16244
 #define STRIKE 14516
 #define DISARM 6713	// no idea if those are correct spells
-#define DAZED_HUNGERER 1604
+//#define DAZED_HUNGERER 1604
 
 class BONECHEWERHUNGERERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(BONECHEWERHUNGERERAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     BONECHEWERHUNGERERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -711,14 +708,14 @@ public:
 		spells[2].cooldown = 50;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+/*
         spells[3].info = dbcSpell.LookupEntry(DAZED_HUNGERER);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 15;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -811,36 +808,36 @@ protected:
 
 #define CN_BONECHEWER_RAVENER 17264
 
-#define DAZED_RAVENGER 1604
+//#define DAZED_RAVENGER 1604
 #define KIDNEY_SHOT 30621
 // Invisibility and Stealth Detection ? 18950
 class BONECHEWERRAVENERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(BONECHEWERRAVENERAI);
-	SP_AI_Spell spells[2];
-	bool m_spellcheck[2];
+	SP_AI_Spell spells[1];
+	bool m_spellcheck[1];
 
     BONECHEWERRAVENERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 2;
+		nrspells = 1;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
-        spells[0].info = dbcSpell.LookupEntry(DAZED_RAVENGER);
+      /*  spells[0].info = dbcSpell.LookupEntry(DAZED_RAVENGER);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
 		spells[0].perctrigger = 0.0f;
-		spells[0].attackstoptimer = 1000;
+		spells[0].attackstoptimer = 1000; */
 
-        spells[1].info = dbcSpell.LookupEntry(KIDNEY_SHOT);
-		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
-		spells[1].cooldown = 25;
-		spells[1].perctrigger = 0.0f;
-		spells[1].attackstoptimer = 1000;
+        spells[0].info = dbcSpell.LookupEntry(KIDNEY_SHOT);
+		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].instant = true;
+		spells[0].cooldown = 25;
+		spells[0].perctrigger = 0.0f;
+		spells[0].attackstoptimer = 1000;
 
     }
     
@@ -935,18 +932,18 @@ protected:
 #define CN_BONECHEWER_RIPPER 17281
 
 #define ENRAGE 18501
-#define DAZED_RIPPER 1604
+//#define DAZED_RIPPER 1604
 
 class BONECHEWERRIPPERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(BONECHEWERRIPPERAI);
-	SP_AI_Spell spells[2];
-	bool m_spellcheck[2];
+	SP_AI_Spell spells[1];
+	bool m_spellcheck[1];
 
     BONECHEWERRIPPERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 2;
+		nrspells = 1;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -957,14 +954,14 @@ public:
 		spells[0].cooldown = 20;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
-
+/*
         spells[1].info = dbcSpell.LookupEntry(DAZED_RIPPER);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+*/
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1305,19 +1302,19 @@ protected:
 #define CN_SHATTERED_HAND_WARHOUND 17280
 
 #define CARNIVOROUS_BITE 30639
-#define DAZED_WARHOUND 1604
+//#define DAZED_WARHOUND 1604
 //#define FURIOUS_HOWL 30636
 // Invisibility and Stealth Detection 18950 ? && Increase Spell Dam 43 17280 ?
 class SHATTEREDHANDWARHOUNDAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHATTEREDHANDWARHOUNDAI);
-	SP_AI_Spell spells[2];
-	bool m_spellcheck[2];
+	SP_AI_Spell spells[1];
+	bool m_spellcheck[1];
 
     SHATTEREDHANDWARHOUNDAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 2;
+		nrspells = 1;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1328,14 +1325,14 @@ public:
 		spells[0].cooldown = 35;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
-
+/*
         spells[1].info = dbcSpell.LookupEntry(DAZED_WARHOUND);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
+
         spells[2].info = dbcSpell.LookupEntry(FURIOUS_HOWL);	// crashes server :O
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
@@ -2123,16 +2120,16 @@ struct Coords
 static Coords fly[] = 
 {
 	{ 0, 0, 0, 0 },
-	{ -1413.410034, 1744.969971,  80.900000, 0.147398 },	// fly starting position
-	{ -1413.410034, 1744.969971,  92.948196, 0.147398 },	// fly !
-	{ -1378.454712, 1687.340332, 110.200218, 1.017074 },	// 1 full fly in circle wp
-	{ -1352.973145, 1726.131470, 110.408745, 1.297234 },	// 2
-    { -1362.943970, 1767.925415, 110.101616, 5.212438 },	// 3
-	{ -1415.544189, 1804.141357, 110.075363, 5.974271 },	// 4
-	{ -1461.189575, 1780.554932, 110.854507, 0.460774 },	// 5
-	{ -1482.489380, 1718.727783, 110.248772, 5.847037 },	// 6
-	{ -1418.811646, 1676.112427, 110.405968, 0.231439 },	// 7
-	{ -1413.408203, 1744.974121,  92.000000, 0.147398 }		// land place
+	{ -1413.410034f, 1744.969971f,  80.900000f, 0.147398f },	// fly starting position
+	{ -1413.410034f, 1744.969971f,  92.948196f, 0.147398f },	// fly !
+	{ -1378.454712f, 1687.340332f, 110.200218f, 1.017074f },	// 1 full fly in circle wp
+	{ -1352.973145f, 1726.131470f, 110.408745f, 1.297234f },	// 2
+    { -1362.943970f, 1767.925415f, 110.101616f, 5.212438f },	// 3
+	{ -1415.544189f, 1804.141357f, 110.075363f, 5.974271f },	// 4
+	{ -1461.189575f, 1780.554932f, 110.854507f, 0.460774f },	// 5
+	{ -1482.489380f, 1718.727783f, 110.248772f, 5.847037f },	// 6
+	{ -1418.811646f, 1676.112427f, 110.405968f, 0.231439f },	// 7
+	{ -1413.408203f, 1744.974121f,  92.000000f, 0.147398f }		// land place
 };
 //	{ -1413.410034, 1744.969971,  80.948196, 0.147398 },	// fly starting position
 
