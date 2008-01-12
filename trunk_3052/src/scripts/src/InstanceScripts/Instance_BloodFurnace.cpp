@@ -2554,6 +2554,24 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Good luck... You'll need it.");
 		_unit->PlaySoundToSet(10171);
        RemoveAIUpdateEvent();
+
+	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(325.40f, -85.95f, 24.65f, 181823);
+	   if(pDoor == 0)
+	   {
+		   return;
+	   }
+
+	   // Open the door
+	   pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
+
+	   GameObject * pDoor2 = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(29.0f, 136.0f, 46.0f, 181766);
+	   if(pDoor2 == 0)
+	   {
+		   return;
+	   }
+
+	   // Open the door
+	   pDoor2->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
     void AIUpdate()
@@ -2686,7 +2704,14 @@ public:
     {
 		CastTime();
        RemoveAIUpdateEvent();
+	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(455.65f, 52.69f, 9.61f, 181819);
+	   if(pDoor == 0)
+	   {
+		   return;
+	   }
 
+	   // Open the door
+	   pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
     void AIUpdate()
@@ -2864,6 +2889,15 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Stay away from... me.");
 		_unit->PlaySoundToSet(10291);
        RemoveAIUpdateEvent();
+
+	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(327.442f, 146.96f, 9.59f, 181812);
+	   if(pDoor == 0)
+	   {
+		   return;
+	   }
+
+	   // Open the door
+	   pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
     void AIUpdate()

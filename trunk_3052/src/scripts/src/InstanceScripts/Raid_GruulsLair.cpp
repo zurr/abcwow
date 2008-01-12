@@ -760,15 +760,17 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Gruul will... crush you!");
 		_unit->PlaySoundToSet(11376);
        RemoveAIUpdateEvent();
+
+	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(95.26f, 251.836f, 0.47f, 183817);
+        if(pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
 	void OnTargetDied(Unit* mTarget)
 	{
 		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
+			int RandomSpeach = RandomUInt(1000)%3;
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -936,16 +938,17 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come and die!");
 		_unit->PlaySoundToSet(11355);
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
+
+		GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(166.897f, 368.226f, 16.9209f, 184662);
+        if(pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 1);
     }
 
 	void OnTargetDied(Unit* mTarget)
     {
 		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
+			int RandomSpeach = RandomUInt(1000)%3;
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -970,6 +973,10 @@ public:
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         GrowthCooldown = 30;
         RemoveAIUpdateEvent();
+		_unit->RemoveAllAuras();
+		GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(166.897f, 368.226f, 16.9209f, 184662);
+        if(pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
     void OnDied(Unit * mKiller)
@@ -978,6 +985,10 @@ public:
 		_unit->PlaySoundToSet(11363);
        RemoveAIUpdateEvent();
        GrowthCooldown = 30;
+	   _unit->RemoveAllAuras();
+	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(166.897f, 368.226f, 16.9209f, 184662);
+        if(pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
     void AIUpdate()
@@ -1016,7 +1027,8 @@ public:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 						case TARGET_RANDOM_DESTINATION:
 							target = RandomTarget();
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+							if (target)
+								_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
 
 					if (spells[i].speech != "")
