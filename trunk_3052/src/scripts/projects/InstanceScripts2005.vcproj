@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="InstanceScripts"
 	ProjectGUID="{EE39B48B-C598-4AAF-9EF0-199402933EE5}"
 	RootNamespace="InstanceScripts"
@@ -469,6 +469,10 @@
 			</File>
 			<File
 				RelativePath="..\src\InstanceScripts\Instance_Uldaman.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_ZulFarrak.cpp"
 				>
 			</File>
 			<File

@@ -26,6 +26,7 @@ void SetupTheSlavePens(ScriptMgr * mgr);
 void SetupTheSteamvault(ScriptMgr * mgr);
 void SetupTheUnderbog(ScriptMgr * mgr);
 void SetupUldaman(ScriptMgr * mgr);
+void SetupZulFarrak(ScriptMgr * mgr);
 //Raids
 void SetupBlackTemple(ScriptMgr * mgr);
 void SetupBlackwingLair(ScriptMgr * mgr);
@@ -73,6 +74,7 @@ enum
 	TARGET_RANDOM_FRIEND,	// doesn't work yet
 	TARGET_RANDOM_SINGLE,
 	TARGET_RANDOM_DESTINATION,
+
 	//.....add
 };
 
