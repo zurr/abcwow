@@ -137,18 +137,18 @@ protected:
 #define CURSE_OF_TONGUES 13338
 #define CORRUPTION_WARLOCK 32197
 #define FEL_POWER 33111 // not sure to these ones (as always :P)
-#define DAZED_WARLOCK 1604
+//#define DAZED_WARLOCK 1604
 
 class SHADOWMOONWARLOCKAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHADOWMOONWARLOCKAI);
-	SP_AI_Spell spells[5];
-	bool m_spellcheck[5];
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
 
     SHADOWMOONWARLOCKAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 5;
+		nrspells = 4;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -180,14 +180,14 @@ public:
 		spells[3].cooldown = 45;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+/*
         spells[4].info = dbcSpell.LookupEntry(DAZED_WARLOCK);
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = true;
 		spells[4].cooldown = 15;
 		spells[4].perctrigger = 0.0f;
 		spells[4].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -284,18 +284,18 @@ protected:
 #define THROW_DYNAMITE 7978
 #define THROW_PROXIMITY_BOMB 30846	// lack of core support =(
 #define SILENCE 6726				// those spell must be checked (as I am not sure if it uses all those)
-#define DAZED_TECHNICIAN 1604
+//#define DAZED_TECHNICIAN 1604
 
 class SHADOWMOONTECHNICIANAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHADOWMOONTECHNICIANAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     SHADOWMOONTECHNICIANAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -320,14 +320,14 @@ public:
 		spells[2].cooldown = 35;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+/*
         spells[3].info = dbcSpell.LookupEntry(DAZED_TECHNICIAN);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 15;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -563,7 +563,7 @@ protected:
 
 #define MARK_OF_SHADOW 30937	// wth it isn't casted by mob and work when used by player :| ?
 #define SHADOW_BOLT_SUMMONER 12739
-#define DAZED_SUMMONER 1604
+//#define DAZED_SUMMONER 1604
 #define STAR_BEAM 30888	// W00T? MUST CHECK IT MORE IN DBC (Idk have more infos about 
 						// this spell, so can't do nothing more for now [also lack of 
 						// core support?])
@@ -572,12 +572,12 @@ class SHADOWMOONCHANNELERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHADOWMOONCHANNELERAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     SHADOWMOONCHANNELERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -595,20 +595,20 @@ public:
 		spells[1].cooldown = 10;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_SUMMONER);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
-        spells[3].info = dbcSpell.LookupEntry(STAR_BEAM);
-		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = false;
-		spells[3].cooldown = 45;
-		spells[3].perctrigger = 0.0f;
-		spells[3].attackstoptimer = 1000;
+*/
+        spells[2].info = dbcSpell.LookupEntry(STAR_BEAM);
+		spells[2].targettype = TARGET_ATTACKING;
+		spells[2].instant = false;
+		spells[2].cooldown = 45;
+		spells[2].perctrigger = 0.0f;
+		spells[2].attackstoptimer = 1000;
 
 
     }
@@ -705,18 +705,18 @@ protected:
 
 #define TRASH 3391 // ? doesn't work coz lack of core support?
 #define KICK 11978
-#define DAZED_ADEPT 1604 // not sure to any spell of these :S
+//#define DAZED_ADEPT 1604 // not sure to any spell of these :S
 
 class SHADOWMOONADEPTAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SHADOWMOONADEPTAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     SHADOWMOONADEPTAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -734,14 +734,14 @@ public:
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_ADEPT);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -961,18 +961,18 @@ protected:
 
 #define STOMP 31900
 #define CONCUSSION_BLOW 22427
-#define DAZED_NASCENT_FEL_ORC 1604
+//#define DAZED_NASCENT_FEL_ORC 1604
 
 class NASCENTFELORCAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(NASCENTFELORCAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     NASCENTFELORCAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -990,14 +990,14 @@ public:
 		spells[1].cooldown = 20;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_NASCENT_FEL_ORC);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -1224,18 +1224,18 @@ protected:
 #define CN_HELLFIRE_FAMILIAR 19016
 
 #define FIREBALL_FAMILIAR 11921
-#define DAZED_FAMILIAR 1604
+//#define DAZED_FAMILIAR 1604
 
 class HELLFIREFAMILIARAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(HELLFIREFAMILIARAI);
-	SP_AI_Spell spells[2];
-	bool m_spellcheck[2];
+	SP_AI_Spell spells[1];
+	bool m_spellcheck[1];
 
     HELLFIREFAMILIARAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 2;
+		nrspells = 1;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1246,14 +1246,14 @@ public:
 		spells[0].cooldown = 10;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
-
+/*
         spells[1].info = dbcSpell.LookupEntry(DAZED_FAMILIAR);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -1473,18 +1473,18 @@ protected:
 
 #define UPPERCUT 18072
 #define PUMMEL 15615
-#define DAZED_FELGUARD_BRUTE 1604
+//#define DAZED_FELGUARD_BRUTE 1604
 
 class FELGUARDBRUTEAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(FELGUARDBRUTEAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     FELGUARDBRUTEAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1502,14 +1502,14 @@ public:
 		spells[1].cooldown = 20;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_FELGUARD_BRUTE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -1605,19 +1605,19 @@ protected:
 
 #define UPPERCUT 18072
 #define PUMMEL 15615
-#define DAZED_FELGUARD_ANNIHILATOR 1604
+//#define DAZED_FELGUARD_ANNIHILATOR 1604
 #define INTERCEPT 27577 //DBC: 20615, 27577, 27826
 
 class FELGUARDANNIHILATORAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(FELGUARDANNIHILATORAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     FELGUARDANNIHILATORAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1635,20 +1635,20 @@ public:
 		spells[1].cooldown = 20;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_FELGUARD_ANNIHILATOR);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
-        spells[3].info = dbcSpell.LookupEntry(INTERCEPT);
-		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
-		spells[3].cooldown = 35;
-		spells[3].perctrigger = 0.0f;
-		spells[3].attackstoptimer = 1000;
+*/
+        spells[2].info = dbcSpell.LookupEntry(INTERCEPT);
+		spells[2].targettype = TARGET_ATTACKING;
+		spells[2].instant = true;
+		spells[2].cooldown = 35;
+		spells[2].perctrigger = 0.0f;
+		spells[2].attackstoptimer = 1000;
 
 
     }
@@ -1745,18 +1745,18 @@ protected:
 
 #define ENRAGE 8269
 #define CHARGE 22120
-#define DAZED_NEOPHYTE 1604
+//#define DAZED_NEOPHYTE 1604
 
 class FELORCNEOPHYTEAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(FELORCNEOPHYTEAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     FELORCNEOPHYTEAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1774,14 +1774,14 @@ public:
 		spells[1].cooldown = 35;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_NEOPHYTE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -1877,18 +1877,18 @@ protected:
 #define CN_LAUGHING_SKULL_WARDEN 17624
 
 #define BATTLE_SHOUT 30833
-#define DAZED_WARDEN 1604
+//#define DAZED_WARDEN 1604
 
 class LAUGHINGSKULLWARDENAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(LAUGHINGSKULLWARDENAI);
-	SP_AI_Spell spells[2];
-	bool m_spellcheck[2];
+	SP_AI_Spell spells[1];
+	bool m_spellcheck[1];
 
     LAUGHINGSKULLWARDENAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 2;
+		nrspells = 1;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1899,14 +1899,14 @@ public:
 		spells[0].cooldown = 70;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
-
+/*
         spells[1].info = dbcSpell.LookupEntry(DAZED_WARDEN);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -2003,7 +2003,7 @@ protected:
 
 #define POISON 34969
 #define KIDNEY_SHOT 30832
-#define DAZED_ROGUE 1604
+//#define DAZED_ROGUE 1604
 #define SLICE_AND_DICE 6434
 #define STEALTH 30831
 
@@ -2011,13 +2011,13 @@ class LAUGHINGSKULLROGUEAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(LAUGHINGSKULLROGUEAI);
-	SP_AI_Spell spells[5];
-	bool m_spellcheck[5];
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
 
     LAUGHINGSKULLROGUEAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
 		FIRST_ATTACK = 1;
-		nrspells = 5;
+		nrspells = 4;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -2035,30 +2035,30 @@ public:
 		spells[1].cooldown = 35;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_ROGUE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
+*/
+        spells[2].info = dbcSpell.LookupEntry(SLICE_AND_DICE);
+		spells[2].targettype = TARGET_SELF;
+		spells[2].instant = true;
+		spells[2].cooldown = 70;
+		spells[2].perctrigger = 0.0f;
+		spells[2].attackstoptimer = 1000;
 
-        spells[3].info = dbcSpell.LookupEntry(SLICE_AND_DICE);
+        spells[3].info = dbcSpell.LookupEntry(STEALTH);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
-		spells[3].cooldown = 70;
+		spells[3].cooldown = -1;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
 
-        spells[4].info = dbcSpell.LookupEntry(STEALTH);
-		spells[4].targettype = TARGET_SELF;
-		spells[4].instant = true;
-		spells[4].cooldown = -1;
-		spells[4].perctrigger = 0.0f;
-		spells[4].attackstoptimer = 1000;
 
-
-		_unit->CastSpell(_unit, spells[4].info, spells[4].instant);
+		_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -2081,7 +2081,7 @@ public:
     void OnCombatStop(Unit *mTarget)
     {
 		FIRST_ATTACK = 1;
-		_unit->CastSpell(_unit, spells[4].info, spells[4].instant);
+		_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
 		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
@@ -2170,18 +2170,18 @@ protected:
 #define ENRAGE_LEGIONNAIRE 8599
 #define UPPERCUT_LEGIONNAIRE 10966
 #define SWEEPING_STRIKES 18765	// DBC: 18765, 12723
-#define DAZED_LEGIONNAIRE 1604
+//#define DAZED_LEGIONNAIRE 1604
 
 class LAUGHINGSKULLLEGIONNAIREAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(LAUGHINGSKULLLEGIONNAIREAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     LAUGHINGSKULLLEGIONNAIREAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -2206,14 +2206,14 @@ public:
 		spells[2].cooldown = 50;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+/*
         spells[3].info = dbcSpell.LookupEntry(DAZED_LEGIONNAIRE);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].cooldown = 15;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
+*/
 
     }
     
@@ -2310,18 +2310,18 @@ protected:
 
 #define STRIKE 14516
 #define SHIELD_SLAM 30688
-#define DAZED_ENFORCER 1604
+//#define DAZED_ENFORCER 1604
 
 class LAUGHINGSKULLENFORCERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(LAUGHINGSKULLENFORCERAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     LAUGHINGSKULLENFORCERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -2339,14 +2339,14 @@ public:
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
+/*
         spells[2].info = dbcSpell.LookupEntry(DAZED_ENFORCER);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
+*/
 
     }
     

@@ -1595,12 +1595,12 @@ class MURMURAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(MURMURAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[5];
+	bool m_spellcheck[5];
 
     MURMURAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 5;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -1608,51 +1608,57 @@ public:
 		} 
 		spells[0].info = dbcSpell.LookupEntry(SONIC_BOOM);
 		spells[0].targettype = TARGET_VARIOUS;
-		spells[0].instant = true;
-		spells[0].cooldown = 30;
-		spells[0].perctrigger = 7.0f;
+		spells[0].instant = false;
+		spells[0].perctrigger = 1.0f;
 		spells[0].attackstoptimer = 1000;
-/*
-		spells[1].info = dbcSpell.LookupEntry(RESONANCE);
+		spells[0].speech = "Murmur draws energy from the air...";
+
+		//spells[1].info = dbcSpell.LookupEntry(RESONANCE);
+		spells[1].info = dbcSpell.LookupEntry(SONIC_BOOM);
 		spells[1].targettype = TARGET_VARIOUS;
-		spells[1].instant = true;
-		spells[1].cooldown = 60;
-		spells[1].perctrigger = 3.0f;
+		spells[1].instant = false;
+		spells[1].perctrigger = 1.0f;
 		spells[1].attackstoptimer = 1000;
-*/
-		spells[1].info = dbcSpell.LookupEntry(SHOCKWAVE);
-		spells[1].targettype = TARGET_VARIOUS; 
-		spells[1].instant = true;
-		spells[1].cooldown = 30;
-		spells[1].perctrigger = 7.0f;
-		spells[1].attackstoptimer = 1000;
+
+		spells[2].info = dbcSpell.LookupEntry(SHOCKWAVE);
+		spells[2].targettype = TARGET_VARIOUS; 
+		spells[2].instant = false;
+		spells[2].perctrigger = 1.0f;
+		spells[2].attackstoptimer = 1000;
 /*
 		spells[2].info = dbcSpell.LookupEntry(SONIC_SHOCK);
 		spells[2].targettype = TARGET_ATTACKING; 
 		spells[2].instant = true;
-		spells[2].cooldown = 30;
 		spells[2].perctrigger = 7.0f;
 		spells[2].attackstoptimer = 1000;
 */
-		spells[2].info = dbcSpell.LookupEntry(MURMURS_TOUCH);
-		spells[2].targettype = TARGET_VARIOUS;
-		spells[2].instant = false;
-		spells[2].cooldown = 60;
-		spells[2].perctrigger = 7.0f;
-		spells[2].attackstoptimer = 1000;
-
-		spells[3].info = dbcSpell.LookupEntry(THUNDERING_STORM);
+		spells[3].info = dbcSpell.LookupEntry(MURMURS_TOUCH);
 		spells[3].targettype = TARGET_VARIOUS;
-		spells[3].instant = true;
-		spells[3].cooldown = 60;
-		spells[3].perctrigger = 7.0f;
-		spells[3].attackstoptimer = 2000;
+		spells[3].instant = false;
+		spells[3].perctrigger = 1.0f;
+		spells[3].attackstoptimer = 1000;
+
+		spells[4].info = dbcSpell.LookupEntry(THUNDERING_STORM);
+		spells[4].targettype = TARGET_VARIOUS;
+		spells[4].instant = false;
+		spells[4].perctrigger = 1.0f;
+		spells[4].attackstoptimer = 2000;
+
+		if(_unit->GetHealthPct() >= 41)
+		{
+			_unit->SetHealthPct(40);
+		}
 
     }
     
     void OnCombatStart(Unit* mTarget)
     {
+		if(_unit->GetHealthPct() >= 41)
+		{
+			_unit->SetHealthPct(40);
+		}
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		_unit->Root();
     }
 
 	void OnTargetDied(Unit* mTarget)
@@ -1663,6 +1669,10 @@ public:
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		if(_unit->GetHealthPct() >= 41)
+		{
+			_unit->SetHealthPct(40);
+		}
         RemoveAIUpdateEvent();
     }
 

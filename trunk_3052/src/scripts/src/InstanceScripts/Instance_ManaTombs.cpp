@@ -530,7 +530,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(PSYCHIC_SCREAM);
 		spells[0].targettype = TARGET_VARIOUS; 
 		spells[0].instant = true;
-		spells[0].perctrigger = 10.0f;
+		spells[0].perctrigger = 3.0f;
 		spells[0].attackstoptimer = 1000;
 
     }
@@ -1095,21 +1095,18 @@ public:
         spells[0].info = dbcSpell.LookupEntry(EARTHQUAKE);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;  // Should be channel spell.
-		spells[0].cooldown = 20;
-		spells[0].perctrigger = 12.0f;
-		spells[0].attackstoptimer = 1000;
+		spells[0].perctrigger = 5.0f;
+		spells[0].attackstoptimer = 2000;
 
 		spells[1].info = dbcSpell.LookupEntry(CRYSTAL_PRISON);
 		spells[1].targettype = TARGET_ATTACKING; //Should attack random target
 		spells[1].instant = true;
-		spells[0].cooldown = 20;
 		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 2000;
 
 		spells[2].info = dbcSpell.LookupEntry(ARCING_SMASH);
 		spells[2].targettype = TARGET_VARIOUS;  // Should affect only party/raid member in front of caster (I think it works, but needs tests anyway)
 		spells[2].instant = true;
-		spells[0].cooldown = 10;
 		spells[2].perctrigger = 16.0f;
 		spells[2].attackstoptimer = 1000;
 
