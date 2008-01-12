@@ -144,7 +144,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		_player->m_itemcooldown.insert(item);
 	}
 
-
+	if(_player->m_currentSpell)
+	{
+		_player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, 0);
+		return;
+	}
 
 	Spell *spell = new Spell(_player, spellInfo, false, NULL);
 	spell->extra_cast_number=cn;
@@ -190,6 +194,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 		//autoshot 75
 		if((spellInfo->Flags3 & FLAGS3_ACTIVATE_AUTO_SHOT) /*spellInfo->Attributes == 327698*/)	// auto shot..
 		{
+			//sLog.outString( "HandleSpellCast: Auto Shot-type spell cast (id %u, name %s)" , spellInfo->Id , spellInfo->Name );
 			Item *weapon = GetPlayer()->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 			if(!weapon) 
 				return;
@@ -226,7 +231,10 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 				uint32 duration = _player->GetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME);
 				SpellCastTargets targets(recvPacket,GetPlayer()->GetGUID());
 				if(!targets.m_unitTarget)
+				{
+					sLog.outString( "Cancelling auto-shot cast because targets.m_unitTarget is null!" );
 					return;
+				}
 				SpellEntry *sp = dbcSpell.LookupEntry(spellid);
 			
 				_player->m_AutoShotSpell = sp;
@@ -244,7 +252,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 			sChatHandler.SystemMessageToPlr(_player, "%sSpell Cast:%s %s %s[Group %u, family %u]", MSG_COLOR_LIGHTBLUE,
 			MSG_COLOR_SUBWHITE, name, MSG_COLOR_YELLOW, spellInfo->SpellGroupType, spellInfo->SpellFamilyName);*/
 
-        if(GetPlayer()->m_currentSpell && GetCastTime(dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex)))
+        if(_player->m_currentSpell)
         {
             _player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, 0);
             return;

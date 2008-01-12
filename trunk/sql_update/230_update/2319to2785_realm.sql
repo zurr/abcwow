@@ -308,3 +308,14 @@ ALTER TABLE `tutorials` ADD UNIQUE `a`(`playerId`);
 
 alter table mailbox drop column external_attached_item_guid;
 alter table mailbox change column attached_item_guid attached_item_guids varchar(200) not null default "";
+
+
+CREATE TABLE `mailbox_insert_queue` (
+  `sender_guid` int(30) NOT NULL,
+  `receiver_guid` int(30) NOT NULL,
+  `subject` varchar(200) NOT NULL,
+  `body` varchar(500) NOT NULL,
+  `stationary` int(30) NOT NULL,
+  `money` int(30) NOT NULL,
+  `item_id` int(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

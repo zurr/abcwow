@@ -2539,6 +2539,25 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 33215 ); 
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 8192 | 131072 | 8388608; // Mind Blast + Mind Control + Mind Flay
+	//Priest: Blessed Recovery
+	sp = dbcSpell.LookupEntry(27811);
+	if(sp != NULL)
+	{
+		sp->EffectTriggerSpell[0] = 27813;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	}
+	sp = dbcSpell.LookupEntry(27815);
+	if(sp != NULL)
+	{
+		sp->EffectTriggerSpell[0] = 27817;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	}
+	sp = dbcSpell.LookupEntry(27816);
+	if(sp != NULL)
+	{
+		sp->EffectTriggerSpell[0] = 27818;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	}
 	//priest- Blessed Resilience
 	sp = dbcSpell.LookupEntry( 33142 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	sp = dbcSpell.LookupEntry( 33145 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
@@ -3607,12 +3626,15 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 11129 );
 	if( sp != NULL )
 	{
-		//sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
-		//disabled until i cant find the way to make it working like it should
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
+		sp->procCharges = 0;
 	}
 	sp = dbcSpell.LookupEntry( 28682 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 8388608 | 16 | 2 | 4 | 4194304 | 1;
+		sp->NameHash = SPELL_HASH_COMBUSTION_PROC;
+	}
 
 	//mage - Empowered Fireball
 	sp = dbcSpell.LookupEntry( 31656 );
@@ -5618,7 +5640,11 @@ bool CharacterLoaderThread::run()
 	running=true;
 	for(;;)
 	{
-		sWorld.PollCharacterInsertQueue();
+		// Get a single connection to maintain for the whole process.
+		MysqlCon * con = CharacterDatabase.GetFreeConnection();
+
+		sWorld.PollCharacterInsertQueue(con);
+		sWorld.PollMailboxInsertQueue(con);
 		/* While this looks weird, it ensures the system doesn't waste time switching to these contexts.
 		   WaitForSingleObject will suspend the thread,
 		   and on unix, select will as well. - Burlex
@@ -5640,7 +5666,40 @@ bool CharacterLoaderThread::run()
 	return true;
 }
 
-void World::PollCharacterInsertQueue()
+void World::PollMailboxInsertQueue(MysqlCon * con)
+{
+	QueryResult * result;
+	Field * f;
+	Item * pItem;
+	uint32 itemid;
+
+	CharacterDatabase.FWaitExecute("LOCK TABLES `mailbox_insert_queue` WRITE", con);
+	result = CharacterDatabase.Query("SELECT * FROM mailbox_insert_queue");
+	if( result != NULL )
+	{
+		do 
+		{
+			f = result->Fetch();
+			itemid = f[6].GetUInt32();
+			
+			if( itemid != 0 )
+				pItem = objmgr.CreateItem( itemid, NULL );
+			else
+				pItem = NULL;
+
+			sMailSystem.SendAutomatedMessage( 0, f[0].GetUInt64(), f[1].GetUInt64(), f[2].GetString(), f[3].GetString(), f[5].GetUInt32(),
+				0, pItem ? pItem->GetGUID() : 0, f[4].GetUInt32() );
+
+		} while ( result->NextRow() );
+		delete result;
+		CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);
+		CharacterDatabase.FWaitExecute("DELETE FROM mailbox_insert_queue", con);
+	}
+	else
+		CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);	
+}
+
+void World::PollCharacterInsertQueue(MysqlCon * con)
 {
 	// Our local stuff..
 	bool has_results = false;
@@ -5650,9 +5709,6 @@ void World::PollCharacterInsertQueue()
 	insert_playeritem ipi;                          
 	static const char * characterTableFormat = "uSuuuuuussuuuuuuuuuuuuuuffffuususuufffuuuuusuuuUssuuuuuuffffuuuuufffssssssuuuuuuuu";
 
-	// Get a single connection to maintain for the whole process.
-	MysqlCon * con = CharacterDatabase.GetFreeConnection();
-	
 	// Lock the table to prevent any more inserts
 	CharacterDatabase.FWaitExecute("LOCK TABLES `playeritems_insert_queue` WRITE", con);
 
@@ -5836,9 +5892,6 @@ void World::PollCharacterInsertQueue()
 		CharacterDatabase.FWaitExecute("DELETE FROM characters_insert_queue", con);
 		CharacterDatabase.FWaitExecute("DELETE FROM playeritems_insert_queue", con);
 	}
-
-	// Release the database connection
-	con->busy.Release();
 }
 
 #ifdef ENABLE_CHECKPOINT_SYSTEM
