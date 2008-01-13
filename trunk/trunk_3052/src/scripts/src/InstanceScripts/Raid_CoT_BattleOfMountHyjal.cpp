@@ -1,21 +1,3 @@
-/*
- * Moon++ Scripts for Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
- * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #include "StdAfx.h"
 #include "Setup.h"
 
@@ -960,79 +942,147 @@ protected:
 	int nrspells;
 };
 
-/*  * Might of the Defiler - Smashed into the ground for 6000 fire damage, 
-		and 3000 every second for 10 seconds.
-    * Grip of the Legion - 250,000 damage over 5 mins. [833.33dps].
-    * Finger of Death - 20,000 shadow damage on a single target. Archimonde 
-		will begin casting this if nobody is in melee range.
-    * Soul Charge - All damage taken increased by 50%. Non-dispellable.
-    * Doomfire - Leaves a trail of fire on the ground, which does 2400 fire 
+// Archimonde Channel TriggerAI
+
+#define CN_ARCHIMONDE_CHANNEL_TRIGGER 30004
+
+// Additional
+#define DRAIN_WORLD_TREE_VISUAL		39140
+#define DRAIN_WORLD_TREE_VISUAL2	39141
+
+class ArchimondeTriggerAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(ArchimondeTriggerAI);
+
+    ArchimondeTriggerAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->m_noRespawn = true;
+
+		Unit* Archimonde = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(5598.629883f, -3447.719971f, 1576.650024f, 17968);
+		if (Archimonde)
+		{
+			_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, Archimonde->GetGUID());
+			_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, DRAIN_WORLD_TREE_VISUAL2);
+		}
+	}
+};
+
+/* * Doomfire - Leaves a trail of fire on the ground, which does 2400 fire 
 		damage per second (occasionally feared people run into these and die) */
 
 // ArchimondeAI
 
 #define CN_ARCHIMONDE 17968
 
-#define AIR_BURST 32014 
-#define GRIP_OF_THE_LEGION 31972
-#define FINGER_OF_DEATH 31984 // 31984 or 32111 // should be casted only when no one in melee range
-#define SOUL_CHARGE 32054
-#define DOOMFIRE 31944 // 31945 -> 31943 -> 31944 // bugged as it's targetting only caster :O
-#define HAND_OF_DEATCH 35354 //99,999 shadow damage....
-// TO DO: Add rest of the sounds (first I must gather infos about to which spell or
-// event there are connected.
+#define FEAR						33547
+#define AIR_BURST					32014 
+#define GRIP_OF_THE_LEGION			31972
+#define DOOMFIRE_STRIKE				31903
+#define FINGER_OF_DEATH				31984	// should be casted only when no one in melee range
+#define HAND_OF_DEATH				35354	// used if too close to Well of Eternity or if after 10 min caster has more than 10% hp
+#define SOUL_CHARGER				32053	// If player dies whole raid gets one of those 3 buffs
+#define SOUL_CHARGEO				32054
+#define SOUL_CHARGEG				32057
 
 class ArchimondeAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(ArchimondeAI);
-	SP_AI_Spell spells[5];
-	bool m_spellcheck[5];
+	SP_AI_Spell spells[6];
+	bool m_spellcheck[6];
 
     ArchimondeAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 5;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
+		}
 
-		} 
 		spells[0].info = dbcSpell.LookupEntry(AIR_BURST);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
-		spells[0].perctrigger = 1.0f;
+		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
+		spells[0].cooldown = 25;
 
 		spells[1].info = dbcSpell.LookupEntry(GRIP_OF_THE_LEGION);
-		spells[1].targettype = TARGET_ATTACKING;
+		spells[1].targettype = TARGET_RANDOM_SINGLE; 
 		spells[1].instant = true;
-		spells[1].perctrigger = 6.0f;
+		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
+		spells[1].cooldown = 25;
+		spells[1].mindist2cast = 0.0f;
+		spells[1].maxdist2cast = 60.0f;
 
-		spells[2].info = dbcSpell.LookupEntry(FINGER_OF_DEATH);
-		spells[2].targettype = TARGET_ATTACKING; 
-		spells[2].instant = false;
-		spells[2].perctrigger = 6.0f;
-		spells[2].attackstoptimer = 1000;
+		spells[2].info = dbcSpell.LookupEntry(DOOMFIRE_STRIKE);
+		spells[2].targettype = TARGET_VARIOUS;
+		spells[2].instant = true;
+		spells[2].perctrigger = 7.0f;
+		spells[2].attackstoptimer = 2000;
 
-		spells[3].info = dbcSpell.LookupEntry(SOUL_CHARGE);
+		spells[3].info = dbcSpell.LookupEntry(FEAR);
 		spells[3].targettype = TARGET_VARIOUS;
-		spells[3].instant = false;
-		spells[3].perctrigger = 7.0f;
+		spells[3].instant = true;
+		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
+		spells[3].cooldown = 40;
 
-		spells[4].info = dbcSpell.LookupEntry(DOOMFIRE);
-		spells[4].targettype = TARGET_ATTACKING;
-		spells[4].instant = true;
-		spells[4].perctrigger = 7.0f;
-		spells[4].attackstoptimer = 2000;
+		spells[4].info = dbcSpell.LookupEntry(FINGER_OF_DEATH);
+		spells[4].targettype = TARGET_RANDOM_SINGLE; 
+		spells[4].instant = false;
+		spells[4].perctrigger = 0.0f;
+		spells[4].attackstoptimer = 1000;
+		spells[4].mindist2cast = 30.0f;
+		spells[4].maxdist2cast = 80.0f;
 
+		spells[5].info = dbcSpell.LookupEntry(HAND_OF_DEATH);
+		spells[5].targettype = TARGET_VARIOUS;
+		spells[5].instant = true;
+		spells[5].perctrigger = 0.0f;
+		spells[5].attackstoptimer = 1000;
+		spells[5].cooldown = 600;
+
+		Trigger = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ARCHIMONDE_CHANNEL_TRIGGER, 5501.476563f, -3524.868408f, 1604.188965f, 0.393633f, false, false, 0, 0);
+
+		if (Trigger && Trigger->IsInWorld())
+		{
+			Trigger->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			Trigger->GetAIInterface()->SetAllowedToEnterCombat(false);
+			Trigger->m_noRespawn = true;
+
+			Trigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, _unit->GetGUID());
+			Trigger->SetUInt32Value(UNIT_CHANNEL_SPELL, DRAIN_WORLD_TREE_VISUAL2);
+
+			_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, Trigger->GetGUID());
+			_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, DRAIN_WORLD_TREE_VISUAL);
+		}
     }
     
     void OnCombatStart(Unit* mTarget)
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your resistance is insignificant.");
 		_unit->PlaySoundToSet(10987);
+
+		_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+		_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+
+		if (Trigger && Trigger->IsInWorld())
+		{
+			Trigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+			Trigger->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+		}
+
+		for (int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+
+		uint32 t = (uint32)time(NULL);
+		spells[3].casttime =  t + spells[3].cooldown;
+		spells[5].casttime =  t + spells[5].cooldown;
+
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
@@ -1040,9 +1090,7 @@ public:
     {
 		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
+			int RandomSpeach=rand()%3;
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -1058,6 +1106,19 @@ public:
 				_unit->PlaySoundToSet(10995);
 				break;
 			}
+
+			if(mTarget->GetTypeId() == TYPEID_PLAYER)
+			{
+				uint32 SpellID = 0;
+				if (mTarget->getClass() == WARRIOR || mTarget->getClass() == ROGUE || mTarget->getClass() == MAGE)
+					SpellID = SOUL_CHARGEO;
+				if (mTarget->getClass() == PRIEST || mTarget->getClass() == PALADIN || mTarget->getClass() == WARLOCK)
+					SpellID = SOUL_CHARGER;
+				else
+					SpellID = SOUL_CHARGEG;
+				
+				_unit->CastSpell(_unit, dbcSpell.LookupEntry(SpellID), false);
+			}
 		}
     }
 
@@ -1065,6 +1126,16 @@ public:
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
+		if (Trigger && Trigger->IsInWorld() && _unit->isAlive())
+		{
+			Trigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, _unit->GetGUID());
+			Trigger->SetUInt32Value(UNIT_CHANNEL_SPELL, DRAIN_WORLD_TREE_VISUAL2);
+
+			_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, Trigger->GetGUID());
+			_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, DRAIN_WORLD_TREE_VISUAL);
+		}
+
         RemoveAIUpdateEvent();
     }
 
@@ -1072,13 +1143,46 @@ public:
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "No, it cannot be! Nooo!");
 		_unit->PlaySoundToSet(10992);
+
        RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
     {
+		//_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+
+		uint32 t = (uint32)time(NULL);
+		if (t > spells[3].casttime && _unit->GetCurrentSpell() == NULL)
+		{
+			_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+
+			spells[3].casttime = t + spells[3].cooldown;
+		}
+
+		else if (t > spells[5].casttime && _unit->GetCurrentSpell() == NULL)
+		{
+			_unit->CastSpell(_unit, spells[5].info, spells[5].instant);
+
+			spells[5].casttime = t + spells[5].cooldown;
+		}
+/*	Crashes server if Archimonde kills player o_O (even with TARGET_ATTACKING, without StopMovement, without setting current agent and so on
+		else if (_unit->GetAIInterface()->GetNextTarget())
+		{
+			if (FingerOfDeath())
+			{
+				_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+				_unit->GetAIInterface()->StopMovement(2000);
+
+				if (_unit->GetCurrentSpell() == NULL)
+				{
+					CastSpellOnRandomTarget(4, spells[4].mindist2cast, spells[4].maxdist2cast, 0, 100);
+					return;
+				}
+			}
+		}
+*/
 		float val = (float)RandomFloat(100.0f);
-        SpellCast(val);
+		SpellCast(val);
     }
 
     void SpellCast(float val)
@@ -1103,29 +1207,101 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-
-                  	m_spellcheck[i] = false;
+					m_spellcheck[i] = false;
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
         }
     }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
+		}
+	}
+
+	bool FingerOfDeath()
+	{
+		Unit* NextTarget = NULL;
+
+		for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+		{
+			if (isHostile(_unit, (*itr)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID() && _unit->GetDistance2dSq((*itr)) <= spells[4].mindist2cast*spells[4].mindist2cast)
+			{
+				NextTarget = (Unit*)(*itr);
+				if (NextTarget && NextTarget->isAlive() && _unit->GetAIInterface()->getThreatByPtr(NextTarget) > 0)
+				{
+					_unit->GetAIInterface()->WipeTargetList();
+					_unit->GetAIInterface()->WipeHateList();
+					_unit->GetAIInterface()->AttackReaction(NextTarget, 1, 0);
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 protected:
 
+	Creature *Trigger;
 	int nrspells;
 };
 
@@ -1135,5 +1311,6 @@ void SetupBattleOfMountHyjal(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_ANETHERON, &AnetheronAI::Create);
 	mgr->register_creature_script(CN_KAZROGAL, &KazrogalAI::Create);
 	mgr->register_creature_script(CN_AZGALOR, &AzgalorAI::Create);
+	mgr->register_creature_script(CN_ARCHIMONDE_CHANNEL_TRIGGER, &ArchimondeTriggerAI::Create);
     mgr->register_creature_script(CN_ARCHIMONDE, &ArchimondeAI::Create);
 }

@@ -76,7 +76,7 @@ public:
 		spells[0].instant = true;
 		spells[0].cooldown = 20;
 		spells[0].perctrigger = 2.0f;
-		spells[0].attackstoptimer = 4000;
+		spells[0].attackstoptimer = 3000;
 		door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
 		GameObject *cube;
 		for (int i = 0; i < 5; i++)
@@ -107,7 +107,7 @@ public:
 	void OnCombatStart(Unit* mTarget)
 	{
 		timer_blastNova = 0;
-		timer_quake = 0;
+		timer_quake = 10;
 		timer_debris = 0;
 	}
 
@@ -163,48 +163,26 @@ public:
 
 	void AIUpdate()
 	{
-		if(_unit->GetHealthPct() <= 30 && m_phase == 2)
+		if (m_eventstarted)
 		{
-			_unit->PlaySoundToSet(10257);
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I will not be taken so easily. Let the walls of this prison tremble... and FALL!!!");
-			_unit->CastSpell(_unit, CAMERASHAKE, true);
-			_unit->GetAIInterface()->StopMovement(5000);
-			_unit->setAttackTimer(5000, false);
-			//sEventMgr.AddEvent(this, &MagtheridonAI::Debris, EVENT_SCRIPT_UPDATE_EVENT, 4000, 1, 0); //Disabled for now as AOE still hits two times --> 11k dmg -.-
-			m_phase = 3;
-			GameObject* falling;
-			for (int i = 0; i < 6; i++)
+			if (channelerAlive[1] || channelerAlive[2] || channelerAlive[3] || channelerAlive[4] || channelerAlive[5])
 			{
-				falling = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(Columns[i].x, Columns[i].y, Columns[i].z, 184634+i);
-				if (falling)
-					falling->SetUInt32Value(GAMEOBJECT_STATE, 0);
-			}
-
-			falling = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(0.0f, 0.0f, 0.0f, 184653);
-			if (falling)
-				falling->SetUInt32Value(GAMEOBJECT_STATE, 0);
-		}
-		if (channelerAlive[1] || channelerAlive[2] || channelerAlive[3] || channelerAlive[4] || channelerAlive[5])
-		{
-			for (int i = 0; i < 5; i++)
-			{
-				if (!channelers[i]->isAlive() && channelerAlive[i])
+				for (int i = 0; i < 5; i++)
 				{
-					channelerAlive[i] = false;
-					for (int x = 0; x < 5; x++)
+					if (!channelers[i]->isAlive() && channelerAlive[i])
 					{
-						if (channelers[x]->isAlive() && (channelers[i] != channelers[x]))
+						channelerAlive[i] = false;
+						for (int x = 0; x < 5; x++)
 						{
-							Aura * aura = new Aura( dbcSpell.LookupEntry(SOUL_TRANSFER), -1, channelers[i], channelers[x]);
-							channelers[x]->AddAura(aura);
+							if (channelers[x]->isAlive() && (channelers[i] != channelers[x]))
+							{
+								Aura * aura = new Aura( dbcSpell.LookupEntry(SOUL_TRANSFER), -1, channelers[i], channelers[x]);
+								channelers[x]->AddAura(aura);
+							}
 						}
 					}
 				}
 			}
-		}
-
-		if (m_eventstarted)
-		{
 			if (!timer_enrage && !enrage)
 			{
 				_unit->DamageDoneModPCT[0] = 2;
@@ -237,8 +215,8 @@ public:
 				Unit *target = GetPlayerCount();
 				if (target)
 				{
-					_unit->PlaySoundToSet(10254);
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Thank you for releasing me. Now... die!");
+					_unit->PlaySoundToSet(10253);
+					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I... am... unleashed!");
 					m_phase = 2;
 					_unit->RemoveAuraVisual(BANISH2, 1);
 					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
@@ -265,38 +243,65 @@ public:
 	}
 	void PhaseTwo()
 	{
-		if (!quake)
+		if(_unit->GetHealthPct() <= 30)
 		{
-			timer_quake++;
-			timer_blastNova++;
-			float val = (float)RandomFloat(100.0f);
-			SpellCast(val);
-
-			if(timer_blastNova > 54)
+			_unit->PlaySoundToSet(10257);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I will not be taken so easily. Let the walls of this prison tremble... and FALL!!!");
+			_unit->CastSpell(_unit, CAMERASHAKE, true);
+			_unit->GetAIInterface()->StopMovement(5000);
+			_unit->setAttackTimer(5000, false);
+			//sEventMgr.AddEvent(this, &MagtheridonAI::Debris, EVENT_SCRIPT_UPDATE_EVENT, 4000, 1, 0); //Disabled for now as AOE still hits two times --> 11k dmg -.-
+			m_phase = 3;
+			GameObject* falling;
+			for (int i = 0; i < 6; i++)
 			{
-				_unit->CastSpell(_unit, BLAST_NOVA, true);
-				timer_blastNova = 0;
+				falling = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(Columns[i].x, Columns[i].y, Columns[i].z, 184634+i);
+				if (falling)
+					falling->SetUInt32Value(GAMEOBJECT_STATE, 0);
+			}
 
-			}
-			else if (timer_quake > 40)
-			{
-				_unit->setAttackTimer(9000, false);
-				_unit->GetAIInterface()->StopMovement(9000);
-				_unit->CastSpell(_unit, QUAKE, true);
-				timer_quake = 0;
-				quake = 1;
-			}
+			falling = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(0.0f, 0.0f, 0.0f, 184653);
+			if (falling)
+				falling->SetUInt32Value(GAMEOBJECT_STATE, 0);
 		}
 		else
 		{
-			if (quake <= 6)
+			if (!quake)
 			{
-				_unit->CastSpell(_unit, QUAKE, true);
-				quake++;
+				timer_quake++;
+				timer_blastNova++;
+				float val = (float)RandomFloat(100.0f);
+				SpellCast(val);
+
+				if(timer_blastNova > 54)
+				{
+					_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, " begins to cast Blast Nova!");
+					_unit->GetAIInterface()->StopMovement(12000);
+					_unit->setAttackTimer(12000, false);
+					_unit->CastSpell(_unit, BLAST_NOVA, true);
+					timer_blastNova = 0;
+
+				}
+				else if (timer_quake > 50)
+				{
+					_unit->setAttackTimer(9000, false);
+					_unit->GetAIInterface()->StopMovement(9000);
+					_unit->CastSpell(_unit, QUAKE, true);
+					timer_quake = 0;
+					quake = 1;
+				}
 			}
 			else
 			{
-				quake = 0;
+				if (quake <= 6)
+				{
+					_unit->CastSpell(_unit, QUAKE, true);
+					quake++;
+				}
+				else
+				{
+					quake = 0;
+				}
 			}
 		}
 	}
@@ -310,13 +315,16 @@ public:
 			float val = (float)RandomFloat(100.0f);
 			SpellCast(val);
 
-			if(timer_blastNova > 54)
+			if(timer_blastNova > 56)
 			{
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, " begins to cast Blast Nova!");
+				_unit->GetAIInterface()->StopMovement(12000);
+				_unit->setAttackTimer(12000, false);
 				_unit->CastSpell(_unit, BLAST_NOVA, true);
 				timer_blastNova = 0;
 
 			}
-			else if (timer_quake > 40)
+			else if (timer_quake > 50)
 			{
 				_unit->setAttackTimer(8000, false);
 				_unit->GetAIInterface()->StopMovement(8000);
@@ -386,6 +394,7 @@ public:
 	{
 		if (!m_eventstarted)
 		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, "'s bonds begin to weaken!");
 			m_eventstarted = true;
 			if (!door)
 				door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
@@ -1008,7 +1017,7 @@ public:
 		if (Channeler)
 			return;
 
-		aura = new Aura(dbcSpell.LookupEntry(MINDEXHAUSTION), 78000, pPlayer, pPlayer);
+		aura = new Aura(dbcSpell.LookupEntry(MINDEXHAUSTION), 90000, magtheridon, pPlayer);
 		pPlayer->AddAura(aura);
 		pPlayer->CastSpell(pPlayer, SHADOWGRASP2, false);
 		myTrigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, magtheridon->GetGUID());
