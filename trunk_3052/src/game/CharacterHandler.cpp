@@ -338,7 +338,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 
 	//Same Faction limitation only applies to PVP and RPPVP realms :)
 	uint32 realmType = sLogonCommHandler.GetRealmType();
-	if(!HasGMPermissions() && (realmType==REALMTYPE_PVP||realmType==REALMTYPE_RPPVP))
+	if(!HasGMPermissions() && (realmType==REALMTYPE_PVP||realmType==REALMTYPE_RPPVP) && sWorld.PvpFactionLimitation)
 	{
 		if(
 			((pNewChar->GetTeam()== 0) && (_side == 2))||

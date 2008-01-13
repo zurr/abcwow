@@ -519,6 +519,8 @@ public:
 
 	string MapPath;
 	bool UnloadMapFiles;
+	bool PvpFactionLimitation;
+	bool FriendFactionLimitation;
 	bool BreathingEnabled;
 	bool SpeedhackProtection;
 	void EventDeleteBattleground(Battleground * BG);
