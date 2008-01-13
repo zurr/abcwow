@@ -1,24 +1,3 @@
-/*
- * Moon++ Scripts for Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
- * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-#include "StdAfx.h"
-#include "Setup.h"
-
 /************************************************************************/
 /* Raid_TheEye.cpp Script												*/
 /************************************************************************/
@@ -1803,8 +1782,8 @@ public:
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-        RemoveAIUpdateEvent();
-    }
+		RemoveAIUpdateEvent();
+	}
 
 	void OnDied(Unit * mKiller)
     {
@@ -1933,13 +1912,13 @@ public:
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].cooldown = 2;
-		spells[0].perctrigger = 100.0f;
+		spells[0].perctrigger = 80.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(WRATH_OF_THE_ASTROMANCER);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
-		spells[1].perctrigger = 15.0f;
+		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 2000;
 
 		spells[2].info = dbcSpell.LookupEntry(MARK_OF_SOLARIAN);
@@ -1962,13 +1941,17 @@ public:
 
 		priestTimer = 0;
 		spawnTimer = 0;
+		spmin = 0;
 	} 
 
     void OnCombatStart(Unit* mTarget)
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Tal anu'men no Sin'dorei!");
 		_unit->PlaySoundToSet(11134);
+
         RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+
+		spmin = 0;
     }
 
 	void OnTargetDied(Unit* mTarget)
@@ -2622,16 +2605,6 @@ protected:
 //    -= Kael'thas SunstriderEvent =- 
 //------------------------------------ 
 
-//Pointers
-Unit* Darkener;
-Unit* Sanguinar;
-Unit* Capernian;
-Unit* Telonicus;
-Unit* Phoenix;
-
-//Timers etc.
-uint32 AdvisorsAlive;
-
 //Thaladred the Darkener AI(1st advisor)
 #define CN_DARKENER 20064
 
@@ -2659,7 +2632,7 @@ public:
 		spells[0].cooldown = -1;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
-		spells[0].speech = "Physic blow";
+		//spells[0].speech = "Physic blow";
 		
 		spells[1].info = dbcSpell.LookupEntry(SILENCE); 
 		spells[1].targettype = TARGET_ATTACKING;
@@ -2667,13 +2640,16 @@ public:
 		spells[1].cooldown = -1;
 		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
-		spells[1].speech = "Silence";
+		//spells[1].speech = "Silence";
 
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->GetAIInterface()->m_canMove = false;
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 	}
     void OnCombatStart(Unit* mTarget)
     {
 		//door close
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
+		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
@@ -2691,8 +2667,6 @@ public:
 	
 	void OnDied(Unit * mKiller)
 	{
-		AdvisorsAlive--;
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "OnDied");
 		RemoveAIUpdateEvent();
 	}
 	
@@ -2793,20 +2767,18 @@ public:
 		spells[0].attackstoptimer = 1000;
 		spells[0].speech = "Fear";
 
-		/*_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		_unit->GetAIInterface()->m_canMove = false;
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE_9);*/
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
 	}
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
 	void OnTargetDied(Unit* mTarget)
 	{
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "OnTargetDied1");
 	}
 
 	void OnCombatStop(Unit *mTarget)
@@ -2818,8 +2790,6 @@ public:
 	
 	void OnDied(Unit * mKiller)
 	{
-		AdvisorsAlive--;
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "OnDied");
 		RemoveAIUpdateEvent();
 	}
 	
@@ -2905,38 +2875,33 @@ public:
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].cooldown = -1;
-		spells[0].perctrigger = 100.0f;
+		spells[0].perctrigger = 20.0f;
 		spells[1].attackstoptimer = 2000;
-		spells[0].speech = "Fireball";
 
 		spells[1].info = dbcSpell.LookupEntry(CONFLAGRATION);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = -1;
-		spells[1].perctrigger = 0.0f;
-		spells[1].speech = "Conflagration";
+		spells[1].perctrigger = 20.0f;
 
 		spells[2].info = dbcSpell.LookupEntry(ARCANE_EXPLOSION);
-		spells[2].targettype = TARGET_ATTACKING;
+		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
 		spells[2].cooldown = -1;
-		spells[2].perctrigger = 0.0f;
-		spells[2].speech = "Arcane Explosion";
+		spells[2].perctrigger = 20.0f;
 
-		/*_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		_unit->GetAIInterface()->m_canMove = false;
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE_9);*/
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
 	}
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
 	void OnTargetDied(Unit* mTarget)
 	{
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "OnTargetDied1");
 	}
 
 	void OnCombatStop(Unit *mTarget)
@@ -2948,8 +2913,6 @@ public:
 	
 	void OnDied(Unit * mKiller)
 	{
-		AdvisorsAlive--;
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "OnDied");
 		RemoveAIUpdateEvent();
 	}
 	
@@ -3035,7 +2998,6 @@ public:
 		spells[0].cooldown = -1;
 		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 0;
-		spells[0].speech = "Bomb";
 
 		spells[1].info = dbcSpell.LookupEntry(REMOTE_TOY);
 		spells[1].targettype = TARGET_VARIOUS;
@@ -3043,22 +3005,19 @@ public:
 		spells[1].cooldown = -1;
 		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
-		spells[1].speech = "Remote Toy";
 
-		/*_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		_unit->GetAIInterface()->m_canMove = false;
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE_9);*/
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
 	}
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
 	void OnTargetDied(Unit* mTarget)
 	{
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "OnTargetDied1");
 	}
 
 	void OnCombatStop(Unit *mTarget)
@@ -3070,8 +3029,6 @@ public:
 	
 	void OnDied(Unit * mKiller)
 	{
-		AdvisorsAlive--;
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "OnDied");
 		RemoveAIUpdateEvent();
 	}
 	
@@ -3239,7 +3196,6 @@ public:
 
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
 		RegisterAIUpdateEvent(1000);
 		Timer = 0;
     }
@@ -3388,7 +3344,8 @@ public:
 
 		if(!DespawnTimer)
 		{
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Spawn Phoenix");
+			Unit* Phoenix;
+			//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Spawn Phoenix");
 			Phoenix = _unit->GetMapMgr()->GetInterface()->SpawnCreature(21362, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), false, false, 0, 0);
 			_unit->Despawn(0,0);
 		}
@@ -3443,7 +3400,7 @@ public:
 		spells[0].cooldown = -1;
 		spells[0].perctrigger = 5.0f; 
 		spells[0].attackstoptimer = 1000; 
-		spells[0].speech = "Flame Strike"; //TODO - should be cast after the "warning"
+		//spells[0].speech = "Flame Strike"; //TODO - should be cast after the "warning"
 		
 		spells[1].info = dbcSpell.LookupEntry(PYROBLAST); 
 		spells[1].targettype = TARGET_ATTACKING;
@@ -3451,7 +3408,7 @@ public:
 		spells[1].cooldown = -1;
 		spells[1].perctrigger = 15.0f;
 		spells[1].attackstoptimer = 1000;
-		spells[1].speech = "Pyroblast";
+		//spells[1].speech = "Pyroblast";
 		
 		spells[2].info = dbcSpell.LookupEntry(ARCANE_DIST);
 		spells[2].targettype = TARGET_ATTACKING;
@@ -3459,7 +3416,7 @@ public:
 		spells[2].cooldown = -1;
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 1000;
-		spells[2].speech = "Arcane Disturption";
+		//spells[2].speech = "Arcane Disturption";
 
 		spells[3].info = dbcSpell.LookupEntry(SHIELD);
 		spells[3].targettype = TARGET_SELF;
@@ -3467,7 +3424,7 @@ public:
 		spells[3].cooldown = -1;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-		spells[3].speech = "Schock Barrier";
+		//spells[3].speech = "Schock Barrier";
 
 		spells[4].info = dbcSpell.LookupEntry(MIND_CONTROL);
 		spells[4].targettype = TARGET_ATTACKING;
@@ -3475,7 +3432,7 @@ public:
 		spells[4].cooldown = -1;
 		spells[4].perctrigger = 0.0f;
 		spells[4].attackstoptimer = 1000;
-		spells[4].speech = "Mind Control";
+		//spells[4].speech = "Mind Control";
 
 		spells[5].info = dbcSpell.LookupEntry(NETHERBEAM);
 		spells[5].targettype = TARGET_ATTACKING;
@@ -3483,7 +3440,7 @@ public:
 		spells[5].cooldown = -1;
 		spells[5].perctrigger = 0.0f;
 		spells[5].attackstoptimer = 1000;
-		spells[5].speech = "Nether Beam";
+		//spells[5].speech = "Nether Beam";
 
 		spells[6].info = dbcSpell.LookupEntry(SUMMON_WEAPONS);
 		spells[6].targettype = TARGET_SELF;
@@ -3491,29 +3448,36 @@ public:
 		spells[6].cooldown = -1;
 		spells[6].perctrigger = 0.0f;
 		spells[6].attackstoptimer = 1000;
-		spells[6].speech = "Summon Weapons";
+		//spells[6].speech = "Summon Weapons";
 
 		// Remove Weapons Spells
 
 		spells[7].info = dbcSpell.LookupEntry(REMOVE_INFUSER);
-		spells[7].speech = "Started removing weapons";
+		//spells[7].speech = "Started removing weapons";
 
 		spells[8].info = dbcSpell.LookupEntry(REMOVE_SLICER);
-		spells[8].speech = "Removing weapons finished";
+		//spells[8].speech = "Removing weapons finished";
 
 		Timer = 0;
-		AdvisorsAlive = 4;
+		addPhase = 1;
+		addActive = 1;
+		//_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+		//_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		
-		/*_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-		_unit->GetAIInterface()->m_canMove = false;
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE_9);*/
+		
 
 	}
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
+		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		_unit->GetAIInterface()->m_canMove = false;
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+		Darkener = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(786.28f, 20.2825f, 48.7285f, 20064);
+		Sanguinar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(785.825f, -22.1231f, 48.7285f, 20060);
+		Capernian = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.128f, -12.6735f, 48.7285f, 20062);
+		Telonicus = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.906f, 11.9183f, 48.7285f, 20063);
     }
 
 	void OnTargetDied(Unit* mTarget)
@@ -3540,6 +3504,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		reset();
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -3556,18 +3521,35 @@ public:
 	
 	void AIUpdate()
 	{
-		Timer = Timer++;
+		Timer++;
 		
-		if (Timer >= 120)
+		switch(addPhase)
 		{
-			SummonPhoenix();
+			case 1:
+				FirstAd();
+				break;
+			case 2:
+				SecondAd();
+				break;
+			case 3:
+				ThirdAd();
+				break;
+			case 4:
+				FourthAd();
+				break;
+			case 5:
+				Phase2();
+			default:
+				float val = RandomFloat(100.0f);
+				SpellCast(val);
+				if (Timer >= 120)
+				{
+					SummonPhoenix();
+					Timer = 0;
+				}
+				break;
 		}
-	
-		else
-		{
-			float val = RandomFloat(100.0f);
-			SpellCast(val);
-		}
+
 	}
 	
 	void SpellCast(float val)
@@ -3615,68 +3597,186 @@ public:
 		}
 	}
 
+
+	void Phase2()
+	{
+		if(addActive == 1)
+		{
+			Darkener->setDeathState(ALIVE);
+			Darkener->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+
+			Sanguinar->setDeathState(ALIVE);
+			Sanguinar->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+
+			Capernian->setDeathState(ALIVE);
+			Capernian->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+
+			Telonicus->setDeathState(ALIVE);
+			Telonicus->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+
+			addActive = 2;
+
+			return;
+		}
+
+		if(!Darkener->isAlive() && !Sanguinar->isAlive() && !Capernian->isAlive() && !Telonicus->isAlive())
+		{
+			_unit->GetAIInterface()->m_canMove = true;
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+
+			addPhase = 6;
+			addActive = 1;
+		}
+	}
+
+	void reset()
+	{
+		if(!Darkener->isAlive())
+		{
+			Darkener->setDeathState(ALIVE);
+			Darkener->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		}
+			Darkener->GetAIInterface()->MoveTo(Darkener->GetSpawnX(),Darkener->GetSpawnY(),Darkener->GetSpawnZ(),Darkener->GetSpawnO());
+			Darkener->GetAIInterface()->SetAllowedToEnterCombat(false);
+			Darkener->GetAIInterface()->m_canMove = false;
+			Darkener->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+
+		if(!Sanguinar->isAlive())
+		{
+			Sanguinar->setDeathState(ALIVE);
+			Sanguinar->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		}
+			Sanguinar->GetAIInterface()->MoveTo(Sanguinar->GetSpawnX(),Sanguinar->GetSpawnY(),Sanguinar->GetSpawnZ(),Sanguinar->GetSpawnO());
+			Sanguinar->GetAIInterface()->SetAllowedToEnterCombat(false);
+			Sanguinar->GetAIInterface()->m_canMove = false;
+			Sanguinar->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		
+
+
+		if(!Capernian->isAlive())
+		{
+			Capernian->setDeathState(ALIVE);
+			Capernian->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		}
+			Capernian->GetAIInterface()->MoveTo(Capernian->GetSpawnX(),Capernian->GetSpawnY(),Capernian->GetSpawnZ(),Capernian->GetSpawnO());
+			Capernian->GetAIInterface()->SetAllowedToEnterCombat(false);
+			Capernian->GetAIInterface()->m_canMove = false;
+			Capernian->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		
+
+		if(!Telonicus->isAlive())
+		{
+			Telonicus->setDeathState(ALIVE);
+			Telonicus->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		}
+			Telonicus->GetAIInterface()->MoveTo(Telonicus->GetSpawnX(),Telonicus->GetSpawnY(),Telonicus->GetSpawnZ(),Telonicus->GetSpawnO());
+			Telonicus->GetAIInterface()->SetAllowedToEnterCombat(false);
+			Telonicus->GetAIInterface()->m_canMove = false;
+			Telonicus->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		
+		_unit->GetAIInterface()->m_canMove = false;
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+
+		Timer = 0;
+		addPhase = 1;
+		addActive = 1;
+	}
+
 	void FirstAd()
 	{
-		Darkener = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(786.28f, 20.2825f, 48.7285f, 20064);
+		if(addActive == 1)
+		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Let us see how your nerves hold up against the Darkener, Thaladred."); 
+			_unit->PlaySoundToSet(11259);
 
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Let us see how your nerves hold up against the Darkener, Thaladred."); 
-		_unit->PlaySoundToSet(11259);
+			Darkener->GetAIInterface()->SetAllowedToEnterCombat(true);
+			Darkener->GetAIInterface()->m_canMove = true;
+			Darkener->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 
-		Darkener->GetAIInterface()->SetAllowedToEnterCombat(true);
-		Darkener->GetAIInterface()->m_canMove = true;
-		Darkener->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+			Unit *target = NULL;
+			target = Darkener->GetAIInterface()->GetNextTarget();
+			Darkener->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
+			addActive = 2;
+		}
 
-		Unit *target = NULL;
-		target = Darkener->GetAIInterface()->GetNextTarget();
-		Darkener->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
+		if(!Darkener->isAlive())
+		{
+			addPhase = 2;
+			addActive = 1;
+		}
 	}
 
 	void SecondAd()
 	{
-		Sanguinar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(785.825f, -22.1231f, 48.7285f, 20060);
+		if(addActive == 1)
+		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You have persevered against some of my best advisors. But none can withstand the might of the Bloodhammer. Behold, Lord Sanguinar."); 
+			_unit->PlaySoundToSet(11260);
 
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You have persevered against some of my best advisors. But none can withstand the might of the Bloodhammer. Behold, Lord Sanguinar."); 
-		_unit->PlaySoundToSet(11260);
+			Sanguinar->GetAIInterface()->SetAllowedToEnterCombat(true);
+			Sanguinar->GetAIInterface()->m_canMove = true;
+			Sanguinar->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 
-		Sanguinar->GetAIInterface()->SetAllowedToEnterCombat(true);
-		Sanguinar->GetAIInterface()->m_canMove = true;
-		Sanguinar->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+			Unit *target = NULL;
+			target = Sanguinar->GetAIInterface()->GetNextTarget();
+			Sanguinar->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
+			addActive = 2;
+		}
 
-		Unit *target = NULL;
-		target = Sanguinar->GetAIInterface()->GetNextTarget();
-		Sanguinar->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
+		if(!Sanguinar->isAlive())
+		{
+			addPhase = 3;
+			addActive = 1;
+		}
 	}
 
 	void ThirdAd()
 	{
-		Capernian = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.128f, -12.6735f, 48.7285f, 20062);
+		if(addActive == 1)
+		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Capernian will see to it that your stay here is a short one."); 
+			_unit->PlaySoundToSet(11257);
 
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Capernian will see to it that your stay here is a short one."); 
-		_unit->PlaySoundToSet(11257);
+			Capernian->GetAIInterface()->SetAllowedToEnterCombat(true);
+			Capernian->GetAIInterface()->m_canMove = true;
+			Capernian->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 
-		Capernian->GetAIInterface()->SetAllowedToEnterCombat(true);
-		Capernian->GetAIInterface()->m_canMove = true;
-		Capernian->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+			Unit *target = NULL;
+			target = Capernian->GetAIInterface()->GetNextTarget();
+			Capernian->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
+			addActive = 2;
+		}
 
-		Unit *target = NULL;
-		target = Capernian->GetAIInterface()->GetNextTarget();
-		Capernian->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
+		if(!Capernian->isAlive())
+		{
+			addPhase = 4;
+			addActive = 1;
+		}
 	}
 
 	void FourthAd()
 	{
-		Telonicus = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.906f, 11.9183f, 48.7285f, 20063);
+		if(addActive == 1)
+		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Well done. You have proven worthy to test your skills against my Master Engineer, Telonicus."); 
+			_unit->PlaySoundToSet(11258);
 
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Well done. You have proven worthy to test your skills against my Master Engineer, Telonicus."); 
-		_unit->PlaySoundToSet(11258);
+			Telonicus->GetAIInterface()->SetAllowedToEnterCombat(true);
+			Telonicus->GetAIInterface()->m_canMove = true;
+			Telonicus->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 
-		Telonicus->GetAIInterface()->SetAllowedToEnterCombat(true);
-		Telonicus->GetAIInterface()->m_canMove = true;
-		Telonicus->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+			Unit *target = NULL;
+			target = Telonicus->GetAIInterface()->GetNextTarget();
+			Telonicus->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
+			addActive = 2;
+		}
 
-		Unit *target = NULL;
-		target = Telonicus->GetAIInterface()->GetNextTarget();
-		Telonicus->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
+		if(!Telonicus->isAlive())
+		{
+			addPhase = 5;
+			addActive = 1;
+		}
 	}
 
 	void SummonPhoenix()
@@ -3720,6 +3820,12 @@ public:
 
 protected:	
 
+	//Pointers
+	Unit* Darkener;
+	Unit* Sanguinar;
+	Unit* Capernian;
+	Unit* Telonicus;
+
 	int nrspells;
 	int Timer;
 	int SummonTimer;
@@ -3727,6 +3833,9 @@ protected:
 	float SummonY;
 	float SummonZ;
 	float SummonO;
+
+	int addPhase;
+	int addActive;
 	};
 
 
