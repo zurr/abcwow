@@ -1,3 +1,6 @@
+#include "StdAfx.h"
+#include "Setup.h"
+
 /************************************************************************/
 /* Raid_TheEye.cpp Script												*/
 /************************************************************************/
@@ -1904,6 +1907,7 @@ public:
 
     HIGHASTROMANCERSOLARIANAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -2765,7 +2769,6 @@ public:
 		spells[0].cooldown = -1;
 		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
-		spells[0].speech = "Fear";
 
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		_unit->GetAIInterface()->m_canMove = false;
@@ -3469,6 +3472,7 @@ public:
 	}
     void OnCombatStart(Unit* mTarget)
     {
+		speechCD = 0;
 		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Combat start");
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 		_unit->GetAIInterface()->m_canMove = false;
@@ -3478,6 +3482,9 @@ public:
 		Sanguinar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(785.825f, -22.1231f, 48.7285f, 20060);
 		Capernian = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.128f, -12.6735f, 48.7285f, 20062);
 		Telonicus = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.906f, 11.9183f, 48.7285f, 20063);
+
+		_unit->PlaySoundToSet(11256);
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Energy. Power. My people are addicted to it. Their dependence made manifest after the Sunwell was destroyed. Welcome to the future...a pity you're too late to stop it. No one can stop me now. Selama ashal'anore.");
     }
 
 	void OnTargetDied(Unit* mTarget)
@@ -3521,8 +3528,14 @@ public:
 	
 	void AIUpdate()
 	{
+		speechCD++;
+		if(speechCD <= 21) //Wait for Kael to say his intro speech.
+		{
+			return;
+		}
+
 		Timer++;
-		
+
 		switch(addPhase)
 		{
 			case 1:
@@ -3539,7 +3552,8 @@ public:
 				break;
 			case 5:
 				Phase2();
-			default:
+				break;
+			case 6:
 				float val = RandomFloat(100.0f);
 				SpellCast(val);
 				if (Timer >= 120)
@@ -3549,7 +3563,6 @@ public:
 				}
 				break;
 		}
-
 	}
 	
 	void SpellCast(float val)
@@ -3621,11 +3634,24 @@ public:
 
 		if(!Darkener->isAlive() && !Sanguinar->isAlive() && !Capernian->isAlive() && !Telonicus->isAlive())
 		{
+			addPhase = 6;
+			addActive = 1;
+
 			_unit->GetAIInterface()->m_canMove = true;
 			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 
-			addPhase = 6;
-			addActive = 1;
+			GameObject *GObj = NULL;
+			GObj = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(743.057f, 4.63443f, 137.796f, 184069);
+			if( !GObj )
+			{
+				sLog.outString("\n[NCDB]Error Could not select Tempest Keep Bridge Gameobject in Kael'thas battle.");
+				return;
+			}
+			if(GObj->GetUInt32Value(GAMEOBJECT_STATE) == 1)
+			{
+				// Crack open the Tempest Keep Bridge
+				GObj->SetUInt32Value(GAMEOBJECT_STATE, 0);
+			}
 		}
 	}
 
@@ -3638,7 +3664,7 @@ public:
 		}
 			Darkener->GetAIInterface()->MoveTo(Darkener->GetSpawnX(),Darkener->GetSpawnY(),Darkener->GetSpawnZ(),Darkener->GetSpawnO());
 			Darkener->GetAIInterface()->SetAllowedToEnterCombat(false);
-			Darkener->GetAIInterface()->m_canMove = false;
+			//Darkener->GetAIInterface()->m_canMove = false;
 			Darkener->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
 
@@ -3649,7 +3675,7 @@ public:
 		}
 			Sanguinar->GetAIInterface()->MoveTo(Sanguinar->GetSpawnX(),Sanguinar->GetSpawnY(),Sanguinar->GetSpawnZ(),Sanguinar->GetSpawnO());
 			Sanguinar->GetAIInterface()->SetAllowedToEnterCombat(false);
-			Sanguinar->GetAIInterface()->m_canMove = false;
+			//Sanguinar->GetAIInterface()->m_canMove = false;
 			Sanguinar->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		
 
@@ -3661,7 +3687,7 @@ public:
 		}
 			Capernian->GetAIInterface()->MoveTo(Capernian->GetSpawnX(),Capernian->GetSpawnY(),Capernian->GetSpawnZ(),Capernian->GetSpawnO());
 			Capernian->GetAIInterface()->SetAllowedToEnterCombat(false);
-			Capernian->GetAIInterface()->m_canMove = false;
+			//Capernian->GetAIInterface()->m_canMove = false;
 			Capernian->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		
 
@@ -3672,15 +3698,29 @@ public:
 		}
 			Telonicus->GetAIInterface()->MoveTo(Telonicus->GetSpawnX(),Telonicus->GetSpawnY(),Telonicus->GetSpawnZ(),Telonicus->GetSpawnO());
 			Telonicus->GetAIInterface()->SetAllowedToEnterCombat(false);
-			Telonicus->GetAIInterface()->m_canMove = false;
+			//Telonicus->GetAIInterface()->m_canMove = false;
 			Telonicus->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		
-		_unit->GetAIInterface()->m_canMove = false;
+		//_unit->GetAIInterface()->m_canMove = false;
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+
 
 		Timer = 0;
 		addPhase = 1;
 		addActive = 1;
+
+		GameObject *GObj = NULL;
+		GObj = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(743.057f, 4.63443f, 137.796f, 184069);
+		if( !GObj )
+		{
+			sLog.outString("\n[NCDB]Error Could not select Tempest Keep Bridge Gameobject in Kael'thas battle.");
+			return;
+		}
+		if(GObj->GetUInt32Value(GAMEOBJECT_STATE) == 0)
+		{
+			// Crack open the Tempest Keep Bridge
+			GObj->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		}
 	}
 
 	void FirstAd()
@@ -3696,6 +3736,8 @@ public:
 
 			Unit *target = NULL;
 			target = Darkener->GetAIInterface()->GetNextTarget();
+			Darkener->GetAIInterface()->setOutOfCombatRange(100000);
+
 			Darkener->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
 			addActive = 2;
 		}
@@ -3800,18 +3842,18 @@ public:
 						_unit->PlaySoundToSet(11267);
 						break;
 					}
-					Unit *target = NULL;
-					target = _unit->GetAIInterface()->GetMostHated(); //TODO
-					SummonX = target->GetPositionX();
-					SummonY = target->GetPositionY();
-					SummonZ = target->GetPositionZ();
-					SummonO = target->GetOrientation();
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FLAMESTRIKE, SummonX, SummonY, SummonZ, SummonO, false, false, 0, 0);
+					//Unit *target = NULL;
+					//target = _unit->GetAIInterface()->GetMostHated(); //TODO
+					//SummonX = target->GetPositionX();
+					//SummonY = target->GetPositionY();
+					//SummonZ = target->GetPositionZ();
+					//SummonO = target->GetOrientation();
+					//_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FLAMESTRIKE, SummonX, SummonY, SummonZ, SummonO, false, false, 0, 0);
 				}break;
 
 				case 5:
 				{
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PHOENIX, SummonX, SummonY, SummonZ, SummonO, false, false, 0, 0);
+					//_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PHOENIX, SummonX, SummonY, SummonZ, SummonO, false, false, 0, 0);
 					Timer = 0;
 				}break;
 		}
@@ -3836,6 +3878,7 @@ protected:
 
 	int addPhase;
 	int addActive;
+	int speechCD;
 	};
 
 

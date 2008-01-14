@@ -4656,14 +4656,10 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 				data << (uint32)1;
 				data << aur->GetSpellId();
 				m_caster->SendMessageToSet(&data,true);
-				u_caster->CastSpell(u_caster, aur->GetSpellProto(), true);
+				Aura *aura = new Aura(aur->GetSpellProto(), (aur->GetDuration()>120000) ? 120000 : aur->GetDuration(), u_caster, u_caster);
+				u_caster->AddAura(aura);
 				unitTarget->RemoveAura(aur);
-				/*int32 dur = (aur->GetDuration()>120000) ? 120000 : aur->GetDuration();
-				//mb here should be another worldpacket for aurabuff.
-				aur->SetDuration(dur);
-				u_caster->AddAura(aur);
-				u_caster->AddAuraVisual(aur->GetSpellId(),1,true);
-					return;*/
+				return;
 			}			
 		}
 	}   
