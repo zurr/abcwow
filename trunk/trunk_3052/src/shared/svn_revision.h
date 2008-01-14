@@ -1,14 +1,14 @@
-// $Id: svn_revision.h 3000 2008-01-08 23:12:47Z burlex $
+// $Id: svn_revision.h 3128 2008-01-14 04:18:50Z debug $
 
 #ifndef _SVN_REVISION_H
 #define _SVN_REVISION_H
 
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
 
-static const char * REVISION_TEXT	= "$Rev: 3000 $";
-static const char * BUILD_TAG		= "2.9-TRUNK";
+static const char * REVISION_TEXT	= "$Rev: 3128 $";
+static const char * BUILD_TAG		= "3.1-TRUNK-ABC";
 
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
 
 ASCENT_INLINE int g_getRevision()
 {
@@ -16,6 +16,6 @@ ASCENT_INLINE int g_getRevision()
 	return atoi( p );
 }
 
-//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//
 
 #endif 

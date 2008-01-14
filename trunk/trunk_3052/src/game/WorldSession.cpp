@@ -42,6 +42,8 @@ _logoutTime(0), permissions(NULL), permissioncount(0), _loggingOut(false), insta
 	m_clientTimeDelay =0;
 	m_loggingInPlayer=NULL;
 	language=0;
+	m_muted = 0;
+	_side = -1;
 
 	for(uint32 x=0;x<8;x++)
 		sAccountData[x].data=NULL;	

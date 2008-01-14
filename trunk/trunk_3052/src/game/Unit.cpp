@@ -78,7 +78,7 @@ Unit::Unit()
 	SM_PDamageBonus=0;
 	SM_PSPELL_VALUE=0;
 	SM_FSPELL_VALUE=0;
-	SM_FResist=0;
+	SM_FHitchance=0;
 	SM_PRange=0;//pct
 	SM_PRadius=0;
 	SM_PAPBonus=0;
@@ -249,7 +249,7 @@ Unit::~Unit()
 	if(SM_PDamageBonus != 0) delete [] SM_PDamageBonus ;
 	if(SM_PSPELL_VALUE != 0) delete [] SM_PSPELL_VALUE ;
 	if(SM_FSPELL_VALUE != 0) delete [] SM_FSPELL_VALUE ;
-	if(SM_FResist != 0) delete [] SM_FResist ;
+	if(SM_FHitchance != 0) delete [] SM_FHitchance ;
 	if(SM_PRange != 0) delete [] SM_PRange ;//pct
 	if(SM_PRadius != 0) delete [] SM_PRadius ;
 	if(SM_PAPBonus != 0) delete [] SM_PAPBonus ;
@@ -664,7 +664,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 			if(spellId && Rand(proc_Chance))
 			{
 				SpellCastTargets targets;
-				if(itr2->procFlags & PROC_TAGRGET_SELF)
+				if(itr2->procFlags & PROC_TARGET_SELF)
 					targets.m_unitTarget = GetGUID();
 				else 
 					targets.m_unitTarget = victim->GetGUID();
@@ -791,7 +791,17 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}
 							else continue; //no weapon no joy
 						}break;
-						//Unbridled Wrath
+						//warrior - Blood Frenzy
+						case 30069:
+						case 30070:
+						{
+							if( !CastingSpell )
+								continue;
+								if( CastingSpell->NameHash != SPELL_HASH_REND && 
+									CastingSpell->NameHash != SPELL_HASH_DEEP_WOUNDS )
+									continue;
+						}break;
+						//warrior - Unbridled Wrath
 						case 12964:
 						{
 							//let's recalc chance to cast since we have a full 100 all time on this one
@@ -803,9 +813,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue; //no weapon no joy
 							}
 							else continue; //no weapon no joy
-//							float chance=it->GetProto()->Delay*100*talentlevel/60000;
-							float chance=float(it->GetProto()->Delay)*float(talentlevel)/600.0f;
-							if(!Rand(chance))
+//							float chance=float(it->GetProto()->Delay)*float(talentlevel)/600.0f;
+							float chance=float(it->GetProto()->Delay)*float(talentlevel)/300.0f; //zack this had a very low proc rate. Kinda liek a waisted talent
+							uint32 myroll=RandomUInt(100);
+							if (myroll > chance )
 								continue;
 						}break;
 /*						//disabled by zack until finished : this needs to get trigered on trap trigger and not trap cast
@@ -1047,7 +1058,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								else
 								{
 									if( CastingSpell->NameHash != SPELL_HASH_MIND_FLAY && // Mind Flay
-										CastingSpell->NameHash != SPELL_HASH_INNER_FIRE && //SW:P
+										CastingSpell->NameHash != SPELL_HASH_SHADOW_WORD__PAIN && //SW:P
 										CastingSpell->NameHash != SPELL_HASH_VAMPIRIC_TOUCH ) //SoC
 										continue;
 								}
@@ -1175,6 +1186,18 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									CastingSpell->NameHash != SPELL_HASH_AMBUSH && //Ambush
 									CastingSpell->NameHash != SPELL_HASH_GARROTE )  //Garrote
 									continue;
+							}break;
+						//Priest - Shadowguard
+						case 28377:
+						case 28378:
+						case 28379:
+						case 28380:
+						case 28381:
+						case 28382:
+						case 28385:
+							{
+								if( CastingSpell && ( this == victim || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) ) ) //no self casts allowed or beneficial spells
+									continue;//we can proc on ranged weapons too
 							}break;
 						//Priest - blackout
 						case 15269:
@@ -1352,6 +1375,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //requires offensive spell. ! might not cover all spells
 									continue;
 							}break;
+						// druid - Celestial Focus
+						case 16922:
+							{
+								if( !CastingSpell )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_STARFIRE )
+									continue;
+							}break;
 						//item - Band of the Eternal Restorer 
 						case 35087:
 							{
@@ -1440,10 +1471,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							if(victim==this || isFriendly(this, victim))
 								continue;
 						}break;
-/*					case 28682: //remove charge only for spell crit
-						{
-							continue; //this is useless, on 1 hand we are increasing this and the other hand we are decreasing it...that results in no action
-						}break;*/
 					}
 				}
 				if(iter2->second.lastproc!=0)
@@ -1870,14 +1897,12 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 
 	if(ability && ability->SpellGroupType)
 	{
-		SM_FFValue(SM_FResist,&hitchance,ability->SpellGroupType);
+		SM_FFValue(SM_FHitchance,&hitchance,ability->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(SM_FDamageBonus,&spell_flat_modifers,ability->SpellGroupType);
-		SM_FIValue(SM_PDamageBonus,&spell_pct_modifers,ability->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell resist mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,hitchance,ability->SpellGroupType);
+		float spell_flat_modifers=0;
+		SM_FFValue(SM_FHitchance,&spell_flat_modifers,ability->SpellGroupType);
+		if(spell_flat_modifers!=0 )
+			printf("!!!!!spell resist mod flat %f,  spell resist bonus %f, spell group %u\n",spell_flat_modifers,hitchance,ability->SpellGroupType);
 #endif
 	}
 	//==========================================================================================
@@ -2153,7 +2178,7 @@ else
 	if(ability && ability->SpellGroupType)
 	{
 		SM_FFValue(SM_CriticalChance,&crit,ability->SpellGroupType);
-		SM_FFValue(SM_FResist,&hitchance,ability->SpellGroupType);
+		SM_FFValue(SM_FHitchance,&hitchance,ability->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		float spell_flat_modifers=0;
 		SM_FFValue(SM_CriticalChance,&spell_flat_modifers,ability->SpellGroupType);
@@ -2321,7 +2346,7 @@ else
 				dmg.full_damage = float2int32(dmg.full_damage*(float(pct_dmg_mod)/100.0f));
 
 			//a bit dirty fix
-			if(ability && ability->NameHash == 0x8401EC6A)
+			if(ability && ability->NameHash == SPELL_HASH_SHRED)
 				summaryPCTmod += pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
 
 			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
@@ -2406,7 +2431,6 @@ else
 					hit_status |= HITSTATUS_CRICTICAL;
 					int32 dmgbonus = dmg.full_damage;
 					//sLog.outString( "DEBUG: Critical Strike! Full_damage: %u" , dmg.full_damage );
-					
 					if(ability && ability->SpellGroupType)
 					{
 						SM_FIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
@@ -3414,14 +3438,13 @@ void Unit::castSpell( Spell * pSpell )
 int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg)
 {
 	int32 plus_damage = 0;
-	Unit *caster=this;
-	uint32 school=spellInfo->School;
+	Unit* caster = this;
+	uint32 school = spellInfo->School;
 
-	/* arcane shot shouldnt be affected by +spell damage, TODO for burlex - replace this with a flag. */
-	if( spellInfo->NameHash == SPELL_HASH_ARCANE_SHOT )
+	if( spellInfo->c_is_flags & SPELL_FLAG_IS_NOT_USING_DMG_BONUS )
 		return 0;
 
-	if(caster->IsPlayer())
+	if( caster->IsPlayer() )
 	{
 		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneByInt[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT3)));
 		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneBySpr[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT4)));
@@ -3441,7 +3464,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	if (spellInfo->dmg_bonus && spellInfo->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
 		spellInfo->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && spellInfo->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE )
 	{
-		dmgdoneaffectperc = spellInfo->dmg_bonus * 0.01f;
+		dmgdoneaffectperc = spellInfo->dmg_bonus/100.0f;
 	}
 	else
 	{
@@ -3451,7 +3474,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 		else
 			if(castaff > 7000) castaff = 7000;
 
-		dmgdoneaffectperc = castaff / 3500;
+		dmgdoneaffectperc = castaff / 3500.0f;
 	}
 
 	//------------------------------by downranking----------------------------------------------
@@ -3475,8 +3498,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 //==============================Bonus Adding To Main Damage=================================
 //==========================================================================================
 	int32 bonus_damage = float2int32(plus_damage * dmgdoneaffectperc);
-
-	bonus_damage +=pVictim->DamageTakenMod[school];
+	//bonus_damage +=pVictim->DamageTakenMod[school]; Bad copy-past i guess :P
 	if(spellInfo->SpellGroupType)
 	{
 		int penalty_pct=0;
@@ -5586,11 +5608,11 @@ void Unit::InheritSMMods(Unit *inherit_from)
 			SM_FSPELL_VALUE = new int32[SPELL_GROUPS];
 		memcpy(SM_FSPELL_VALUE,inherit_from->SM_FSPELL_VALUE,sizeof(int)*SPELL_GROUPS);
 	}
-	if(inherit_from->SM_FResist)
+	if(inherit_from->SM_FHitchance)
 	{
-		if(SM_FResist==0)
-			SM_FResist = new int32[SPELL_GROUPS];
-		memcpy(SM_FResist,inherit_from->SM_FResist,sizeof(int)*SPELL_GROUPS);
+		if(SM_FHitchance==0)
+			SM_FHitchance = new int32[SPELL_GROUPS];
+		memcpy(SM_FHitchance,inherit_from->SM_FHitchance,sizeof(int)*SPELL_GROUPS);
 	}
 	if(inherit_from->SM_PRange)
 	{
@@ -5816,5 +5838,11 @@ bool Unit::isAttackReady(bool offhand)
 		return (getMSTime() >= m_attackTimer_1) ? true : false;
 	else
 		return (getMSTime() >= m_attackTimer) ? true : false;
+}
+
+void Unit::ReplaceAIInterface(AIInterface *new_interface) 
+{ 
+	delete m_aiInterface;	//be carefull when you do this. Might screw unit states !
+	m_aiInterface = new_interface; 
 }
 

@@ -641,10 +641,23 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		int spell_flat_modifers=0;
 		int spell_pct_modifers=0;
-		SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_FRezist_dispell,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PRezist_dispell,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
 			printf("!!!!!spell dipell resist mod flat %d , spell dipell resist mod pct %d , spell dipell resist %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,resistchance,m_spellInfo->SpellGroupType);
+#endif
+	}
+
+	if(m_spellInfo->SpellGroupType && u_caster)
+	{
+		float hitchance=0;
+		SM_FFValue(u_caster->SM_FHitchance,&hitchance,m_spellInfo->SpellGroupType);
+		resistchance -= hitchance;
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		float spell_flat_modifers=0;
+		SM_FFValue(u_caster->SM_FHitchance,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 )
+			printf("!!!!!spell to hit mod flat %f, spell resist chance %f, spell group %u\n",spell_flat_modifers,resistchance,m_spellInfo->SpellGroupType);
 #endif
 	}
 
@@ -2579,6 +2592,7 @@ uint8 Spell::CanCast(bool tolerate)
 			}
 		}
 
+		/*
 		// check for duel areas
 		if(p_caster && m_spellInfo->Id == 7266)
 		{
@@ -2586,7 +2600,7 @@ uint8 Spell::CanCast(bool tolerate)
 			if(at->AreaFlags & AREA_CITY_AREA)
 				return SPELL_FAILED_NO_DUELING;
 		}
-
+		*/
 		// check if spell is allowed while player is on a taxi
 		if(p_caster->m_onTaxi)
 		{
@@ -2907,6 +2921,14 @@ uint8 Spell::CanCast(bool tolerate)
 	{
 		SM_FFValue( u_caster->SM_FRange, &maxRange, m_spellInfo->SpellGroupType );
 		SM_PFValue( u_caster->SM_PRange, &maxRange, m_spellInfo->SpellGroupType );
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		int spell_pct_modifers=0;
+		SM_FIValue(u_caster->SM_FRange,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PRange,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!spell range bonus mod flat %d , spell range bonus pct %d , spell range %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxRange,m_spellInfo->SpellGroupType);
+#endif
 	}
 
 	// Targeted Location Checks (AoE spells)
@@ -3606,7 +3628,7 @@ exit:
 		SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
 		SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 
-		SM_FIValue(u_caster->SM_PEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
 		SM_FIValue(u_caster->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 
 		//now get mods from unit target. These are rare to find talents
@@ -3818,10 +3840,11 @@ void Spell::Heal(int32 amount)
 	}
 
 	//Make it critical
-	bool critical=false;
+	bool critical = false;
+	int32 bonus = 0;
+	float healdoneaffectperc = 0;
 	if( u_caster != NULL )
 	{
-		float healdoneaffectperc = 0;
 		if(!m_spellInfo->dmg_bonus)
 		{
 			SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
@@ -3833,11 +3856,11 @@ void Spell::Heal(int32 amount)
 			else if(castaff < 1500) 
 				castaff = 1500;
 
-			healdoneaffectperc = castaff / 3500;
+			healdoneaffectperc = castaff / 3500.0f;
 		}
 		else
 		{
-			healdoneaffectperc = m_spellInfo->dmg_bonus * 0.01f;
+			healdoneaffectperc = m_spellInfo->dmg_bonus/100.0f;
 		}
 		
 		//Downranking
@@ -3852,10 +3875,32 @@ void Spell::Heal(int32 amount)
 			healdoneaffectperc *= downrank1 * downrank2;
 		}
 
-		amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
-		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
-		amount += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
-		amount += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
+		//caster sided bonus
+		bonus += u_caster->HealDoneMod[m_spellInfo->School] + (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
+
+		if(m_spellInfo->SpellGroupType)
+		{
+			int penalty_pct = 0;
+			int penalty_flt = 0;
+			SM_FIValue( u_caster->SM_PPenalty, &penalty_pct, m_spellInfo->SpellGroupType );
+			bonus += bonus * ( penalty_pct / 100 );
+			SM_FIValue( u_caster->SM_FPenalty, &penalty_flt, m_spellInfo->SpellGroupType );
+			bonus += penalty_flt;
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			int spell_flat_modifers=0;
+			int spell_pct_modifers=0;
+			SM_FIValue(u_caster->SM_FPenalty,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(u_caster->SM_PPenalty,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,m_spellInfo->SpellGroupType);
+#endif
+		}
+//		amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
+//		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
+		bonus += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
+		bonus += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
+
+
 
 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
 		if(critical = Rand(spellCrit))
@@ -3874,13 +3919,20 @@ void Spell::Heal(int32 amount)
 		}
 		
 	}
-	if(amount < 0) amount = 0;
 
 	if( p_caster != NULL )  
 	{
-		amount += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
-		amount += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+		bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
+		bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+	}
 
+	amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
+
+	if(amount < 0) 
+		amount = 0;
+
+	if( p_caster != NULL )  
+	{
 		if( unitTarget->IsPlayer() )
 		{
 			SendHealSpellOnPlayer( p_caster, static_cast< Player* >( unitTarget ), amount, critical );

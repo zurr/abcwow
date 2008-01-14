@@ -332,7 +332,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_comboTarget = 0;
 	m_comboPoints = 0;
 
-	chat_disabled_until		= 0;
 	SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, 0.0f);
 	SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, 0.0f);
 
@@ -5659,6 +5658,7 @@ void Player::SendInitialLogonPackets()
     data << m_bind_zoneid;
     GetSession()->SendPacket( &data );
 #else
+	WorldPacket data(32);
     SendBindPointUpdate(m_bind_pos_x,m_bind_pos_y,m_bind_pos_z,m_bind_mapid,m_bind_zoneid);
 #endif
 
@@ -7443,6 +7443,7 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 		m_session->SendPacket(&msg);
 		return false;
 	}
+
 	_Relocate(MapID, vec, true, instance, InstanceID);
 	return true;
 #endif
@@ -8629,18 +8630,6 @@ void Player::SendAreaTriggerMessage(const char * message, ...)
 	WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 6 + strlen(msg));
 	data << (uint32)0 << msg << (uint8)0x00;
 	m_session->SendPacket(&data);
-}
-
-void Player::Set_Mute_on_player(uint32 until)
-{
-	chat_disabled_until = until;
-	if(!sEventMgr.HasEvent(this,EVENT_MUTE_PLAYER))
-		sEventMgr.AddEvent(this,&Player::Remove_Mute_on_player,EVENT_MUTE_PLAYER,chat_disabled_until,1,0);
-}
-
-void Player::Remove_Mute_on_player()
-{
-	chat_disabled_until = 0;
 }
 
 void Player::removeSoulStone()

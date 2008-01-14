@@ -114,7 +114,7 @@ enum SPELL_MODIFIER_TYPE
     // 13 dont exist spells with it
     SMT_COST                =14,// mana/energy/rage cost reduction // GOOD
     SMT_CRITICAL_DAMAGE     =15,// increases critical strike damage bonus (no flat)
-    SMT_RESIST              =16,// enemy resist chance decrease (flat as %) // GOOD need work
+    SMT_HITCHANCE           =16,// enemy resist chance decrease (flat as %) // GOOD need work
     SMT_ADDITIONAL_TARGET   =17,// Your Healing Wave will now jump to additional nearby targets. Each jump reduces the effectiveness of the heal by 80% // GOOD
     SMT_TRIGGER             =18,// adds/increases chance to trigger some spell for example increase chance to apply poisons or entaglin // GOOD need work
     SMT_TIME                =19,// delay for nova, redirection time bonus for totem,maybe smth else // GOOD need work
@@ -131,40 +131,44 @@ enum SPELL_MODIFIER_TYPE
 };
 
 
-static void SM_FFValue(int32 *m, float *v,uint32 group)
+static void SM_FFValue( int32* m, float* v, uint64 group )
 {
-    if(m == 0) return;
+    if( m == 0 )
+		return;
 
-    for(uint32 x=0;x<SPELL_GROUPS;x++)
-        if((1<<x) & group)
-            (*v)+=m[x];
+    for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+        if( ( (uint64)1 << x) & group )
+            (*v) += m[x];
 }
 
-static void SM_FIValue(int32 *m, int32 *v,uint32 group)
+static void SM_FIValue( int32* m, int32* v, uint64 group )
 {
-    if(m == 0) return;
+    if( m == 0 )
+		return;
 
-    for(uint32 x=0;x<SPELL_GROUPS;x++)
-        if((1<<x) & group)
-            (*v)+=m[x];
+    for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+        if( ( (uint64)1 << x ) & group )
+            (*v) += m[x];
 }
 
-static void SM_PIValue(int32 *m, int32 *v,uint32 group)
+static void SM_PIValue( int32* m, int32* v, uint64 group )
 {
-    if(m == 0) return;
+    if( m == 0 )
+		return;
 
-    for(uint32 x=0;x<SPELL_GROUPS;x++)
-        if((1<<x) & group)
-            (*v)+= ((*v)*(m[x]))/100;
+    for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+        if( ( (uint64)1 << x ) & group )
+            (*v) += ( (*v) * m[x] ) / 100;
 }
 
-static void SM_PFValue(int32*m, float *v,uint32 group)
+static void SM_PFValue( int32* m, float* v, uint64 group )
 {
-    if(m == 0) return;
+    if( m == 0 )
+		return;
     
-    for(uint32 x=0;x<SPELL_GROUPS;x++)
-        if((1<<x) & group)
-            (*v)+= ((*v)*m[x])/100.0f;
+    for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+        if( ( (uint64)1 << x ) & group )
+            (*v) += ( (*v) * m[x] ) / 100.0f;
 }
 
 //bool IsBeneficSpell(SpellEntry *sp);
@@ -260,7 +264,7 @@ enum procFlags
     PROC_MISC                       = 0x10000000,//our custom flag to decide if proc dmg or shield
     PROC_ON_BLOCK_VICTIM            = 0x20000000,//added it as custom, maybe already exists in another form ?
     PROC_ON_SPELL_CRIT_HIT          = 0x40000000,//added it as custom, maybe already exists in another form ?
-    PROC_TAGRGET_SELF               = 0x80000000,//our custom flag to decide if proc target is self or victim
+    PROC_TARGET_SELF               = 0x80000000,//our custom flag to decide if proc target is self or victim
 };
 
 enum CastInterruptFlags
@@ -335,7 +339,7 @@ enum Attributes
     ATTRIBUTES_UNK7								= 0x20, // Reagents
     ATTRIBUTES_PASSIVE							= 0x40,
     ATTRIBUTES_NO_VISUAL_AURA					= 0x80,
-    ATTRIBUTES_UNK10							= 0x100,//seems to be afflicts pet
+    ATTRIBUTES_UNK10							= 0x100,	//seems to be afflicts pet
     ATTRIBUTES_UNK11							= 0x200, // only appears in shaman imbue weapon spells
     ATTRIBUTES_UNK12							= 0x400,
     ATTRIBUTES_UNK13							= 0x800,
@@ -967,6 +971,7 @@ enum SpellIsFlags
     SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE	= 0x00000008, //it started with rogue cold blood but i'm sure others will come
     SPELL_FLAG_IS_POISON				= 0x00000010, //rogue has a few spells that can stack so can't use the spell_type enum ;)
     SPELL_FLAG_IS_FINISHING_MOVE		= 0x00000020, //rogue has a few spells that can stack so can't use the spell_type enum ;)
+    SPELL_FLAG_IS_NOT_USING_DMG_BONUS	= 0x00000040, //rogue has a few spells that can stack so can't use the spell_type enum ;)
 };
 
 ASCENT_INLINE bool CanAgroHash(uint32 spellhashname)
@@ -1125,25 +1130,6 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
 		return true;
 	
     return false;
-}
-
-ASCENT_INLINE bool IsTargetingStealthed(SpellEntry *sp)
-{
-	if(
-		sp->EffectImplicitTargetA[0]==3 ||
-		sp->EffectImplicitTargetA[1]==3 ||
-		sp->EffectImplicitTargetA[2]==3 ||
-		sp->EffectImplicitTargetB[0]==3 ||
-		sp->EffectImplicitTargetB[1]==3 ||
-		sp->EffectImplicitTargetB[2]==3 ||
-		sp->EffectImplicitTargetA[0]==22 ||
-		sp->EffectImplicitTargetA[1]==22 ||
-		sp->EffectImplicitTargetA[2]==22 ||
-		sp->EffectImplicitTargetB[0]==22 ||
-		sp->EffectImplicitTargetB[1]==22 ||
-		sp->EffectImplicitTargetB[2]==22 )
-		return 1;
-	return 0;
 }
 
 ASCENT_INLINE bool IsInrange(LocationVector & location, Object * o, float square_r)
@@ -1400,6 +1386,33 @@ typedef enum {
    EFF_TARGET_SELECTED_ENEMY_CHANNELED					= 77,
    EFF_TARGET_SELECTED_ENEMY_DEADLY_POISON				= 86,
 } SpellEffectTarget;
+
+
+ASCENT_INLINE bool IsTargetingStealthed(SpellEntry *sp)
+{
+	if(
+		sp->EffectImplicitTargetA[0]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetA[1]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetA[2]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetB[0]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetB[1]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetB[2]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED
+		)
+		return 1;
+	return 0;
+}
 
 // slow
 struct SpellTargetMod
@@ -1759,6 +1772,14 @@ public:
                 {
                     SM_FIValue(u_caster->SM_FDur,(int32*)&this->Dur,m_spellInfo->SpellGroupType);
                     SM_PIValue(u_caster->SM_PDur,(int32*)&this->Dur,m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+					int spell_flat_modifers=0;
+					int spell_pct_modifers=0;
+					SM_FIValue(u_caster->SM_FDur,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+					SM_FIValue(u_caster->SM_PDur,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+					if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+						printf("!!!!!spell duration mod flat %d , spell duration mod pct %d , spell duration %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Dur,m_spellInfo->SpellGroupType);
+#endif
                 }
             }
             else
@@ -1783,15 +1804,15 @@ public:
         {
             SM_FFValue(u_caster->SM_FRadius,&Rad[i],m_spellInfo->SpellGroupType);
             SM_PFValue(u_caster->SM_PRadius,&Rad[i],m_spellInfo->SpellGroupType);
-        }
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell radius mod flat %d , spell radius mod pct %d , spell radius %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Rad[i],m_spellInfo->SpellGroupType);
+			int spell_flat_modifers=0;
+			int spell_pct_modifers=0;
+			SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!spell radius mod flat %d , spell radius mod pct %d , spell radius %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Rad[i],m_spellInfo->SpellGroupType);
 #endif
+        }
 
         return Rad[i];
     }
