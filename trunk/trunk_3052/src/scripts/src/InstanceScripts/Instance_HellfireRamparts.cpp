@@ -274,12 +274,12 @@ class BLEEDINGHOLLOWSCRYERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(BLEEDINGHOLLOWSCRYERAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
     BLEEDINGHOLLOWSCRYERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -298,12 +298,12 @@ public:
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-        spells[2].info = dbcSpell.LookupEntry(FEL_INFUSION);
+        /*spells[2].info = dbcSpell.LookupEntry(FEL_INFUSION);
 		spells[2].targettype = TARGET_SELF;	// why it targets enemy :O
 		spells[2].instant = true;
 		spells[2].cooldown = 25;
 		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
+		spells[2].attackstoptimer = 1000;*/
 
 
     }
