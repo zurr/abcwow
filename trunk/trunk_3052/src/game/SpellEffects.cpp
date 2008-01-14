@@ -535,7 +535,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			return;
 
 		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(m_spellInfo->School)*80)/100);
-		if (damage > playerTarget->GetUInt32Value(UNIT_FIELD_HEALTH))
+		if (damage >= playerTarget->GetUInt32Value(UNIT_FIELD_HEALTH))
 			return;
 		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
 		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
