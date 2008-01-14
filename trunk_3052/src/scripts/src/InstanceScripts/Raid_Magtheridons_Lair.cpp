@@ -218,8 +218,8 @@ public:
 					_unit->PlaySoundToSet(10253);
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I... am... unleashed!");
 					m_phase = 2;
-					_unit->RemoveAuraVisual(BANISH2, 1);
 					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+					_unit->RemoveAuraVisual(BANISH2, 1);
 					_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 					_unit->GetAIInterface()->AttackReaction(target, 0, 0);
 				}
