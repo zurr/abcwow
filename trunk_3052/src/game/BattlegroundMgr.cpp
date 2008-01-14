@@ -250,7 +250,6 @@ void CBattlegroundManager::EventQueueUpdate()
 					{
 						plr = *tempPlayerVec[0].begin();
 						tempPlayerVec[0].pop_front();
-						plr->m_bgTeam=team;
 						arena->AddPlayer(plr, team);
 						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 						team = arena->GetFreeTeam();

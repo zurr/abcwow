@@ -323,8 +323,7 @@ struct SpellEntry
     uint32 StartRecoveryTime;               //194
     uint32 StartRecoveryCategory;           //195
     uint32 SpellFamilyName;                 //196
-    uint32 SpellGroupType;                  //197   flags 
-    uint32 unkne;                           //198   flags hackwow=shit 
+	uint64 SpellGroupType;					//197+198
     uint32 MaxTargets;                      //199 
     uint32 Spell_Dmg_Type;                  //200   dmg_class Integer      0=None, 1=Magic, 2=Melee, 3=Ranged
     uint32 FG;                              //201   0,1,2 related to Spell_Dmg_Type I think
@@ -350,6 +349,7 @@ struct SpellEntry
 	bool removable_by_immunity;
 	uint32 in_front_status;
 	bool is_melee_spell;
+    uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
 	uint32 dmg_bonus;						//!!! CUSTOM, spell co-efficiency ( dmg/healing % taken from gear )
 };	
 
@@ -830,6 +830,12 @@ struct CombatRatingDBC
 	float val;
 };
 
+struct ChatChannelDBC
+{
+	uint32 id;
+	uint32 flags;
+};
+
 #pragma pack(pop)
 
 ASCENT_INLINE float GetRadius(SpellRadius *radius)
@@ -1133,6 +1139,7 @@ extern SERVER_DECL DBCStorage<MapEntry> dbcMap;
 extern SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 extern SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 extern SERVER_DECL DBCStorage<CombatRatingDBC> dbcCombatRating;
+extern SERVER_DECL DBCStorage<ChatChannelDBC> dbcChatChannels;
 
 bool LoadDBCs();
 

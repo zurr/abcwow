@@ -21,42 +21,65 @@
 
 Mutex m_confSettingLock;
 vector<string> m_bannedChannels;
-vector<string> m_generalChannels;
 uint64 voicechannelhigh = 0;
 
 void Channel::LoadConfSettings()
 {
 	string BannedChannels = Config.MainConfig.GetStringDefault("Channels", "BannedChannels", "");
-	string GeneralChannels = Config.MainConfig.GetStringDefault("Channels", "GeneralChannels", "General -;Trade -;LookingForGroup;GuildRecruitment;LocalDefense;WorldDefense");
 	m_confSettingLock.Acquire();
 	m_bannedChannels = StrSplit(BannedChannels, ";");
-	m_generalChannels = StrSplit(GeneralChannels, ";");
 	m_confSettingLock.Release();
 }
 
-Channel::Channel(const char * name, uint32 team)
+bool Channel::HasMember(Player * pPlayer)
 {
-	// flags (0x01 = custom?, 0x04 = trade?, 0x20 = city?, 0x40 = lfg?, , 0x80 = voice?,
+	m_lock.Acquire();
+	if( m_members.find(pPlayer) == m_members.end() )
+	{
+		m_lock.Release();
+		return false;
+	}
+	else
+	{
+		m_lock.Release();
+		return true;
+	}
+}
+
+Channel::Channel(const char * name, uint32 team, uint32 type_id)
+{
+	ChatChannelDBC * pDBC;
 	m_flags = 0;
 	m_announce = true;
 	m_muted = false;
 	m_general = false;
 	m_name = string(name);
 	m_team = team;
+	m_id = type_id;
 	voice_enabled = sVoiceChatHandler.CanUseVoiceChat();
 
-	m_confSettingLock.Acquire();
-	for(vector<string>::iterator itr = m_generalChannels.begin(); itr != m_generalChannels.end(); ++itr)
+	pDBC = dbcChatChannels.LookupEntryForced(type_id);
+	if( pDBC != NULL )
 	{
-		if(!strnicmp(m_name.c_str(), (*itr).c_str(), (*itr).size()))
-		{
-			m_general = true;
-			m_announce = false;
-			voice_enabled = false;
-			break;
-		}
+		m_general = true;
+		m_announce = false;
+		voice_enabled = false;
+
+		m_flags |= 0x10;			// general flag
+		// flags (0x01 = custom?, 0x04 = trade?, 0x20 = city?, 0x40 = lfg?, , 0x80 = voice?,		
+
+		if( pDBC->flags & 0x08 )
+			m_flags |= 0x08;		// trade
+
+		if( pDBC->flags & 0x10 || pDBC->flags & 0x20 )
+			m_flags |= 0x20;		// city flag
+
+		if( pDBC->flags & 0x40000 )
+			m_flags |= 0x40;		// lfg flag
 	}
-	m_confSettingLock.Release();
+	else
+		m_flags = 0x01;
+
 	i_voice_channel_id = -1;
 }
 
@@ -65,6 +88,10 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 	Guard mGuard(m_lock);
 	WorldPacket data(SMSG_CHANNEL_NOTIFY, 100);
 	uint32 flags = CHANNEL_FLAG_NONE;
+
+	if( !m_general && plr->GetSession()->CanUseCommand('c') )
+		flags |= CHANNEL_FLAG_MODERATOR;
+
 	if(!m_password.empty() && strcmp(m_password.c_str(), password) != 0)
 	{
         data << uint8(CHANNEL_NOTIFY_FLAG_WRONGPASS) << m_name;
@@ -92,24 +119,37 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 	plr->JoinedChannel(this);
 	m_members.insert(make_pair(plr, flags));
 
-	data << uint8(CHANNEL_NOTIFY_FLAG_YOUJOINED) << m_name << m_id << uint32(0) << uint8(0);
-	plr->GetSession()->SendPacket(&data);
-
 	if(m_announce)
 	{
-		data.clear();
 		data << uint8(CHANNEL_NOTIFY_FLAG_JOINED) << m_name << plr->GetGUID();
-		SendToAll(&data, plr);
-
-		/*data.Initialize(SMSG_PLAYER_JOINED_CHANNEL);
-		data << plr->GetGUID() << uint8(0x14) << m_flags << m_id << m_name;
-		SendToAll(&data);*/
+		SendToAll(&data, NULL);
 	}
+	
+	data.clear();
+	if( m_flags & 0x40 && !plr->GetSession()->HasFlag( ACCOUNT_FLAG_NO_AUTOJOIN ) )
+		data << uint8(CHANNEL_NOTIFY_FLAG_YOUJOINED) << m_name << uint8(0x1A) << uint32(0) << uint32(0);
+	else
+		data << uint8(CHANNEL_NOTIFY_FLAG_YOUJOINED) << m_name << m_flags << m_id << uint32(0);
+
+	plr->GetSession()->SendPacket(&data);
 
 	if(voice_enabled)
 	{
 		data.Initialize(SMSG_CHANNEL_NOTIFY);
 		data << uint8(CHANNEL_NOTIFY_FLAG_VOICE_ON) << m_name << plr->GetGUID();
+		plr->GetSession()->SendPacket(&data);
+
+		//JoinVoiceChannel(plr);
+
+		data.Initialize(0x03d9);
+		//data << uint32(0x00002e57);
+		//data << uint32(0xe0e10000);
+
+		// this is voice channel id?
+		data << uint64(0xe0e10000000032abULL);
+		data << uint8(0);		// 00=custom,03=party,04=raid
+		data << m_name;
+		data << plr->GetGUID();
 		plr->GetSession()->SendPacket(&data);
 	}
 }
@@ -167,7 +207,7 @@ void Channel::Part(Player * plr)
 		SendToAll(&data);*/
 	}
 
-    if(m_members.size() == 0)
+    if(m_members.size() == 0 )
     {
         m_lock.Release();
 		channelmgr.RemoveChannel(this);
@@ -804,12 +844,12 @@ void Channel::SendToAll(WorldPacket * data, Player * plr)
 	}
 }
 
-Channel * ChannelMgr::GetCreateChannel(const char *name, Player * p)
+Channel * ChannelMgr::GetCreateChannel(const char *name, Player * p, uint32 type_id)
 {
 	ChannelList::iterator itr;
 	ChannelList * cl = &Channels[0];
 	Channel * chn;
-	if(seperatechannels)
+	if( seperatechannels && p != NULL )
 		cl = &Channels[p->GetTeam()];
 
 	lock.Acquire();
@@ -835,7 +875,7 @@ Channel * ChannelMgr::GetCreateChannel(const char *name, Player * p)
 	}
 	m_confSettingLock.Release();
 
-	chn = new Channel(name, seperatechannels ? p->GetTeam() : 0);
+	chn = new Channel(name, ( seperatechannels && p != NULL ) ? p->GetTeam() : 0, type_id);
 	cl->insert(make_pair(chn->m_name, chn));
 	lock.Release();
 	return chn;
@@ -914,6 +954,7 @@ void Channel::VoiceChannelCreated(uint16 id)
 {
 	Log.Debug("VoiceChannelCreated", "id %u", id);
 	i_voice_channel_id = id;
+
 	SendVoiceUpdate();
 }
 
@@ -922,7 +963,7 @@ void Channel::JoinVoiceChannel(Player * plr)
 	m_lock.Acquire();
 	if(m_VoiceMembers.find(plr) == m_VoiceMembers.end())
 	{
-		m_VoiceMembers.insert(make_pair(plr, 0x40));
+		m_VoiceMembers.insert(make_pair(plr, 0x06));
 		if(m_VoiceMembers.size() == 1)		// create channel
 			sVoiceChatHandler.CreateVoiceChannel(this);
 
@@ -968,18 +1009,22 @@ void Channel::SendVoiceUpdate()
 	*/
 
 	WorldPacket data(SMSG_VOICE_SESSION, 300);
-	uint8 m_encryptionKey[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	//uint8 m_encryptionKey[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint8 m_encryptionKey[16] = { 0xba, 0x4d, 0x45, 0x60, 0x63, 0xcc, 0x12, 0xBC, 0x73, 0x94, 0x90, 0x03, 0x18, 0x14, 0x45, 0x1F };
 	uint8 counter=1;
 	m_lock.Acquire();
 	MemberMap::iterator itr;
 
-	data << uint32(i_voice_channel_id) << uint32(0);
-	data << i_voice_channel_id;
+	//data << uint32(i_voice_channel_id) << uint32(0);
+	data << uint64(0xe0e10000000032abULL);
+	//data << i_voice_channel_id;
+	data << uint16(0x5e26);		// used in header of udp packets
 	data << uint8(0);
 	data << m_name;
 	data.append(m_encryptionKey, 16);
 	data << uint32(htonl(sVoiceChatHandler.GetVoiceServerIP()));
 	data << uint16(htons(sVoiceChatHandler.GetVoiceServerPort()));
+	//data << uint16(sVoiceChatHandler.GetVoiceServerPort());
 	data << uint8(m_VoiceMembers.size());
     
 	for(itr = m_VoiceMembers.begin(); itr != m_VoiceMembers.end(); ++itr)

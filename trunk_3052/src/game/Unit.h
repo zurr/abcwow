@@ -31,7 +31,7 @@ bool SERVER_DECL Rand(float);
 
 #define UF_TARGET_DIED  1
 #define UF_ATTACKING	2 // this unit is attacking it's selection
-#define SPELL_GROUPS 32//maximum possible is 32, may be less
+#define SPELL_GROUPS	64//This is actually on 64 bits !
 
 #define UNIT_TYPE_HUMANOID_BIT (1 << (HUMANOID-1)) //should get computed by precompiler ;)
 
@@ -840,6 +840,7 @@ public:
 
 	// AIInterface
 	AIInterface *GetAIInterface() { return m_aiInterface; }
+	void ReplaceAIInterface(AIInterface *new_interface) ;
 	void ClearHateList();
 	void WipeHateList();
 	void WipeTargetList();
@@ -914,7 +915,7 @@ public:
 	int32 * SM_PDamageBonus;//pct
 	int32 * SM_PSPELL_VALUE;//pct
 	int32 * SM_FSPELL_VALUE;//flat
-	int32 * SM_FResist;//flat
+	int32 * SM_FHitchance;//flat
 	int32 * SM_PAPBonus;//pct
 	int32 * SM_PCost;
 	int32 * SM_FCost;

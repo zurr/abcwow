@@ -28,7 +28,7 @@ void AccountMgr::ReloadAccounts(bool silent)
 	if(!silent) sLog.outString("[AccountMgr] Reloading Accounts...");
 
 	// Load *all* accounts.
-	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned, forceLanguage FROM accounts");
+	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned, forceLanguage, muted FROM accounts");
 	Field * field;
 	string AccountName;
 	set<string> account_list;
@@ -121,6 +121,8 @@ void AccountMgr::AddAccount(Field* field)
 	else
 		acct->forcedLocale = false;
 
+    acct->Muted = field[7].GetUInt32();
+
 	// Convert username/password to uppercase. this is needed ;)
 	ASCENT_TOUPPER(Username);
 	ASCENT_TOUPPER(Password);
@@ -162,6 +164,8 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 	}
 	else
 		acct->forcedLocale = false;
+
+	acct->Muted = field[7].GetUInt32();
 
 	// Convert username/password to uppercase. this is needed ;)
 	ASCENT_TOUPPER(Username);

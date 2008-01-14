@@ -1,0 +1,1061 @@
+Index: src/game/BattlegroundMgr.cpp
+===================================================================
+--- src/game/BattlegroundMgr.cpp	(revision 3143)
++++ src/game/BattlegroundMgr.cpp	(working copy)
+@@ -252,6 +252,7 @@
+ 						tempPlayerVec[0].pop_front();
+ 						arena->AddPlayer(plr, team);
+ 						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
++						team = arena->GetFreeTeam();
+ 					}
+ 				}
+ 				else
+@@ -385,15 +386,14 @@
+ 
+ 			Arena * ar = ((Arena*)CreateInstance(i,LEVEL_GROUP_70));
+ 			GroupMembersSet::iterator itx;
+-			int32 team;
+ 			ar->rated_match=true;
+ 
+ 			for(itx = group1->GetSubGroup(0)->GetGroupMembersBegin(); itx != group1->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
+ 			{
+ 				if((*itx)->m_loggedInPlayer)
+ 				{
+-					if( (team = ar->GetFreeTeam()) != -1 )
+-                        ar->AddPlayer((*itx)->m_loggedInPlayer, team);
++					if( ar->HasFreeSlots(0) )
++                        ar->AddPlayer((*itx)->m_loggedInPlayer, 0);
+ 				}
+ 			}
+ 
+@@ -401,8 +401,8 @@
+ 			{
+ 				if((*itx)->m_loggedInPlayer)
+ 				{
+-					if( (team = ar->GetFreeTeam()) != -1 )
+-						ar->AddPlayer((*itx)->m_loggedInPlayer, team);
++					if( ar->HasFreeSlots(1) )
++						ar->AddPlayer((*itx)->m_loggedInPlayer, 1);
+ 				}
+ 			}
+ 		}
+Index: src/game/CharacterHandler.cpp
+===================================================================
+--- src/game/CharacterHandler.cpp	(revision 3143)
++++ src/game/CharacterHandler.cpp	(working copy)
+@@ -345,7 +345,7 @@
+ 
+ 	//Same Faction limitation only applies to PVP and RPPVP realms :)
+ 	uint32 realmType = sLogonCommHandler.GetRealmType();
+-	if( !HasGMPermissions() && realmType == REALM_PVP && _side < 0 )
++	if(!HasGMPermissions() && (realmType==REALMTYPE_PVP||realmType==REALMTYPE_RPPVP) && sWorld.PvpFactionLimitation)
+ 	{
+ 		if( ((pNewChar->GetTeam()== 0) && (_side == 1)) || ((pNewChar->GetTeam()== 1) && (_side == 0)) )
+ 		{
+Index: src/game/Chat.h
+===================================================================
+--- src/game/Chat.h	(revision 3143)
++++ src/game/Chat.h	(working copy)
+@@ -43,8 +43,7 @@
+ 	CHAT_MSG_SYSTEM									= 0x0A,
+ 	CHAT_MSG_MONSTER_SAY							= 0x0B,
+ 	CHAT_MSG_MONSTER_YELL							= 0x0C,
+-    CHAT_MSG_MONSTER_WHISPER                        = 0x0D,
+-	//CHAT_MSG_MONSTER_EMOTE							= 0x0E,
++	CHAT_MSG_MONSTER_EMOTE							= 0x0D,
+ 	CHAT_MSG_CHANNEL								= 0x0E,
+ 	CHAT_MSG_CHANNEL_JOIN							= 0x10,
+ 	CHAT_MSG_CHANNEL_LEAVE							= 0x11,
+@@ -56,10 +55,12 @@
+ 	CHAT_MSG_COMBAT_LOG								= 0x17,
+ 	CHAT_MSG_IGNORED								= 0x18,
+ 	CHAT_MSG_SKILL									= 0x19,
++	CHAT_MSG_MONSTER_WHISPER						= 0x1A,
+ 	CHAT_MSG_LOOT									= 0x20,
+ 	CHAT_MSG_BATTLEGROUND_EVENT						= 0x53,
+ 	CHAT_MSG_RAIDLEADER								= 0x57,
+ 	CHAT_MSG_RAIDWARNING							= 0x58,
++	CHAT_MSG_RAID_BOSS_EMOTE						= 0x5A,
+     CHAT_MSG_MONEY,                                 // value is guessed...
+ };
+ 
+Index: src/game/DayWatcherThread.cpp
+===================================================================
+--- src/game/DayWatcherThread.cpp	(revision 3143)
++++ src/game/DayWatcherThread.cpp	(working copy)
+@@ -197,6 +197,7 @@
+ 	Player * plr;
+ 	uint32 guid, arenapoints, orig_arenapoints;
+ 	ArenaTeam * team;
++	uint32 arenapointsPerTeam[3] = {0};
+ 	double X, Y;
+ 	if(result)
+ 	{
+@@ -207,6 +208,9 @@
+ 			arenapoints = f[1].GetUInt32();
+ 			orig_arenapoints = arenapoints;
+ 
++			for(uint32 i = 0; i < 3; ++i)
++				arenapointsPerTeam[i] = 0;
++
+ 			/* are we in any arena teams? */
+ 			for(uint32 i = 0; i < 3; ++i)			// 3 arena team types
+ 			{
+@@ -265,10 +269,13 @@
+ 					}
+ 					
+ 					if(Y > 1.0)
+-						arenapoints += long2int32(double(ceil(Y)));
++						arenapointsPerTeam[i] += long2int32(double(ceil(Y)));
+ 				}
+ 			}
+ 
++			arenapointsPerTeam[0] = max(arenapointsPerTeam[0],arenapointsPerTeam[1]);
++			arenapoints += max(arenapointsPerTeam[0],arenapointsPerTeam[2]);
++
+ 			if(orig_arenapoints != arenapoints)
+ 			{
+ 				plr = objmgr.GetPlayer(guid);
+Index: src/game/LootMgr.cpp
+===================================================================
+--- src/game/LootMgr.cpp	(revision 3143)
++++ src/game/LootMgr.cpp	(working copy)
+@@ -104,6 +104,7 @@
+ 	LoadLootTables("fishingloot",&FishingLoot);
+ 	LoadLootTables("itemloot", &ItemLoot);
+ 	LoadLootTables("prospectingloot", &ProspectingLoot);
++	LoadLootTables("disenchantingloot", &DisenchantingLoot);
+ 	LoadLootTables("pickpocketingloot", &PickpocketingLoot);
+ 	is_loading = false;
+ }
+@@ -213,25 +214,28 @@
+ {
+   sLog.outString("  Deleting Loot Tables...");
+   for(LootStore::iterator iter=CreatureLoot.begin(); iter != CreatureLoot.end(); ++iter)
+-  delete [] iter->second.items;
++	delete [] iter->second.items;
+ 
+   for(LootStore::iterator iter=FishingLoot.begin(); iter != FishingLoot.end(); ++iter)
+-  delete [] iter->second.items;
++	delete [] iter->second.items;
+ 
+   for(LootStore::iterator iter=SkinningLoot.begin(); iter != SkinningLoot.end(); ++iter)
+-  delete [] iter->second.items;
++	delete [] iter->second.items;
+ 
+   for(LootStore::iterator iter=GOLoot.begin(); iter != GOLoot.end(); ++iter)
+-  delete [] iter->second.items;
++	delete [] iter->second.items;
+ 
+   for(LootStore::iterator iter=ItemLoot.begin(); iter != ItemLoot.end(); ++iter)
+ 	  delete [] iter->second.items;
+ 
+   for(LootStore::iterator iter=ProspectingLoot.begin(); iter != ProspectingLoot.end(); ++iter)
+-  delete [] iter->second.items;
++	delete [] iter->second.items;
+ 
+- for(LootStore::iterator iter=PickpocketingLoot.begin(); iter != PickpocketingLoot.end(); ++iter)
+- delete [] iter->second.items;
++  for(LootStore::iterator iter=DisenchantingLoot.begin(); iter != DisenchantingLoot.end(); ++iter)
++	delete [] iter->second.items;
++
++  for(LootStore::iterator iter=PickpocketingLoot.begin(); iter != PickpocketingLoot.end(); ++iter)
++	delete [] iter->second.items;
+ }
+ 
+ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
+@@ -465,7 +469,7 @@
+ 
+ void LootMgr::FillCreatureLoot(Loot * loot,uint32 loot_id, bool heroic)
+ {
+-	loot->items.clear ();
++	loot->items.clear();
+ 	loot->gold =0;
+ 	
+ 	LootStore::iterator tab =CreatureLoot.find(loot_id);
+Index: src/game/LootMgr.h
+===================================================================
+--- src/game/LootMgr.h	(revision 3143)
++++ src/game/LootMgr.h	(working copy)
+@@ -146,7 +146,8 @@
+ 	LootStore	GOLoot;
+ 	LootStore	ItemLoot;
+ 	LootStore	ProspectingLoot;
+-	LootStore PickpocketingLoot;
++	LootStore	DisenchantingLoot;
++	LootStore	PickpocketingLoot;
+ 	std::map<uint32, std::set<uint32> > quest_loot_go;
+ 
+ 	RandomProps * GetRandomProperties(ItemPrototype * proto);
+Index: src/game/MovementHandler.cpp
+===================================================================
+--- src/game/MovementHandler.cpp	(revision 3143)
++++ src/game/MovementHandler.cpp	(working copy)
+@@ -600,7 +600,7 @@
+ 
+ 				//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
+ 
+-				if( distance_delta > 16.0f )
++				if( !HasGMPermissions() && distance_delta > 16.0f )
+ 				{
+ 					switch ( _player->m_speedhackChances )
+ 					{
+Index: src/game/ObjectMgr.cpp
+===================================================================
+--- src/game/ObjectMgr.cpp	(revision 3143)
++++ src/game/ObjectMgr.cpp	(working copy)
+@@ -1846,6 +1846,32 @@
+ 	} while(result->NextRow());
+ 	delete result;
+ 	Log.Notice("ObjectMgr", "%u spell fixes loaded.", fixed_count);
++
++	/*##########################################################################################*/
++
++	// Loads data from spell_data_extra table
++	QueryResult * result1 = WorldDatabase.Query("SELECT * FROM spell_data_extra");
++	if(result1 == 0) return;
++
++	uint32 override_count = 0;
++	do
++	{
++		Field * fields1 = result1->Fetch();
++		uint32 spell_id = fields1[0].GetUInt32();
++		SpellEntry * sp = dbcSpell.LookupEntry(spell_id);
++		if(sp == 0) 
++			continue;
++
++		if(sp->dmg_bonus == 0)
++		{
++			sp->dmg_bonus = fields1[1].GetUInt32();
++			override_count++;
++		}
++
++	} while (result1->NextRow());
++
++	delete result1;
++	Log.Notice("ObjectMgr", "%u spell data extra loaded.", override_count);
+ }
+ 
+ void ObjectMgr::LoadSpellOverride()
+Index: src/game/Professions.cpp
+===================================================================
+--- src/game/Professions.cpp	(revision 3143)
++++ src/game/Professions.cpp	(working copy)
+@@ -39,150 +39,80 @@
+ 	return 0;
+ }
+ 
+-void AddItemFromDisenchant(ItemPrototype *proto,Player*owner)
++void AddItemFromDisenchant(uint32 loot_id, Player *owner)
+ {
+-	uint32 count = 0,item = 0;
+-	uint32 l=proto->ItemLevel;
+-	if(proto->Quality ==4 && l>=51)
++	LootStore::iterator tab =lootmgr.DisenchantingLoot.find(loot_id);
++	if( lootmgr.DisenchantingLoot.end()==tab)
++		return;
++
++	StoreLootList *list = &(tab->second);
++
++	uint32 count;
++	for( uint32 x = 0; x < list->count; x++ )
+ 	{
+-		count=1;
+-		if (l<61) item=20725;
+-		else item=22450;
+-	}
+-	else
+-	{
+-		if(proto->Quality ==2)//green -> dust for armor, essence for weapon
++		if( list->items[x].item.itemproto )
+ 		{
+-			if(proto->Class==4)//armor->dust
++			float chance = list->items[x].chance;
++			if(chance == 0.0f) continue;
++			
++			ItemPrototype *itemproto = list->items[x].item.itemproto;
++			if(Rand(chance))
+ 			{
+-				if(l<=20)item=10940;
+-				else if(l<=30)item=11083;
+-				else if(l<=40)item=11137;
+-				else if(l<=50)item=11176;
+-				else if(l<=60)item=16204;
+-				else item=22445;
++				if( list->items[x].mincount == list->items[x].maxcount )
++					count = list->items[x].maxcount;
++				else
++					count = RandomUInt(list->items[x].maxcount - list->items[x].mincount) + list->items[x].mincount;
++
++				Item *add;
++				SlotResult slotresult;
++				add = owner->GetItemInterface()->FindItemLessMax(list->items[x].item.itemproto->ItemId, count, false);
++				if (!add)
++				{
++					slotresult = owner->GetItemInterface()->FindFreeInventorySlot(itemproto);
++					if(!slotresult.Result)
++					{
++						owner->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_INVENTORY_FULL);
++						return;
++					}
++					Item * it=objmgr.CreateItem(list->items[x].item.itemproto->ItemId,owner);  
++					it->SetUInt32Value( ITEM_FIELD_STACK_COUNT, count);
++					owner->GetItemInterface()->SafeAddItem(it,slotresult.ContainerSlot, slotresult.Slot);
++				}
++				else
++				{
++					add->SetCount(add->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + count);
++					add->m_isDirty = true;
++				}
+ 			}
+-			else
+-			{
+-				if(l<=10)item=10938;
+-				else if(l<=15)item=10939;
+-				else if(l<=20)item=10998;
+-				else if(l<=25)item=11082;
+-				else if(l<=30)item=11134;
+-				else if(l<=35)item=11135;
+-				else if(l<=40)item=11174;
+-				else if(l<=45)item=11175;
+-				else if(l<=50)item=16202;
+-				else if(l<=60)item=16203;
+-				else if(l<=66) item=22447;
+-				else item=22446;
+-			
+-			}
+-			count =1+rand()%3; 
+ 		}
+-		else if(proto->Quality >=3)//blue -> shards
+-		{
+-				if(l<=20)item=10978;
+-				else if(l<=25)item=11084;
+-				else if(l<=30)item=11138;
+-				else if(l<=35)item=11139;
+-				else if(l<=40)item=11177;
+-				else if(l<=45)item=11178;
+-				else if(l<=50)item=14343;
+-				else if(l<=60)item=14344;
+-				else if(l<=65)item=22448;
+-				else item=22449;
+-		
+-			count = proto->Quality-2+rand()%3;
+-		}
+ 	}
+-	Item *add;
+-	SlotResult slotresult;
+-	add = owner->GetItemInterface()->FindItemLessMax(item, count, false);
+-	if (!add)
+-	{
+-		slotresult = owner->GetItemInterface()->FindFreeInventorySlot(proto);
+-		if(!slotresult.Result)
+-		{
+-			owner->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_INVENTORY_FULL);
+-			return;
+-		}
+-		Item * it=objmgr.CreateItem(item,owner);  
+-		it->SetUInt32Value( ITEM_FIELD_STACK_COUNT, count);
+-		owner->GetItemInterface()->SafeAddItem(it,slotresult.ContainerSlot, slotresult.Slot);
+-	}
+-	else
+-	{
+-		add->SetCount(add->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + count);
+-		add->m_isDirty = true;
+-	}
+ }
+ 
+-/*
+-Dusts usually are extracted from armors, but also occasionally found from weapons. 
+ 
+-Strange Dust - Disenchanted from level 1 to 20 items [10940]
+-Soul Dust - Disenchanted from level 21 to 30 items [11083]
+-Vision Dust - Disenchanted from level 31 to 40 items [11137]
+-Dream Dust - Disenchanted from level 41 to 50 items [11176]
+-Illusion Dust - Disenchanted from level 51 to 60 items [16204]
+-
+-
+-Essences usually are extracted from weapons, but also occasionally found from armors. 
+-
+-Lesser Magic Essence - Disenchanted from level 1 to 10 items [10938]
+-Greater Magic Essence - Disenchanted from level 11 to 15 items [10939]
+-Lesser Astral Essence - Disenchanted from level 16 to 20 items [10998]
+-Greater Astral Essence - Disenchanted from level 21 to 25 items [11082]
+-Lesser Mystic Essence - Disenchanted from level 26 to 30 items [11134]
+-Greater Mystic Essence - Disenchanted from level 31 to 35 items [11135]
+-Lesser Nether Essence - Disenchanted from level 36 to 40 items [11174]
+-Greater Nether Essence - Disenchanted from level 41 to 45 items [11175]
+-Lesser Eternal Essence - Disenchanted from level 46 to 50 items [16202]
+-Greater Eternal Essence - Disenchanted from level 51 to 60 items [16203]
+-
+-
+-Shards are normally disenchanted from blue or better items, but have a small chance of coming from green items. 
+-
+-Small Glimmering Shard - Disenchanted from level 1 to 20 items [10978]
+-Large Glimmering Shard - Disenchanted from level 21 to 25 items [11084]
+-Small Glowing Shard - Disenchanted from level 26 to 30 items [11138]
+-Large Glowing Shard - Disenchanted from level 31 to 35 items [11139]
+-Small Radiant Shard - Disenchanted from level 36 to 40 items [11177]
+-Large Radiant Shard - Disenchanted from level 41 to 45 items [11178]
+-Small Brilliant Shard - Disenchanted from level 46 to 50 items [14343]
+-Large Brilliant Shard - Disenchanted from level 51 to 60 items [14344]
+-
+-Nexus Crystals are obtained by disenchanting Epic (purple) items, and sometimes come from Rare (blue) items also. 
+-
+-Nexus Crystal - Disenchanted from level 51-60 items [20725]
+-*/
+-
+-void AddItemFromProspecting(uint32 loot_id,Player*owner)
++void AddItemFromProspecting(uint32 loot_id, Player *owner)
+ {
+ 	LootStore::iterator tab =lootmgr.ProspectingLoot.find(loot_id);
+ 	if( lootmgr.ProspectingLoot.end()==tab)
+ 		return;
+-	StoreLootList *list=&(tab->second);
+ 
+-	for(uint32 x =0,pass=0; x<list->count; x++,pass++)
++	StoreLootList *list = &(tab->second);
++
++	uint32 count;
++	for( uint32 x = 0; x < list->count; x++ )
+ 	{
+-		if(list->items[x].item.itemproto)// this check is needed until loot DB is fixed
++		if( list->items[x].item.itemproto )
+ 		{
+-			if(Rand(list->items[x].chance)) 
+-		    {
+-				ItemPrototype *itemproto = list->items[x].item.itemproto;
+-				if(!itemproto)
+-					return;
+-				uint32 count = 1;
+-				if(list->count != (x - 1))
+-				{
+-					for(uint32 z = (x + 1); z < list->count; z++)
+-						if(itemproto->MaxCount && (count == itemproto->MaxCount))
+-							break;
+-						else if(list->items[x].item.itemproto == list->items[z].item.itemproto && Rand(list->items[x].chance))
+-							count++;
+-				}
++			float chance = list->items[x].chance;
++			if(chance == 0.0f) continue;
++			
++			ItemPrototype *itemproto = list->items[x].item.itemproto;
++			if(Rand(chance))
++			{
++				if( list->items[x].mincount == list->items[x].maxcount )
++					count = list->items[x].maxcount;
++				else
++					count = RandomUInt(list->items[x].maxcount - list->items[x].mincount) + list->items[x].mincount;
++
+ 				Item *add;
+ 				SlotResult slotresult;
+ 				add = owner->GetItemInterface()->FindItemLessMax(list->items[x].item.itemproto->ItemId, count, false);
+@@ -205,5 +135,5 @@
+ 				}
+ 			}
+ 		}
+- 	}
++	}
+ }
+Index: src/game/Professions.h
+===================================================================
+--- src/game/Professions.h	(revision 3143)
++++ src/game/Professions.h	(working copy)
+@@ -22,7 +22,7 @@
+ 
+ uint32 GetGOReqSkill(GameObject * gameObjTarget);
+ void UseFishing(Player *player);
+-void AddItemFromDisenchant(ItemPrototype *proto,Player*owner);
+-void AddItemFromProspecting(uint32 loot_id,Player*owner);
++void AddItemFromDisenchant(uint32 loot_id, Player *owner);
++void AddItemFromProspecting(uint32 loot_id, Player *owner);
+ 
+ #endif
+Index: src/game/SocialMgr.cpp
+===================================================================
+--- src/game/SocialMgr.cpp	(revision 3143)
++++ src/game/SocialMgr.cpp	(working copy)
+@@ -165,9 +165,9 @@
+ 		plr->GetSession()->SendPacket( &data );
+ 		return;
+ 	}
+-	if( friendInfo->team != playerInfo->team )
++	if( friendInfo->team != playerInfo->team && sWorld.FriendFactionLimitation )
+ 	{
+-		sLog.outDebug("SocialMgr: %s tried to add an ennemy to his friendlist", plr->GetName());
++		sLog.outDebug("SocialMgr: %s tried to add an enemy to his friendlist", plr->GetName());
+ 		data << (uint8)FRIEND_ENEMY << (uint64)friendInfo->guid;
+ 		plr->GetSession()->SendPacket( &data );
+ 		return;
+@@ -244,7 +244,7 @@
+ 
+ 	if( pGuid == iGuid )
+ 	{
+-		sLog.outDebug("SocialMgr: %s tried to add himself to his friendlist", plr->GetName());
++		sLog.outDebug("SocialMgr: %s tried to add himself to his ignorelist", plr->GetName());
+ 		data << (uint8)FRIEND_IGNORE_SELF << (uint64)iGuid;
+ 		plr->GetSession()->SendPacket(&data);
+ 		return;
+Index: src/game/Spell.cpp
+===================================================================
+--- src/game/Spell.cpp	(revision 3143)
++++ src/game/Spell.cpp	(working copy)
+@@ -2592,6 +2592,7 @@
+ 			}
+ 		}
+ 
++		/*
+ 		// check for duel areas
+ 		if(p_caster && m_spellInfo->Id == 7266)
+ 		{
+@@ -2599,7 +2600,7 @@
+ 			if(at->AreaFlags & AREA_CITY_AREA)
+ 				return SPELL_FAILED_NO_DUELING;
+ 		}
+-
++		*/
+ 		// check if spell is allowed while player is on a taxi
+ 		if(p_caster->m_onTaxi)
+ 		{
+@@ -3844,16 +3845,23 @@
+ 	float healdoneaffectperc = 0;
+ 	if( u_caster != NULL )
+ 	{
+-		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
++		if(!m_spellInfo->dmg_bonus)
++		{
++			SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
+ 
+-		// affect the plus damage by duration
+-		float castaff = float(GetCastTime(sd));
+-		if(castaff > 3500) 
+-            castaff = 3500;
+-		else if(castaff < 1500) 
+-            castaff = 1500;
++			// affect the plus damage by duration
++			float castaff = float(GetCastTime(sd));
++			if(castaff > 3500) 
++				castaff = 3500;
++			else if(castaff < 1500) 
++				castaff = 1500;
+ 
+-		healdoneaffectperc = castaff / 3500.0f;
++			healdoneaffectperc = castaff / 3500.0f;
++		}
++		else
++		{
++			healdoneaffectperc = m_spellInfo->dmg_bonus/100.0f;
++		}
+ 		
+ 		//Downranking
+ 		if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
+Index: src/game/SpellAuras.cpp
+===================================================================
+--- src/game/SpellAuras.cpp	(revision 3143)
++++ src/game/SpellAuras.cpp	(working copy)
+@@ -1265,6 +1265,289 @@
+ 
+ 	switch(GetSpellId())
+ 	{
++
++		case 32052: //custom
++		{
++			if (apply)
++			{
++				sChatHandler.SystemMessage(_ptarget->GetSession(), "MUHAHAHA ...");
++
++				uint8 race, race_old, class_,gender,powertype/*,skin,face,hairStyle,hairColor,facialHair*/;
++				uint32 team = _ptarget->GetTeam();
++
++				race_old = race = _ptarget->getRace();
++				class_ = _ptarget->getClass();
++				gender = _ptarget->getGender();
++				powertype = _ptarget->GetPowerType();
++				
++				switch(class_)
++				{
++				case WARRIOR:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_UNDEAD; break;
++								case 1: race = RACE_ORC; break;
++								case 2: race = RACE_TROLL; break;
++								case 3: race = RACE_TAUREN; break;
++							}
++						}else{
++							switch(RandomUInt(4))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_DWARF; break;
++								case 2: race = RACE_NIGHTELF; break;
++								case 3: race = RACE_GNOME; break;
++								case 4: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case PALADIN:
++					{
++						if(!team) //a
++						{
++							race = RACE_BLOODELF;
++						}else{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_DWARF; break;
++								case 2: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case HUNTER:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_ORC; break;
++								case 1: race = RACE_TAUREN; break;
++								case 2: race = RACE_TROLL; break;
++								case 3: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_DWARF; break;
++								case 1: race = RACE_NIGHTELF; break;
++								case 2: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case ROGUE:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_UNDEAD; break;
++								case 1: race = RACE_ORC; break;
++								case 2: race = RACE_TROLL; break;
++								case 3: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_DWARF; break;
++								case 2: race = RACE_NIGHTELF; break;
++								case 3: race = RACE_GNOME; break;
++							}
++						}
++					}break;
++				case PRIEST:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_UNDEAD; break;
++								case 1: race = RACE_TROLL; break;
++								case 2: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_DWARF; break;
++								case 2: race = RACE_NIGHTELF; break;
++								case 3: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case SHAMAN:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_ORC; break;
++								case 1: race = RACE_TAUREN; break;
++								case 2: race = RACE_TROLL; break;
++							}
++						}else race = RACE_DRAENEI;
++					}break;
++				case MAGE:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_UNDEAD; break;
++								case 1: race = RACE_TROLL; break;
++								case 2: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_GNOME; break;
++								case 2: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case WARLOCK:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_ORC ; break;
++								case 1: race = RACE_UNDEAD; break;
++								case 2: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_GNOME; break;
++							}
++						}
++					}break;
++				case DRUID:
++					{
++						switch(race)
++						{
++						case RACE_TAUREN: race = RACE_NIGHTELF; break;
++						case RACE_NIGHTELF: race = RACE_TAUREN; break;
++						}
++					}break;
++				}
++
++				_ptarget->SetTeam( team ? 0 : 1 );
++				PlayerCreateInfo *info = objmgr.GetPlayerCreateInfo(race, class_);
++				if (!info)
++					break;
++
++				_ptarget->SetFloatValue(OBJECT_FIELD_SCALE_X, ((race==RACE_TAUREN)?1.3f:1.0f));
++				_ptarget->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, info->factiontemplate );	
++				_ptarget->SetUInt32Value(UNIT_FIELD_BYTES_0, ( ( race ) | ( class_ << 8 ) | ( gender << 16 ) | ( powertype << 24 ) ) );
++				if(race != RACE_BLOODELF)
++				{
++					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId + gender );
++					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId + gender );
++				}
++				else
++				{
++					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId - gender );
++					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId - gender );
++				}
++				// Different races have different number of visuals
++				_ptarget->SetUInt32Value(PLAYER_BYTES, ((RandomUInt(5))|(RandomUInt(5)<<8)|(RandomUInt(5)<<16)|(RandomUInt(5)<<24)));
++				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (( !gender ? 0 : RandomUInt(3) ) | (0x02 << 24)));
++				//_ptarget->SetUInt32Value(PLAYER_BYTES, ((skin) | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
++				//_ptarget->SetUInt32Value(PLAYER_BYTES_2, (facialHair | (0x02 << 24)));
++				
++				_ptarget->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, 0xEEEEEEEE);
++				//dump reputation data
++				ReputationMap m_tempRepMap;
++				//store neutral
++				for(uint32 i = 0; i < dbcFaction.GetNumRows(); ++i)
++				{
++					FactionDBC * f = dbcFaction.LookupRow(i);
++					if(f == 0) continue;
++					// dont store side related factions
++					if( _ptarget->GetStanding(f->ID) &&
++						f->parentFaction != 67 && f->parentFaction != 469 &&
++						f->parentFaction != 892 && f->parentFaction != 891 && 
++						f->ID != 947 && f->ID != 946 && //HH/thrallmar
++						f->ID != 892 && f->ID != 891 && //h/a Forces
++						f->ID != 941 && f->ID != 978 && //Mag'har / Kurenai
++						f->ID != 922 //Tranquillien
++						)
++					{
++						FactionReputation * rep = new FactionReputation;
++						rep->flag = 0;
++						rep->standing = _ptarget->GetStanding(f->ID);
++						rep->baseStanding = _ptarget->GetBaseStanding(f->ID);
++
++						m_tempRepMap[f->ID] = rep;
++					}
++				}
++				//add all starting fresh flashing
++				_ptarget->_InitialReputation();
++				//add/mod all stored
++				for(ReputationMap::iterator itr = m_tempRepMap.begin(); itr != m_tempRepMap.end(); ++itr)
++				{
++					_ptarget->SetStanding(itr->first, itr->second->standing );
++					//delete itr->second;
++				}
++
++				_ptarget->_RemoveLanguages();
++				
++				//remove racial spells along with all starting spells then add them for new race
++				PlayerCreateInfo * old_info = objmgr.GetPlayerCreateInfo(race_old, class_);
++				if (!old_info) break;
++
++				for(std::set<uint32>::iterator sp = old_info->spell_list.begin(); sp!=old_info->spell_list.end(); sp++)
++					if (_ptarget->HasSpell(*sp)) _ptarget->removeSpell((*sp), false, false, 0);
++
++				for(std::set<uint32>::iterator sp = info->spell_list.begin(); sp!=info->spell_list.end(); sp++)
++					_ptarget->addSpell(*sp);
++
++				//quit guild
++				if (_ptarget->GetGuildId())
++				{
++					Guild *pGuild = objmgr.GetGuild( _ptarget->GetGuildId() );
++
++					if(pGuild && pGuild->GetGuildLeader() != _ptarget->GetGUID() )
++					{
++						_ptarget->SetGuildId(0);
++						_ptarget->SetGuildRank(0);
++						pGuild->RemoveGuildMember(_ptarget->m_playerInfo, NULL);
++
++						WorldPacket data(100);
++						data.Initialize(SMSG_GUILD_EVENT);
++						data << uint8(GUILD_EVENT_LEFT);
++						data << uint8(1);
++						data << _ptarget->GetName();
++						pGuild->SendPacket(&data);
++					}
++				}
++
++				//arena team remove
++				for(uint32 i = 0; i < 3 ; i++)
++				{
++					ArenaTeam * team;
++					if( (team = _ptarget->m_arenaTeams[i]) != NULL )
++						team->RemoveMember(_ptarget->m_playerInfo);
++				}
++
++				_ptarget->SaveToDB(false);
++			}
++			else
++			{
++				sChatHandler.SystemMessage(_ptarget->GetSession(), "Signed in blood. There is no going back now ...");
++				sChatHandler.SystemMessage(_ptarget->GetSession(), "Relog ...");
++				//force relog
++				_ptarget->Kick(5000);
++			}
++		}break;
++
+ 	//paladin - Blessing of Light.
+ 	case 19977:
+ 	case 19978:
+@@ -2031,14 +2314,22 @@
+ 	}
+ 
+ 	int amp = m_spellProto->EffectAmplitude[mod->i];
+-	if( amp > 0 ) 
++	if( !amp  ) 
+ 		amp = static_cast< EventableObject* >( this )->event_GetEventPeriod( EVENT_AURA_PERIODIC_HEAL );
+ 
+ 	if( GetDuration() )
+ 	{
+-		int ticks = ( amp > 0 ) ? GetDuration() / amp : 0;
+-		bonus = ( ticks > 0 ) ? bonus / ticks : 0;
+-		bonus = float2int32( float( bonus * GetDuration() / 15000.0f ) );
++		int ticks = (amp > 0) ? GetDuration()/amp : 0;
++
++		if (!m_spellProto->dmg_bonus)
++		{
++			bonus = (ticks > 0) ? bonus/ticks : 0;
++			bonus = float2int32(float(bonus * GetDuration() / 15000.0f));
++		}
++		else
++		{
++			bonus = (ticks > 0) ? float2int32(float( (bonus*m_spellProto->dmg_bonus/100)/ticks )) : 0;
++		}
+ 	}
+ 	else
+ 		bonus = 0;
+@@ -7043,9 +7334,6 @@
+ 
+ void Aura::SpellAuraIncreaseRating( bool apply )
+ {
+-	//value == amt
+-	//misc = bitmask for ITEM_STAT_TYPE
+-
+ 	int v = apply ? mod->m_amount : -mod->m_amount;
+ 
+ 	if( !m_target->IsPlayer() )
+@@ -7056,6 +7344,11 @@
+ 		if( ( ( ( uint32 )1 ) << x ) & mod->m_miscValue )
+ 			plr->ModifyBonuses( 11 + x, v );
+ 
++	//MELEE_CRITICAL_AVOIDANCE_RATING + RANGED_CRITICAL_AVOIDANCE_RATING + SPELL_CRITICAL_AVOIDANCE_RATING
++	//comes only as combination of them  - ModifyBonuses() not adding them individually anyhow
++	if( mod->m_miscValue & (0x0004000|0x0008000|0x0010000) )
++			plr->ModifyBonuses( RESILIENCE_RATING, v );
++
+ 	if( mod->m_miscValue & 1 )//weapon skill
+ 	{
+ 		std::map<uint32, uint32>::iterator i;
+Index: src/game/SpellEffects.cpp
+===================================================================
+--- src/game/SpellEffects.cpp	(revision 3143)
++++ src/game/SpellEffects.cpp	(working copy)
+@@ -1169,7 +1169,7 @@
+ 		{
+ 			/* try to get a selection */
+  			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+-			if( (unitTarget == NULL ) || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f))
++			if(unitTarget == NULL || (unitTarget->CalcDistance(p_caster) > 25.0f))
+ 				return;
+ 		}
+ 
+@@ -4193,7 +4193,7 @@
+ 	if(skill < 75)//can up skill
+ 	if(Rand(float(100-skill*100.0/75.0)))
+ 		caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
+-	AddItemFromDisenchant(it->GetProto(),caster);
++	AddItemFromDisenchant(it->GetEntry(),caster);
+ 
+ 	if(it==i_caster)
+ 		i_caster=NULL;
+@@ -4632,16 +4632,16 @@
+ 		damage = damage*sunder_count;
+ 	}
+ 
++	//hemorage
++	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
++		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
++
+ 	if( m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
+ 	{
+ 		add_damage = (uint32)(damage * 1.5);
+ 		return;
+ 	}
+ 
+-	//hemorage
+-	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
+-		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
+-
+ 	//rogue - mutilate ads dmg if target is poisoned
+ 	if(	m_spellInfo->NameHash == SPELL_HASH_MUTILATE && unitTarget->IsPoisoned() )
+ 		damage = damage + float2int32( (float)damage * 0.5f );
+Index: src/game/Unit.cpp
+===================================================================
+--- src/game/Unit.cpp	(revision 3143)
++++ src/game/Unit.cpp	(working copy)
+@@ -3459,13 +3459,23 @@
+ //==============================+Spell Damage Bonus Modifications===========================
+ //==========================================================================================
+ //------------------------------by cast duration--------------------------------------------
+-	SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
+-	float castaff = float(GetCastTime(sd));
+-	if(castaff < 1500) castaff = 1500;
++	float dmgdoneaffectperc = 0;
++	// exception for spell with both dot and direct dmg - use bonus only for direct dmg for now
++	if (spellInfo->dmg_bonus && spellInfo->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
++		spellInfo->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && spellInfo->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE )
++	{
++		dmgdoneaffectperc = spellInfo->dmg_bonus/100.0f;
++	}
+ 	else
+-		if(castaff > 7000) castaff = 7000;
++	{
++		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
++		float castaff = float(GetCastTime(sd));
++		if(castaff < 1500) castaff = 1500;
++		else
++			if(castaff > 7000) castaff = 7000;
+ 
+-	float dmgdoneaffectperc = castaff / 3500;
++		dmgdoneaffectperc = castaff / 3500.0f;
++	}
+ 
+ 	//------------------------------by downranking----------------------------------------------
+ 	//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
+@@ -3665,6 +3675,31 @@
+ 
+ 	switch(type)
+ 	{
++	case CHAT_MSG_MONSTER_EMOTE:
++		{
++			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
++			{
++				if((*i)->GetTypeId() == TYPEID_PLAYER)
++				{
++					std::stringstream szMessage;
++					szMessage << UnitName << msg;
++
++					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
++					data << type;
++					data << lang;
++					data << GetGUID();
++					data << uint32(0);			// new in 2.1.0
++					data << uint32(UnitNameLength);
++					data << UnitName;
++					data << ((Player*)(*i))->GetGUID();
++					data << uint32(strlen(szMessage.str().c_str())+1);
++					data << szMessage.str().c_str();
++					data << uint8(0x00);
++					WorldSession *session = ((Player*)(*i))->GetSession();
++					session->SendPacket(&data);
++				}
++			}
++		}break;
+ 	case CHAT_MSG_MONSTER_SAY:
+ 		{
+ 			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
+Index: src/game/World.cpp
+===================================================================
+--- src/game/World.cpp	(revision 3143)
++++ src/game/World.cpp	(working copy)
+@@ -1519,6 +1519,19 @@
+ 
+ 	SpellEntry* sp;
+ 
++	//"deal with the devil" custom spell based on unused dummy 
++	sp = dbcSpell.LookupEntry(32052);
++	if(sp != NULL)
++	{
++		sp->DurationIndex = 407;
++		sp->dummy = 1;
++		sp->procFlags = 0;
++		sp->Attributes = 0;
++		sp->AttributesEx = 0;
++		sp->Flags3 = 0;
++		sp->maxstack = 0;
++	}
++
+ 	sp = dbcSpell.LookupEntry( 16164 );
+ 	if( sp != NULL && sp->Id == 16164 )
+ 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
+@@ -5607,6 +5620,8 @@
+ 		new MailSystem;
+ 
+ 	channelmgr.seperatechannels = Config.MainConfig.GetBoolDefault("Server", "SeperateChatChannels", false);
++	PvpFactionLimitation = Config.MainConfig.GetBoolDefault("Server", "PvpFactionLimitation", true);
++	FriendFactionLimitation = Config.MainConfig.GetBoolDefault("Server", "FriendFactionLimitation", true);
+ 	sendRevisionOnJoin = Config.MainConfig.GetBoolDefault("Server", "SendBuildOnJoin", false);
+ 	MapPath = Config.MainConfig.GetStringDefault("Terrain", "MapPath", "maps");
+ 	UnloadMapFiles = Config.MainConfig.GetBoolDefault("Terrain", "UnloadMapFiles", true);
+Index: src/game/World.h
+===================================================================
+--- src/game/World.h	(revision 3143)
++++ src/game/World.h	(working copy)
+@@ -520,6 +520,8 @@
+ 
+ 	string MapPath;
+ 	bool UnloadMapFiles;
++	bool PvpFactionLimitation;
++	bool FriendFactionLimitation;
+ 	bool BreathingEnabled;
+ 	bool SpeedhackProtection;
+ 	void EventDeleteBattleground(Battleground * BG);
+Index: src/shared/Database/DBCStores.h
+===================================================================
+--- src/shared/Database/DBCStores.h	(revision 3143)
++++ src/shared/Database/DBCStores.h	(working copy)
+@@ -350,7 +350,8 @@
+ 	uint32 in_front_status;
+ 	bool is_melee_spell;
+     uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
+-};
++	uint32 dmg_bonus;						//!!! CUSTOM, spell co-efficiency ( dmg/healing % taken from gear )
++};	
+ 
+ struct ItemExtendedCostEntry
+ {

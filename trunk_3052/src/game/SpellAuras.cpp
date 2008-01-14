@@ -1049,7 +1049,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 				}
 			}
 		}
-		uint32 gr = GetSpellProto()->SpellGroupType;
+		uint64 gr = GetSpellProto()->SpellGroupType;
 		if(gr)
 		{
 			Unit*c=GetUnitCaster();
@@ -1131,8 +1131,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				float ticks= float((amp) ? GetDuration()/amp : 0);
 				float fbonus = float(bonus);
 				fbonus += (ticks) ? bonus_damage/ticks : 0;
-				if(!m_spellProto->ChannelInterruptFlags)
-					fbonus *= float(GetDuration()) / 15000.0f;
+				fbonus *= float(GetDuration()) / 15000.0f;
 				bonus = float2int32(fbonus);
 			}
 			else bonus = 0;
@@ -2274,93 +2273,114 @@ void Aura::SpellAuraPeriodicHeal( bool apply )
 
 void Aura::EventPeriodicHeal( uint32 amount )
 {
-	if(!m_target->isAlive())
+	if( !m_target->isAlive() )
 		return;
-	Unit * c = GetUnitCaster();
 
-	int bonus = 0;
-	int bonus_target = 0;
+	Unit* c = GetUnitCaster();
 
-	if(c && c->IsPlayer())
+	int32 bonus = 0;
+
+	if( c != NULL && c->IsPlayer() )
 	{
-		bonus += float2int32(((Player*)c)->SpellHealDoneByInt[m_spellProto->School] * ((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT3));
-		bonus += float2int32(((Player*)c)->SpellHealDoneBySpr[m_spellProto->School] * ((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT4));
+		bonus += float2int32( static_cast< Player* >( c )->SpellHealDoneByInt[m_spellProto->School] * static_cast< Player* >( c )->GetUInt32Value( UNIT_FIELD_STAT3 ) );
+		bonus += float2int32( static_cast< Player* >( c )->SpellHealDoneBySpr[m_spellProto->School] * static_cast< Player* >( c )->GetUInt32Value( UNIT_FIELD_STAT4 ) );
 		bonus += c->HealDoneMod[GetSpellProto()->School];
 		//Druid Tree of Life form. it should work not like this, but it's better then nothing. 
-		if (static_cast<Player*>(c)->IsInFeralForm() && static_cast<Player*>(c)->GetShapeShift() == FORM_TREE)
-			bonus += float2int32(0.25f*((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT4));
+		if( static_cast< Player* >( c )->IsInFeralForm() && static_cast< Player* >( c )->GetShapeShift() == FORM_TREE)
+			bonus += float2int32( 0.25f * static_cast< Player* >( c )->GetUInt32Value( UNIT_FIELD_STAT4 ) );
 	}
-	bonus_target += m_target->HealTakenMod[GetSpellProto()->School];
+
+	if( c != NULL )
+	{
+		bonus += m_target->HealTakenMod[m_spellProto->School] + (amount * c->HealDonePctMod[m_spellProto->School]) / 100;
+	}
+
+	if( c != NULL && m_spellProto->SpellGroupType )
+	{
+		int penalty_pct = 0;
+		int penalty_flt = 0;
+		SM_FIValue( c->SM_PPenalty, &penalty_pct, GetSpellProto()->SpellGroupType );
+		bonus += bonus * ( penalty_pct / 100 );
+		SM_FIValue( c->SM_FPenalty, &penalty_flt, GetSpellProto()->SpellGroupType );
+		bonus += penalty_flt;
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		int spell_pct_modifers=0;
+		SM_FIValue(c->SM_FPenalty,&spell_flat_modifers,GetSpellProto()->SpellGroupType);
+		SM_FIValue(c->SM_PPenalty,&spell_pct_modifers,GetSpellProto()->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,GetSpellProto()->SpellGroupType);
+#endif
+	}
 
 	int amp = m_spellProto->EffectAmplitude[mod->i];
-	if(!amp) 
-		amp=((EventableObject*)this)->event_GetEventPeriod(EVENT_AURA_PERIODIC_HEAL);
+	if( !amp  ) 
+		amp = static_cast< EventableObject* >( this )->event_GetEventPeriod( EVENT_AURA_PERIODIC_HEAL );
 
-	if(GetDuration())
+	if( GetDuration() )
 	{
-		int ticks= (amp) ? GetDuration()/amp : 0;
-		bonus= (ticks) ? bonus/ticks : 0;
-		bonus = float2int32(float(bonus*GetDuration() / 15000.0f));
+		int ticks = (amp > 0) ? GetDuration()/amp : 0;
 
 		if (!m_spellProto->dmg_bonus)
 		{
-			bonus = (ticks) ? (bonus+bonus_target)/ticks : 0;
-			if(!m_spellProto->ChannelInterruptFlags)
-				bonus *= (int)(GetDuration() / 15000.0f + 0.5);
+			bonus = (ticks > 0) ? bonus/ticks : 0;
+			bonus = float2int32(float(bonus * GetDuration() / 15000.0f));
 		}
 		else
 		{
-			bonus = (ticks) ? (int)(((bonus*m_spellProto->dmg_bonus*0.01)+bonus_target)/ticks+0.5) : 0;
+			bonus = (ticks > 0) ? float2int32(float( (bonus*m_spellProto->dmg_bonus/100)/ticks )) : 0;
 		}
 	}
-	else bonus = 0;
+	else
+		bonus = 0;
 
     //Downranking
-    if(c &&c->IsPlayer())
+    if( c != NULL && c->IsPlayer() )
     {
-       if(m_spellProto->baseLevel > 0 && m_spellProto->maxLevel > 0)
-        {
+		if( m_spellProto->baseLevel > 0 && m_spellProto->maxLevel > 0 )
+		{
             float downrank1 = 1.0f;
-            if (m_spellProto->baseLevel < 20)
-                downrank1 = 1.0f - (20.0f - float (m_spellProto->baseLevel) ) * 0.0375f;
+            if( m_spellProto->baseLevel < 20 )
+                downrank1 = 1.0f - ( 20.0f - float( m_spellProto->baseLevel ) ) * 0.0375f;
+
             float downrank2 = ( float(m_spellProto->maxLevel + 5.0f) / float(c->getLevel()) );
-            if (downrank2 >= 1 || downrank2 < 0)
+            if( downrank2 >= 1 || downrank2 < 0 )
                 downrank2 = 1.0f;
 
-            bonus = float2int32(float(bonus)*downrank1*downrank2);
+            bonus = float2int32( float( bonus ) * downrank1 * downrank2 );
         }
     }
 
-
-	int add = (bonus+amount>0) ? bonus+amount : 0;
-	if (c)
-		add += float2int32(add*(m_target->HealTakenPctMod[GetSpellProto()->School]+c->HealDonePctMod[GetSpellProto()->School]/100.0f));
-	uint32 newHealth = m_target->GetUInt32Value(UNIT_FIELD_HEALTH) + (uint32)add;
+	int add = ( bonus + amount > 0 ) ? bonus + amount : 0;
+	if( c != NULL )
+		add += float2int32( add * ( m_target->HealTakenPctMod[m_spellProto->School]+ c->HealDonePctMod[GetSpellProto()->School] / 100.0f));
 	
-	if(newHealth <= m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH))
-		m_target->SetUInt32Value(UNIT_FIELD_HEALTH, newHealth);
+	uint32 newHealth = m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) + (uint32)add;
+	
+	if( newHealth <= m_target->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) )
+		m_target->SetUInt32Value( UNIT_FIELD_HEALTH, newHealth );
 	else
-		m_target->SetUInt32Value(UNIT_FIELD_HEALTH, m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		m_target->SetUInt32Value( UNIT_FIELD_HEALTH, m_target->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) );
 
-	SendPeriodicHealAuraLog(add);
+	SendPeriodicHealAuraLog( add );
 
-	if(GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP)
+	if( GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP )
 	{
-		m_target->Emote(EMOTE_ONESHOT_EAT);
+		m_target->Emote( EMOTE_ONESHOT_EAT );
 	}
 
-		// add threat
-	SpellEntry* spe = this->GetSpellProto();
-	Unit* u_caster=this->GetUnitCaster();
-	if(u_caster)
+	// add threat
+	SpellEntry* spe = m_spellProto;
+	Unit* u_caster = this->GetUnitCaster();
+	if( u_caster != NULL )
 	{
-		Spell* spell = new Spell(u_caster,spe,false,NULL);
+		Spell* spell = new Spell( u_caster, spe, false, NULL );
 
 		uint32 base_threat=spell->GetBaseThreat(add);
 		int count = 0;
-		Unit *unit;
-		std::vector<Unit*> target_threat;
-		if(base_threat)
+		Unit* unit;
+		std::vector< Unit* > target_threat;
+		if( base_threat > 0 )
 		{
 			target_threat.reserve(u_caster->GetInRangeCount()); // this helps speed
 
@@ -3891,8 +3911,8 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 			return;
 		}*/
 		m_target->m_procSpells.push_front(pts);
-//		sLog.outDebug("%u is registering %u chance %u flags %u charges %u triggeronself %u interval %u\n",pts.origId,pts.spellId,pts.ospinfo->procChance,pts.ospinfo->procFlags & ~PROC_TAGRGET_SELF,pts.ospinfo->procCharges,pts.ospinfo->procFlags & PROC_TAGRGET_SELF,pts.ospinfo->proc_interval);
-		sLog.outDebug("%u is registering %u chance %u flags %u charges %u triggeronself %u interval %u\n",pts.origId,pts.spellId,pts.procChance,m_spellProto->procFlags & ~PROC_TAGRGET_SELF,m_spellProto->procCharges,m_spellProto->procFlags & PROC_TAGRGET_SELF,m_spellProto->proc_interval);
+//		sLog.outDebug("%u is registering %u chance %u flags %u charges %u triggeronself %u interval %u\n",pts.origId,pts.spellId,pts.ospinfo->procChance,pts.ospinfo->procFlags & ~PROC_TARGET_SELF,pts.ospinfo->procCharges,pts.ospinfo->procFlags & PROC_TARGET_SELF,pts.ospinfo->proc_interval);
+		sLog.outDebug("%u is registering %u chance %u flags %u charges %u triggeronself %u interval %u\n",pts.origId,pts.spellId,pts.procChance,m_spellProto->procFlags & ~PROC_TARGET_SELF,m_spellProto->procCharges,m_spellProto->procFlags & PROC_TARGET_SELF,m_spellProto->proc_interval);
 	}
 	else
 	{
@@ -4651,6 +4671,8 @@ void Aura::SpellAuraFeignDeath(bool apply)
 			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
 			data << uint32(2);
 			pTarget->GetSession()->SendPacket(&data);
+			if( sEventMgr.HasEvent(pTarget,EVENT_PLAYER_FORECED_RESURECT) ) 
+				sEventMgr.RemoveEvents(pTarget,EVENT_PLAYER_FORECED_RESURECT); //in case he forgets to release spirit (afk or something)
 		}
 	}
 }
@@ -5626,7 +5648,7 @@ void Aura::SpellAuraHover( bool apply )
 void Aura::SpellAuraAddPctMod( bool apply )
 {
 	int32 val = apply ? mod->m_amount : -mod->m_amount;
-	uint32 AffectedGroups = GetSpellProto()->EffectSpellGroupRelation[mod->i];
+	uint64 AffectedGroups = (uint64)GetSpellProto()->EffectSpellGroupRelation[mod->i] + ((uint64)GetSpellProto()->EffectSpellGroupRelation_high[mod->i] << 32);
 	//printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 
 	switch( mod->m_miscValue )//let's generate warnings for unknown types of modifiers
@@ -5732,17 +5754,16 @@ void Aura::SpellAuraAddPctMod( bool apply )
 }
 
 
-void Aura::SendModifierLog( int32** m, int32 v, uint32 mask, uint8 type, bool pct )
+void Aura::SendModifierLog( int32** m, int32 v, uint64 mask, uint8 type, bool pct )
 {
 	WorldPacket data( SMSG_SET_FLAT_SPELL_MODIFIER + pct, 6 );
 
 	if( *m == 0 )
 	{
 		*m = new int32[SPELL_GROUPS];
-
 		for( uint32 x = 0; x < SPELL_GROUPS; x++ )
 		{
-			if( ( 1 << x ) & mask )
+			if( ( ((uint64)1) << x ) & mask )
 			{
 				(*m)[x] = v;
 
@@ -5764,7 +5785,7 @@ void Aura::SendModifierLog( int32** m, int32 v, uint32 mask, uint8 type, bool pc
 	{
 		for( uint32 x = 0; x < SPELL_GROUPS; x++ )
 		{
-			if( ( 1 << x ) & mask )
+			if( ( ((uint64)1) << x ) & mask )
 			{
 				(*m)[x] += v;
 
@@ -6729,13 +6750,16 @@ void Aura::SpellAuraIncreaseSpellDamageBySpr(bool apply)
 
 	if(m_target->IsPlayer())
 	{	
-		for(uint32 x=1;x<7;x++)
+		for(uint32 x=0;x<7;x++)
 		{
 			if (mod->m_miscValue & (((uint32)1)<<x) )
 			{
+				m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) + val);
 				static_cast<Player*>(m_target)->SpellDmgDoneBySpr[x]+=((float)(val))/100;
 			}
 		}
+		if(m_target->IsPlayer())
+			static_cast<Player*>(m_target)->UpdateChanceFields();
 	}
 }
 
@@ -6768,13 +6792,18 @@ void Aura::SpellAuraIncreaseHealingBySpr(bool apply)
 				static_cast<Player*>(m_target)->SpellHealDoneBySpr[x]+=((float)(val))/100;
 			}
 		}
+		if(m_target->IsPlayer())
+		{
+			static_cast<Player*>(m_target)->UpdateChanceFields();
+			m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) + val);
+		}
 	}
 }
 
 void Aura::SpellAuraAddFlatModifier(bool apply)
 {
 	int32 val = apply?mod->m_amount:-mod->m_amount;
-	uint32 AffectedGroups = GetSpellProto()->EffectSpellGroupRelation[mod->i];
+	uint64 AffectedGroups = (uint64)GetSpellProto()->EffectSpellGroupRelation[mod->i] + ((uint64)GetSpellProto()->EffectSpellGroupRelation_high[mod->i] << 32);
 
 //printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 
@@ -6827,8 +6856,8 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 		SendModifierLog(&m_target->SM_FSPELL_VALUE,val,AffectedGroups,mod->m_miscValue);
 		break;
 
-	case SMT_RESIST:
-		SendModifierLog(&m_target->SM_FResist,val,AffectedGroups,mod->m_miscValue);
+	case SMT_HITCHANCE:
+		SendModifierLog(&m_target->SM_FHitchance,val,AffectedGroups,mod->m_miscValue);
 		break;
 
 		// as far as I know its not yet used!!!

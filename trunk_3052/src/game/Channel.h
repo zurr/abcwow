@@ -84,8 +84,8 @@ public:
 	static void LoadConfSettings();
 	string m_name;
 	string m_password;
-	uint32 m_id;
 	uint8 m_flags;
+	uint32 m_id;
 	bool m_general;
 	bool m_muted;
 	bool m_announce;
@@ -96,7 +96,7 @@ public:
 	MemberMap m_VoiceMembers;
 
 public:
-	Channel(const char * name, uint32 team);
+	Channel(const char * name, uint32 team, uint32 type_id);
 	~Channel();
 
 	void AttemptJoin(Player * plr, const char * password);
@@ -134,6 +134,7 @@ public:
 	void PartVoiceChannel(Player * plr);
 	void SendVoiceUpdate();
 	void VoiceDied();
+	bool HasMember(Player * pPlayer);
 };
 
 class ChannelIterator

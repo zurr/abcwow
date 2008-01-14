@@ -160,7 +160,7 @@ pSpellEffect SpellEffectsHandler[TOTAL_SPELL_EFFECTS]={
         &Spell::SpellEffectNULL,// unknown - 137 // http://www.thottbot.com/s41542
         &Spell::SpellEffectNULL,// unknown - 138 // related to superjump or even "*jump" spells http://www.thottbot.com/?e=Unknown%20138
         &Spell::SpellEffectNULL,// unknown - 139 // no spells
-		&Spell::SpellEffectTeleportUnits,//SPELL_EFFECT_TELEPORT_UNITS - 140 IronForge teleport / portal only it seems
+        &Spell::SpellEffectTeleportUnits,//SPELL_EFFECT_TELEPORT_UNITS - 140 IronForge teleport / portal only it seems
         &Spell::SpellEffectNULL,// unknown - 141 // triggers spell, magic one,  (Mother spell) http://www.thottbot.com/s41065
         &Spell::SpellEffectNULL,// unknown - 142 // triggers some kind of "Put spell on target" thing... (dono for sure) http://www.thottbot.com/s40872 and http://www.thottbot.com/s33076
         &Spell::SpellEffectNULL,// unknown - 143 // Master -> deamon effecting spell, http://www.thottbot.com/s25228 and http://www.thottbot.com/s35696
@@ -388,14 +388,9 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 
 	/**************************************************************************
 	* This handles the correct damage of "Judgement of Command" (all ranks)
-	*
-	* note: "unkne" contains flags related to aura's and other scripted stuff
 	**************************************************************************/
-	if (m_spellInfo->unkne == 520)
-	{
-		if (!unitTarget->IsStunned())
+	if (m_spellInfo->NameHash == SPELL_HASH_JUDGEMENT_OF_COMMAND && !unitTarget->IsStunned())
 			dmg = dmg >> 1;
-	}
 
 	if(m_spellInfo->speed > 0)
 	{
@@ -1136,7 +1131,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ILotP.origId = 34299;
 			ILotP.spellId = 34299;
 			ILotP.procChance = 100;
-			ILotP.procFlags = PROC_ON_CRIT_ATTACK | PROC_TAGRGET_SELF;
+			ILotP.procFlags = PROC_ON_CRIT_ATTACK | PROC_TARGET_SELF;
 			ILotP.deleted = false;
 			ILotP.caster = u_caster->GetGUID();
 			ILotP.LastTrigger = 0;
@@ -1172,13 +1167,14 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 	{
 		/* this is rather tricky actually. we have to calculate the orientation of the creature/player, and then calculate a little bit of distance behind that. */
 		float ang;
-		if(unitTarget == m_caster)
+		if( unitTarget == m_caster )
 		{
 			/* try to get a selection */
-			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
-			if(unitTarget == NULL || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f))
+ 			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+			if(unitTarget == NULL || (unitTarget->CalcDistance(p_caster) > 25.0f))
 				return;
 		}
+
 		if( unitTarget->GetTypeId() == TYPEID_UNIT )
 		{
 			if( unitTarget->GetUInt64Value( UNIT_FIELD_TARGET ) != 0 )
@@ -1207,7 +1203,8 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 		float new_y = unitTarget->GetPositionY() - (shadowstep_distance * sinf(ang));
 		
 		/* Send a movement packet to "charge" at this target. Similar to warrior charge. */
-		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, (unitTarget->GetPositionZ() + 0.15f), unitTarget->GetOrientation()));
+		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, (unitTarget->GetPositionZ() + 0.1f), unitTarget->GetOrientation()));
+		
 		return;
 	}
 
@@ -2004,6 +2001,22 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 
 	p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), dest );
 #endif
+	// just in case
+	for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
+	{
+		if( p_caster->m_auras[i] != NULL )
+		{
+			for(uint32 j = 0; j < 3; ++j)
+			{
+				if( p_caster->m_auras[i]->GetSpellProto()->EffectApplyAuraName[j] == SPELL_AURA_MOD_STUN || 
+					p_caster->m_auras[i]->GetSpellProto()->EffectApplyAuraName[j] == SPELL_AURA_MOD_ROOT )
+				{
+					p_caster->m_auras[i]->Remove();
+					break;
+				}
+			}
+		}
+	}
 }
 
 void Spell::SpellEffectEnergize(uint32 i) // Energize
@@ -3676,7 +3689,20 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 
 void Spell::SpellEffectSanctuary(uint32 i) // Stop all attacks made to you
 {
-	/* Note to burlex: RE-WRITE ME! */
+	if(!u_caster)
+		return;
+
+	Object::InRangeSet::iterator itr = u_caster->GetInRangeOppFactsSetBegin();
+	Object::InRangeSet::iterator itr_end = u_caster->GetInRangeOppFactsSetBegin();
+	Unit * pUnit;
+
+	for( ; itr != itr_end; ++itr ) {
+		pUnit = static_cast<Unit*>(*itr);
+		++itr;
+
+		if( pUnit->GetTypeId() == TYPEID_UNIT )
+			pUnit->GetAIInterface()->RemoveThreatByPtr( u_caster );
+	}
 }
 
 void Spell::SpellEffectAddComboPoints(uint32 i) // Add Combo Points
