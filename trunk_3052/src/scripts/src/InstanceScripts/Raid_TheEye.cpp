@@ -3466,10 +3466,8 @@ public:
 		addActive = 1;
 		//_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 		//_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-		
-		
-
 	}
+
     void OnCombatStart(Unit* mTarget)
     {
 		speechCD = 0;
@@ -3539,17 +3537,29 @@ public:
 		switch(addPhase)
 		{
 			case 1:
-				FirstAd();
-				break;
+				if(Darkener)
+				{
+					FirstAd();
+					break;
+				}
 			case 2:
-				SecondAd();
-				break;
+				if(Sanguinar)
+				{
+					SecondAd();
+					break;
+				}
 			case 3:
-				ThirdAd();
-				break;
+				if(Capernian)
+				{
+					ThirdAd();
+					break;
+				}
 			case 4:
-				FourthAd();
-				break;
+				if(Telonicus)
+				{
+					FourthAd();
+					break;
+				}
 			case 5:
 				Phase2();
 				break;
@@ -3615,24 +3625,60 @@ public:
 	{
 		if(addActive == 1)
 		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Perhaps I underestimated you. It would be unfair to make you fight all four Advisors at once, but...fair treatment was never shown to my people. I'm just returning the favor.");
+			_unit->PlaySoundToSet(11262);
+
+			if(Darkener)
+			{
 			Darkener->setDeathState(ALIVE);
 			Darkener->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-
-			Sanguinar->setDeathState(ALIVE);
-			Sanguinar->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-
-			Capernian->setDeathState(ALIVE);
-			Capernian->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-
-			Telonicus->setDeathState(ALIVE);
-			Telonicus->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			}
+			if(Sanguinar)
+			{
+				Sanguinar->setDeathState(ALIVE);
+				Sanguinar->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			}
+			if(Capernian)
+			{
+				Capernian->setDeathState(ALIVE);
+				Capernian->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			}
+			if(Telonicus)
+			{
+				Telonicus->setDeathState(ALIVE);
+				Telonicus->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			}
 
 			addActive = 2;
 
 			return;
 		}
 
-		if(!Darkener->isAlive() && !Sanguinar->isAlive() && !Capernian->isAlive() && !Telonicus->isAlive())
+		if(Darkener && Sanguinar && Capernian && Telonicus)
+		{
+			if(!Darkener->isAlive() && !Sanguinar->isAlive() && !Capernian->isAlive() && !Telonicus->isAlive())
+			{
+				addPhase = 6;
+				addActive = 1;
+
+				_unit->GetAIInterface()->m_canMove = true;
+				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+
+				GameObject *GObj = NULL;
+				GObj = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(743.057f, 4.63443f, 137.796f, 184069);
+				if( !GObj )
+				{
+					sLog.outString("\n[NCDB]Error Could not select Tempest Keep Bridge Gameobject in Kael'thas battle.");
+					return;
+				}
+				if(GObj->GetUInt32Value(GAMEOBJECT_STATE) == 1)
+				{
+					// Crack open the Tempest Keep Bridge
+					GObj->SetUInt32Value(GAMEOBJECT_STATE, 0);
+				}
+			}
+		}
+		else
 		{
 			addPhase = 6;
 			addActive = 1;
@@ -3655,51 +3701,66 @@ public:
 		}
 	}
 
+	void Phase3()
+	{
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "As you can see, I have many weapons in my arsenal.");
+		_unit->PlaySoundToSet(11261);
+	}
+
 	void reset()
 	{
-		if(!Darkener->isAlive())
+		if(Darkener)
 		{
-			Darkener->setDeathState(ALIVE);
-			Darkener->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			if(!Darkener->isAlive())
+			{
+				Darkener->setDeathState(ALIVE);
+				Darkener->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			}
+				Darkener->GetAIInterface()->MoveTo(Darkener->GetSpawnX(),Darkener->GetSpawnY(),Darkener->GetSpawnZ(),Darkener->GetSpawnO());
+				Darkener->GetAIInterface()->SetAllowedToEnterCombat(false);
+				//Darkener->GetAIInterface()->m_canMove = false;
+				Darkener->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		}
-			Darkener->GetAIInterface()->MoveTo(Darkener->GetSpawnX(),Darkener->GetSpawnY(),Darkener->GetSpawnZ(),Darkener->GetSpawnO());
-			Darkener->GetAIInterface()->SetAllowedToEnterCombat(false);
-			//Darkener->GetAIInterface()->m_canMove = false;
-			Darkener->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-
-		if(!Sanguinar->isAlive())
+		if(Sanguinar)
 		{
-			Sanguinar->setDeathState(ALIVE);
-			Sanguinar->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-		}
+			if(!Sanguinar->isAlive())
+			{
+				Sanguinar->setDeathState(ALIVE);
+				Sanguinar->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			}
 			Sanguinar->GetAIInterface()->MoveTo(Sanguinar->GetSpawnX(),Sanguinar->GetSpawnY(),Sanguinar->GetSpawnZ(),Sanguinar->GetSpawnO());
 			Sanguinar->GetAIInterface()->SetAllowedToEnterCombat(false);
 			//Sanguinar->GetAIInterface()->m_canMove = false;
 			Sanguinar->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		}
 		
 
-
-		if(!Capernian->isAlive())
+		if(Capernian)
 		{
-			Capernian->setDeathState(ALIVE);
-			Capernian->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-		}
+			if(!Capernian->isAlive())
+			{
+				Capernian->setDeathState(ALIVE);
+				Capernian->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			}
 			Capernian->GetAIInterface()->MoveTo(Capernian->GetSpawnX(),Capernian->GetSpawnY(),Capernian->GetSpawnZ(),Capernian->GetSpawnO());
 			Capernian->GetAIInterface()->SetAllowedToEnterCombat(false);
 			//Capernian->GetAIInterface()->m_canMove = false;
 			Capernian->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-		
-
-		if(!Telonicus->isAlive())
-		{
-			Telonicus->setDeathState(ALIVE);
-			Telonicus->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 		}
+		
+		if(Telonicus)
+		{
+			if(!Telonicus->isAlive())
+			{
+				Telonicus->setDeathState(ALIVE);
+				Telonicus->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+			}
 			Telonicus->GetAIInterface()->MoveTo(Telonicus->GetSpawnX(),Telonicus->GetSpawnY(),Telonicus->GetSpawnZ(),Telonicus->GetSpawnO());
 			Telonicus->GetAIInterface()->SetAllowedToEnterCombat(false);
 			//Telonicus->GetAIInterface()->m_canMove = false;
 			Telonicus->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		}
 		
 		//_unit->GetAIInterface()->m_canMove = false;
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
@@ -3740,12 +3801,18 @@ public:
 
 			Darkener->GetAIInterface()->AttackReaction(target, UNIT_FIELD_MINDAMAGE, 0);
 			addActive = 2;
+
+
+
+			//gravityLapse(target);
 		}
 
 		if(!Darkener->isAlive())
 		{
 			addPhase = 2;
 			addActive = 1;
+
+			//gravityLand(Darkener->GetAIInterface()->GetNextTarget());
 		}
 	}
 
@@ -3842,13 +3909,16 @@ public:
 						_unit->PlaySoundToSet(11267);
 						break;
 					}
-					//Unit *target = NULL;
-					//target = _unit->GetAIInterface()->GetMostHated(); //TODO
-					//SummonX = target->GetPositionX();
-					//SummonY = target->GetPositionY();
-					//SummonZ = target->GetPositionZ();
-					//SummonO = target->GetOrientation();
-					//_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FLAMESTRIKE, SummonX, SummonY, SummonZ, SummonO, false, false, 0, 0);
+					Unit *target = NULL;
+					target = _unit->GetAIInterface()->GetMostHated(); //TODO
+					if(target)
+					{
+						SummonX = target->GetPositionX();
+						SummonY = target->GetPositionY();
+						SummonZ = target->GetPositionZ();
+						SummonO = target->GetOrientation();
+						_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FLAMESTRIKE, SummonX, SummonY, SummonZ, SummonO, false, false, 0, 0);
+					}
 				}break;
 
 				case 5:
@@ -3857,6 +3927,35 @@ public:
 					Timer = 0;
 				}break;
 		}
+	}
+
+	void gravityLapse(Player chr)
+	{
+/*		WorldPacket fly(835, 13);
+
+//		if(!chr)
+//			chr = chr->m_session->GetPlayer();
+
+		chr->m_setflycheat = true;
+		fly << chr->GetNewGUID();
+		fly << uint32(2);
+		chr->SendMessageToSet(&fly, true);
+		*/
+	}
+
+	void gravityLand(Player chr)
+	{
+		/*
+		WorldPacket fly(836, 13);
+
+		//if(!chr)
+		//	chr = chr->m_session->GetPlayer();
+
+		chr->m_setflycheat = false;
+		fly << chr->GetNewGUID();
+		fly << uint32(5);
+		chr->SendMessageToSet(&fly, true);
+		*/
 	}
 
 
@@ -3899,7 +3998,7 @@ void SetupTheEye(ScriptMgr * mgr)
 	// Bosses
 	mgr->register_creature_script(CN_VOID_REAVER, &VOIDREAVERAI::Create);
 	mgr->register_creature_script(CN_HIGH_ASTROMANCER_SOLARIAN, &HIGHASTROMANCERSOLARIANAI::Create);
-	mgr->register_creature_script(CN_ALAR, &AlarAI::Create);
+	//mgr->register_creature_script(CN_ALAR, &AlarAI::Create);
 
 	//Kael'Thas Encounter
 	mgr->register_creature_script(CN_PHOENIX, &PhoenixAI::Create);
@@ -3910,5 +4009,4 @@ void SetupTheEye(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_CAPERNIAN, &CapernianAI::Create);
 	mgr->register_creature_script(CN_TELONICUS, &TelonicusAI::Create);
 	mgr->register_creature_script(CN_KAELTHAS, &KaelThasAI::Create);
-
 }
