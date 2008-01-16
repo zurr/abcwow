@@ -503,8 +503,8 @@ public:
 		{
 			if (!submergetimer)
 			{
-				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 				_unit->RemoveAllAuras();
+				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 				_unit->GetAIInterface()->disable_melee = true;
 				_unit->Emote(EMOTE_ONESHOT_SUBMERGE);
 				_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
@@ -532,7 +532,7 @@ public:
 				{
 					whirlcd--;
 				}
-				if (_unit->GetAIInterface()->GetMostHated() && (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetMostHated()) > 500))
+				if (_unit->GetAIInterface()->GetMostHated() && (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetMostHated()) > 450))
 				{
 					if (GetPlayerCount() == 0)
 					{
@@ -555,7 +555,7 @@ public:
 					{
 						uint32 threat = _unit->GetAIInterface()->getThreatByPtr(_unit->GetAIInterface()->GetMostHated());
 						_unit->GetAIInterface()->RemoveThreatByPtr(_unit->GetAIInterface()->GetMostHated());
-						Unit * target = RandomTarget(false, true, 500);
+						Unit * target = RandomTarget(false, true, 450);
 						if (target)
 						{
 							_unit->GetAIInterface()->modThreatByPtr(target, threat);
@@ -1442,6 +1442,7 @@ public:
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
+		m_eventstarted = false;
 		sharkkisalive = true;
 		caribdisalive = true;
 		tidalvessalive = true;
@@ -1454,13 +1455,7 @@ public:
 	{
 		_unit->PlaySoundToSet(11277);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Guards, attention! We have visitors....");
-		_unit->GetAIInterface()->SetAIState(STATE_ATTACKING);
-		if (caribdis->GetAIInterface()->getAIState() != STATE_ATTACKING)
-			caribdis->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-		if (sharkkis->GetAIInterface()->getAIState() != STATE_ATTACKING)
-			sharkkis->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-		if (tidalvess->GetAIInterface()->getAIState() != STATE_ATTACKING)
-			tidalvess->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+		EventStart(mTarget);
 		RegisterAIUpdateEvent(1000);
 		CastTime();
 	}
@@ -1651,6 +1646,17 @@ public:
 			break;
 		}
 	}
+	void EventStart(Unit* mTarget)
+	{
+		if (!m_eventstarted)
+		{
+			m_eventstarted = true;
+			_unit->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			caribdis->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			sharkkis->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			tidalvess->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+		}
+	}
 
 	void tidalsurge()
 	{
@@ -1676,6 +1682,7 @@ protected:
 	bool sharkkisalive;
 	bool caribdisalive;
 	bool tidalvessalive;
+	bool m_eventstarted;
 	uint32 tidalsurgecd;
 	uint32 beastwithincd;
 	uint32 firetotemcd;
@@ -1710,16 +1717,17 @@ public:
 		spells[0].cooldown = 30;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
+
+		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
-		_unit->GetAIInterface()->SetAIState(STATE_ATTACKING);
 		RegisterAIUpdateEvent(1000);
-		if (karathress->GetAIInterface()->getAIState() != STATE_ATTACKING)
+		if (karathress)
 		{
-			karathress->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			CreatureAIScript *mob_script = karathress->GetScript();
+			((KARATHRESSAI*)mob_script)->EventStart(mTarget);
 		}
 		CastTime();
 		tidalsurgecd = 15 + RandomUInt(100)%3;
@@ -1861,16 +1869,17 @@ public:
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 1000;
+		
+		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
-		_unit->GetAIInterface()->SetAIState(STATE_ATTACKING);
 		RegisterAIUpdateEvent(1000);
-		if (karathress->GetAIInterface()->getAIState() != STATE_ATTACKING)
+		if (karathress)
 		{
-			karathress->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			CreatureAIScript *mob_script = karathress->GetScript();
+			((KARATHRESSAI*)mob_script)->EventStart(mTarget);
 		}
 		CastTime();
 		petcd = 15;
@@ -2117,16 +2126,17 @@ public:
 		spells[2].cooldown = 20;
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 1000;
+		
+		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
-		_unit->GetAIInterface()->SetAIState(STATE_ATTACKING);
 		RegisterAIUpdateEvent(1000);
-		if (karathress->GetAIInterface()->getAIState() != STATE_ATTACKING)
+		if (karathress)
 		{
-			karathress->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			CreatureAIScript *mob_script = karathress->GetScript();
+			((KARATHRESSAI*)mob_script)->EventStart(mTarget);
 		}
 		earthtotemcd = 15;
 		firetotemcd = 25;
@@ -2345,6 +2355,7 @@ public:
 		m_enrage = 600;
 		enraged = 0;
 		shadow = NULL;
+		m_eventstarted = false;
 		_unit->CastSpell(_unit, LEOTHERAS_BANISH, true);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -2437,8 +2448,8 @@ public:
 			if (!channeler1->isAlive() && !channeler2->isAlive() && !channeler3->isAlive())
 			{
 				m_phase = 1;
-				_unit->RemoveAura(LEOTHERAS_BANISH);
 				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+				_unit->RemoveAura(LEOTHERAS_BANISH);
 				_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 			}
 		}
@@ -2671,6 +2682,17 @@ public:
 		}
 	}
 
+	void EventStart(Unit* mTarget)
+	{
+		if (!m_eventstarted)
+		{
+			m_eventstarted = true;
+			channeler1->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			channeler2->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			channeler3->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+		}
+	}
+
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
 	{
 		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
@@ -2729,6 +2751,7 @@ protected:
 	int m_enrage;
 	int enraged;
 
+	bool m_eventstarted;
 	int m_phase;
 	Creature *shadow;
 
@@ -2851,6 +2874,11 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		if (leotheras)
+		{
+			CreatureAIScript *mob_script = leotheras->GetScript();
+			((LEOTHERASAI*)mob_script)->EventStart(mTarget);
+		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
