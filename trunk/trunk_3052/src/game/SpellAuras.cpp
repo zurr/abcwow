@@ -1127,11 +1127,12 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			{
 				if( GetSpellProto() && GetSpellProto()->NameHash == SPELL_HASH_IGNITE )  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
 					bonus_damage=0;
-				else bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount);
+				else bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount,1);
 				float ticks= float((amp) ? GetDuration()/amp : 0);
 				float fbonus = float(bonus);
 				fbonus += (ticks) ? bonus_damage/ticks : 0;
-				fbonus *= float(GetDuration()) / 15000.0f;
+				if(!m_spellProto->ChannelInterruptFlags)
+					fbonus *= float(GetDuration()) / 15000.0f;
 				bonus = float2int32(fbonus);
 			}
 			else bonus = 0;
@@ -4119,9 +4120,72 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		if(m_target->SchoolImmunityList[GetSpellProto()->School])
 			return;
 
-		//zack: latest new is that this spell uses spell damage bonus only and not healing bonus
-		amount += m_caster->GetSpellDmgBonus(m_target,GetSpellProto(),amount)*50/100;
-	
+		float bonus_damage;
+		int amp = m_spellProto->EffectAmplitude[mod->i];
+		if( !amp ) 
+			amp = static_cast< EventableObject* >( this )->event_GetEventPeriod( EVENT_AURA_PERIODIC_LEECH );
+
+		if(GetDuration())
+		{
+			bonus_damage = (float)m_caster->GetSpellDmgBonus(m_target,m_spellProto,amount,1);
+			float ticks= float((amp) ? GetDuration()/amp : 0);
+			bonus_damage = (ticks) ? bonus_damage/ticks : 0;
+			if(!m_spellProto->ChannelInterruptFlags)
+				bonus_damage *= GetDuration() / 15000.0f;
+		}
+		else bonus_damage = 0;
+
+		amount += float2int32(bonus_damage);
+
+		if(amount < 0)
+			amount = 0;
+		else
+		{
+			float summaryPCTmod = 1.0f;
+			if( m_target->IsPlayer() )//resilience
+			{
+				float dmg_reduction_pct = static_cast<Player*>(m_target)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
+				if( dmg_reduction_pct > 1.0f )
+					dmg_reduction_pct = 1.0f;
+				summaryPCTmod -= dmg_reduction_pct;
+			}
+			amount = (uint32)(amount*summaryPCTmod);
+			if( amount < 0 ) 
+				amount = 0;
+		}
+
+		uint32 ress=(uint32)amount;
+		uint32 abs_dmg = m_target->AbsorbDamage(m_spellProto->School, &ress);
+		uint32 ms_abs_dmg= m_target->ManaShieldAbsorb(ress);
+		if (ms_abs_dmg)
+		{
+			if(ms_abs_dmg > ress)
+				ress = 0;
+			else
+				ress-=ms_abs_dmg;
+
+			abs_dmg += ms_abs_dmg;
+		}
+
+		if(ress < 0) ress = 0;
+		amount = ress;
+		dealdamage dmg;
+		dmg.school_type = m_spellProto->School;
+		dmg.full_damage = ress;
+		dmg.resisted_damage = 0;
+		
+		if(amount <= 0) 
+			dmg.resisted_damage = dmg.full_damage;
+
+		if(amount > 0)
+		{
+			m_caster->CalculateResistanceReduction(m_target,&dmg);
+			if((int32)dmg.resisted_damage > dmg.full_damage)
+				amount = 0;
+			else
+                amount = dmg.full_damage - dmg.resisted_damage;
+		}
+
 		uint32 Amount = min( amount, m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) );
 		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
 		
@@ -4141,27 +4205,8 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		data << uint32(Amount);
 		m_target->SendMessageToSet(&data,true);
 
-		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, 0, 0, FLAG_PERIODIC_LEECH);
-
-		//deal damage before we add healing bonus to damage
+		SendPeriodicAuraLog(m_target, m_caster, m_spellProto->Id, m_spellProto->School, Amount, abs_dmg, dmg.resisted_damage, FLAG_PERIODIC_LEECH);
 		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id,true);
-
-		//add here bonus to healing taken. Maybe not all spells should receive it ?
-		/*
-		//zack : have no idea if we should use downranking here so i'm removing it until confirmed
-		float healdoneaffectperc = 1500 / 3500;
-		//Downranking
-		if(GetSpellProto()->baseLevel > 0 && GetSpellProto()->maxLevel > 0)
-		{
-			float downrank1 = 1.0f;
-			if (GetSpellProto()->baseLevel < 20)
-			downrank1 = 1.0f - (20.0f - float (GetSpellProto()->baseLevel) ) * 0.0375f;
-			float downrank2 = ( float(GetSpellProto()->maxLevel + 5.0f) / float(m_caster->getLevel()) );
-			if (downrank2 >= 1 || downrank2 < 0)
-			downrank2 = 1.0f;
-			healdoneaffectperc *= downrank1 * downrank2;
-		}
-		*/
 	}	
 }
 

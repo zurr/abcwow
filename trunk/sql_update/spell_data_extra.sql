@@ -299,14 +299,14 @@ INSERT INTO `spell_data_extra` (`spellid`,`dmg_bonus`) VALUES
  
 -- Drain Life
 INSERT INTO `spell_data_extra` (`spellid`,`dmg_bonus`) VALUES
- (689,71),
- (699,71),
- (709,71),
- (7651,71),
- (11699,71),
- (11700,71),
- (27219,71),
- (27220,71);
+ (689,50),
+ (699,50),
+ (709,50),
+ (7651,50),
+ (11699,50),
+ (11700,50),
+ (27219,50),
+ (27220,50);
  
 -- Drain Mana
 INSERT INTO `spell_data_extra` (`spellid`,`dmg_bonus`) VALUES
