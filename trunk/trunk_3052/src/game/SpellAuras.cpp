@@ -217,7 +217,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraIncreaseSpellDamageByInt,//194 Apply Aura: Increase Spell Damage by % of Intellect (All)
 		&Aura::SpellAuraIncreaseHealingByInt,//195 Apply Aura: Increase Healing by % of Intellect
 		&Aura::SpellAuraNULL,//196 Apply Aura: Mod All Weapon Skills (6)
-		&Aura::SpellAuraNULL,//197 Apply Aura: Reduce Attacker Critical Hit Chance by %
+		&Aura::SpellAuraModAttackerCritChance,//197 Apply Aura: Reduce Attacker Critical Hit Chance by %
 		&Aura::SpellAuraIncreaseAllWeaponSkill,//198
 		&Aura::SpellAuraIncreaseHitRate,//199 Apply Aura: Increases Spell % To Hit (Fire, Nature, Frost)
 		&Aura::SpellAuraNULL,//200 // Increases experience earned by $s1%.  Lasts $d.
@@ -395,8 +395,10 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 
 void Aura::Remove()
 {
-	sLog.outDetail("Aura::Remove %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name, m_target->GetGUIDLow());
- 	sEventMgr.RemoveEvents( this );
+	if( m_spellProto == NULL )
+		sLog.outDetail("Aura::Remove %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name != NULL ? m_spellProto->Name : "", m_target != NULL ? m_target->GetGUIDLow() : 0 );
+ 	
+	sEventMgr.RemoveEvents( this );
 
 	if( !IsPassive() || IsPassive() && m_spellProto->AttributesEx & 1024 )
 		RemoveAuraVisual();
@@ -581,9 +583,8 @@ void Aura::ApplyModifiers( bool apply )
 		{
 			for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
 			{
-				if(itr->origId == GetSpellId() && itr->caster == m_casterGuid)
+				if(itr->origId == GetSpellId() && itr->caster == m_casterGuid && !itr->deleted)
 				{
-					//m_target->m_procSpells.erase(itr);
 					itr->deleted = true;
 					break;
 				}
@@ -1990,7 +1991,7 @@ void Aura::SpellAuraDummy(bool apply)
 				static_cast<Player*>(m_target)->m_RegenManaOnSpellResist += ((apply) ? 1:-1)*(float)mod->m_amount/100;
 			}
 		}break;
-	//warlock - seed of corruption
+/*	//warlock - seed of corruption
 	case 27243:
 	case 32863:
 	case 36123:
@@ -2027,7 +2028,7 @@ void Aura::SpellAuraDummy(bool apply)
 					}
 				}
 			}
-		}break;
+		}break;*/
 	case 17007: //Druid:Leader of the Pack
 		{
 			if (!m_target->IsPlayer())
@@ -2131,18 +2132,24 @@ void Aura::SpellAuraModConfuse(bool apply)
 
 void Aura::SpellAuraModCharm(bool apply)
 {
-	Unit * ucaster = GetUnitCaster();
-	Player * caster = ((Player*)ucaster);
-	Creature * target = ((Creature*)m_target);
+	Unit* ucaster = GetUnitCaster();
+	Player* caster = static_cast< Player* >( ucaster );
+	Creature* target = static_cast< Creature* >( m_target );
   
 	SetPositive(3); //we ignore the other 2 effect of this spell and force it to be a positive spell
 
-	if( !m_target || (m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() ))
+	if( m_target == NULL || m_target->GetTypeId() != TYPEID_UNIT )
 		return;
 
-	if(apply)
+	if( static_cast< Creature* >( m_target )->IsTotem() )
+		return;
+
+	if( ucaster == NULL || ucaster->GetTypeId() != TYPEID_PLAYER )
+		return;
+
+	if( apply )
 	{
-		if(!ucaster || ucaster->GetTypeId() != TYPEID_PLAYER || (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() || m_target->GetTypeId() != TYPEID_UNIT)
+		if( (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() )
 			return;
 
 		// this should be done properly
@@ -2195,7 +2202,7 @@ void Aura::SpellAuraModCharm(bool apply)
 		m_target->GetAIInterface()->Init(m_target, AITYPE_AGRO, MOVEMENTTYPE_NONE);
 		m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
 
-		if( caster && caster->GetSession() ) // crashfix
+		if( caster != NULL && caster->GetSession() != NULL ) // crashfix
 		{
 			caster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
 			WorldPacket data(SMSG_PET_SPELLS, 8);
@@ -3526,7 +3533,7 @@ void Aura::SpellAuraModShapeshift(bool apply)
 {
 	if(!p_target) return;
 
-	if(p_target->m_MountSpellId)
+	if(p_target->m_MountSpellId && p_target->m_MountSpellId != m_spellProto->Id)
 		m_target->RemoveAura(p_target->m_MountSpellId); // these spells are not compatible
 
 	uint32 spellId = 0;
@@ -3575,6 +3582,18 @@ void Aura::SpellAuraModShapeshift(bool apply)
 			freeMovements = true;
 			spellId = 5419;
 			modelId = 917;
+
+			if( apply )
+			{
+				if( m_target->IsPlayer() )
+					static_cast<Player*>(m_target)->m_MountSpellId = m_spellProto->Id;
+			}
+			else
+			{
+				if( m_target->IsPlayer() )
+					static_cast<Player*>(m_target)->m_MountSpellId = 0;
+			}
+
 		} break;
 	case FORM_AQUA:
 		{//druid aqua
@@ -3622,6 +3641,16 @@ void Aura::SpellAuraModShapeshift(bool apply)
 	case FORM_GHOSTWOLF:
 		{
 			modelId = 4613;
+			if( apply )
+			{
+				if( m_target->IsPlayer() )
+					static_cast<Player*>(m_target)->m_MountSpellId = m_spellProto->Id;
+			}
+			else
+			{
+				if( m_target->IsPlayer() )
+					static_cast<Player*>(m_target)->m_MountSpellId = 0;
+			}
 		} break;  
 	case FORM_DEFENSIVESTANCE:
 		{
@@ -3921,16 +3950,14 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 			return;
 		}*/
 		m_target->m_procSpells.push_front(pts);
-//		sLog.outDebug("%u is registering %u chance %u flags %u charges %u triggeronself %u interval %u\n",pts.origId,pts.spellId,pts.ospinfo->procChance,pts.ospinfo->procFlags & ~PROC_TARGET_SELF,pts.ospinfo->procCharges,pts.ospinfo->procFlags & PROC_TARGET_SELF,pts.ospinfo->proc_interval);
 		sLog.outDebug("%u is registering %u chance %u flags %u charges %u triggeronself %u interval %u\n",pts.origId,pts.spellId,pts.procChance,m_spellProto->procFlags & ~PROC_TARGET_SELF,m_spellProto->procCharges,m_spellProto->procFlags & PROC_TARGET_SELF,m_spellProto->proc_interval);
 	}
 	else
 	{
 		for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
 		{
-			if(itr->origId == GetSpellId() && itr->caster == m_casterGuid)
+			if(itr->origId == GetSpellId() && itr->caster == m_casterGuid && !itr->deleted)
 			{
-				//m_target->m_procSpells.erase(itr);
 				itr->deleted = true;
 				break; //only 1 instance of a proc spell per caster ?
 			}
@@ -3948,8 +3975,8 @@ void Aura::SpellAuraProcTriggerDamage(bool apply)
 		ds.m_school = GetSpellProto()->School;
 		ds.m_flags = m_spellProto->procFlags;
 		ds.owner = (void*)this;
-sLog.outDebug("registering dmg proc %u, school %u, flags %u, charges %u \n",ds.m_spellId,ds.m_school,ds.m_flags,m_spellProto->procCharges);
 		m_target->m_damageShields.push_back(ds);
+		sLog.outDebug("registering dmg proc %u, school %u, flags %u, charges %u \n",ds.m_spellId,ds.m_school,ds.m_flags,m_spellProto->procCharges);
 	}
 	else
 	{
@@ -7209,6 +7236,11 @@ void Aura::SpellAuraIncreaseHealingByInt(bool apply)
 		}
 	}
 }
+void Aura::SpellAuraModAttackerCritChance(bool apply)
+{
+	int32 val  = (apply) ? mod->m_amount : -mod->m_amount;
+	m_target->AttackerCritChanceMod[0] +=val;
+}
 
 void Aura::SpellAuraIncreaseAllWeaponSkill(bool apply)
 {
@@ -7506,15 +7538,23 @@ void Aura::SpellAuraSpiritOfRedemption(bool apply)
 
 void Aura::SpellAuraIncreaseAttackerSpellCrit(bool apply)
 {
-	int32 val = (apply) ? mod->m_amount : -mod->m_amount;
-	if (m_target->IsUnit())
-	{
-		SetNegative();
-		for(uint32 x=0;x<7;x++)
-			if (mod->m_miscValue & (((uint32)1)<<x))
-				static_cast<Unit*>(m_target)->AttackerSpellCritChanceMod[x] += val;
-	}
+	int32 val = mod->m_amount;
 
+	if (apply)
+	{
+		if (mod->m_amount>0)
+			SetNegative();
+		else
+			SetPositive();
+	}
+	else
+		val = -val;
+
+	for(uint32 x=0;x<7;x++)
+	{
+		if (mod->m_miscValue & (((uint32)1)<<x))
+			m_target->AttackerCritChanceMod[x] += val;
+	}
 }
 
 void Aura::SpellAuraIncreaseRepGainPct(bool apply)

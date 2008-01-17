@@ -722,11 +722,17 @@ void Creature::UpdateItemAmount(uint32 itemid)
 
 void Creature::TotemExpire()
 {
-	totemOwner->m_TotemSlots[totemSlot] = 0;
+	if( totemOwner != NULL )
+	{
+		totemOwner->m_TotemSlots[totemSlot] = 0;
+	}
+	
 	totemSlot = -1;
-	totemOwner = 0;
+	totemOwner = NULL;
 
-	RemoveFromWorld(false, true);
+	if( IsInWorld() )
+		RemoveFromWorld(false, true);
+
 	SafeDelete();
 }
 
@@ -1405,7 +1411,7 @@ void Creature::SetGuardWaypoints()
 		if( wp->z == NO_WMO_HEIGHT )
 			wp->z = m_mapMgr->GetLandHeight(wp->x, wp->y);
 
-		if( abs( wp->z - m_spawnLocation.z ) > 10.0f )
+		if( fabs( wp->z - m_spawnLocation.z ) > 10.0f )
 			wp->z = m_spawnLocation.z;
 #else
 		wp->z = GetMapMgr()->GetLandHeight(wp->x, wp->y);

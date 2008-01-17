@@ -2661,3 +2661,4 @@ void ObjectMgr::UpdateArenaTeamRankings()
 	m_arenaTeamLock.Release();
 }
 
+

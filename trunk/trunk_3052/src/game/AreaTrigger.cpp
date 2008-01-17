@@ -115,18 +115,24 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 {		
 	sLog.outDebug("AreaTrigger: %u", id);
 
-	AreaTrigger * pAreaTrigger = AreaTriggerStorage.LookupEntry(id);
-
-	if (_player->GetSession()->CanUseCommand('z') && pAreaTrigger)
-		sChatHandler.BlueSystemMessage(this, "[%sSystem%s] |rEntered areatrigger: %s%u (%s).", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE, id, pAreaTrigger->Name);
-
 	// Are we REALLY here?
-	if(!pAreaTrigger || !_player->IsInWorld())
+	if( !_player->IsInWorld() )
 		return;
 
     // Search quest log, find any exploration quests
 	sQuestMgr.OnPlayerExploreArea(GetPlayer(),id);
-	
+
+	AreaTrigger* pAreaTrigger = AreaTriggerStorage.LookupEntry( id );
+
+	if (_player->GetSession()->CanUseCommand('z') && pAreaTrigger)
+		sChatHandler.BlueSystemMessage(this, "[%sSystem%s] |rEntered areatrigger: %s%u (%s).", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE, id, pAreaTrigger->Name);
+
+	if( pAreaTrigger == NULL )
+	{
+		sLog.outDebug("Missing AreaTrigger: %u", id);
+		return;
+	}
+
 	// if in BG handle is triggers
 	if(_player->m_bg)
 	{
@@ -134,7 +140,8 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 		return;
 	}
 	// Hook for Scripted Areatriggers
-	_player->GetMapMgr()->HookOnAreaTrigger(_player, id);
+	if (_player->GetMapMgr())
+		_player->GetMapMgr()->HookOnAreaTrigger(_player, id);
 
 	switch(pAreaTrigger->Type)
 	{
