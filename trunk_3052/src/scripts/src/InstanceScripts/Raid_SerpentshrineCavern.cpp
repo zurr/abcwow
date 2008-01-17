@@ -82,9 +82,9 @@ public:
 			_unit->DamageDoneModPCT[5] = 0;
 			_unit->DamageDoneModPCT[6] = 0;
 		}
-		RemoveAIUpdateEvent();
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
 	}
 	void OnDied(Unit * mKiller)
 	{
@@ -140,6 +140,8 @@ public:
 	}
 	void AIUpdate()
 	{
+		m_enrage--;
+		m_markcd--;
 		if (!m_enrage && !enraged)
 		{
 			_unit->DamageDoneModPCT[0] = 2;
@@ -151,140 +153,133 @@ public:
 			_unit->DamageDoneModPCT[6] = 2;
 			enraged = 1;
 		}
-		else
+		uint32 dist = FL2UINT(_unit->GetAIInterface()->_CalcDistanceFromHome());
+		if (dist > 700)
 		{
-			uint32 dist = FL2UINT(_unit->GetAIInterface()->_CalcDistanceFromHome());
-			if (dist > 700)
+			if (m_phase == 1)
 			{
-				if (m_phase == 1)
-				{
-					m_phase = 2;
-					_unit->PlaySoundToSet(11297);
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Aaghh, the poison...");
-					_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20609);
-					_unit->GetAIInterface()->WipeHateList();
-					m_markcd = 15;
-					m_markstate = 1;
-					m_vilesludge = 15;
+				m_phase = 2;
+				_unit->PlaySoundToSet(11297);
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Aaghh, the poison...");
+				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20609);
+				_unit->GetAIInterface()->WipeHateList();
+				m_markcd = 15;
+				m_markstate = 1;
+				m_vilesludge = 15;
 
-					summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-					summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-					summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-					summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-					_unit->SchoolImmunityList[4] = 0;
-					_unit->SchoolImmunityList[3] = 1;
-					_unit->BaseAttackType = 3;
-				}
-				else 
-				{
-					if (!m_markcd)
-					{
-						switch (m_markstate)
-						{
-						case 1:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT1, true);
-							break;
-						case 2:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT2, true);
-							break;
-						case 3:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT3, true);
-							break;
-						case 4:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT4, true);
-							break;
-						case 5:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT5, true);
-							break;
-						case 6:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT6, true);
-							break;
-						default:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT6, true);
-							break;
-						}
-						m_markstate++;
-						m_markcd = 15;
-					}
-					if (!m_vilesludge)
-					{
-						Unit *target = RandomTarget(false, true, 10000);
-						if (target)
-						{
-							_unit->CastSpell(target, HYDROSS_VILESLUDGE, false);
-						}
-						m_vilesludge = 15;
-					}
-					m_vilesludge--;
-				}
+				summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				_unit->SchoolImmunityList[4] = 0;
+				_unit->SchoolImmunityList[3] = 1;
+				_unit->BaseAttackType = 3;
 			}
-			else
+			else 
 			{
-				if (m_phase == 2)
+				if (!m_markcd)
 				{
-					m_phase = 1;
-					_unit->PlaySoundToSet(11290);
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Better, much better.");
-					_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20162);
-					_unit->GetAIInterface()->WipeHateList();
+					switch (m_markstate)
+					{
+					case 1:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT1, true);
+						break;
+					case 2:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT2, true);
+						break;
+					case 3:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT3, true);
+						break;
+					case 4:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT4, true);
+						break;
+					case 5:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT5, true);
+						break;
+					case 6:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT6, true);
+						break;
+					default:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT6, true);
+						break;
+					}
+					m_markstate++;
 					m_markcd = 15;
-					m_markstate = 1;
-					m_watertomb = 7;
-
-					summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-					summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-					summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-					summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-					_unit->SchoolImmunityList[4] = 1;
-					_unit->SchoolImmunityList[3] = 0;
-					_unit->BaseAttackType = 4;
 				}
-				else
+				m_vilesludge--;
+				if (!m_vilesludge)
 				{
-					if (!m_markcd)
+					Unit *target = RandomTarget(false, true, 10000);
+					if (target)
 					{
-						switch (m_markstate)
-						{
-						case 1:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS1, true);
-							break;
-						case 2:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS2, true);
-							break;
-						case 3:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS3, true);
-							break;
-						case 4:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS4, true);
-							break;
-						case 5:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS5, true);
-							break;
-						case 6:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS6, true);
-							break;
-						default:
-							_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS6, true);
-							break;
-						}
-						m_markstate++;
-						m_markcd = 15;
+						_unit->CastSpell(target, HYDROSS_VILESLUDGE, false);
 					}
-					if (!m_watertomb)
-					{
-						Unit *target = RandomTarget(false, true, 10000);
-						if (target)
-						{
-							_unit->CastSpell(target, HYDROSS_WATERTOMB, false);
-						}
-						m_watertomb = 7;
-					}
-					m_watertomb--;
+					m_vilesludge = 15;
 				}
 			}
 		}
-		m_markcd--;
-		m_enrage--;
+		else
+		{
+			if (m_phase == 2)
+			{
+				m_phase = 1;
+				_unit->PlaySoundToSet(11290);
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Better, much better.");
+				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20162);
+				_unit->GetAIInterface()->WipeHateList();
+				m_markcd = 15;
+				m_markstate = 1;
+				m_watertomb = 7;
+
+				summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				_unit->SchoolImmunityList[4] = 1;
+				_unit->SchoolImmunityList[3] = 0;
+				_unit->BaseAttackType = 4;
+			}
+			else
+			{
+				if (!m_markcd)
+				{
+					switch (m_markstate)
+					{
+					case 1:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS1, true);
+						break;
+					case 2:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS2, true);
+						break;
+					case 3:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS3, true);
+						break;
+					case 4:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS4, true);
+						break;
+					case 5:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS5, true);
+						break;
+					case 6:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS6, true);
+						break;
+					default:
+						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS6, true);
+						break;
+					}
+					m_markstate++;
+					m_markcd = 15;
+				}
+				m_watertomb--;
+				if (!m_watertomb)
+				{
+					Unit *target = RandomTarget(false, true, 10000);
+					if (target)
+						_unit->CastSpell(target, HYDROSS_WATERTOMB, false);
+					m_watertomb = 7;
+				}
+			}
+		}
 	}
 
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
@@ -1869,7 +1864,7 @@ public:
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 1000;
-		
+
 		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
 	}
 
@@ -2126,7 +2121,7 @@ public:
 		spells[2].cooldown = 20;
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 1000;
-		
+
 		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
 	}
 
@@ -2601,14 +2596,19 @@ public:
 						target5 = (Player *) RandomTarget(false, true, 10000);
 					}
 					Creature *summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target1->GetPositionX(), target1->GetPositionY(), target1->GetPositionZ(), target1->GetOrientation(), true, false, 0, 0);
-					summon1->GetAIInterface()->AttackReaction( target1, 100000, 0);
+					summon1->GetAIInterface()->SetSoulLinkedWith(target1);
+					summon1->GetAIInterface()->AttackReaction( target1, 10000, 0);
 					Creature *summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target2->GetPositionX(), target2->GetPositionY(), target2->GetPositionZ(), target2->GetOrientation(), true, false, 0, 0);
-					summon2->GetAIInterface()->AttackReaction( target2, 100000, 0);
+					summon2->GetAIInterface()->SetSoulLinkedWith(target2);
+					summon2->GetAIInterface()->AttackReaction( target2, 10000, 0);
 					Creature *summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target3->GetPositionX(), target3->GetPositionY(), target3->GetPositionZ(), target3->GetOrientation(), true, false, 0, 0);
-					summon3->GetAIInterface()->AttackReaction( target3, 100000, 0);
+					summon3->GetAIInterface()->SetSoulLinkedWith(target3);
+					summon3->GetAIInterface()->AttackReaction( target3, 10000, 0);
 					Creature *summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target4->GetPositionX(), target4->GetPositionY(), target4->GetPositionZ(), target4->GetOrientation(), true, false, 0, 0);
-					summon4->GetAIInterface()->AttackReaction( target4, 100000, 0);
+					summon4->GetAIInterface()->SetSoulLinkedWith(target4);
+					summon4->GetAIInterface()->AttackReaction( target4, 10000, 0);
 					Creature *summon5 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target5->GetPositionX(), target5->GetPositionY(), target5->GetPositionZ(), target5->GetOrientation(), true, false, 0, 0);
+					summon5->GetAIInterface()->SetSoulLinkedWith(target5);
 					summon5->GetAIInterface()->AttackReaction( target5, 100000, 0);
 				}
 				innerdemons = 1;
@@ -4368,7 +4368,7 @@ public:
 		case 2:
 			target = RandomTarget(true, true, 10000);
 			if (target)
-			_unit->CastSpellAoF(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), dbcSpell.LookupEntry(REFRESHINGMIST), true);
+				_unit->CastSpellAoF(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), dbcSpell.LookupEntry(REFRESHINGMIST), true);
 			break;
 		case 3:
 			amount = 10 + RandomUInt(100)%6;
