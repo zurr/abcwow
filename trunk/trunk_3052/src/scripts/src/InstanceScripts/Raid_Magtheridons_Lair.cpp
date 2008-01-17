@@ -48,7 +48,7 @@ struct Coords Columns[]=
 
 #define SOUL_TRANSFER 30531
 #define QUAKE 30571
-#define BLAST_NOVA 30616 // (30616)/(30613)
+#define BLAST_NOVA 30616
 #define CLEAVE 37476
 #define BANISH 30231
 #define BANISH2 40825
@@ -77,7 +77,6 @@ public:
 		spells[0].cooldown = 20;
 		spells[0].perctrigger = 2.0f;
 		spells[0].attackstoptimer = 3000;
-		door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
 		GameObject *cube;
 		for (int i = 0; i < 5; i++)
 		{
@@ -96,6 +95,7 @@ public:
 
 		_unit->AddAuraVisual(BANISH2, 1, false);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		m_phase = 1;
 		enrage = 0;
@@ -210,6 +210,7 @@ public:
 	{
 		if (m_eventstarted)
 		{
+			timer_banish--;
 			if (!timer_banish)
 			{
 				Unit *target = GetPlayerCount();
@@ -226,8 +227,8 @@ public:
 				else
 					EventStop(NULL);
 			}
-			else
-				timer_banish--;
+			else if (timer_banish == 60)
+				_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " is nearly free of his bounds!");
 		}
 		else
 		{
@@ -278,7 +279,7 @@ public:
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, " begins to cast Blast Nova!");
 					_unit->GetAIInterface()->StopMovement(12000);
 					_unit->setAttackTimer(12000, false);
-					_unit->CastSpell(_unit, BLAST_NOVA, true);
+					_unit->CastSpell(_unit, BLAST_NOVA, false);
 					timer_blastNova = 0;
 
 				}
@@ -320,7 +321,7 @@ public:
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, " begins to cast Blast Nova!");
 				_unit->GetAIInterface()->StopMovement(12000);
 				_unit->setAttackTimer(12000, false);
-				_unit->CastSpell(_unit, BLAST_NOVA, true);
+				_unit->CastSpell(_unit, BLAST_NOVA, false);
 				timer_blastNova = 0;
 
 			}
@@ -394,7 +395,7 @@ public:
 	{
 		if (!m_eventstarted)
 		{
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, "'s bonds begin to weaken!");
+			_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, "'s bonds begin to weaken!");
 			m_eventstarted = true;
 			if (!door)
 				door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
