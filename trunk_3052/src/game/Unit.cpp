@@ -3435,7 +3435,7 @@ void Unit::castSpell( Spell * pSpell )
 	pLastSpell = pSpell->m_spellInfo;
 }
 
-int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg)
+int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg, uint32 isDot)
 {
 	int32 plus_damage = 0;
 	Unit* caster = this;
@@ -3459,14 +3459,15 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 //==============================+Spell Damage Bonus Modifications===========================
 //==========================================================================================
 //------------------------------by cast duration--------------------------------------------
-	float dmgdoneaffectperc = 0;
+	float dmgdoneaffectperc = 1.0f;
 	// exception for spell with both dot and direct dmg - use bonus only for direct dmg for now
-	if (spellInfo->dmg_bonus && spellInfo->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
-		spellInfo->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && spellInfo->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE )
+	if (spellInfo->dmg_bonus && ((isDot && spellInfo->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
+		spellInfo->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && spellInfo->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE)
+		|| !isDot))
 	{
 		dmgdoneaffectperc = spellInfo->dmg_bonus/100.0f;
 	}
-	else
+	else if (!isDot) // this isnt valid for DoTs
 	{
 		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
 		float castaff = float(GetCastTime(sd));
@@ -3476,14 +3477,15 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 
 		dmgdoneaffectperc = castaff / 3500.0f;
 	}
+	else
+	{
+		//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
+		float td = float( GetDuration( dbcSpellDuration.LookupEntry( spellInfo->DurationIndex )  ));
+		if( spellInfo->NameHash == SPELL_HASH_MOONFIRE || spellInfo->NameHash == SPELL_HASH_IMMOLATE || spellInfo->NameHash == SPELL_HASH_ICE_LANCE || spellInfo->NameHash == SPELL_HASH_PYROBLAST )
+			dmgdoneaffectperc *= float( 1.0f - ( ( td / 15000.0f ) / ( ( td / 15000.0f ) + dmgdoneaffectperc ) ) );
+	}
 
 	//------------------------------by downranking----------------------------------------------
-	//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
-
-	float td = float( GetDuration( dbcSpellDuration.LookupEntry( spellInfo->DurationIndex )  ));
-	if( spellInfo->NameHash == SPELL_HASH_MOONFIRE || spellInfo->NameHash == SPELL_HASH_IMMOLATE || spellInfo->NameHash == SPELL_HASH_ICE_LANCE || spellInfo->NameHash == SPELL_HASH_PYROBLAST )
-		dmgdoneaffectperc *= float( 1.0f - ( ( td / 15000.0f ) / ( ( td / 15000.0f ) + dmgdoneaffectperc ) ) );
-
 	if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
 	{
 		float downrank1 = 1.0f;
