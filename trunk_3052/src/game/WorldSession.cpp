@@ -170,6 +170,7 @@ int WorldSession::Update(uint32 InstanceID)
 			// If we hit this -> means a packet has changed our map.
 			return 2;
 		}
+
 		if( bDeleted )
 		{
 			return 1;

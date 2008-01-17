@@ -327,7 +327,7 @@ void Spell::FillAllTargetsInArea(uint32 i,float srcx,float srcy,float srcz, floa
 		{
 			if( u_caster != NULL )
 			{
-				if( isAttackable( u_caster, static_cast< Unit* >( *itr ), false ) )
+				if( isAttackable( u_caster, static_cast< Unit* >( *itr ), !(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED) ) )
 				{
 					did_hit_result = DidHit(i, static_cast< Unit* >( *itr ) );
 					if( did_hit_result == SPELL_DID_HIT_SUCCESS )
@@ -341,7 +341,7 @@ void Spell::FillAllTargetsInArea(uint32 i,float srcx,float srcy,float srcz, floa
 				if( g_caster != NULL && g_caster->GetUInt32Value( OBJECT_FIELD_CREATED_BY ) && g_caster->m_summoner != NULL )
 				{
 					//trap, check not to attack owner and friendly
-					if( isAttackable( g_caster->m_summoner, static_cast< Unit* >( *itr ), false ) )
+					if( isAttackable( g_caster->m_summoner, static_cast< Unit* >( *itr ), !(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED) ) )
 						tmpMap->push_back( (*itr)->GetGUID() );
 				}
 				else
@@ -2576,6 +2576,13 @@ uint8 Spell::CanCast(bool tolerate)
 
 	if( p_caster != NULL )
 	{
+#ifdef COLLISION
+		if( m_spellInfo->Attributes & ATTRIBUTES_ONLY_OUTDOORS )
+		{
+			if( CollideInterface.IsIndoorMod( p_caster->GetMapId(), p_caster->GetPositionV() ) )
+				return SPELL_FAILED_ONLY_OUTDOORS;
+		}
+#endif
 		// check for cooldowns
 		if(!tolerate && !p_caster->CanCastDueToCooldown(m_spellInfo))
 				return SPELL_FAILED_NOT_READY;
@@ -3659,6 +3666,29 @@ exit:
 		value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
 
 	}
+	else if( i_caster != NULL && target)
+	{	
+		//we should inherit the modifiers from the conjured food caster
+		Unit *item_creator = target->GetMapMgr()->GetUnit( i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) );
+		if( item_creator != NULL )
+		{
+			int32 spell_flat_modifers=0;
+			int32 spell_pct_modifers=0;
+			int32 spell_pct_modifers2=0;//separated from the other for debugging purpuses
+
+			SM_FIValue(item_creator->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(item_creator->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+
+			SM_FIValue(item_creator->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(item_creator->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0 || spell_pct_modifers2!=0)
+				printf("!!!!ITEMCASTER ! : spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
+#endif
+			value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
+		}
+	}
+
 
 	return value;
 }
@@ -3873,7 +3903,7 @@ void Spell::Heal(int32 amount)
 		}
 		
 		//Downranking
-		if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
+		/*if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
 		{
 			float downrank1 = 1.0f;
 			if (m_spellInfo->baseLevel < 20)
@@ -3882,7 +3912,7 @@ void Spell::Heal(int32 amount)
 			if (downrank2 >= 1 || downrank2 < 0)
 				downrank2 = 1.0f;
 			healdoneaffectperc *= downrank1 * downrank2;
-		}
+		}*/
 
 		//caster sided bonus
 		bonus += u_caster->HealDoneMod[m_spellInfo->School] + (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;

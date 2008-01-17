@@ -367,12 +367,19 @@ bool ChatHandler::HandleGMTicketGetAllCommand(const char* args, WorldSession *m_
 		uint32 cont = 0;
 		uint32 zone = 0;
 		Player* plr = objmgr.GetPlayer((uint32)(*itr)->guid);
-		if(plr)
+		/*if(plr)
+		{
 			if(plr->IsInWorld())
 			{
 				zone = plr->GetZoneId();
 				cont = plr->GetMapId();
 			}
+		}*/
+		if( plr == NULL || !plr->IsInWorld() )
+			continue;
+
+		cont = plr->GetMapId();
+		zone = plr->GetZoneId();
 
 			std::stringstream str;
 			str << "GmTicket 0,";
@@ -2679,7 +2686,7 @@ bool ChatHandler::HandleCollisionTestIndoor(const char * args, WorldSession * m_
 #ifdef COLLISION
 	Player * plr = m_session->GetPlayer();
 	const LocationVector & loc = plr->GetPosition();
-	bool res = CollideInterface.IsIndoor(plr->GetMapId(), loc.x, loc.y, loc.z);
+	bool res = CollideInterface.IsIndoor(plr->GetMapId(), loc.x, loc.y, loc.z + 2.0f);
 	SystemMessage(m_session, "Result was: %s.", res ? "indoors" : "outside");
 	return true;
 #else

@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 UpdateMask Player::m_visibleUpdateMask;
+#define COLLISION_MOUNT_CHECK_INTERVAL 1000
 
 Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 {
@@ -383,6 +384,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_fallDisabledUntil = 0;
 	m_lfgMatch = NULL;
 	m_lfgInviterGuid = 0;
+	m_mountCheckTimer = 0;
 	this->OnLogin();
 }
 
@@ -767,12 +769,18 @@ void Player::Update( uint32 p_time )
 			_EventAttack(true);
 	}
 
-	if(m_onAutoShot)
+	if( m_onAutoShot)
 	{
-		if(m_AutoShotAttackTimer > p_time)
+		if( m_AutoShotAttackTimer > p_time )
+		{
+			//sLog.outDebug( "HUNTER AUTOSHOT 0) %i, %i", m_AutoShotAttackTimer, p_time );
 			m_AutoShotAttackTimer -= p_time;
+		}
 		else
+		{
+			//sLog.outDebug( "HUNTER AUTOSHOT 1) %i", p_time );
 			EventRepeatSpell();
+		}
 	}
 	else if(m_AutoShotAttackTimer > 0)
 	{
@@ -879,6 +887,24 @@ void Player::Update( uint32 p_time )
 		else
 			m_pvpTimer -= p_time;
 	}
+
+#ifdef COLLISION
+	if(m_MountSpellId != 0)
+	{
+		if( mstime >= m_mountCheckTimer )
+		{
+			if( CollideInterface.IsIndoorMod( m_mapId, &m_position ) )
+			{
+				RemoveAura( m_MountSpellId );
+				m_MountSpellId = 0;
+			}
+			else
+			{
+				m_mountCheckTimer = mstime + COLLISION_MOUNT_CHECK_INTERVAL;
+			}
+		}
+	}
+#endif
 }
 
 void Player::EventDismount(uint32 money, float x, float y, float z)
@@ -1841,6 +1867,7 @@ void Player::SpawnPet(uint32 pet_number)
 	Pet *pPet = objmgr.CreatePet();
 	pPet->SetInstanceID(GetInstanceID());
 	pPet->LoadFromDB(this, itr->second);
+	EventSummonPet(pPet); //cast our talent on the little bastard :)
 }
 
 void Player::_LoadPetSpells(QueryResult * result)
@@ -3029,9 +3056,9 @@ void Player::_LoadQuestLogEntry(QueryResult * result)
 		do 
 		{
 			fields = result->Fetch();
-			questid = fields[2].GetUInt32();
+			questid = fields[1].GetUInt32();
 			quest = QuestStorage.LookupEntry(questid);
-			slot = fields[3].GetUInt32();
+			slot = fields[2].GetUInt32();
 			ASSERT(slot != -1);
 			
 			// remove on next save if bad quest
@@ -3156,10 +3183,13 @@ void Player::AddToWorld(MapMgr * pMapMgr)
 		m_session->SetInstance(m_mapMgr->GetInstanceID());
 }
 
-void Player::OnPushToWorld()
+void Player::OnPrePushToWorld()
 {
 	SendInitialLogonPackets();
+}
 
+void Player::OnPushToWorld()
+{
 	if(m_TeleportState == 2)   // Worldport Ack
 		OnWorldPortAck();
 
@@ -5402,85 +5432,85 @@ void Player::SendTalentResetConfirm()
 	GetSession()->SendPacket(&data);
 }
 
-int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
+int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot )
 {
-	SpellEntry *spellinfo = dbcSpell.LookupEntry(spellid);
-	if(!spellinfo)
+	uint8 fail = 0;
+
+	SpellEntry* spellinfo = dbcSpell.LookupEntry( spellid );
+
+	if( spellinfo == NULL )
 		return -1;
 	//sLog.outString( "Canshootwithrangedweapon!?!? spell: [%u] %s" , spellinfo->Id , spellinfo->Name );
-	uint8 fail = 0;
-	Item *itm = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
-	if(!itm)
-	{
-		fail = SPELL_FAILED_NO_AMMO;
-		return -1;
-	}
 
-	if(m_curSelection != m_AutoShotTarget)
-	{
-		// Player has clicked off target. Fail spell.
+	// Check ammo
+	Item* itm = GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
+	if( itm == NULL )
+		fail = SPELL_FAILED_NO_AMMO;
+
+	// Player has clicked off target. Fail spell.
+	if( m_curSelection != m_AutoShotTarget )
 		fail = SPELL_FAILED_INTERRUPTED;
-	}
-	if(target->isDead())
+
+	if( target->isDead() )
 		fail = SPELL_FAILED_TARGETS_DEAD;
 
-	if(GetCurrentSpell())
+	if( GetCurrentSpell() )
 		return -1;
    
-	if(!target || target->isDead())
+	if( fail > 0 )
 		return -1;	
 
 	// Supalosa - The hunter ability Auto Shot is using Shoot range, which is 5 yards shorter.
 	// So we'll use 114, which is the correct 35 yard range used by the other Hunter abilities (arcane shot, concussive shot...)
-	uint32 rIndex = (autoshot) ? 114 : spellinfo->rangeIndex;
-	SpellRange * range = dbcSpellRange.LookupEntry( rIndex );
-	float minrange = GetMinRange(range);
-	float dist = CalcDistance(this, target);
-	float maxr = GetMaxRange(range);
+	uint32 rIndex = autoshot ? 114 : spellinfo->rangeIndex;
+	SpellRange* range = dbcSpellRange.LookupEntry( rIndex );
+	float minrange = GetMinRange( range );
+	float dist = CalcDistance( this, target );
+	float maxr = GetMaxRange( range ) + 2.52f;
+
 	//float bonusRange = 0;
 	// another hackfix: bonus range from hunter talent hawk eye: +2/4/6 yard range to ranged weapons
 	//if(autoshot)
 	//SM_FFValue( SM_FRange, &bonusRange, dbcSpell.LookupEntry( 75 )->SpellGroupType ); // HORRIBLE hackfixes :P
 	// Partha: +2.52yds to max range, this matches the range the client is calculating.
 	// see extra/supalosa_range_research.txt for more info
-	maxr += 2.52f;
 	//bonusRange = 2.52f;
+	//sLog.outString( "Bonus range = %f" , bonusRange );
+
 	// Check for close
-	if(spellid != SPELL_RANGED_WAND)//no min limit for wands
-		if(minrange > dist)
+	if( spellid != SPELL_RANGED_WAND )//no min limit for wands
+		if( minrange > dist )
 			fail = SPELL_FAILED_TOO_CLOSE;
 	
-
-	//sLog.outString( "Bonus range = %f" , bonusRange );
-	if( dist > maxr)
+	if( dist > maxr )
 	{
 		//	sLog.outString( "Auto shot failed: out of range (Maxr: %f, Dist: %f)" , maxr , dist );
 		fail = SPELL_FAILED_OUT_OF_RANGE;
 	}
 
-	if(spellid == SPELL_RANGED_THROW)
+	if( spellid == SPELL_RANGED_THROW )
 	{
-		if(itm) // no need for this
-			if(itm->GetProto())
-				if(GetItemInterface()->GetItemCount(itm->GetProto()->ItemId) == 0)
+		if( itm != NULL ) // no need for this
+			if( itm->GetProto() )
+				if( GetItemInterface()->GetItemCount( itm->GetProto()->ItemId ) == 0 )
 					fail = SPELL_FAILED_NO_AMMO;
 	} 
- /*   else
+/*  else
 	{
 		if(GetUInt32Value(PLAYER_AMMO_ID))//for wand
 			if(this->GetItemInterface()->GetItemCount(GetUInt32Value(PLAYER_AMMO_ID)) == 0)
 				fail = SPELL_FAILED_NO_AMMO;
-	}*/
-
-	if(fail)// && fail != SPELL_FAILED_OUT_OF_RANGE)
+	}
+*/
+	if( fail > 0 )// && fail != SPELL_FAILED_OUT_OF_RANGE)
 	{
-		SendCastResult(autoshot ? 75 : spellid, fail, 0);
-		if(fail != SPELL_FAILED_OUT_OF_RANGE)
+		SendCastResult( autoshot ? 75 : spellid, fail, 0 );
+		if( fail != SPELL_FAILED_OUT_OF_RANGE )
 		{
 			uint32 spellid2 = autoshot ? 75 : spellid;
-			m_session->OutPacket(SMSG_CANCEL_AUTO_REPEAT, 4, &spellid2);
+			m_session->OutPacket( SMSG_CANCEL_AUTO_REPEAT, 4, &spellid2 );
 		}
-//		sLog.outString( "Result for CanShootWIthRangedWeapon: %u" , fail );
+		//sLog.outString( "Result for CanShootWIthRangedWeapon: %u" , fail );
 		return fail;
 	}
 	return 0;
@@ -5488,30 +5518,31 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 
 void Player::EventRepeatSpell()
 {
-	if(!m_curSelection)
+	if( !m_curSelection )
 		return;
 	
-	Unit *target = GetMapMgr()->GetUnit(m_curSelection);
-	if(target==NULL)
+	Unit* target = GetMapMgr()->GetUnit( m_curSelection );
+	if( target == NULL )
 	{
 		m_AutoShotAttackTimer = 0; //avoid flooding client with error mesages
-		m_onAutoShot=false;
+		m_onAutoShot = false;
 		return;
 	}
 
 	m_AutoShotDuration = m_uint32Values[UNIT_FIELD_RANGEDATTACKTIME];
 
-	if(m_isMoving)
+	if( m_isMoving )
 	{
+		//sLog.outDebug( "HUNTER AUTOSHOT 2) %i, %i", m_AutoShotAttackTimer, m_AutoShotDuration );
 		m_AutoShotAttackTimer = m_AutoShotDuration;//avoid flooding client with error mesages
 		return;
 	}
 
-	int32 f= this->CanShootRangedWeapon(m_AutoShotSpell->Id, target, true);
+	int32 f = this->CanShootRangedWeapon( m_AutoShotSpell->Id, target, true );
 
-	if(f!=0)
+	if( f != 0 )
 	{
-		if(f!=SPELL_FAILED_OUT_OF_RANGE)
+		if( f != SPELL_FAILED_OUT_OF_RANGE )
 		{
 			m_AutoShotAttackTimer = 0; 
 			m_onAutoShot=false;
@@ -5526,11 +5557,11 @@ void Player::EventRepeatSpell()
 	{		
 		m_AutoShotAttackTimer = m_AutoShotDuration;
 	
-		Spell *sp = new Spell(this, m_AutoShotSpell, true, NULL);
+		Spell* sp = new Spell( this, m_AutoShotSpell, true, NULL );
 		SpellCastTargets tgt;
 		tgt.m_unitTarget = m_curSelection;
 		tgt.m_targetMask = TARGET_FLAG_UNIT;
-		sp->prepare(&tgt);
+		sp->prepare( &tgt );
 	}
 }
 
@@ -6277,6 +6308,7 @@ void Player::RemovePlayerPet(uint32 pet_number)
 	{
 		delete itr->second;
 		m_Pets.erase(itr);
+		EventDismissPet();
 	}
 }
 #ifndef CLUSTERING
@@ -6571,12 +6603,12 @@ void Player::PushUpdateData(ByteBuffer *data, uint32 updatecount)
 	// imagine the bytebuffer getting appended from 2 threads at once! :D
 	_bufferS.Acquire();
 
-	/* this is a safe barrier. */
-	if(bUpdateBuffer.size() >= 40000)
-	{
-        /* force an update to push out our pending data */
+	// unfortunately there is no guarantee that all data will be compressed at a ratio
+	// that will fit into 2^16 bytes ( stupid client limitation on server packets )
+	// so if we get more than 63KB of update data, force an update and then append it
+	// to the clean buffer.
+	if( (data->size() + bUpdateBuffer.size() ) >= 63000 )
 		ProcessPendingUpdates();
-	}
 
 	mUpdateCount += updatecount;
 	bUpdateBuffer.append(*data);
@@ -6608,15 +6640,15 @@ void Player::PushOutOfRange(const WoWGuid & guid)
 
 void Player::PushCreationData(ByteBuffer *data, uint32 updatecount)
 {
-    	// imagine the bytebuffer getting appended from 2 threads at once! :D
+    // imagine the bytebuffer getting appended from 2 threads at once! :D
 	_bufferS.Acquire();
 
-	/* this is a safe barrier. */
-	if(bCreationBuffer.size() >= 40000)
-	{
-        /* force an update to push out our pending data */
+	// unfortunately there is no guarantee that all data will be compressed at a ratio
+	// that will fit into 2^16 bytes ( stupid client limitation on server packets )
+	// so if we get more than 63KB of update data, force an update and then append it
+	// to the clean buffer.
+	if( (data->size() + bCreationBuffer.size() + mOutOfRangeIds.size() ) >= 63000 )
 		ProcessPendingUpdates();
-	}
 
 	mCreationCount += updatecount;
 	bCreationBuffer.append(*data);
@@ -7401,28 +7433,20 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 	{
 		instance = true;
 		this->SetInstanceID(InstanceID);
+#ifndef COLLISION
 		// if we are mounted remove it
 		if( m_MountSpellId )
 			RemoveAura( m_MountSpellId );
-		// if we are in ghost wolf remove it
-		if( this->FindAura( 2645 ) )
-			RemoveAura( 2645 );
-		// if we are in travel form remove it
-		if( this->FindAura( 783 ) )
-			RemoveAura( 783 );
+#endif
 	}
 	else if(m_mapId != MapID)
 	{
 		instance = true;
+#ifndef COLLISION
 		// if we are mounted remove it
 		if( m_MountSpellId )
 			RemoveAura( m_MountSpellId );
-		// if we are in ghost wolf remove it
-		if( this->FindAura( 2645 ) )
-			RemoveAura( 2645 );
-		// if we are in travel form remove it
-		if( this->FindAura( 783 ) )
-			RemoveAura( 783 );
+#endif
 	}
 
 	// make sure player does not drown when teleporting from under water
@@ -7877,7 +7901,10 @@ void Player::CompleteLoading()
 	{
 		info = dbcSpell.LookupEntry(*itr);
 
-		if(info && (info->Attributes & ATTRIBUTES_PASSIVE)  ) // passive
+		if(	info  
+			&& (info->Attributes & ATTRIBUTES_PASSIVE)  // passive
+			&& !( info->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET ) //on pet summon talents
+			 ) 
 		{
 			Spell * spell=new Spell(this,info,true,NULL);
 			spell->prepare(&targets);
@@ -7907,6 +7934,10 @@ void Player::CompleteLoading()
 
 		// this stuff REALLY needs to be fixed - Burlex
 		SpellEntry * sp = dbcSpell.LookupEntry((*i).id);
+
+		if ( sp->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET )
+			continue; //do not load auras that only exist while pet exist. We should recast these when pet is created anyway
+
 		Aura * a = new Aura(sp,(*i).dur,this,this);
 
 		for(uint32 x =0;x<3;x++)
@@ -8221,11 +8252,18 @@ void Player::SaveAuras(stringstream &ss)
 				}
 			}
 
+			if( aur->pSpellId )
+				skip = true; //these auras were gained due to some proc. We do not save these eighter to avoid exploits of not removing them
+
+			if ( aur->m_spellProto->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET )
+				skip = true;
+
 			// skipped spells due to bugs
 			switch(aur->m_spellProto->Id)
 			{
 			case 12043: // Presence of mind
 			case 11129: // Combustion
+			case 28682: // Combustion proc
 			case 16188: // Natures Swiftness
 			case 17116: // Natures Swiftness
 			case 34936: // Backlash
@@ -9491,6 +9529,7 @@ void Player::save_Auras()
 			{
 			case 12043: // Presence of mind
 			case 11129: // Combustion
+			case 28682: // Combustion proc
 			case 16188: // Natures Swiftness
 			case 17116: // Natures Swiftness
 			case 34936: // Backlash
@@ -9612,4 +9651,47 @@ void Player::PartLFGChannel()
 			return;
 		}
 	}
+}
+
+//if we charmed or simply summoned a pet, this function should get called
+void Player::EventSummonPet( Pet *new_pet )
+{
+	if ( !new_pet )
+		return ; //another wtf error
+
+	SpellSet::iterator it,iter;
+	for(iter= mSpells.begin();iter != mSpells.end();)
+	{
+		it = iter++;
+		uint32 SpellID = *it;
+		SpellEntry *spellInfo = dbcSpell.LookupEntry(SpellID);
+		if( spellInfo->c_is_flags & SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER )
+		{
+			SpellCastTargets targets( this->GetGUID() );
+			Spell *spell = new Spell(this, spellInfo ,true, NULL);	//we cast it as a proc spell, maybe we should not !
+			spell->prepare(&targets);
+		}
+		if( spellInfo->c_is_flags & SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET )
+		{
+			SpellCastTargets targets( new_pet->GetGUID() );
+			Spell *spell = new Spell(this, spellInfo ,true, NULL);	//we cast it as a proc spell, maybe we should not !
+			spell->prepare(&targets);
+		}
+	}
+	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_ON_PET)
+			m_auras[x]->Remove();
+}
+
+//if pet/charm died or whatever hapened we should call this function
+//!! note function might get called multiple times :P
+void Player::EventDismissPet()
+{
+	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET)
+			m_auras[x]->Remove();
+//	//remove owner warlock soul link from caster
+//	RemoveAura( (uint32)19028 );
+//	//remove owner warlock Demonic Knowledge from caster
+//	RemoveAura( (uint32)39576 );
 }

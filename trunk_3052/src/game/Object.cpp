@@ -355,7 +355,8 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			}
 		
 			if(static_cast<Unit*>(this)->GetAIInterface()->IsFlying())
-				flags2 |= 0x800;
+//				flags2 |= 0x800; //in 2.3 this is some state that i was not able to decode yet
+				flags2 |= 0x400; //Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
 			if(static_cast<Creature*>(this)->proto && static_cast<Creature*>(this)->proto->extra_a9_flags)
 			{
 				if(!(flags2 & 0x0200))
@@ -982,6 +983,8 @@ void Object::PushToWorld(MapMgr*mgr)
 	m_instanceId = mgr->GetInstanceID();
 
 	m_mapMgr = mgr;
+	OnPrePushToWorld();
+
 	mgr->PushObject(this);
 
 	// correct incorrect instance id's
@@ -1722,6 +1725,8 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 #endif
 		//warlock - seed of corruption
 		pVictim->HandleProc( PROC_ON_DIE, pVictim, NULL );
+		if( IsUnit() )
+			static_cast< Player* >( this )->HandleProc( PROC_ON_TARGET_DIE, pVictim, NULL );
 		pVictim->m_procCounter = 0;
 
 		/* victim died! */
@@ -2081,15 +2086,15 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 					//remove owner warlock soul link from caster
 					Player* owner = static_cast<Pet*>( pVictim )->GetPetOwner();
 					if( owner != NULL )
-						owner->RemoveAura( (uint32)19028 );
+						owner->EventDismissPet();
 				}
 				/* ----------------------------- PET DEATH HANDLING END -------------- */
 				else if( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) )
 				{
 					//remove owner warlock soul link from caster
 					Unit *owner=pVictim->GetMapMgr()->GetUnit( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) );
-					if( owner != NULL )
-						owner->RemoveAura( (uint32)19028 );
+					if( owner != NULL && owner->IsPlayer())
+						static_cast<Player*>( owner )->EventDismissPet();
 				}
 			}
 		}
@@ -2179,9 +2184,8 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			res = 0;
 		else
 		{
-
 //------------------------------critical strike chance--------------------------------------	
-			float CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerSpellCritChanceMod[school];
+			float CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerCritChanceMod[school];
 			if( caster->IsPlayer() && ( pVictim->m_rooted - pVictim->m_stunned ) )	
 				CritChance += static_cast< Player* >( caster )->m_RootedCritChanceBonus;
 
