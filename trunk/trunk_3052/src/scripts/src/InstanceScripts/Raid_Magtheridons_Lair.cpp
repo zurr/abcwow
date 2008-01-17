@@ -715,27 +715,27 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(SHADOW_BOLT_VOLLEY);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
-		spells[0].perctrigger = 9.0f;
+		spells[0].perctrigger = 3.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(DARK_MENDING);
-		spells[1].targettype = TARGET_VARIOUS;	
-		spells[1].instant = true;
-		spells[1].perctrigger = 8.0f;
+		spells[1].targettype = TARGET_SELF;
+		spells[1].instant = false;
+		spells[1].perctrigger = 6.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(BURNING_ABYSSAL);
-		spells[2].targettype = TARGET_RANDOM_SINGLE;	
+		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = true;
-		spells[2].perctrigger = 6.0f;
+		spells[2].perctrigger = 3.0f;
 		spells[2].attackstoptimer = 1000;
 		spells[2].cooldown = 30;
 
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		magtheridon = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-22.657900f, 2.159050f, -0.345542f, 17257);
 	}
 	void OnCombatStart(Unit* mTarget)
 	{
-		magtheridon = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-22.657900f, 2.159050f, -0.345542f, 17257);
 		_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
 		_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
 		RegisterAIUpdateEvent(1000);
@@ -1058,7 +1058,7 @@ public:
 	{
 		magtheridon = magtheridon = _gameobject->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-22.6579f, 2.15905f, -0.345542f, 17257);
 	}
-	
+
 	void MagtheridonUnbanish()
 	{
 		//TODO: REMOVE DMG BOOST
