@@ -939,7 +939,7 @@ void Player::EventDismount(uint32 money, float x, float y, float z)
 	}
 }
 
-void Player::_EventAttack(bool offhand)
+void Player::_EventAttack( bool offhand )
 {
 	if (m_currentSpell)
 	{
@@ -1005,7 +1005,7 @@ void Player::_EventAttack(bool offhand)
 
 		if (!GetOnMeleeSpell())
 		{
-			Strike(pVictim,(uint32)offhand,NULL,0,0,0, false,false);
+			Strike( pVictim, ( offhand ? OFFHAND : MELEE ), NULL, 0, 0, 0, false, false );
 		} 
 		else 
 		{ 
@@ -1088,7 +1088,7 @@ void Player::_EventCharmAttack()
 
 			if (!m_CurrentCharm->GetOnMeleeSpell())
 			{
-				m_CurrentCharm->Strike(pVictim,0,NULL,0,0,0, false,false);
+				m_CurrentCharm->Strike( pVictim, MELEE, NULL, 0, 0, 0, false, false );
 			} 
 			else 
 			{ 
@@ -3885,9 +3885,9 @@ void Player::ResurrectPlayer()
 {
 	sEventMgr.RemoveEvents(this,EVENT_PLAYER_FORECED_RESURECT); //in case somebody resurected us before this event happened
 	if( m_resurrectHealth )
-		SetUInt32Value( UNIT_FIELD_HEALTH, min( m_resurrectHealth, m_uint32Values[UNIT_FIELD_MAXHEALTH] ) );
+		SetUInt32Value( UNIT_FIELD_HEALTH, (uint32)min( m_resurrectHealth, m_uint32Values[UNIT_FIELD_MAXHEALTH] ) );
 	if( m_resurrectMana )
-		SetUInt32Value( UNIT_FIELD_POWER1, min( m_resurrectMana, m_uint32Values[UNIT_FIELD_MAXPOWER1] ) );
+		SetUInt32Value( UNIT_FIELD_POWER1, (uint32)min( m_resurrectMana, m_uint32Values[UNIT_FIELD_MAXPOWER1] ) );
 
 	m_resurrectHealth = m_resurrectMana = 0;
 
@@ -9690,8 +9690,4 @@ void Player::EventDismissPet()
 	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET)
 			m_auras[x]->Remove();
-//	//remove owner warlock soul link from caster
-//	RemoveAura( (uint32)19028 );
-//	//remove owner warlock Demonic Knowledge from caster
-//	RemoveAura( (uint32)39576 );
 }
