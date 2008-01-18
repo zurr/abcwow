@@ -44,6 +44,12 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 		return;
 	Item *i2=_player->GetItemInterface()->GetInventoryItem(DstInvSlot,DstSlot);
 
+	if( (i1 && i1->wrapped_item_id) || (i2 && i2->wrapped_item_id) )
+	{
+		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(i1, i2, INV_ERR_ITEM_CANT_STACK);
+        return;
+	}
+
 	if(i2)//smth already in this slot
 	{
 		if(i1->GetEntry()==i2->GetEntry() )
@@ -644,6 +650,15 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 		}
 	}
 
+	if( Slot <= INVENTORY_SLOT_BAG_END )
+	{
+		if((error = _player->GetItemInterface()->CanEquipItemInSlot(INVENTORY_SLOT_NOT_SET, Slot, eitem->GetProto(), false, false)))
+		{
+			_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL, error);
+			return;
+		}
+	}
+
 	Item*oitem=NULL;
 
 	if(SrcInvSlot == INVENTORY_SLOT_NOT_SET)
@@ -1006,7 +1021,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 	int8 slot;
 	uint8 amount = 0;
 	uint8 error;
-	uint8 bagslot = 0xff;
+	int8 bagslot = INVENTORY_SLOT_NOT_SET;
 
 	recv_data >> srcguid >> itemid;
 	recv_data >> bagguid; 
@@ -1109,7 +1124,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		return;
 	}
 
-	// ok our bagslot and slot are set.
+	// ok our z and slot are set.
 	Item * oldItem= NULL;
 	Item * pItem=NULL;
 	if(slot != INVENTORY_SLOT_NOT_SET)
@@ -1843,6 +1858,7 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 	int8 sourceitem_bagslot, sourceitem_slot;
 	int8 destitem_bagslot, destitem_slot;
 	uint32 source_entry;
+	uint32 itemid;
 	Item * src,*dst;
 
 	recv_data >> sourceitem_bagslot >> sourceitem_slot;
@@ -1860,6 +1876,12 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 	if(src == dst || !(src->GetProto()->Class == 0 && src->GetProto()->SubClass == 8))
 	{
 		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_WRAPPED_CANT_BE_WRAPPED );
+		return;
+	}
+
+	if( dst->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) > 1 )
+	{
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_STACKABLE_CANT_BE_WRAPPED );
 		return;
 	}
 
@@ -1920,9 +1942,37 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 		src->m_isDirty = true;
 	}
 
+	itemid = source_entry;
+	switch( source_entry )
+	{
+	case 5042:
+		itemid = 5043;
+		break;
+
+	case 5048:
+		itemid = 5044;
+		break;
+
+	case 17303:
+		itemid = 17302;
+		break;
+
+	case 17304:
+		itemid = 17305;
+		break;
+
+	case 17307:
+		itemid = 17308;
+		break;
+
+	case 21830:
+		itemid = 21831;
+		break;
+	}
+
 	// change the dest item's entry
 	dst->wrapped_item_id = dst->GetEntry();
-	dst->SetUInt32Value( OBJECT_FIELD_ENTRY, source_entry );
+	dst->SetUInt32Value( OBJECT_FIELD_ENTRY, itemid );
 
 	// set the giftwrapper fields
 	dst->SetUInt32Value( ITEM_FIELD_GIFTCREATOR, _player->GetGUIDLow() );
