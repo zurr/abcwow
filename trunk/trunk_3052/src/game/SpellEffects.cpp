@@ -1285,7 +1285,11 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 
 	uint32 powerField = UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
 	uint32 curPower = unitTarget->GetUInt32Value(powerField);
-	uint32 amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*80)/100);
+	uint32 amt;
+	if (m_spellInfo->NameHash == SPELL_HASH_DARK_PACT)
+		amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*96)/100);
+	else
+		amt=damage;
 	if(amt>curPower)
 	{
 		amt=curPower;
