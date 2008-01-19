@@ -1160,7 +1160,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								uint32 dmg = static_cast<Player*>(this)->GetMainMeleeDamage(AP_owerride);
 								SpellEntry *sp_for_the_logs = dbcSpell.LookupEntry(spellId);
 								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
-								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
 								//nothing else to be done for this trigger
 								continue;
 							}break;
