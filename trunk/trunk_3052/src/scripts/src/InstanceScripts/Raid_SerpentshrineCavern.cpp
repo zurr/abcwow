@@ -443,7 +443,7 @@ public:
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
 		spells[0].cooldown = 17;
-		spells[0].perctrigger = 7.0f;
+		spells[0].perctrigger = 6.0f;
 		spells[0].attackstoptimer = 1000;
 
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 0, FLY));

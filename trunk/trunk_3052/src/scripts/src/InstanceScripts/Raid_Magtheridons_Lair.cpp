@@ -722,13 +722,13 @@ public:
 		spells[1].info = dbcSpell.LookupEntry(DARK_MENDING);
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = false;
-		spells[1].perctrigger = 6.0f;
+		spells[1].perctrigger = 4.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(BURNING_ABYSSAL);
 		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = true;
-		spells[2].perctrigger = 3.0f;
+		spells[2].perctrigger = 1.5f;
 		spells[2].attackstoptimer = 1000;
 		spells[2].cooldown = 30;
 
