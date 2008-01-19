@@ -4881,7 +4881,7 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		spell->prepare(&targets);
 		if(!sunder_count)
 			return; //no damage = no joy
-		damage = damage*(m_spellInfo->EffectBasePoints[0]+1)+(1+ m_spellInfo->EffectBasePoints[1])*sunder_count;
+		damage = (int32)(0.01*damage*(m_spellInfo->EffectBasePoints[0]+1)+(1+ m_spellInfo->EffectBasePoints[1])*sunder_count);
 	}
 
 	//hemorage
