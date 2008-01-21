@@ -2442,10 +2442,17 @@ public:
 		{
 			if (!channeler1->isAlive() && !channeler2->isAlive() && !channeler3->isAlive())
 			{
-				m_phase = 1;
-				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-				_unit->RemoveAura(LEOTHERAS_BANISH);
-				_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+				Unit *target = GetAttackTarget();
+				if (target)
+				{
+					m_phase = 1;
+					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+					_unit->RemoveAura(LEOTHERAS_BANISH);
+					_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+					_unit->GetAIInterface()->AttackReaction(target, 0, 0);
+				}
+				else
+					EventStop(NULL);
 			}
 		}
 		else
@@ -2692,6 +2699,21 @@ public:
 			channeler3->GetAIInterface()->AttackReaction(mTarget, 0, 0);
 		}
 	}
+	void EventStop(Unit* mTarget)
+	{
+		if (m_eventstarted)
+		{
+			m_eventstarted = false;
+			if (_unit->isAlive())
+			{
+				channeler1->Despawn(100, 0);
+				channeler2->Despawn(100, 0);
+				channeler3->Despawn(100, 0);
+				RemoveAIUpdateEvent();
+				_unit->Despawn(100, 2500);
+			}
+		}
+	}
 
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
 	{
@@ -2739,6 +2761,27 @@ public:
 			return 0;
 
 		return (int)targetTable.size();
+	}
+
+	Unit *GetAttackTarget()
+	{
+		if (_unit->GetInRangePlayersCount() == 0)
+			return NULL;
+
+		std::vector<Unit*> targetTable;
+		TargetMap::iterator itr;
+		for (set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); itr++)
+		{
+			Unit *temp = (Unit*)(*itr);
+			if (temp->isAlive())
+				targetTable.push_back(temp);
+		}
+		if (!targetTable.size())
+			return NULL;
+
+		uint32 randt = RandomUInt(100)%targetTable.size();
+		Unit * randomtarget = targetTable[randt];
+		return randomtarget;
 	}
 
 protected:
@@ -2866,6 +2909,11 @@ public:
 	}
 	void OnCombatStart(Unit* mTarget)
 	{
+		if (leotheras)
+		{
+			CreatureAIScript *mob_script = leotheras->GetScript();
+			((LEOTHERASAI*)mob_script)->EventStart(mTarget);
+		}
 		_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
 		_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
 		CastTime();
@@ -2877,7 +2925,7 @@ public:
 		if (leotheras)
 		{
 			CreatureAIScript *mob_script = leotheras->GetScript();
-			((LEOTHERASAI*)mob_script)->EventStart(mTarget);
+			((LEOTHERASAI*)mob_script)->EventStop(mTarget);
 		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
@@ -4285,7 +4333,7 @@ public:
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = true;
 			spells[0].cooldown = 15;
-			spells[0].perctrigger = 10.0f;
+			spells[0].perctrigger = 5.0f;
 			spells[0].attackstoptimer = 1000;
 			break;
 		case 1:
@@ -4297,7 +4345,7 @@ public:
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = false;
 			spells[0].cooldown = 36;
-			spells[0].perctrigger = 10.0f;
+			spells[0].perctrigger = 5.0f;
 			spells[0].attackstoptimer = 8000;
 			break;
 		case 2:
@@ -4307,14 +4355,14 @@ public:
 			spells[0].targettype = TARGET_SELF;
 			spells[0].instant = true;
 			spells[0].cooldown = 20;
-			spells[0].perctrigger = 10.0f;
+			spells[0].perctrigger = 5.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(ATROPHICBLOW);
 			spells[1].targettype = TARGET_ATTACKING;
 			spells[1].instant = true;
 			spells[1].cooldown = 16;
-			spells[1].perctrigger = 10.0f;
+			spells[1].perctrigger = 5.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		}
@@ -4518,6 +4566,7 @@ public:
 	}
 	void sporequakeknockdown()
 	{
+		int val;
 		if (_unit->GetAIInterface()->getAITargetsCount() > 0)
 		{
 			TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
@@ -4526,7 +4575,9 @@ public:
 			{
 				if (_unit->GetDistance2dSq(itr->first) <= 900)
 				{
-					itr->first->CastSpell(itr->first, SPOREQUAKEKNOCKDOWN, true);
+					val = RandomUInt(100)%3;
+					if (!val)
+						itr->first->CastSpell(itr->first, SPOREQUAKEKNOCKDOWN, true);
 				}
 			}
 		}
@@ -4577,14 +4628,14 @@ public:
 			spells[0].targettype = TARGET_ATTACKING;
 			spells[0].instant = true;
 			spells[0].cooldown = 18;
-			spells[0].perctrigger = 10.0f;
+			spells[0].perctrigger = 6.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FROSTBOLTVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = true;
 			spells[1].cooldown = 12;
-			spells[1].perctrigger = 10.0f;
+			spells[1].perctrigger = 6.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		case 1:
@@ -4595,14 +4646,14 @@ public:
 			spells[0].targettype = TARGET_RANDOM_DESTINATION;
 			spells[0].instant = true;
 			spells[0].cooldown = 18;
-			spells[0].perctrigger = 10.0f;
+			spells[0].perctrigger = 6.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FIREBALLVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = true;
 			spells[1].cooldown = 12;
-			spells[1].perctrigger = 10.0f;
+			spells[1].perctrigger = 6.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		case 2:
@@ -4612,14 +4663,14 @@ public:
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = true;
 			spells[0].cooldown = 18;
-			spells[0].perctrigger = 10.0f;
+			spells[0].perctrigger = 6.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(ARCANEVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = true;
 			spells[1].cooldown = 12;
-			spells[1].perctrigger = 10.0f;
+			spells[1].perctrigger = 6.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		}
