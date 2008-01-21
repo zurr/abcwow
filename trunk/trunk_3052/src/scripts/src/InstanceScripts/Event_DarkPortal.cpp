@@ -26,21 +26,8 @@
 
 //------------------------------- TO-DO --------------------------------//
 
-/* 1. Add to ranged units ranged combat style (like for undercity or
- *    stormwind mages, darnassian archer or darkspear axe thrower.	DONE
- */
-
-/* 2. Add combat AI for Pit Commander and include "special cases" for him
- *    like Infernal spawning and so on.								DONE
- */
-
-/* 3. Add additional stuff to Trigger.								DONE
- */
-
-/* 4. Add Waypoints for Infernals.									DELETED
- */
-
 /* 5. Add special NPC spawning - no clear informations.
+ *																	NO INFOS
  */
 
 /* 6. Additional fights (I saw some on youtube movies - like Silvermoon
@@ -49,14 +36,7 @@
  */
 
 /* 7. Npc special emotes/yells/texts - no clear informations about
- *    situations
- */
-
-/* 8. Rest of waypoints - I have NO informations about that for		DONE
- *    Alliance and Horde
- */
-
-/* 9. Fix unexpected fights between ex. SW Soldiers and Org Gunts
+ *    situations.													MOSTLY DONE
  */
 
 // ----------------------------- Defines ------------------------------ //
@@ -114,6 +94,7 @@ struct SCoords
 //======================================= Demon Stuff ==========================================//
 //==============================================================================================//
 
+// Infernals' spawn points
 struct SCoords Infernals[]=
 {
 	{ -261.202820f, 1097.126099f, 41.666908f, 4.543878f },
@@ -122,6 +103,7 @@ struct SCoords Infernals[]=
 	{ -241.768570f, 1097.750366f, 41.666908f, 4.580745f }
 };
 
+// Demons' spawn points
 struct SCoords DSPoints[]=
 {
 	{ -259.384735f, 1207.090210f, 37.783020f, 3.815325f },	// <- 1
@@ -136,6 +118,7 @@ struct SCoords DSPoints[]=
 	{ -231.589218f, 1209.054321f, 37.514587f, 4.626029f }
 };
 
+// Demons' path from Pit Commander's back to dark portal
 struct SCoords PitDemonPaths[]=
 {
 	{},
@@ -225,13 +208,15 @@ struct SCoords PitDemonPaths[]=
 //====================================== Common Stuff ==========================================//
 //==============================================================================================//
 
+// Commander/Lieutenant positions to script special units spawning
 struct SCoords AHChecks[]=
 {
 	{ -265.506012f, 1028.310059f, 54.324100f, 5.455820f },	// ---- Commander Duron
 	{ -232.919998f, 1028.270020f, 54.407799f, 3.892080f }	// ---- Lieutenant General Orion
 };
 
-struct SCoords SWP[]=	// Special Spawns WPs
+// Special units' last WPs
+struct SCoords SWP[]=
 {
 	{ -269.433014f, 1072.020020f, 54.490700f, 1.505257f },	// ---- Justinius the Harbinger
 	{ -230.486786f, 1072.293945f, 54.353722f, 1.658060f }	// ---- Melgromm Highmountain
@@ -241,7 +226,8 @@ struct SCoords SWP[]=	// Special Spawns WPs
 //===================================== Alliance Stuff =========================================//
 //==============================================================================================//
 
-struct SCoords AMSPoints[]=	// Alliance melee units spawn pos
+// Alliance melee units spawn pos
+struct SCoords AMSPoints[]=
 {
 	{ -337.971008f, 963.656582f, 54.461300f, 1.675520f },
 	{ -337.971008f, 963.656682f, 54.461300f, 1.675520f },
@@ -255,7 +241,8 @@ struct SCoords AMSPoints[]=	// Alliance melee units spawn pos
 	{ -337.971008f, 963.657482f, 54.461300f, 1.675520f }
 };
 
-struct SCoords ARSPoints[]=	// Alliance ranged units spawn pos
+// Alliance ranged units spawn pos
+struct SCoords ARSPoints[]=
 {
 	{ -337.971008f, 963.656782f, 54.461300f, 1.675520f },
 	{ -337.971008f, 963.656882f, 54.461300f, 1.675520f },
@@ -265,13 +252,15 @@ struct SCoords ARSPoints[]=	// Alliance ranged units spawn pos
 	{ -337.971008f, 963.657282f, 54.461300f, 1.675520f }
 };
 
-struct SCoords ACSPoints[]=	// Alliance casters spawn pos
+// Alliance casters spawn pos
+struct SCoords ACSPoints[]=
 {
 	{ -337.971008f, 963.656882f, 54.461300f, 1.675520f },
 	{ -337.971008f, 963.656982f, 54.461300f, 1.675520f }
 };
 
-struct SCoords AWP[]=	// Main Alliance way
+// Alliance spawned units' ways (last WP is before stairs)
+struct SCoords AWP[]=
 {
 	{},
 	{ -329.585999f, 989.763977f, 54.327599f, 1.181110f },
@@ -287,6 +276,7 @@ struct SCoords AWP[]=	// Main Alliance way
 	// ... to add
 };
 
+// Alliance spawned units' WPs from stairs to formation positions (melee)
 struct SCoords AMWP[]=
 {
 	{ -272.106995f, 1098.439941f, 42.094299f, 1.343900f },
@@ -301,6 +291,7 @@ struct SCoords AMWP[]=
 	{ -253.451996f, 1092.979980f, 42.139801f, 1.762780f }
 };
 
+// Alliance spawned units' WPs from stairs to formation positions (ranged)
 struct SCoords ARWP[]=
 {
 	{ -270.035004f, 1087.030029f, 45.921700f, 1.431170f },
@@ -311,6 +302,7 @@ struct SCoords ARWP[]=
 	{ -260.299011f, 1084.189941f, 47.854801f, 1.518440f }	// custom
 };
 
+// Alliance spawned units' WPs from stairs to formation positions (casters)
 struct SCoords ACWP[]=
 {
 	{ -273.237000f, 1075.800049f, 54.494099f, 1.710420f },
@@ -321,7 +313,8 @@ struct SCoords ACWP[]=
 //======================================= Horde Stuff ==========================================//
 //==============================================================================================//
 
-struct SCoords HMSPoints[]=	// Horde melee units spawn pos
+// Horde melee units spawn pos
+struct SCoords HMSPoints[]=
 {
 	{ -161.376007f, 966.457608f, 54.463501f, 1.745330f },
 	{ -161.376007f, 966.457708f, 54.463501f, 1.745330f },
@@ -335,7 +328,8 @@ struct SCoords HMSPoints[]=	// Horde melee units spawn pos
 	{ -161.376007f, 966.458508f, 54.463501f, 1.745330f }
 };
 
-struct SCoords HRSPoints[]=	// Horde ranged units spawn pos
+// Horde ranged units spawn pos
+struct SCoords HRSPoints[]=
 {
 	{ -161.376007f, 966.457808f, 54.463501f, 1.745330f },
 	{ -161.376007f, 966.457908f, 54.463501f, 1.745330f },
@@ -345,13 +339,15 @@ struct SCoords HRSPoints[]=	// Horde ranged units spawn pos
 	{ -161.376007f, 966.458308f, 54.463501f, 1.745330f }
 };
 
-struct SCoords HCSPoints[]=	// Horde casters spawn pos
+// Horde casters spawn pos
+struct SCoords HCSPoints[]=
 {
 	{ -161.376007f, 966.457908f, 54.463501f, 1.745330f },
 	{ -161.376007f, 966.458008f, 54.463501f, 1.745330f }
 };
 
-struct SCoords HWP[]=	// Main Horde way
+// Horde spawned units' ways (last WP is before stairs)
+struct SCoords HWP[]=
 {
 	{},
 	{ -173.104004f, 1002.599976f, 54.326099f, 1.867840f },
@@ -368,6 +364,7 @@ struct SCoords HWP[]=	// Main Horde way
 	// ... to add
 };
 
+// Horde spawned units' WPs from stairs to formation positions (melee)
 struct SCoords HMWP[]=
 {
 	{ -229.492004f, 1098.260010f, 41.849998f, 1.413720f },
@@ -382,6 +379,7 @@ struct SCoords HMWP[]=
 	{ -249.309998f, 1094.050049f, 41.849998f, 1.326450f }
 };
 
+// Horde spawned units' WPs from stairs to formation positions (ranged)
 struct SCoords HRWP[]=
 {
 	{ -232.173996f, 1087.959961f, 45.621899f, 1.570800f },	// custom
@@ -392,6 +390,7 @@ struct SCoords HRWP[]=
 	{ -239.162003f, 1084.719971f, 47.769100f, 1.361360f }
 };
 
+// Alliance spawned units' WPs from stairs to formation positions (ranged)
 struct SCoords HCWP[]=
 {
 	{ -227.608994f, 1074.969971f, 54.492901f, 1.570800f },
@@ -422,25 +421,29 @@ struct SCoords AHSPoints[]=
 class DarkPortalEventTrigger : public CreatureAIScript
 {
 public:
-	ADD_CREATURE_FACTORY_FUNCTION(DarkPortalEventTrigger);
-	std::vector<Unit*> DemonTable, AllianceMelee, AllianceRanged, AllianceCaster, HordeMelee, HordeRanged, HordeCaster;
-	std::vector<Creature*> InfernalTable;
+	ADD_CREATURE_FACTORY_FUNCTION ( DarkPortalEventTrigger );
+	std::vector< Unit* > DemonTable, AllianceMelee, AllianceRanged, AllianceCaster, HordeMelee, HordeRanged, HordeCaster;
+	std::vector< Creature* > InfernalTable;
 	SP_AI_Spell spells[2];
 
-    DarkPortalEventTrigger(Creature* pCreature) : CreatureAIScript(pCreature)
+    DarkPortalEventTrigger( Creature *pCreature ) : CreatureAIScript( pCreature )
     {
-		spells[0].info = dbcSpell.LookupEntry(SUMMON_INFERNALS);
+		// Spell casted by Pit Commander when he summons infernals
+		spells[0].info = dbcSpell.LookupEntry( SUMMON_INFERNALS );
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
 
-		spells[1].info = dbcSpell.LookupEntry(SUMMON_INFERNALS2);
+		// Spell effect - caster throws "falling fel stones" from his pos to destination pos
+		spells[1].info = dbcSpell.LookupEntry( SUMMON_INFERNALS2 );
 		spells[1].targettype = TARGET_DESTINATION;
 		spells[1].instant = true;
 
-		_unit->GetAIInterface()->MoveTo(_unit->GetSpawnX()+5.0f, _unit->GetSpawnY(), _unit->GetSpawnZ(), _unit->GetSpawnO());
+		// Trigger settings (added MoveTo to prevent situations when unit falls on first cell loading.
+		_unit->GetAIInterface()->MoveTo( _unit->GetSpawnX()+5.0f, _unit->GetSpawnY(), _unit->GetSpawnZ(), _unit->GetSpawnO() );
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		_unit->GetAIInterface()->m_moveFly = true;
 
+		// Variable initialization
 		PitCommanderRespawn = DEMON_RESPAWN_TIME;
 		InfernalSpawn = SUMMON_INFERNAL_TIME;
 		SpecialUnitCheckTimer = 0;
@@ -458,676 +461,908 @@ public:
 		MelgrMove = 0;
 		Ress = false;
 
+		// AIUpdate registering
 		RegisterAIUpdateEvent(1000);
     }
 
     void AIUpdate()
 	{
-		// it's very possible that trigger will fall down when cell is loaded for the first time after server start, so we will add hacky fix for that.
-		if (_unit->GetPositionX() != _unit->GetSpawnX() || _unit->GetPositionY() != _unit->GetSpawnY() || _unit->GetPositionZ() != _unit->GetSpawnZ())
-			_unit->GetAIInterface()->MoveTo(_unit->GetSpawnX(), _unit->GetSpawnY(), _unit->GetSpawnZ(), _unit->GetSpawnO());
+		// Hack to prevent trigger falling from his default/spawn position
+		if ( _unit->GetPositionX() != _unit->GetSpawnX() || _unit->GetPositionY() != _unit->GetSpawnY() || _unit->GetPositionZ() != _unit->GetSpawnZ() )
+			_unit->GetAIInterface()->MoveTo( _unit->GetSpawnX(), _unit->GetSpawnY(), _unit->GetSpawnZ(), _unit->GetSpawnO() );
 
-		if (Ress && !Ressed)
+		// Function to ressurect Melgromm when he dies for the first time
+		if ( Ress && !Ressed )
 		{
-			if (pMelgr && !pMelgr->isAlive())
+			// We check if he's in memory and is alive - if so we renew his HP and make him alive
+			if ( pMelgr && pMelgr->IsInWorld() && !pMelgr->isAlive() )
 			{
-				pMelgr->SetUInt32Value(UNIT_FIELD_HEALTH,_unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));	// no idea if it should work like that
+				pMelgr->SetUInt32Value( UNIT_FIELD_HEALTH,_unit->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) );	// no idea if it should work like that
 				pMelgr->setDeathState(ALIVE);
 
-				pMelgr->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+				pMelgr->GetAIInterface()->setMoveType( MOVEMENTTYPE_DONTMOVEWP );
 			}
 
+			// We set Ressed = true to prevent double ressurection
 			Ressed = true;
 		}
 
-		if (pJusti || pMelgr)
+		// Function written to set special units pointers as null
+		if ( pJusti || pMelgr )
 		{
-			if (pJusti && (!pJusti->isAlive() || !pJusti->IsInWorld()))
+			// We set pJusti = NULL when he's in memory, but is not alive or is not in world
+			if ( pJusti && ( !pJusti->IsInWorld() || !pJusti->isAlive() ) )
 				pJusti = NULL;
 
-			if (pMelgr && !pMelgr->isAlive() && !Ress && !Ressed)
+			// If Melgromm is in memory, but is not alive and wasn't ressurected yet we cast 'ress' spell on him
+			if ( pMelgr && pMelgr->IsInWorld() && !pMelgr->isAlive() && !Ress && !Ressed )
 			{
+				// We cast Self Ressurection spell on Melgromm
 				pMelgr->CastSpell(pMelgr, dbcSpell.LookupEntry(32343), true);
 
+				// We set Ress = true to prevent double spell casting
 				Ress = true;
 			}
 
-			if (pMelgr && (!pMelgr->isAlive() || !pMelgr->IsInWorld()) && Ress && Ressed)
+			// If Melgromm's pointer is valid and unit is not alive or is not in world, but was 'ressed' we NULL it's pointer
+			if ( pMelgr && ( !pMelgr->isAlive() || !pMelgr->IsInWorld() ) && Ress && Ressed )
 			{
+				// We reset Melgromm ressurection settings
 				Ressed = false;
 				Ress = false;
 
+				// We null pointer
 				pMelgr = NULL;
 			}
 		}
 
+		// Hack to prevent huge army spawning - not really sure if it should be here and not sure if it even works
+		MapCell *objCell = _unit->GetMapMgr()->GetCellByCoords( _unit->GetPositionX(), _unit->GetPositionY() );
+		if ( objCell && !objCell->IsActive() )
+			return;
+
+		// We check each 5 seconds (default setting) if special units should be spawned
 		SpecialUnitCheckTimer++;
-		if (SpecialUnitCheckTimer >= SPECIAL_UNIT_CHECK_TIME)
+		if ( SpecialUnitCheckTimer >= SPECIAL_UNIT_CHECK_TIME )
 			AHSpecialUnitChecks();
 
+		// We rise special units' move timer to let them move naturally (not right after being spawned)
 		JustiMove++;
 		MelgrMove++;
-		if (JustiMove == 5 || MelgrMove == 5)
+		if ( JustiMove == 5 || MelgrMove == 5 )
 		{
-			if (JustiMove == 5 && pJusti && pJusti->isAlive())
+			// We check requirements for Justinius and if they match we let him move to first WP
+			if ( JustiMove == 5 && pJusti && pJusti->isAlive() )
 			{
-				pJusti->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-				pJusti->GetAIInterface()->setWaypointToMove(1);
+				pJusti->GetAIInterface()->setMoveType( MOVEMENTTYPE_FORWARDTHANSTOP );
+				pJusti->GetAIInterface()->setWaypointToMove( 1 );
 			}
 
-			if (MelgrMove == 5 && pMelgr && pMelgr->isAlive())
+			// We check requirements for Melgromm and if they match we let him move to first WP
+			if ( MelgrMove == 5 && pMelgr && pMelgr->isAlive() )
 			{
-				pMelgr->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-				pMelgr->GetAIInterface()->setWaypointToMove(1);
+				pMelgr->GetAIInterface()->setMoveType( MOVEMENTTYPE_FORWARDTHANSTOP );
+				pMelgr->GetAIInterface()->setWaypointToMove( 1 );
 			}
 		}
 
-		if (APortalMove)
+		// If alliance portal unit was spawned we rise it's portal move timer to let it move naturally
+		if ( APortalMove )
 		{
+			// If unit is valid and portal move is equal to 5 we let it move to first WP
 			APortalMove++;
-			if (APortalMove == 5 && pAlliance && pAlliance->isAlive())
+			if ( pAlliance && ( !pAlliance->IsInWorld() || !pAlliance->isAlive() ) )
 			{
-				pAlliance->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-				pAlliance->GetAIInterface()->setWaypointToMove(1);
+				pAlliance = NULL;
+				APortalMove = 0;
+			}
+
+			if ( APortalMove == 5 && pAlliance && pAlliance->isAlive() )
+			{
+				pAlliance->GetAIInterface()->setMoveType( MOVEMENTTYPE_FORWARDTHANSTOP );
+				pAlliance->GetAIInterface()->setWaypointToMove( 1 );
 
 				APortalMove = 0;
 			}
 		}
 
-		if (HPortalMove)
+		// If horde portal unit was spawned we rise it's portal move timer to let it move naturally
+		if ( HPortalMove )
 		{
+			// If unit is valid and portal move is equal to 5 we let it move to first WP
 			HPortalMove++;
-			if (HPortalMove == 5 && pHorde && pHorde->isAlive())
+			if ( pHorde && ( !pHorde->IsInWorld() || !pHorde->isAlive() ) )
 			{
-				pHorde->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-				pHorde->GetAIInterface()->setWaypointToMove(1);
+				pHorde = NULL;
+				HPortalMove = 0;
+			}
+
+			if ( HPortalMove == 5 && pHorde && pHorde->isAlive() )
+			{
+				pHorde->GetAIInterface()->setMoveType( MOVEMENTTYPE_FORWARDTHANSTOP );
+				pHorde->GetAIInterface()->setWaypointToMove( 1 );
 
 				HPortalMove = 0;
 			}
 		}
 
+		// After each 5 seconds we check if new alliance unit should be spawned
 		APortalRespawn++;
-		if (APortalRespawn >= SPAWN_NEW_UNIT_PORTAL)
+		if ( APortalRespawn >= SPAWN_NEW_UNIT_PORTAL )
 		{
-			// Spawn Alliance Unit
 			AlliancePortal();
 
+			// We also reset timer to prevent checks being triggered each second (saves comp resources)
 			APortalRespawn = 0;
 		}
 
+		// After each 5 seconds we check if new horde unit should be spawned
 		HPortalRespawn++;
-		if (HPortalRespawn >= SPAWN_NEW_UNIT_PORTAL)
+		if ( HPortalRespawn >= SPAWN_NEW_UNIT_PORTAL )
 		{
-			// Spawn Horde Unit
 			HordePortal();
 
+			// We also reset timer to prevent checks being triggered each second (saves comp resources)
 			HPortalRespawn = 0;
 		}
 
+		// If InfernalSpawn timer is equal to 0 we let Pit Commander (if he exists) cast spell to summon infernals
 		InfernalSpawn--;
-		if (!InfernalSpawn)
+		if ( !InfernalSpawn )
 		{
 			PitCommanderInfernalSummon();
 
+			// We also reset timer to summon infernals each 40 seconds (default value)
 			InfernalSpawn = SUMMON_INFERNAL_TIME;
 		}
 
-		if (InfernalSpawn == SUMMON_INFERNAL_TIME-3 && _Infernals)
+		// After 3 seconds of casting spells to summon infernals we spawn them manually
+		if ( InfernalSpawn == SUMMON_INFERNAL_TIME-3 && _Infernals )
 		{
 			Creature *pInfernal;
-			pInfernal = _unit->GetMapMgr()->GetInterface()->SpawnCreature(INFERNAL_SIEGEBREAKER, Infernals[LastInfernal].x, Infernals[LastInfernal].y, Infernals[LastInfernal].z, Infernals[LastInfernal].o, true, false, 0, 0);
-			InfernalTable.push_back(pInfernal);
+			pInfernal = _unit->GetMapMgr()->GetInterface()->SpawnCreature( INFERNAL_SIEGEBREAKER, Infernals[LastInfernal].x, Infernals[LastInfernal].y, Infernals[LastInfernal].z, Infernals[LastInfernal].o, true, false, 0, 0 );
+			InfernalTable.push_back( pInfernal );
 
-			pInfernal = _unit->GetMapMgr()->GetInterface()->SpawnCreature(INFERNAL_SIEGEBREAKER, Infernals[LastInfernal+2].x, Infernals[LastInfernal+2].y, Infernals[LastInfernal+2].z, Infernals[LastInfernal+2].o, true, false, 0, 0);
-			InfernalTable.push_back(pInfernal);
+			pInfernal = _unit->GetMapMgr()->GetInterface()->SpawnCreature( INFERNAL_SIEGEBREAKER, Infernals[LastInfernal+2].x, Infernals[LastInfernal+2].y, Infernals[LastInfernal+2].z, Infernals[LastInfernal+2].o, true, false, 0, 0 );
+			InfernalTable.push_back( pInfernal );
 
 			_Infernals = false;
 		}
 
+		// After 20 seconds of spawning demons we command 5 of them (if it's 10-demon-formation) to attack
 		PitCommanderRespawn--;
-		if (PitCommanderRespawn == DEMON_RESPAWN_TIME-20 && PitComSpw)
+		if ( PitCommanderRespawn == DEMON_RESPAWN_TIME-20 && PitComSpw )
 		{
 			PitCommanderAttackCmd();
 
 			PitComSpw = false;
 		}
 
-		if (PitCommanderRespawn == DEMON_RESPAWN_TIME-TEN_DEMON_WAVE_DELAY-20 && SecondWave)
+		// After 50 seconds of first 5-demon-formation attack we let another 5 demons to attack Dark Portal (only if 10-demon-formation was spawned)
+		if ( PitCommanderRespawn == DEMON_RESPAWN_TIME-TEN_DEMON_WAVE_DELAY-20 && SecondWave )
 		{
 			SecondWaveAttackCmd();
+
+			// We also reset 10-demon-formation check
 			SecondWave = false;
 		}
 
-		if (!PitCommanderRespawn)
+		// If PitCommanderRespawn run out we spawn (if we can) another demon formation to take over Dark Portal
+		if ( !PitCommanderRespawn )
 		{
 			PitCommanderSpawn();
 
+			// We set it as true to prevent first formations being spawned without 'permission'
 			PitComSpw = true;
 		}
     }
 
+	// Function to check Commander/Lieutenant units' states and spawn special units if needed
 	void AHSpecialUnitChecks()
 	{
+		// We get Commander unit
 		Unit *pCommander = NULL;
-		pCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(AHChecks[0].x, AHChecks[0].y, AHChecks[0].z, COMMANDER_DURON);
+		pCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords( AHChecks[0].x, AHChecks[0].y, AHChecks[0].z, COMMANDER_DURON );
 
-		if ((!pCommander || pCommander && (pCommander->CombatStatus.IsInCombat() || !pCommander->isAlive())) && !pJusti)
+		// We check if Commander is in world, is alive, is in combat and if Justinius isn't already spawned
+		if ( ( !pCommander || ( pCommander && ( pCommander->GetAIInterface()->GetNextTarget() || !pCommander->isAlive() ) ) ) && !pJusti )
 		{
-			pJusti = _unit->GetMapMgr()->GetInterface()->SpawnCreature(JUSTINIUS_THE_HARBINGER, AHSPoints[0].x, AHSPoints[0].y, AHSPoints[0].z, AHSPoints[0].o, true, false, 0, 0);
+			// We get Justinius unit for further use
+			pJusti = _unit->GetMapMgr()->GetInterface()->SpawnCreature( JUSTINIUS_THE_HARBINGER, AHSPoints[0].x, AHSPoints[0].y, AHSPoints[0].z, AHSPoints[0].o, true, false, 0, 0 );
 			
+			// We reset movement variable
 			JustiMove = 0;
 		}
 
+		// We get Lieutenant unit
 		Unit *pLieutenant = NULL;
-		pLieutenant = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(AHChecks[1].x, AHChecks[1].y, AHChecks[1].z, LIEUTENANT_GENERAL_ORION);	
-		
-		if ((!pLieutenant || pLieutenant && (pLieutenant->CombatStatus.IsInCombat() || !pLieutenant->isAlive())) && !pMelgr)
+		pLieutenant = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords( AHChecks[1].x, AHChecks[1].y, AHChecks[1].z, LIEUTENANT_GENERAL_ORION );	
+
+		// We check if Lieutenant is in world, is alive, is in combat and if Melgromm isn't already spawned
+		if ( ( !pLieutenant || ( pLieutenant && ( pLieutenant->GetAIInterface()->GetNextTarget() || !pLieutenant->isAlive() ) ) ) && !pMelgr )
 		{
-			pMelgr = _unit->GetMapMgr()->GetInterface()->SpawnCreature(MELGROMM_HIGHMOUNTAIN, AHSPoints[1].x, AHSPoints[1].y, AHSPoints[1].z, AHSPoints[1].o, true, false, 0, 0);
+			// We get Melgromm unit for further use
+			pMelgr = _unit->GetMapMgr()->GetInterface()->SpawnCreature( MELGROMM_HIGHMOUNTAIN, AHSPoints[1].x, AHSPoints[1].y, AHSPoints[1].z, AHSPoints[1].o, true, false, 0, 0 );
 		
+			// We reset movement variable
 			MelgrMove = 0;
 		}
 
+		// We reset special unit check timer to 0 to prevent check triggering every second
 		SpecialUnitCheckTimer = 0;
 	}
 
+	// Bool to check if we can spawn any alliance melee unit to prevent formation messing
 	bool AMSize()
 	{
-		if (AllianceMelee.size() < 10)
+		// We check size of unit list - if it's smaller than 10 we return true - melee unit may be spawned
+		if ( AllianceMelee.size() < 10 )
 			return true;
 
+		// If not we check first 10 units (because we have here 10-man-formation)
 		else
 		{
-			for (uint32 i = 0; i < 10; i++)
+			for ( uint32 i = 0; i < 10; i++ )
 			{
+				// We check if unit with i place on our list really exists (if i isn't out of list array) - if it does we point it
 				Unit* SetUnit = NULL;
-				if (AllianceMelee.size() >= i+1)
+				if ( AllianceMelee.size() >= i+1 )
 					SetUnit = AllianceMelee[i];
 
-				if (!SetUnit || (SetUnit && (!SetUnit->isAlive() || !SetUnit->IsInWorld())))
+				// If unit doesn't exist or exists, but is not alive or is not in world we return true and break loop
+				if ( !SetUnit || ( SetUnit && ( !SetUnit->isAlive() || !SetUnit->IsInWorld() ) ) )
 				{
 					return true;
 					break;
 				}
 			}
 
+			// Else we return false - melee unit can't be spawned
 			return false;
 		}
 	}
 
+	// Bool to check if we can spawn any alliance ranged unit to prevent formation messing
 	bool ARSize()
 	{
-		if (AllianceRanged.size() < 6)
+		// We check size of unit list - if it's smaller than 6 we return true - ranged unit may be spawned
+		if ( AllianceRanged.size() < 6 )
 			return true;
 
+		// If not we check first 6 units (because we have here 6-man-formation)
 		else
 		{
-			for (uint32 i = 0; i < 6; i++)
+			for ( uint32 i = 0; i < 6; i++ )
 			{
+				// We check if unit with i place on our list really exists (if i isn't out of list array) - if it does we point it
 				Unit* SetUnit = NULL;
-				if (AllianceRanged.size() >= i+1)
+				if ( AllianceRanged.size() >= i+1 )
 					SetUnit = AllianceRanged[i];
 
-				if (!SetUnit || (SetUnit && (!SetUnit->isAlive() || !SetUnit->IsInWorld())))
+				// If unit doesn't exist or exists, but is not alive or is not in world we return true and break loop
+				if ( !SetUnit || ( SetUnit && ( !SetUnit->isAlive() || !SetUnit->IsInWorld() ) ) )
 				{
 					return true;
 					break;
 				}
 			}
 
+			// Else we return false - ranged unit can't be spawned
 			return false;
 		}
 	}
 
+	// Bool to check if we can spawn any alliance caster unit to prevent formation messing
 	bool ACSize()
 	{
-		if (AllianceCaster.size() < 2)
+		// We check size of unit list - if it's smaller than 2 we return true - caster unit may be spawned
+		if ( AllianceCaster.size() < 2 )
 			return true;
 
+		// If not we check first 2 units (because we have here 2-man-formation)
 		else
 		{
-			for (uint32 i = 0; i < 2; i++)
+			for ( uint32 i = 0; i < 2; i++ )
 			{
+				// We check if unit with i place on our list really exists (if i isn't out of list array) - if it does we point it
 				Unit* SetUnit = NULL;
-				if (AllianceCaster.size() >= i+1)
+				if ( AllianceCaster.size() >= i+1 )
 					SetUnit = AllianceCaster[i];
 
-				if (!SetUnit || (SetUnit && (!SetUnit->isAlive() || !SetUnit->IsInWorld())))
+				// If unit doesn't exist or exists, but is not alive or is not in world we return true and break loop
+				if ( !SetUnit || ( SetUnit && ( !SetUnit->isAlive() || !SetUnit->IsInWorld() ) ) )
 				{
 					return true;
 					break;
 				}
 			}
 
+			// Else we return false - caster unit can't be spawned
 			return false;
 		}
 	}
 
+	// Function used to check if any alliance unit should be spawned
 	void AlliancePortal()
 	{
+		// Variable initialization
 		uint32 Pos = 0;
 		uint32 Entry = 0;
 		uint32 Change = RandomUInt(6);
 		std::vector<Unit*> BackupList;
 
-		if (AMSize())						// default spawn
+		// Default unit to spawn is basic close combat soldier
+		if ( AMSize() )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = STORMWIND_SOLDIER;
 			Pos = 10;
 		}
-		else if (ARSize())					// default spawn if melee regiment is full
+
+		// Default unit to spawn is ranged combat soldier if melee regiment is full
+		else if ( ARSize() )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = DARNASSIAN_ARCHER;
 			Pos = 6;
 		}
-		else if (ACSize())					// default spawn if ranged regiment is full
+
+		// Default unit to spawn is caster if melee and ranged regiments are full
+		else if ( ACSize() )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = STORMWIND_MAGE;
 			Pos = 2;
 		}
-		if (AMSize() && Change == 1)
+
+		// If melee regiment is not full there is possibility to change unit to spawn to Ironforge Paladin
+		if ( AMSize() && Change == 1 )
 		{
+			// We change Entry (position count is not required, because if melee regiment is not full, Pos = 10 is default value)
 			Entry = IRONFORGE_PALADIN;
 		}
-		if (ARSize() && Change == 2)
+
+		// If ranged regiment is not full there is possibility to change unit to spawn to Darnassian Archer
+		if ( ARSize() && Change == 2 )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = DARNASSIAN_ARCHER;
 			Pos = 6;
 		}
-		if (ACSize() && Change == 3)
+
+		// If caster regiment is not full there is possibility to change unit to spawn to Stormwind Mage
+		if ( ACSize() && Change == 3 )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = STORMWIND_MAGE;
 			Pos = 2;
 		}
 
+		// We go through all positions and check units
 		bool Stop = false;
-		for (uint32 i = 0; i < Pos; i++)
+		for ( uint32 i = 0; i < Pos; i++ )
 		{
+			// We set unit to check
 			Unit* SetUnit = NULL;
-			if (Pos == 10 && AllianceMelee.size() >= i+1)
+			if ( Pos == 10 && AllianceMelee.size() >= i+1 )
 				SetUnit = AllianceMelee[i];
-			if (Pos == 6 && AllianceRanged.size() >= i+1)
+			if ( Pos == 6 && AllianceRanged.size() >= i+1 )
 				SetUnit = AllianceRanged[i];
-			if (Pos == 2 && AllianceCaster.size() >= i+1)
+			if ( Pos == 2 && AllianceCaster.size() >= i+1 )
 				SetUnit = AllianceCaster[i];
 
-			if ((!SetUnit || (SetUnit && (!SetUnit->isAlive() || !SetUnit->IsInWorld()))) && !Stop)
+			// If unit does not exist or exists, but is not alive or in world and unit wasn't already spawned we spawn one
+			if ( ( !SetUnit || ( SetUnit && ( !SetUnit->isAlive() || !SetUnit->IsInWorld() ) ) ) && !Stop )
 			{
-				if (Pos == 10)
-					SetUnit = pAlliance = _unit->GetMapMgr()->GetInterface()->SpawnCreature(Entry, AMSPoints[i].x, AMSPoints[i].y, AMSPoints[i].z, AMSPoints[i].o, true, false, 0, 0);
-				if (Pos == 6)
-					SetUnit = pAlliance = _unit->GetMapMgr()->GetInterface()->SpawnCreature(Entry, ARSPoints[i].x, ARSPoints[i].y, ARSPoints[i].z, ARSPoints[i].o, true, false, 0, 0);
-				if (Pos == 2)
-					SetUnit = pAlliance = _unit->GetMapMgr()->GetInterface()->SpawnCreature(Entry, ACSPoints[i].x, ACSPoints[i].y, ACSPoints[i].z, ACSPoints[i].o, true, false, 0, 0);
-			
+				if ( Pos == 10 )
+					SetUnit = pAlliance = _unit->GetMapMgr()->GetInterface()->SpawnCreature( Entry, AMSPoints[i].x, AMSPoints[i].y, AMSPoints[i].z, AMSPoints[i].o, true, false, 0, 0 );
+				if ( Pos == 6 )
+					SetUnit = pAlliance = _unit->GetMapMgr()->GetInterface()->SpawnCreature( Entry, ARSPoints[i].x, ARSPoints[i].y, ARSPoints[i].z, ARSPoints[i].o, true, false, 0, 0 );
+				if ( Pos == 2 )
+					SetUnit = pAlliance = _unit->GetMapMgr()->GetInterface()->SpawnCreature( Entry, ACSPoints[i].x, ACSPoints[i].y, ACSPoints[i].z, ACSPoints[i].o, true, false, 0, 0 );
+
+				// We set APortalMove = 1 to let those units move after 5 seconds and set value to stop loops
 				APortalMove = 1;
 				Stop = true;
 			}
 
-			BackupList.push_back(SetUnit);
+			// We add every unit to backup list
+			BackupList.push_back( SetUnit );
 		}
 
-		if (Pos == 10)
+		// If we did that loop for melee regiment we recreate it's whole list (with formations)
+		if ( Pos == 10 )
 		{
+			// We clear list
 			AllianceMelee.clear();
 
-			for (uint32 i = 0; i < BackupList.size(); i++)
+			// We readd all units to list by importing them from BackupList
+			for ( uint32 i = 0; i < BackupList.size(); i++ )
 			{
-				AllianceMelee.push_back(BackupList[i]);
+				AllianceMelee.push_back( BackupList[i] );
 			}
 		}
 
-		if (Pos == 6)
+		// If we did that loop for ranged regiment we recreate it's whole list (with formations)
+		if ( Pos == 6 )
 		{
+			// We clear list
 			AllianceRanged.clear();
 
-			for (uint32 i = 0; i < BackupList.size(); i++)
+			// We readd all units to list by importing them from BackupList
+			for ( uint32 i = 0; i < BackupList.size(); i++ )
 			{
-				AllianceRanged.push_back(BackupList[i]);
+				AllianceRanged.push_back( BackupList[i] );
 			}
 		}
 
-		if (Pos == 2)
+		// If we did that loop for caster regiment we recreate it's whole list (with formations)
+		if ( Pos == 2 )
 		{
+			// We clear list
 			AllianceCaster.clear();
 
-			for (uint32 i = 0; i < BackupList.size(); i++)
+			// We readd all units to list by importing them from BackupList
+			for ( uint32 i = 0; i < BackupList.size(); i++ )
 			{
-				AllianceCaster.push_back(BackupList[i]);
+				AllianceCaster.push_back( BackupList[i] );
 			}
 		}
 
+		// We clear backup list as it's not needed anymore
 		BackupList.clear();
 	}
 
+	// Bool used to check if horde melee regiment is full
 	bool HMSize()
 	{
-		if (HordeMelee.size() < 10)
+		// If list size is lesser than 10 we return true - melee units can be spawned
+		if ( HordeMelee.size() < 10 )
 			return true;
 
+		// In other case we check all 10 units one by one
 		else
 		{
-			for (uint32 i = 0; i < 10; i++)
+			for ( uint32 i = 0; i < 10; i++ )
 			{
+				// We check if unit with i place on our list really exists (if i isn't out of list array) - if it does we point it
 				Unit* SetUnit = NULL;
-				if (HordeMelee.size() >= i+1)
+				if ( HordeMelee.size() >= i+1 )
 					SetUnit = HordeMelee[i];
 
-				if (!SetUnit || (SetUnit && (!SetUnit->isAlive() || !SetUnit->IsInWorld())))
+				// If unit does not exist or it exists, but it not alive or is not in world - we return true
+				if ( !SetUnit || ( SetUnit && ( !SetUnit->isAlive() || !SetUnit->IsInWorld() ) ) )
 				{
 					return true;
 					break;
 				}
 			}
 
+			// Else we return false - melee formation is full
 			return false;
 		}
 	}
 
+	// Bool used to check if horde ranged regiment is full
 	bool HRSize()
 	{
-		if (HordeRanged.size() < 6)
+		// If list size is lesser than 6 we return true - ranged units can be spawned
+		if ( HordeRanged.size() < 6 )
 			return true;
 
+		// In other case we check all 6 units one by one
 		else
 		{
-			for (uint32 i = 0; i < 6; i++)
+			for ( uint32 i = 0; i < 6; i++ )
 			{
+				// We check if unit with i place on our list really exists (if i isn't out of list array) - if it does we point it
 				Unit* SetUnit = NULL;
-				if (HordeRanged.size() >= i+1)
+				if ( HordeRanged.size() >= i+1 )
 					SetUnit = HordeRanged[i];
 
-				if (!SetUnit || (SetUnit && (!SetUnit->isAlive() || !SetUnit->IsInWorld())))
+				// If unit does not exist or it exists, but it not alive or is not in world - we return true
+				if ( !SetUnit || ( SetUnit && ( !SetUnit->isAlive() || !SetUnit->IsInWorld() ) ) )
 				{
 					return true;
 					break;
 				}
 			}
 
+			// Else we return false - ranged formation is full
 			return false;
 		}
 	}
 
+	// Bool used to check if horde caster regiment is full
 	bool HCSize()
 	{
-		if (HordeCaster.size() < 2)
+		// If list size is lesser than 2 we return true - caster can be spawned
+		if ( HordeCaster.size() < 2 )
 			return true;
 
+		// In other case we check all 2 units one by one
 		else
 		{
-			for (uint32 i = 0; i < 2; i++)
+			for ( uint32 i = 0; i < 2; i++ )
 			{
+				// We check if unit with i place on our list really exists (if i isn't out of list array) - if it does we point it
 				Unit* SetUnit = NULL;
-				if (HordeCaster.size() >= i+1)
+				if ( HordeCaster.size() >= i+1 )
 					SetUnit = HordeCaster[i];
 
-				if (!SetUnit || (SetUnit && (!SetUnit->isAlive() || !SetUnit->IsInWorld())))
+				// If unit does not exist or it exists, but it not alive or is not in world - we return true
+				if ( !SetUnit || ( SetUnit && ( !SetUnit->isAlive() || !SetUnit->IsInWorld() ) ) )
 				{
 					return true;
 					break;
 				}
 			}
 
+			// Else we return false - caster formation is full
 			return false;
 		}
 	}
 
+	// Function used to horde portal unit spawning
 	void HordePortal()
 	{
+		// Variable initialization
 		uint32 Pos = 0;
 		uint32 Entry = 0;
 		uint32 Change = RandomUInt(6);
 		std::vector<Unit*> BackupList;
 
-		if (HMSize())						// default spawn
+		// If melee regiment is not full, default unit to spawn is Orgrimmar Grunt
+		if ( HMSize() )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = ORGRIMMAR_GRUNT;
 			Pos = 10;
 		}
-		else if (HRSize())					// default spawn if melee regiment is full
+
+		// If melee regiment is full and ranged regiment is not, default unit to spawn is Darkspear Axe Thrower
+		else if ( HRSize() )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = DARKSPEAR_AXE_THROWER;
 			Pos = 6;
 		}
-		else if (HCSize())					// default spawn if ranged regiment is full
+
+		// If melee and ranged regiments are full, default unit to spawn is Undercity Mage
+		else if ( HCSize() )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = UNDERCITY_MAGE;
 			Pos = 2;
 		}
-		if (HMSize() && Change == 1)
+
+		// If melee regiment is not full there is possibility to change unit to spawn to Orgrimmar Shaman
+		if ( HMSize() && Change == 1 )
 		{
+			// We change Entry (position count is not required, because if melee regiment is not full, Pos = 10 is default value)
 			Entry = ORGRIMMAR_SHAMAN;
 		}
-		if (HRSize() && Change == 2)
+
+		// If ranged regiment is not full there is possibility to change unit to spawn to Darkspear Axe Thrower
+		if ( HRSize() && Change == 2 )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = DARKSPEAR_AXE_THROWER;
 			Pos = 6;
 		}
-		if (HCSize() && Change == 3)
+
+		// If caster regiment is not full there is possibility to change unit to spawn to Undercity Mage
+		if ( HCSize() && Change == 3 )
 		{
+			// We change Entry and set position count in which units may be spawned
 			Entry = UNDERCITY_MAGE;
 			Pos = 2;
 		}
 
+		// We go through all positions and check units
 		bool Stop = false;
-		for (uint32 i = 0; i < Pos; i++)
+		for ( uint32 i = 0; i < Pos; i++ )
 		{
+			// We set unit to check
 			Unit* SetUnit = NULL;
-			if (Pos == 10 && HordeMelee.size() >= i+1)
+			if ( Pos == 10 && HordeMelee.size() >= i+1 )
 				SetUnit = HordeMelee[i];
-			if (Pos == 6 && HordeRanged.size() >= i+1)
+			if ( Pos == 6 && HordeRanged.size() >= i+1 )
 				SetUnit = HordeRanged[i];
-			if (Pos == 2 && HordeCaster.size() >= i+1)
+			if ( Pos == 2 && HordeCaster.size() >= i+1 )
 				SetUnit = HordeCaster[i];
 
-			if ((!SetUnit || (SetUnit && (!SetUnit->isAlive() || !SetUnit->IsInWorld()))) && !Stop)
+			// If unit does not exist, is not alive or is not in world and any other unit was not spawned before we spawn one
+			if ( ( !SetUnit || ( SetUnit && ( !SetUnit->isAlive() || !SetUnit->IsInWorld() ) ) ) && !Stop )
 			{
-				if (Pos == 10)
-					SetUnit = pHorde = _unit->GetMapMgr()->GetInterface()->SpawnCreature(Entry, HMSPoints[i].x, HMSPoints[i].y, HMSPoints[i].z, HMSPoints[i].o, true, false, 0, 0);
-				if (Pos == 6)
-					SetUnit = pHorde = _unit->GetMapMgr()->GetInterface()->SpawnCreature(Entry, HRSPoints[i].x, HRSPoints[i].y, HRSPoints[i].z, HRSPoints[i].o, true, false, 0, 0);
-				if (Pos == 2)
-					SetUnit = pHorde = _unit->GetMapMgr()->GetInterface()->SpawnCreature(Entry, HCSPoints[i].x, HCSPoints[i].y, HCSPoints[i].z, HCSPoints[i].o, true, false, 0, 0);
-			
+				if ( Pos == 10 )
+					SetUnit = pHorde = _unit->GetMapMgr()->GetInterface()->SpawnCreature( Entry, HMSPoints[i].x, HMSPoints[i].y, HMSPoints[i].z, HMSPoints[i].o, true, false, 0, 0 );
+				if ( Pos == 6 )
+					SetUnit = pHorde = _unit->GetMapMgr()->GetInterface()->SpawnCreature( Entry, HRSPoints[i].x, HRSPoints[i].y, HRSPoints[i].z, HRSPoints[i].o, true, false, 0, 0 );
+				if ( Pos == 2 )
+					SetUnit = pHorde = _unit->GetMapMgr()->GetInterface()->SpawnCreature( Entry, HCSPoints[i].x, HCSPoints[i].y, HCSPoints[i].z, HCSPoints[i].o, true, false, 0, 0 );
+
+				// We set HPortalMove = 1 to let those units move after 5 seconds and set value to stop loops
 				HPortalMove = 1;
 				Stop = true;
 			}
 
-			BackupList.push_back(SetUnit);
+			// We add every unit to backup list
+			BackupList.push_back( SetUnit );
 		}
 
-		if (Pos == 10)
+		// If we did that loop for melee regiment we recreate it's whole list (with formations)
+		if ( Pos == 10 )
 		{
+			// We clear horde melee list
 			HordeMelee.clear();
 
-			for (uint32 i = 0; i < BackupList.size(); i++)
+			// We recreate horde melee unit list
+			for ( uint32 i = 0; i < BackupList.size(); i++ )
 			{
-				HordeMelee.push_back(BackupList[i]);
+				HordeMelee.push_back( BackupList[i] );
 			}
 		}
 
-		if (Pos == 6)
+		// If we did that loop for ranged regiment we recreate it's whole list (with formations)
+		if ( Pos == 6 )
 		{
+			// We clear horde ranged list
 			HordeRanged.clear();
 
-			for (uint32 i = 0; i < BackupList.size(); i++)
+			// We recreate horde ranged unit list
+			for ( uint32 i = 0; i < BackupList.size(); i++ )
 			{
-				HordeRanged.push_back(BackupList[i]);
+				HordeRanged.push_back( BackupList[i] );
 			}
 		}
 
-		if (Pos == 2)
+		// If we did that loop for caster regiment we recreate it's whole list (with formations)
+		if ( Pos == 2 )
 		{
+			// We clear horde caster list
 			HordeCaster.clear();
 
-			for (uint32 i = 0; i < BackupList.size(); i++)
+			// We recreate horde caster unit list
+			for ( uint32 i = 0; i < BackupList.size(); i++ )
 			{
-				HordeCaster.push_back(BackupList[i]);
+				HordeCaster.push_back( BackupList[i] );
 			}
 		}
 
+		// We clear backup list
 		BackupList.clear();
 	}
 
+	// Function used to summon infernals
 	void PitCommanderInfernalSummon()
 	{
+		// First of all we save Pit Commander in memory
 		Unit* pPitCommander = NULL;
-		pPitCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-249.119995f, 1169.209961f, 41.552101f, PIT_COMMANDER);
+		pPitCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords( -249.119995f, 1169.209961f, 41.552101f, PIT_COMMANDER );
 
-		if (InfernalTable.size())
+		// We run through whole Infernal list
+		if ( InfernalTable.size() )
 		{
+			// We create backup list to recreate our default list later and check all infernals
 			Creature* pInfernal;
-			std::vector<Creature*> InfernalBackup;
-			for (size_t i = 0; i < InfernalTable.size(); i++)
+			std::vector< Creature* > InfernalBackup;
+			for ( size_t i = 0; i < InfernalTable.size(); i++ )
 			{
 				pInfernal = InfernalTable[i];
-				if (pInfernal && !pInfernal->isAlive())
+
+				// If Infernal's data was saved in memory, but creature is not in world we go to another unit and set that unit on list as null
+				if ( pInfernal && !pInfernal->IsInWorld() )
+				{
+					InfernalTable[i] = NULL;
+					pInfernal = NULL;
+					continue;
+				}
+
+				// If Infernal's pointer is valid, but unit is not alive we despawn it and go another unit
+				if ( pInfernal && !pInfernal->isAlive() )
 				{
 					pInfernal->Despawn(0,0);
 					continue;
 				}
 
-				InfernalBackup.push_back(pInfernal);
+				// If unit shouldn't be despawned we add it to backup list
+				InfernalBackup.push_back( pInfernal );
 			}
 
+			// We clear default infernal list and recreate it
 			InfernalTable.clear();
-			for (size_t i = 0; i < InfernalBackup.size(); i++)
+			for ( size_t i = 0; i < InfernalBackup.size(); i++ )
 			{
-				InfernalTable.push_back(InfernalBackup[i]);
+				InfernalTable.push_back( InfernalBackup[i] );
 			}
 
+			// We also clean backup list, because it's unneeded now
 			InfernalBackup.clear();
 		}
 
-		if (pPitCommander && pPitCommander->isAlive() && InfernalTable.size() <= 2)
+		// We check if Pit Commander pointer is valid and if he's alive and we have on battlefield less than 3 infernals
+		if ( pPitCommander && pPitCommander->isAlive() && InfernalTable.size() <= 2 )
 		{
-			pPitCommander->CastSpell(pPitCommander, spells[0].info, spells[0].instant);
+			// We force Pit Commander to cast spell that looks like summoning infernals
+			pPitCommander->CastSpell( pPitCommander, spells[0].info, spells[0].instant );
 
+			// We rand infernals' spawn positions
 			LastInfernal = rand()%2;
 
-			_unit->CastSpellAoF(Infernals[LastInfernal].x, Infernals[LastInfernal].y, Infernals[LastInfernal].z, spells[1].info, spells[1].instant);
-			_unit->CastSpellAoF(Infernals[LastInfernal+2].x, Infernals[LastInfernal+2].y, Infernals[LastInfernal+2].z, spells[1].info, spells[1].instant);
+			// We force trigger to "throw huge fel stones" from it's actual position
+			_unit->CastSpellAoF( Infernals[LastInfernal].x, Infernals[LastInfernal].y, Infernals[LastInfernal].z, spells[1].info, spells[1].instant );
+			_unit->CastSpellAoF( Infernals[LastInfernal+2].x, Infernals[LastInfernal+2].y, Infernals[LastInfernal+2].z, spells[1].info, spells[1].instant );
 
+			// We mark infernals as spawned 
 			_Infernals = true;
 			return;							// will prevent adding infernals and letting demon army to move in the same time
 		}
 
+		// We reset InfernalSpawn timer to default value (40 sec)
 		InfernalSpawn = SUMMON_INFERNAL_TIME;
 	}
 
+	// Function we use to send 5 demons to attack Dark Portal defenders
 	void PitCommanderAttackCmd()
 	{
+		// We get Pit Commander unit
 		Unit* pPitCommander = NULL;
-		pPitCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-249.119995f, 1169.209961f, 41.552101f, PIT_COMMANDER);
-		
-		if (pPitCommander && !pPitCommander->CombatStatus.IsInCombat() && RandomUInt(3) == 1)
+		pPitCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords( -249.119995f, 1169.209961f, 41.552101f, PIT_COMMANDER );
+
+		// If pointer is valid, Pit Commander is not in combat we randomize emoting
+		if ( pPitCommander && !pPitCommander->GetAIInterface()->GetNextTarget() && RandomUInt(3) == 1 )
 				pPitCommander->Emote(EMOTE_ONESHOT_POINT);
 
-		if (DemonTable.size() == 5)
+		// If DemonTable size is equal to 5 we send all demons to fight
+		if ( DemonTable.size() == 5 )
 		{
-			for (uint32 i = 0; i < DemonTable.size(); i++)
+			for ( uint32 i = 0; i < DemonTable.size(); i++ )
 			{
 				Unit* pDemon = NULL;
 				pDemon = DemonTable[i];
 
-				if (pDemon)
+				// If Demon's data was saved in memory, but creature is not in world or is not alive we go to another unit and set that unit on list as null
+				if ( pDemon && ( !pDemon->isAlive() || !pDemon->IsInWorld() ) )
 				{
-					pDemon->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-					pDemon->GetAIInterface()->setWaypointToMove(3);
+					DemonTable[i] = NULL;
+					pDemon = NULL;
+					continue;
+				}
+
+				if ( pDemon )
+				{
+					pDemon->GetAIInterface()->setMoveType( MOVEMENTTYPE_FORWARDTHANSTOP );
+					pDemon->GetAIInterface()->setWaypointToMove( 3 );
 				}
 			}
 		}
 
+		// In other case we send 5 out of 10 demons
 		else
 		{
-			for (uint32 i = 0; i < DemonTable.size(); i+=2)
+			for ( uint32 i = 0; i < DemonTable.size(); i+=2 )
 			{
 				Unit* pDemon = NULL;
 				pDemon = DemonTable[i];
 
-				if (pDemon)
+				// If Demon's data was saved in memory, but creature is not in world or is not alive we go to another unit and set that unit on list as null
+				if ( pDemon && ( !pDemon->isAlive() || !pDemon->IsInWorld() ) )
 				{
-					pDemon->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-					pDemon->GetAIInterface()->setWaypointToMove(3);
+					DemonTable[i] = NULL;
+					pDemon = NULL;
+					continue;
+				}
+
+				if ( pDemon )
+				{
+					pDemon->GetAIInterface()->setMoveType( MOVEMENTTYPE_FORWARDTHANSTOP );
+					pDemon->GetAIInterface()->setWaypointToMove( 3 );
 				}
 			}
 		}
 
-		if (DemonTable.size() == 5)
+		// If DemonTable size is equal to 5 we clear it. Else we just mark it to send another wave on the battlefield
+		if ( DemonTable.size() == 5 )
 			DemonTable.clear();
 		else SecondWave = true;
 	}
 
+	// Function used to send second wave of demons
 	void SecondWaveAttackCmd()
 	{
+		// We get Pit Commander pointer
 		Unit* pPitCommander = NULL;
-		pPitCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-249.119995f, 1169.209961f, 41.552101f, PIT_COMMANDER);
+		pPitCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords( -249.119995f, 1169.209961f, 41.552101f, PIT_COMMANDER );
 		
-		if (pPitCommander && !pPitCommander->CombatStatus.IsInCombat() && RandomUInt(3) == 1)
-				pPitCommander->Emote(EMOTE_ONESHOT_POINT);
+		// We check if pointer is valid, if Pit Commander is in combat and we randomize emoting
+		if ( pPitCommander && !pPitCommander->GetAIInterface()->GetNextTarget() && RandomUInt(3) == 1 )
+				pPitCommander->Emote( EMOTE_ONESHOT_POINT );
 
-		for (uint32 i = 1; i < DemonTable.size(); i+=2)
+		// We send another 5 demons to fight
+		for ( uint32 i = 1; i < DemonTable.size(); i+=2 )
 		{
 			Unit* pDemon = NULL;
 			pDemon = DemonTable[i];
 
-			if (pDemon)
+			// If Demon's data was saved in memory, but creature is not in world or is not alive we go to another unit and set that unit on list as null
+			if ( pDemon && ( !pDemon->isAlive() || !pDemon->IsInWorld() ) )
 			{
-				pDemon->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-				pDemon->GetAIInterface()->setWaypointToMove(3);
+				DemonTable[i] = NULL;
+				pDemon = NULL;
+				continue;
+			}
+
+			if ( pDemon )
+			{
+				pDemon->GetAIInterface()->setMoveType( MOVEMENTTYPE_FORWARDTHANSTOP );
+				pDemon->GetAIInterface()->setWaypointToMove( 3 );
 			}
 		}
 
+		// We clear DemonTable
 		DemonTable.clear();
 	}
 
+	// Void used to spawn demons
 	void PitCommanderSpawn()
 	{
+		// We reset Respawn timer and initialize other variables
 		PitCommanderRespawn = DEMON_RESPAWN_TIME;
 		uint32 WaveSize = 0;
 		uint32 Counter = 0;
-		for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr)
+
+		// We run through set of objects and check how many spawned demons are still fighting
+		for( set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr )
 		{	
-			if ((*itr)->GetTypeId()== TYPEID_UNIT)
+			if ( (*itr)->GetTypeId()== TYPEID_UNIT )
 			{
 				Creature* CreatureToCheck = NULL;
 				CreatureToCheck = (Creature*)(*itr);
-				if (CreatureToCheck && CreatureToCheck->spawnid == 0 && CreatureToCheck->isAlive() && (CreatureToCheck->GetEntry() == 18944 || CreatureToCheck->GetEntry() == 19005))
+				if ( CreatureToCheck && CreatureToCheck->spawnid == 0 && CreatureToCheck->isAlive() && ( CreatureToCheck->GetEntry() == 18944 || CreatureToCheck->GetEntry() == 19005 ) )
 					Counter++;
 			}
 		}
 
-		if (Counter >= 0 && Counter <= 5)
+		// If less than 6 we may spawn 5 and 10 demon waves.
+		if ( Counter >= 0 && Counter <= 5 )
 			WaveSize = RandomUInt(3);
-		if (Counter > 5 && Counter <= 10)
+
+		// If less than 11 but more than 5 we may only spawn 5 demon wave
+		if ( Counter > 5 && Counter <= 10 )
 			WaveSize = 2;
-		if (Counter > 10)
+
+		// If more than 10 demons are on the battlefield we don't spawn any new demon
+		if ( Counter > 10 )
 			WaveSize = 5;
 
-		if (WaveSize == 1)
+		// If WaveSize == 1 we spawn 10-demon-wave and add them to our list
+		if ( WaveSize == 1 )
 		{
-			for (int i = 0; i < 10; i++)
+			for ( int i = 0; i < 10; i++ )
 			{
 				uint32 Entry = FEL_SOLDIER;
-				if (RandomUInt(3) == 1)
+				if ( RandomUInt(3) == 1 )
 					Entry = WRATH_MASTER;
 
-				DemonTable.push_back(_unit->GetMapMgr()->GetInterface()->SpawnCreature(Entry, DSPoints[i].x, DSPoints[i].y, DSPoints[i].z, DSPoints[i].o, true, false, 0, 0));
+				DemonTable.push_back( _unit->GetMapMgr()->GetInterface()->SpawnCreature( Entry, DSPoints[i].x, DSPoints[i].y, DSPoints[i].z, DSPoints[i].o, true, false, 0, 0 ) );
 			}
 		}
 
-		else if (WaveSize == 5)
+		// If WaveSize == 5 we set PitCommanderRespawn to 60 seconds and check again if we can spawn demon wave after that time
+		else if ( WaveSize == 5 )
 			PitCommanderRespawn = 60;
 
+		// In other cases we just spawn 5-demon-wave and add them to our DemonList
 		else
 		{
-			for (int i = 0; i < 10; i+=2)
+			for ( int i = 0; i < 10; i+=2 )
 			{
 				uint32 Entry = FEL_SOLDIER;
-				if (RandomUInt(3) == 1)
+				if ( RandomUInt(3) == 1 )
 					Entry = WRATH_MASTER;
 
-				DemonTable.push_back(_unit->GetMapMgr()->GetInterface()->SpawnCreature(Entry, DSPoints[i].x, DSPoints[i].y, DSPoints[i].z, DSPoints[i].o, true, false, 0, 0));
+				DemonTable.push_back( _unit->GetMapMgr()->GetInterface()->SpawnCreature( Entry, DSPoints[i].x, DSPoints[i].y, DSPoints[i].z, DSPoints[i].o, true, false, 0, 0 ) );
 			}
 		}
 	}
@@ -1241,7 +1476,6 @@ public:
 			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 
 			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
-			_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1758);
 			_unit->GetAIInterface()->m_moveBackward = true;
 			_unit->GetAIInterface()->m_moveRun = true;
 			_unit->m_noRespawn = true;
@@ -1472,7 +1706,6 @@ public:
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 
 				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
-				_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1758);
 				_unit->GetAIInterface()->m_moveBackward = true;
 				_unit->GetAIInterface()->m_moveRun = true;
 				_unit->SetUInt32Value(UNIT_NPC_FLAGS, 0);
@@ -1673,7 +1906,6 @@ public:
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 
 				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
-				_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1759);
 				_unit->GetAIInterface()->m_moveBackward = true;
 				_unit->GetAIInterface()->m_moveRun = true;
 				_unit->m_noRespawn = true;
@@ -1883,8 +2115,6 @@ public:
 		spells[0].perctrigger = 100.0f;
 		spells[0].attackstoptimer = 1000;
 
-		_unit->GetAIInterface()->m_canRangedAttack = true;
-		_unit->GetAIInterface()->disable_ranged = true;
 		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
 
 		LastWP = 0;
@@ -1897,7 +2127,6 @@ public:
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 
 				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
-				_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1758);
 				_unit->GetAIInterface()->m_moveBackward = true;
 				_unit->GetAIInterface()->m_moveRun = true;
 				_unit->m_noRespawn = true;
@@ -1916,24 +2145,15 @@ public:
     {
 		if (_unit->GetDistance2dSq(mTarget) >= 64.0f && _unit->GetDistance2dSq(mTarget) <= 900.0f)
 		{
-			_unit->GetAIInterface()->disable_ranged = true;
-			_unit->GetAIInterface()->m_canMove = false;
-
-			_unit->CastSpell(mTarget, spells[0].info, spells[0].instant);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+			_unit->GetAIInterface()->StopMovement(1);
 		}
 
-		if (_unit->GetDistance2dSq(mTarget) > 900.0f)
-			_unit->GetAIInterface()->disable_ranged = true;
-
 		RegisterAIUpdateEvent(1500);
-		//RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
     void OnCombatStop(Unit *mTarget)
     {
-		_unit->GetAIInterface()->disable_ranged = false;
-		_unit->GetAIInterface()->m_canMove = true;
-
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 
@@ -1952,21 +2172,17 @@ public:
 
     void AIUpdate()
 	{
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+
 		if (_unit->GetAIInterface()->GetNextTarget())
 		{
 			if (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) >= 64.0f && _unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) <= 900.0f)
 			{
-				_unit->GetAIInterface()->disable_ranged = true;
-				_unit->GetAIInterface()->m_canMove = false;
+				_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+				_unit->GetAIInterface()->StopMovement(1);
 				
 				float val = RandomFloat(100.0f);
 				SpellCast(val);
-			}
-
-			else
-			{
-				_unit->GetAIInterface()->disable_ranged = false;
-				_unit->GetAIInterface()->m_canMove = true;
 			}
 		}
     }
@@ -2098,8 +2314,6 @@ public:
 		spells[2].perctrigger = 15.0f;
 		spells[2].attackstoptimer = 1000;
 
-		_unit->GetAIInterface()->m_canRangedAttack = true;
-		_unit->GetAIInterface()->disable_ranged = true;
 		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
 
 		LastWP = 0;
@@ -2112,7 +2326,6 @@ public:
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 
 				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
-				_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1758);
 				_unit->GetAIInterface()->m_moveBackward = true;
 				_unit->GetAIInterface()->m_moveRun = true;
 				_unit->m_noRespawn = true;
@@ -2131,23 +2344,15 @@ public:
     {
 		if (_unit->GetDistance2dSq(mTarget) <= 1600.0f)
 		{
-			_unit->GetAIInterface()->disable_ranged = true;
-			_unit->GetAIInterface()->m_canMove = false;
-
-			_unit->CastSpell(mTarget, spells[0].info, spells[0].instant);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+			_unit->GetAIInterface()->StopMovement(1);
 		}
-
-		else
-			_unit->GetAIInterface()->disable_ranged = true;
 
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
     void OnCombatStop(Unit *mTarget)
     {
-		_unit->GetAIInterface()->disable_ranged = false;
-		_unit->GetAIInterface()->m_canMove = true;
-
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 
@@ -2166,21 +2371,17 @@ public:
 
     void AIUpdate()
 	{
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+
 		if (_unit->GetAIInterface()->GetNextTarget())
 		{
 			if (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) >= 0.0f && _unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) <= 1600.0f)
 			{
-				_unit->GetAIInterface()->disable_ranged = true;
-				_unit->GetAIInterface()->m_canMove = false;
+				_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+				_unit->GetAIInterface()->StopMovement(1);
 				
 				float val = RandomFloat(100.0f);
 				SpellCast(val);
-			}
-
-			else
-			{
-				_unit->GetAIInterface()->disable_ranged = false;
-				_unit->GetAIInterface()->m_canMove = true;
 			}
 		}
     }
@@ -2981,8 +3182,6 @@ public:
 		spells[0].perctrigger = 100.0f;
 		spells[0].attackstoptimer = 1000;
 
-		_unit->GetAIInterface()->m_canRangedAttack = true;
-		_unit->GetAIInterface()->disable_ranged = true;
 		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
 
 		LastWP = 0;
@@ -2995,7 +3194,6 @@ public:
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 
 				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
-				_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1755);
 				_unit->GetAIInterface()->m_moveBackward = true;
 				_unit->GetAIInterface()->m_moveRun = true;
 				_unit->m_noRespawn = true;
@@ -3014,24 +3212,15 @@ public:
     {
 		if (_unit->GetDistance2dSq(mTarget) >= 64.0f && _unit->GetDistance2dSq(mTarget) <= 900.0f)
 		{
-			_unit->GetAIInterface()->disable_ranged = true;
-			_unit->GetAIInterface()->m_canMove = false;
-
-			_unit->CastSpell(mTarget, spells[0].info, spells[0].instant);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+			_unit->GetAIInterface()->StopMovement(1);
 		}
 
-		if (_unit->GetDistance2dSq(mTarget) > 900.0f)
-			_unit->GetAIInterface()->disable_ranged = true;
-
 		RegisterAIUpdateEvent(1500);
-		//RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
     void OnCombatStop(Unit *mTarget)
     {
-		_unit->GetAIInterface()->disable_ranged = true;
-		_unit->GetAIInterface()->m_canMove = true;
-
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 
@@ -3050,21 +3239,17 @@ public:
 
     void AIUpdate()
 	{
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+
 		if (_unit->GetAIInterface()->GetNextTarget())
 		{
 			if (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) >= 64.0f && _unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) <= 900.0f)
 			{
-				_unit->GetAIInterface()->disable_ranged = true;
-				_unit->GetAIInterface()->m_canMove = false;
+				_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+				_unit->GetAIInterface()->StopMovement(1);
 				
 				float val = RandomFloat(100.0f);
 				SpellCast(val);
-			}
-
-			else
-			{
-				_unit->GetAIInterface()->disable_ranged = false;
-				_unit->GetAIInterface()->m_canMove = true;
 			}
 		}
     }
@@ -3197,8 +3382,6 @@ public:
 		spells[2].perctrigger = 15.0f;
 		spells[2].attackstoptimer = 1000;
 
-		_unit->GetAIInterface()->m_canRangedAttack = true;
-		_unit->GetAIInterface()->disable_ranged = true;
 		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
 
 		LastWP = 0;
@@ -3211,7 +3394,6 @@ public:
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 
 				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
-				_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1755);
 				_unit->GetAIInterface()->m_moveBackward = true;
 				_unit->GetAIInterface()->m_moveRun = true;
 				_unit->m_noRespawn = true;
@@ -3230,23 +3412,15 @@ public:
     {
 		if (_unit->GetDistance2dSq(mTarget) <= 1600.0f)
 		{
-			_unit->GetAIInterface()->disable_ranged = true;
-			_unit->GetAIInterface()->m_canMove = false;
-
-			_unit->CastSpell(mTarget, spells[0].info, spells[0].instant);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+			_unit->GetAIInterface()->StopMovement(1);
 		}
-
-		else
-			_unit->GetAIInterface()->disable_ranged = true;
 
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
     void OnCombatStop(Unit *mTarget)
     {
-		_unit->GetAIInterface()->disable_ranged = false;
-		_unit->GetAIInterface()->m_canMove = true;
-
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 
@@ -3265,21 +3439,17 @@ public:
 
     void AIUpdate()
 	{
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+
 		if (_unit->GetAIInterface()->GetNextTarget())
 		{
 			if (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) >= 0.0f && _unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) <= 1600.0f)
 			{
-				_unit->GetAIInterface()->disable_ranged = true;
-				_unit->GetAIInterface()->m_canMove = false;
+				_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+				_unit->GetAIInterface()->StopMovement(1);
 				
 				float val = RandomFloat(100.0f);
 				SpellCast(val);
-			}
-
-			else
-			{
-				_unit->GetAIInterface()->disable_ranged = false;
-				_unit->GetAIInterface()->m_canMove = true;
 			}
 		}
     }
@@ -3511,28 +3681,12 @@ public:
 		}
     }
 
-    void OnCombatStart(Unit* mTarget)
-    {
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
+		_unit->GetAIInterface()->MoveTo(_unit->GetPositionX(), _unit->GetPositionY() + 3.0f, _unit->GetPositionZ(), _unit->GetOrientation());
+
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-
-        RemoveAIUpdateEvent();
-    }
-
-    void OnDied(Unit * mKiller)
-    {
-       RemoveAIUpdateEvent();
-    }
-
-    void AIUpdate()
-	{
-		//float val = RandomFloat(100.0f);
-		//SpellCast(val);
     }
 };
 
@@ -3578,7 +3732,6 @@ public:
 			_unit->GetPositionZ() == DSPoints[i].z)
 			{
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-				_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1758);
 				_unit->GetAIInterface()->m_moveBackward = true;
 				_unit->m_noRespawn = true;
 
@@ -3603,6 +3756,8 @@ public:
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 
         RemoveAIUpdateEvent();
+
+		_unit->GetAIInterface()->MoveTo(_unit->GetPositionX(), _unit->GetPositionY() + 3.0f, _unit->GetPositionZ(), _unit->GetOrientation());
 
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
 		_unit->GetAIInterface()->setWaypointToMove(LastWP);
@@ -3720,7 +3875,6 @@ public:
 			_unit->GetPositionZ() == DSPoints[i].z)
 			{
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-				_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 1758);
 				_unit->GetAIInterface()->m_moveBackward = true;
 				_unit->m_noRespawn = true;
 
@@ -3745,6 +3899,8 @@ public:
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 
         RemoveAIUpdateEvent();
+
+		_unit->GetAIInterface()->MoveTo(_unit->GetPositionX(), _unit->GetPositionY() + 3.0f, _unit->GetPositionZ(), _unit->GetOrientation());
 
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
 		_unit->GetAIInterface()->setWaypointToMove(LastWP);

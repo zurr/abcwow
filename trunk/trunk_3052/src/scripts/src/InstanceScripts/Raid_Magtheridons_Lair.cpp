@@ -716,19 +716,22 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(SHADOW_BOLT_VOLLEY);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
-		spells[0].perctrigger = 3.0f;
+		spells[0].cooldown = 10;
+		spells[0].perctrigger = 1.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(DARK_MENDING);
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = false;
-		spells[1].perctrigger = 4.0f;
+		spells[1].cooldown = 20;
+		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(BURNING_ABYSSAL);
 		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = true;
-		spells[2].perctrigger = 1.5f;
+		spells[2].cooldown = 20;
+		spells[2].perctrigger = 1.0f;
 		spells[2].attackstoptimer = 1000;
 		spells[2].cooldown = 30;
 

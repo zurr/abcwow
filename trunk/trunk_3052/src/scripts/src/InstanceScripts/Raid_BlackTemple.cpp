@@ -1,3 +1,21 @@
+/*
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "StdAfx.h"
 #include "Setup.h"
 
@@ -13,10 +31,11 @@
 //------------------------------------
 
 #define CN_NAJENTUS 22887
+
 #define CRASHING_WAVE 40100//Crashing Wave (2313-2687 Nature damage)
 #define NEEDLE_SPINE 39835//Needle Spine (3188-4312 Damage, AoE of 2375-2625 Aura): Fires a needle spine at an enemy target.
 #define NEEDLE_SPINE_EXPLOSION 39968
-#define TIDAL_SHIELD 185584//39872//Tidal Shield : Impervious to normal attack and spells. Regenerating health. Will deal 8500 frost damage to the raid when broken.
+#define TIDAL_SHIELD 39872//Tidal Shield : Impervious to normal attack and spells. Regenerating health. Will deal 8500 frost damage to the raid when broken.
 #define NAJENTUS_SPINE_GO 3264//Campfire so it wont crash Real go is 185584 //Did not find it in any database (including drake's go's), tested with a chair, and it works
 
 class NajentusAI : public CreatureAIScript
@@ -45,38 +64,50 @@ public:
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
+		spells[0].cooldown = 15;
 
 		spells[1].info = dbcSpell.LookupEntry(NEEDLE_SPINE);
-		spells[1].targettype = TARGET_ATTACKING;
+		spells[1].targettype = TARGET_RANDOM_SINGLE;
 		spells[1].instant = false;
-		spells[1].perctrigger = 10.0f;
+		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 2000; // 2sec
+		spells[1].cooldown = 10;
 
 		spells[2].info = dbcSpell.LookupEntry(TIDAL_SHIELD);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = false;
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 2000; // 2sec
+		spells[2].cooldown = 105;
 
+		// not sure about this spell so I won't make it 'castable'
 		spells[3].info = dbcSpell.LookupEntry(NEEDLE_SPINE_EXPLOSION);
 		spells[3].targettype = TARGET_VARIOUS;
 		spells[3].instant = true;
-		spells[3].perctrigger = 10.0f;
+		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 2000; // 2sec
     }
 
     void OnCombatStart(Unit* mTarget)
     {
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		for (int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+
+		uint32 t = (uint32)time(NULL);
+		spells[1].casttime = t + 20;
+		spells[2].casttime = t + 60;
+
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You will die, in the name of Lady Vashj!");
 		_unit->PlaySoundToSet(11450);
+
+		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
 	void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
        RemoveAIUpdateEvent();
     }
 
@@ -84,6 +115,7 @@ public:
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Lord Illidan will... crush you.");
 		_unit->PlaySoundToSet(11459);
+
 		RemoveAIUpdateEvent();
     }
 
@@ -95,6 +127,21 @@ public:
 
 	void AIUpdate()
 	{
+		uint32 t = (uint32)time(NULL);
+		if (t > spells[2].casttime)
+		{
+			_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+
+			spells[2].casttime = t + spells[2].cooldown;
+		}
+
+		if (t > spells[1].casttime)
+		{
+			CastSpellOnRandomTarget(1, 0.0f, 50.0f, 0, 100);
+
+			spells[1].casttime = t + spells[1].cooldown;
+		}
+
 		float val = (float)RandomFloat(100.0f);
         SpellCast(val);
 	}
@@ -119,18 +166,23 @@ public:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							_unit->GetMapMgr()->GetInterface()->SpawnGameObject(NAJENTUS_SPINE_GO , _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.207343, true, 0, 0);
-							break;
+							_unit->GetMapMgr()->GetInterface()->SpawnGameObject(NAJENTUS_SPINE_GO , _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.207343, true, 0, 0); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
@@ -138,9 +190,60 @@ public:
         }
     }
 
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
+		}
+	}
+
 protected:
+
 	int nrspells;
-};		
+};
+
 //------------------------------------
 //          -= Supremus =-
 //------------------------------------
@@ -150,7 +253,6 @@ protected:
 //Abilities - Phase 1
 #define MOLTEN_FLAME 40253 //Molten Flame: Blue-flamed fire sent along the ground in a straight line toward random players that deals 3325-3675 fire damage every 1 second while stood on. Ability used every 20 seconds.
 #define HURTFUL_STRIKE 40126 //33813 //Hurtful Strike: A massive melee ability applied to the second highest on his aggro list. If there are no other melee targets in range, it will be performed on the main tank instead.
-
 
 //Abilities - Phase 2
 //Gaze: Supremus will target a random player and follow that target around for 10 seconds at 90% of normal movement speed. Switches targets after 10 seconds.
@@ -367,8 +469,6 @@ protected:
 #define FEL_RAGE 40508
 #define ACID_GEYSER 40629
 
-
-
 class GurtoggAI : public CreatureAIScript
 {
 public:
@@ -559,7 +659,6 @@ public:
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
 
 		spells[1].info = dbcSpell.LookupEntry(ENRAGE_EOS);
 		spells[1].targettype = TARGET_ATTACKING;
@@ -691,7 +790,6 @@ public:
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
 
 		spells[1].info = dbcSpell.LookupEntry(DEADEN);
 		spells[1].targettype = TARGET_ATTACKING;
@@ -822,7 +920,6 @@ public:
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
 
 		spells[1].info = dbcSpell.LookupEntry(SOUL_SCREAM);
 		spells[1].targettype = TARGET_VARIOUS;
@@ -958,7 +1055,6 @@ public:
 		spells[0].instant = true;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
 
 		spells[1].info = dbcSpell.LookupEntry(SABER_LASH);
 		spells[1].targettype = TARGET_ATTACKING;
@@ -1007,13 +1103,22 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You seem a little tense.");
-		_unit->PlaySoundToSet(11505);
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Stop toying with my emotions!");
-		_unit->PlaySoundToSet(11510);
+		switch (RandomUInt(2))
+		{
+		case 1:
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You seem a little tense.");
+			_unit->PlaySoundToSet(11505);
+			break;
+		default:
+			{
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Stop toying with my emotions!");
+				_unit->PlaySoundToSet(11510);
+			}
+		}
+
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 	
     void OnDied(Unit * mKiller)
@@ -1114,7 +1219,6 @@ public:
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
 
 		spells[1].info = dbcSpell.LookupEntry(DIVINE_WRATH);
 		spells[1].targettype = TARGET_ATTACKING;
@@ -1637,8 +1741,6 @@ protected:
 #define INCINERATE 40239
 #define SHADOW_OF_DEATH 40251
 
-
-
 class TerongorefiendAI : public CreatureAIScript
 {
 public:
@@ -1654,6 +1756,7 @@ public:
 			m_spellcheck[i] = false;
 
 		} 
+
 		spells[0].info = dbcSpell.LookupEntry(DOOM_BLOSSOM); //summon visual effect 
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = false;
@@ -1677,24 +1780,23 @@ public:
 		spells[3].instant = false;
 		spells[3].perctrigger = 0.1f;
 		spells[3].attackstoptimer = 2000;
-
     }
     
     void OnCombatStart(Unit* mTarget)
     {
-		phase = 1;
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Vengeance is mine!");
 		_unit->PlaySoundToSet(11513);
+
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+
+		phase = 1;
     }
 
 	void OnTargetDied(Unit* mTarget)
     {
 		if (_unit->GetHealthPct() > 0)	
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
+			int RandomSpeach=rand()%3;
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -1717,7 +1819,9 @@ public:
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
         RemoveAIUpdateEvent();
+
 		phase = 1;
     }
 
@@ -1725,21 +1829,22 @@ public:
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The wheel...spins...again....");
 		_unit->PlaySoundToSet(11521);
-       RemoveAIUpdateEvent();
+
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
 	{
-		if(_unit->GetHealthPct() <= 25 && phase == 1)
+		if (_unit->GetHealthPct() <= 25 && phase == 1)
 		{
-		phase = 2;
-		Creature *cre = NULL;
-        cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23111, 
-        _unit->GetPositionX(), _unit->GetPositionY(),
-        _unit->GetPositionZ(), _unit->GetOrientation(), 
-        true, false, 0, 0); 
-		cre->GetAIInterface()->setOutOfCombatRange(30000);
+			phase = 2;
+			Creature *pSummon = NULL;
+			pSummon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23111, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0); 
+
+			if(pSummon)
+				pSummon->GetAIInterface()->setOutOfCombatRange(30000);
 		}
+
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
 	}
@@ -1798,8 +1903,6 @@ protected:
 #define CN_SHADE_OF_AKAMA 22841
 
 #define SINFUL_BEAM0 00000
-
-
 
 class ShadeofakamaAI : public CreatureAIScript
 {
@@ -1883,8 +1986,9 @@ public:
                 cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23421, 
                     _unit->GetPositionX(), _unit->GetPositionY(),
                     _unit->GetPositionZ(), _unit->GetOrientation(),
-                    true, false, 0, 0); 
-				cre->GetAIInterface()->setOutOfCombatRange(30000);
+                    true, false, 0, 0);
+				if (cre)
+					cre->GetAIInterface()->setOutOfCombatRange(30000);
 			}
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Abandon all hope! The legion has returned to finish what was begun so many years ago. This time there will be no escape!");
 		_unit->PlaySoundToSet(10999);
@@ -1899,7 +2003,8 @@ public:
                     _unit->GetPositionX(), _unit->GetPositionY(),
                     _unit->GetPositionZ(), _unit->GetOrientation(),
                     true, false, 0, 0); 
-				cre->GetAIInterface()->setOutOfCombatRange(30000);
+				if (cre)
+					cre->GetAIInterface()->setOutOfCombatRange(30000);
 			}
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Abandon all hope! The legion has returned to finish what was begun so many years ago. This time there will be no escape!");
 		_unit->PlaySoundToSet(10999);
@@ -1914,7 +2019,8 @@ public:
                     _unit->GetPositionX(), _unit->GetPositionY(),
                     _unit->GetPositionZ(), _unit->GetOrientation(),
                     true, false, 0, 0); 
-				cre->GetAIInterface()->setOutOfCombatRange(30000);
+				if (cre)
+					cre->GetAIInterface()->setOutOfCombatRange(30000);
 			}
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Abandon all hope! The legion has returned to finish what was begun so many years ago. This time there will be no escape!");
 		_unit->PlaySoundToSet(10999);
@@ -1929,7 +2035,8 @@ public:
                     _unit->GetPositionX(), _unit->GetPositionY(),
                     _unit->GetPositionZ(), _unit->GetOrientation(),
                     true, false, 0, 0); 
-				cre->GetAIInterface()->setOutOfCombatRange(30000);
+				if (cre)
+					cre->GetAIInterface()->setOutOfCombatRange(30000);
 			}
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Abandon all hope! The legion has returned to finish what was begun so many years ago. This time there will be no escape!");
 		_unit->PlaySoundToSet(10999);
@@ -1944,7 +2051,8 @@ public:
                     _unit->GetPositionX(), _unit->GetPositionY(),
                     _unit->GetPositionZ(), _unit->GetOrientation(),
                     true, false, 0, 0); 
-				cre->GetAIInterface()->setOutOfCombatRange(30000);
+				if (cre)
+					cre->GetAIInterface()->setOutOfCombatRange(30000);
 			}
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Abandon all hope! The legion has returned to finish what was begun so many years ago. This time there will be no escape!");
 		_unit->PlaySoundToSet(10999);
@@ -1959,7 +2067,8 @@ public:
                     _unit->GetPositionX(), _unit->GetPositionY(),
                     _unit->GetPositionZ(), _unit->GetOrientation(),
                     true, false, 0, 0); 
-				cre->GetAIInterface()->setOutOfCombatRange(30000);
+				if (cre)
+					cre->GetAIInterface()->setOutOfCombatRange(30000);
 			}
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Abandon all hope! The legion has returned to finish what was begun so many years ago. This time there will be no escape!");
 		_unit->PlaySoundToSet(10999);
@@ -2472,12 +2581,10 @@ protected:
 #define CN_SHADOWY_CONSTRUCTS 23111
 
 #define SPIRIT_STRIKE 40325
-#define SPIRIT_LANCE 40157
+#define SPIRIT_LANCE  40157
 #define SPIRIT_VOLLEY 40314
-#define SPIRIT_CHAINS 40157
-#define SPIRIT_SHIELD 40314
-
-
+#define SPIRIT_CHAINS 40175
+#define SPIRIT_SHIELD 40322
 
 class  ShadowyconstructsAI : public CreatureAIScript
 {
@@ -2532,11 +2639,6 @@ public:
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
-	void OnTargetDied(Unit* mTarget)
-    {
-
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
@@ -2546,8 +2648,6 @@ public:
 
     void OnDied(Unit * mKiller)
     {
-		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "hahahahaa aahaah");
-		//_unit->PlaySoundToSet(11018);
        RemoveAIUpdateEvent();
     }
 
@@ -2615,7 +2715,6 @@ protected:
 
 // Additional stuff
 uint32 m_phase[1000000];	// dunno if it's enough (uint32 InstanceID -> 4,294,967,295)
-uint32 WayStart[1000000];
 uint32 FoADeaths[1000000];
 uint32 MaievDialog[1000000];
 
@@ -2629,7 +2728,6 @@ uint32 DeathEvent[1000000];
 
 // Global definitions - comment to disable
 #define USE_SHADOW_PRISON	// aggroes a lot of mobs/NPCs if they are not friendly to Illidan
-#define HACKS_ENABLED
 
 /* Effect and Trigger AIs */
 
@@ -2711,6 +2809,7 @@ public:
 
     EyeBeamTriggerAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);		// temp. fix
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_moveRun = true;
 		_unit->m_noRespawn = true;
@@ -2765,11 +2864,7 @@ public:
 
 		_unit->CastSpell(_unit, dbcSpell.LookupEntry(EYE_BLAST), true);
 
-#ifdef HACKS_ENABLED
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_DEMON_FIRE, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), false, false, 0, 0);
-#endif
 		DespawnTimer--;
-
 		if (!DespawnTimer)
 			_unit->Despawn(0,0);
     }
@@ -3004,10 +3099,6 @@ public:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
 
-#ifdef HACKS_ENABLED
-					if (i == 0)
-						_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_BLAZE, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), false, false, 0, 0);
-#endif
 					m_spellcheck[i] = false;
 					return;
 				}
@@ -3041,30 +3132,32 @@ public:
     void GossipHello(Object* pObject, Player* plr, bool AutoSend)
     {
         GossipMenu *Menu;
+		Creature *Akama = (Creature*)(pObject);
+		if (Akama == NULL)
+			return;
 
-		if (WayStart[pObject->GetInstanceID()] != 2 && WayStart[pObject->GetInstanceID()] != 3) return;
+		if (Akama->GetAIInterface()->getCurrentWaypoint() >= 10)
+		{
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 229902, plr);
+			Menu->AddItem( 0, "We're ready to face Illidan.", 2);
+		}
 
 		else
 		{
-			switch (WayStart[pObject->GetInstanceID()])
-			{
-				case 2:
-					objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 229901, plr);
-					Menu->AddItem( 0, "I'm ready, Akama.", 1);
-					break;
-				case 3:
-					objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 229902, plr);
-					Menu->AddItem( 0, "We're ready to face Illidan.", 2);
-					break;
-			}
-	 
-			if(AutoSend)
-				Menu->SendTo(plr);
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 229901, plr);
+			Menu->AddItem( 0, "I'm ready, Akama.", 1);
 		}
+	 
+		if(AutoSend)
+			Menu->SendTo(plr);
     }
  
 	void GossipSelectOption(Object* pObject, Player* plr, uint32 Id, uint32 IntId, const char * EnteredCode)
     {
+		Creature *Akama = (Creature*)(pObject);
+		if (Akama == NULL)
+			return;
+
 		switch (IntId)
 		{
 			case 0:
@@ -3073,16 +3166,22 @@ public:
  
 			case 1:
 			{
-				pObject->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+				Akama->SetUInt32Value(UNIT_NPC_FLAGS, 0);
 
-				WayStart[pObject->GetInstanceID()] = 0;
+				Akama->GetAIInterface()->StopMovement(0);
+				Akama->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+				Akama->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+				Akama->GetAIInterface()->setWaypointToMove(1);
 			}break;
 
 			case 2:
 			{
-				pObject->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+				Akama->SetUInt32Value(UNIT_NPC_FLAGS, 0);
 
-				WayStart[pObject->GetInstanceID()] = 4;
+				Akama->GetAIInterface()->StopMovement(0);
+				Akama->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+				Akama->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+				Akama->GetAIInterface()->setWaypointToMove(17);
 			}break;
 		}
 	}
@@ -3196,9 +3295,9 @@ public:
 		else _unit->SetUInt32Value(UNIT_NPC_FLAGS, 0);
 
 		MaievDialog[_unit->GetInstanceID()] = 0;
-		WayStart[_unit->GetInstanceID()] = 2;
 		m_phase[_unit->GetInstanceID()] = 0;
 		AkamaDialog = 0;
+		DoorEvent = 0;
 		CourtSay = 0;
 		AkamaRun = 0;
 	}
@@ -3209,8 +3308,6 @@ public:
 
 		SoundLimiter = 0;
 
-		//RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-
 		for (int i = 0; i < nrspells; i++)
 			spells[i].casttime = 0;
     }
@@ -3220,17 +3317,15 @@ public:
 		if (m_phase[_unit->GetInstanceID()] > 0)
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 
-        //_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
 
 		//RemoveAIUpdateEvent();
 
-		WayStart[_unit->GetInstanceID()] = 2;
 		AkamaDialog = 0;
 		//AkamaRun = 0;
 		CourtSay = 0;
-
-		//_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
     }
 
 	void OnTargetDied(Unit* mTarget)
@@ -3261,7 +3356,6 @@ public:
 
 		RemoveAIUpdateEvent();
 
-		WayStart[_unit->GetInstanceID()] = 2;
 		AkamaDialog = 0;
 		AkamaRun = 0;
 		CourtSay = 0;
@@ -3271,7 +3365,7 @@ public:
     {
 		SoundLimiter++;
 
-		if (_unit->GetHealthPct() <= 15)
+		if (_unit->GetHealthPct() <= 15 && _unit->GetAIInterface()->GetNextTarget())
 		{
 			int RandomSpeach = rand()%2;
 
@@ -3292,23 +3386,16 @@ public:
 				SoundLimiter = 0;
 			}
 
-			if (m_phase[_unit->GetInstanceID()] == 1)
-				_unit->CastSpell(_unit, spells[1].info, spells[1].instant);
-
+			if (_unit->GetAIInterface()->GetNextTarget()->GetTypeId() == TYPEID_UNIT)
+			{
+				Creature *Target = NULL;
+				Target = (Creature*)_unit->GetAIInterface()->GetNextTarget();
+				if (Target && Target->GetEntry() == 22917)
+					_unit->CastSpell(_unit, spells[1].info, spells[1].instant);
+			}
 		}
 
-		if (!m_phase[_unit->GetInstanceID()] && !WayStart[_unit->GetInstanceID()] && MaievDialog[_unit->GetInstanceID()] < 30)
-		{
-			_unit->GetAIInterface()->StopMovement(0);
-			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-			_unit->GetAIInterface()->setWaypointToMove(1);
-			
-			WayStart[_unit->GetInstanceID()] = 2;
-			DoorEvent = 0;
-		}
-
-		if (WayStart[_unit->GetInstanceID()] == 1)
+		if (_unit->GetAIInterface()->getCurrentWaypoint() == 6 && DoorEvent)
 		{
 			GameObject* Gate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(774.7f, 304.6f, 314.85f, 185905);
 
@@ -3324,6 +3411,8 @@ public:
 				_unit->GetAIInterface()->setWaypointToMove(7);
 				_unit->SetFacing(6.248631f);
 
+				DoorEvent = 0;
+
 				if (Udalo)
 				{
 					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
@@ -3336,24 +3425,23 @@ public:
 					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
 				}
 
-				WayStart[_unit->GetInstanceID()] = 2;
 				return;
 			}
 
 			switch (DoorEvent)
 			{
-				case 1:
+				case 2:
 				{
 					_unit->SetFacing(6.248631f);
 				}break;
 
-				case 5:
+				case 6:
 				{
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "The door is all that stands between us and the Betrayer. Stand aside, friends." );
 					_unit->Emote(EMOTE_ONESHOT_TALK);
 				}break;
 
-				case 9:		// here will be first try to break door (Akama himself only)
+				case 10:		// here will be first try to break door (Akama himself only)
 				{
 					if (DoorTrigger)
 					{
@@ -3363,19 +3451,19 @@ public:
 					}
 				}break;
 
-				case 18:	// here we will stop casting spell on door
+				case 19:		// here we will stop casting spell on door
 				{
 					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
 					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
 				}break;
 
-				case 19:
+				case 20:
 				{
 					_unit->Emote(EMOTE_ONESHOT_NO);
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "I cannot do this alone..." );
 				}break;
 
-				case 25:	// summoning two spirits to help Akama with breaking doors
+				case 26:		// summoning two spirits to help Akama with breaking doors
 				{
 					Udalo = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23410, 751.884705f, 311.270050f, 312.121185f, 0.047113f, true, false, 0, 0);
 					Olum  = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23411, 751.687744f, 297.408600f, 312.124817f, 0.054958f, true, false, 0, 0);
@@ -3393,19 +3481,19 @@ public:
 					}
 				}break;
 
-				case 26:
+				case 27:
 				{
 					if (Udalo)
 						Udalo->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You are not alone, Akama." );
 				}break;
 
-				case 32:
+				case 33:
 				{
 					if (Olum)
 						Olum->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Your people will always be with you." );
 				}break;
 
-				case 37:	// Akama starts casting his spell again with both spirits
+				case 38:			// Akama starts casting his spell again with both spirits
 				{
 					if (DoorTrigger)
 					{
@@ -3415,7 +3503,7 @@ public:
 					}
 				}break;
 
-				case 38:
+				case 39:
 				{
 					if (DoorTrigger)
 					{
@@ -3435,7 +3523,7 @@ public:
 					}
 				}break;
 
-				case 47:	// Door has been broken and channel stoped
+				case 48:			// Door has been broken and channel stoped
 				{
 					Gate->SetUInt32Value(GAMEOBJECT_STATE, 0);
 
@@ -3445,7 +3533,7 @@ public:
 					}
 				}break;
 
-				case 48:
+				case 49:
 				{
 					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
 					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
@@ -3463,13 +3551,13 @@ public:
 					}
 				}break;
 
-				case 51:
+				case 52:
 				{
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "I thank you for your aid, my brothers. Our people will be redeemed!" );
 					_unit->Emote(EMOTE_ONESHOT_SALUTE);
 				}break;
 
-				case 54:
+				case 55:
 				{
 					if (Udalo)
 						Udalo->Emote(EMOTE_ONESHOT_SALUTE);
@@ -3477,15 +3565,17 @@ public:
 						Olum->Emote(EMOTE_ONESHOT_SALUTE);
 				}break;
 
-				case 57:
+				case 58:
 				{
 					_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
 					_unit->GetAIInterface()->setWaypointToMove(7);
-
-					WayStart[_unit->GetInstanceID()] = 2;
 				}break;
 			}
+
 			DoorEvent++;
+
+			if (DoorEvent > 58)
+				DoorEvent = 0;
 		}
 
 		if (CourtSay)
@@ -3508,22 +3598,11 @@ public:
 			}
 		}
 
-		if (WayStart[_unit->GetInstanceID()] == 4)
-		{
-			_unit->GetAIInterface()->StopMovement(0);
-			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-			_unit->GetAIInterface()->setWaypointToMove(17);
-			_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
-
-			WayStart[_unit->GetInstanceID()] = 2;
-		}
-
 		if (AkamaDialog)
 		{
 			Illidan = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(704.539001f, 305.282013f, 353.919006f, 22917);
 
-			if (!Illidan || !Illidan->isAlive() && m_phase[_unit->GetInstanceID()] == 0 || !DeathEvent[_unit->GetInstanceID()] && !Illidan->isAlive())	// added check of Illidan's life state, coz some stupid GMs can kill Illidan by command before real part of event starts
+			if (!Illidan || !Illidan->isAlive())
 			{
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Not this time my friends." );
 				_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
@@ -3601,8 +3680,8 @@ public:
 					Illidan->PlaySoundToSet(11466);
 
 					_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+
 					Illidan->Emote(EMOTE_ONESHOT_CUSTOMSPELL05);
-					
 				}break;
 			case 38:
 				{
@@ -3638,7 +3717,7 @@ public:
 
 			AkamaDialog++;
 
-			if (AkamaDialog == 45)
+			if (AkamaDialog > 40)
 				AkamaDialog = 0;
 		}
 
@@ -3706,10 +3785,10 @@ public:
 				DeathEvent[_unit->GetInstanceID()]++;
 		}
 
-		if (m_phase[_unit->GetInstanceID()])
+		if ((_unit->GetAIInterface()->GetNextTarget() || AkamaRun >= 7) && _unit->GetAIInterface()->getCurrentWaypoint() < 18)
 		{
 			CastTriggering--;
-			if (!CastTriggering && AkamaRun < 7 && Illidan && Illidan->GetHealthPct() > 85)
+			if (!CastTriggering && AkamaRun < 7)	// && Illidan && Illidan->GetHealthPct() > 85)
 			{
 				_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
 				float val = (float)RandomFloat(100.0f);
@@ -3717,16 +3796,8 @@ public:
 
 				CastTriggering = 2;
 			}
-/*
-			if (Illidan->GetAIInterface()->getAITargetsCount() == 1 && AkamaRun == 7 && Illidan->GetAIInterface()->GetNextTarget() == _unit)
-				return;
 
-			if (m_phase[_unit->GetInstanceID()] > 1 && AkamaRun < 7)				// those cases are needed, as if we won't disallow Akama
-				_unit->GetAIInterface()->m_canMove = false;	// to move when ex. Illidan starts flying Akama will come
-			if (m_phase[_unit->GetInstanceID()] > 1 && AkamaRun >= 7)				// with Illidan and will stay on main platform ----------
-				_unit->GetAIInterface()->m_canMove = true;	// (battlefield) ----------------------------------------
-*/
-			if ((!Illidan || !Illidan->isAlive()) && AkamaRun <= 7 || !DeathEvent[_unit->GetInstanceID()] && !Illidan->isAlive())	// added check for Illidan life state, coz some stupid GMs can kill Illidan by command before real part of event starts
+			if (((!Illidan || !Illidan->isAlive()) && AkamaRun <= 7) || (!DeathEvent[_unit->GetInstanceID()] && !Illidan->isAlive()))	// added check for Illidan life state, coz some stupid GMs can kill Illidan by command before real part of event starts
 			{
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Not this time my friends." );
 				_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
@@ -3752,6 +3823,7 @@ public:
 						_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 						_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 						_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+						_unit->GetAIInterface()->SetNextTarget(NULL);
 						/*_unit->GetAIInterface()->WipeTargetList();	// it's strange that if Akama goes out of combat he affects Illidan so he won't cast or update ai correctly
 						_unit->GetAIInterface()->WipeHateList();*/
 
@@ -3811,6 +3883,8 @@ public:
 				}
 				
 				AkamaRun++;
+				if (AkamaRun > 15)
+					AkamaRun = 0;
 			}
 		}
     }
@@ -3860,18 +3934,14 @@ public:
 		{
 		case 6:
 			{
-				WayStart[_unit->GetInstanceID()] = 1;
+				DoorEvent = 1;
 			}break;
 		case 16:
 			{
-				WayStart[_unit->GetInstanceID()] = 3;
 				CourtSay = 1;
 			}break;
 		case 17:
 			{
-				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-				_unit->GetAIInterface()->setWaypointToMove(0);
-
 				AkamaDialog = 1;
 			}break;
 		case 19:
@@ -3880,9 +3950,6 @@ public:
 			}break;
 		case 20:
 			{
-				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-				_unit->GetAIInterface()->setWaypointToMove(0);
-
 				DeathEvent[_unit->GetInstanceID()] = 49;
 			}break;
 		default:
@@ -4455,6 +4522,33 @@ public:
 
     void OnCombatStop(Unit *mTarget)
     {
+		std::vector<Creature*> DespawnTable;	/* From M4ksiu - Big THX to Capt who learned me how to use std stuff <3	*/
+												/* If anyone wants to use this function, then leave this note!			*/
+		for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+		{ 
+			if ((*itr)->GetTypeId()== TYPEID_UNIT && (*itr)->GetInstanceID() == _unit->GetInstanceID() && (*itr) != _unit)
+			{
+				Creature *CreatureToAdd = NULL;
+				CreatureToAdd = (Creature*)(*itr);
+
+				if (CreatureToAdd && CreatureToAdd->GetSQL_id() == 0 && (CreatureToAdd->GetEntry() == CN_FLAME_OF_AZZINOTH || 
+					CreatureToAdd->GetEntry() == CN_BLADE_OF_AZZINOTH || (_unit->isAlive() && CreatureToAdd->GetEntry() == CN_MAIEV)))
+				{
+					DespawnTable.push_back(CreatureToAdd);
+				} 
+			} 
+		}
+
+		for (uint32 i = 0; i < DespawnTable.size(); i++)
+		{
+			Creature *CreatureToDespawn = DespawnTable[i];
+
+			if (CreatureToDespawn)
+				CreatureToDespawn->Despawn(0,0);
+		}
+
+		DespawnTable.clear();
+
 		_unit->GetAIInterface()->disable_melee = false;
 		_unit->GetAIInterface()->m_moveFly = false;
 		_unit->GetAIInterface()->m_canMove = true;
@@ -4510,10 +4604,15 @@ public:
 			DemonPhase = 76;
 		}
 
-		if (FoA1) delete FoA1;
+		FoA1 = NULL;
+		FoA2 = NULL;
+		Blade1 = NULL;
+		Blade2 = NULL;
+
+		/*if (FoA1) delete FoA1;
 		if (FoA2) delete FoA2;
 		if (Blade1) delete Blade1;
-		if (Blade2) delete Blade2;
+		if (Blade2) delete Blade2;*/
 
 		if (_unit->isAlive()) delete Maiev;
     }
