@@ -285,8 +285,6 @@ void CBattlegroundManager::EventQueueUpdate()
 					{
 						plr = *tempPlayerVec[0].begin();
 						tempPlayerVec[0].pop_front();
-
-						plr->m_bgTeam=team;
 						arena->AddPlayer(plr, team);
 						team = arena->GetFreeTeam();
 
@@ -317,7 +315,6 @@ void CBattlegroundManager::EventQueueUpdate()
 							{
 								plr = *tempPlayerVec[k].begin();
 								tempPlayerVec[k].pop_front();
-								plr->m_bgTeam=k;
 								bg->AddPlayer(plr, k);
 								ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 							}
@@ -683,6 +680,8 @@ void CBattleground::AddPlayer(Player * plr, uint32 team)
 {
 	m_mainLock.Acquire();
 
+	plr->m_bgTeam = team;
+
 	/* This is called when the player is added, not when they port. So, they're essentially still queued, but not inside the bg yet */
 	m_pendPlayers[team].insert(plr->GetGUIDLow());
 
@@ -728,7 +727,6 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		return;
 	}
 
-	plr->SetTeam(plr->m_bgTeam);
 	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
 	data << plr->GetGUID();
 	DistributePacketToAll(&data);
@@ -737,6 +735,16 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 
 	/* remove from any auto queue remove events */
 	sEventMgr.RemoveEvents(plr, EVENT_BATTLEGROUND_QUEUE_UPDATE);
+
+	if(!skip_teleport)
+	{
+		/* This is where we actually teleport the player to the battleground. */	
+		//plr->SafeTeleport(m_mapMgr->GetMapId(), m_mapMgr->GetInstanceID(), GetStartingCoords(plr->m_bgTeam));
+		if(plr->IsInWorld())
+			plr->RemoveFromWorld();
+		plr->SafeTeleport(m_mapMgr,GetStartingCoords(plr->m_bgTeam));
+		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, (uint32)UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
+	}
 
 	plr->m_pendingBattleground = 0;
 	plr->m_bg = this;
@@ -754,13 +762,13 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	UpdatePvPData();
 
 	/* add the player to the group */
-	/*if(plr->GetGroup())
+	if(plr->GetGroup())
 	{
 		// remove them from their group
-		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
+		plr->GetGroup()->RemovePlayer(plr->m_playerInfo);
 	}
 
-	m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);*/
+	//m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);
 
 	if(!m_countdownStage)
 	{
@@ -771,16 +779,6 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 
 	sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_CLOSE);
 	OnAddPlayer(plr);
-
-	if(!skip_teleport)
-	{
-		/* This is where we actually teleport the player to the battleground. */	
-		//plr->SafeTeleport(m_mapMgr->GetMapId(), m_mapMgr->GetInstanceID(), GetStartingCoords(plr->m_bgTeam));
-		if(plr->IsInWorld())
-			plr->RemoveFromWorld();
-		plr->SafeTeleport(m_mapMgr,GetStartingCoords(plr->m_bgTeam));
-		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, (uint32)UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
-	}
 
 	m_mainLock.Release();
 }
@@ -797,7 +795,7 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 		/* arenas follow a different procedure. */
 		static const uint32 arena_map_ids[3] = { 559, 562, 572 };
 		uint32 mapid = arena_map_ids[RandomUInt(2)];
-		mapid=562;
+		//mapid=562;
 		uint32 players_per_side;
 		mgr = sInstanceMgr.CreateBattlegroundInstance(mapid);
 		if(mgr == NULL)
@@ -1043,8 +1041,7 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	/*if(plr->GetGroup() == m_groups[plr->m_bgTeam])
 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);*/
 
-	// reset team
-	plr->ResetTeam();
+	plr->m_bgTeam=plr->GetTeam();
 
 	/* revive the player if he is dead */
 	if(!plr->isAlive())
@@ -1082,7 +1079,6 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 		sEventMgr.AddEvent(this, &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 600000, 1,0);
 	}
 
-	plr->m_bgTeam=plr->GetTeam();
 	m_mainLock.Release();
 }
 
