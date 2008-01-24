@@ -1,0 +1,2 @@
+ALTER TABLE `creature_proto` ADD COLUMN `modImmunities` INT(30) UNSIGNED NOT NULL DEFAULT 0 AFTER `extra_a9_flags`;
+UPDATE creature_proto SET modImmunities=4095 WHERE entry IN (SELECT entry FROM creature_names WHERE rank=3);

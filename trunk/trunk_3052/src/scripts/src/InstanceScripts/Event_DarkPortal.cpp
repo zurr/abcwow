@@ -50,7 +50,7 @@
 
 #define MIN_TIME_TO_SUMMON		3	// it says the smallest diff between one and another portal spawning
 #define SPECIAL_UNIT_CHECK_TIME 5
-#define SUMMON_INFERNAL_TIME	40
+#define SUMMON_INFERNAL_TIME	50
 #define DEMON_RESPAWN_TIME		180
 #define TEN_DEMON_WAVE_DELAY	50
 #define SPAWN_NEW_UNIT_PORTAL	5
