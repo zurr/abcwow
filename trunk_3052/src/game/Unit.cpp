@@ -551,7 +551,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 	bool can_delete = !bProcInUse; //if this is a nested proc then we should have this set to TRUE by the father proc
 	bProcInUse = true; //locking the proc list
 
-	std::list<uint32> remove;
 	std::list<struct ProcTriggerSpell>::iterator itr,itr2;
 	for( itr = m_procSpells.begin();itr != m_procSpells.end();)  // Proc Trigger Spells for Victim
 	{
@@ -692,6 +691,20 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 				//these are player talents. Fuckem they pull the emu speed down 
 				if(IsPlayer())
 				{
+					if (itr2->ProcType == 1 && static_cast<Player*>(this)->IsInFeralForm()) 
+					{
+						switch (static_cast<Player*>(this)->GetShapeShift())
+						{
+							case FORM_CAT:
+							case FORM_BEAR:
+							case FORM_DIREBEAR:
+								continue;
+								break;
+							default:
+								break;
+						}
+					}
+
 					uint32 talentlevel=0;
 					switch(origId)
 					{
@@ -796,8 +809,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								it = static_cast<Player*>(this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
 								if(it && it->GetProto())
 								{
-									//class 2 means weapons ;)
-									if(it->GetProto()->Class!=2)
+									if(it->GetProto()->Class != ITEM_CLASS_WEAPON)
 										continue;
 								}
 								else continue; //no weapon no joy

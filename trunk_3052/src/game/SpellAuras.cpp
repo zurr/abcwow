@@ -577,6 +577,7 @@ void Aura::ApplyModifiers( bool apply )
 			pts.procCharges = GetSpellProto()->procCharges;
 			pts.LastTrigger = 0;
 			pts.deleted = false;
+			pts.ProcType = 0;
 			m_target->m_procSpells.push_front(pts);
 		}
 		else
@@ -1642,6 +1643,7 @@ void Aura::SpellAuraDummy(bool apply)
 			pts.procCharges = GetSpellProto()->procCharges;
 			pts.LastTrigger = 0;
 			pts.deleted = false;
+			pts.ProcType = 0;
 			m_target->m_procSpells.push_front(pts);
 			}
 			else
@@ -2014,6 +2016,7 @@ void Aura::SpellAuraDummy(bool apply)
 				pts.procCharges = GetSpellProto()->procCharges;
 				pts.LastTrigger = 0;
 				pts.deleted = false;
+				pts.ProcType = 0;
 				m_target->m_procSpells.push_front(pts);
 			}
 			else
@@ -3910,6 +3913,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 		pts.procCharges = GetSpellProto()->procCharges;
 		pts.LastTrigger = 0;
 		pts.deleted = false;
+		pts.ProcType = 0;
 
 		if( m_spellProto->NameHash == SPELL_HASH_THE_TWIN_BLADES_OF_AZZINOTH )
 		{
