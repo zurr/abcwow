@@ -1133,6 +1133,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ILotP.procFlags = PROC_ON_CRIT_ATTACK | PROC_TARGET_SELF;
 			ILotP.deleted = false;
 			ILotP.caster = u_caster->GetGUID();
+			ILotP.ProcType = 0;
 			ILotP.LastTrigger = 0;
 			u_caster->m_procSpells.push_back(ILotP);
 		}

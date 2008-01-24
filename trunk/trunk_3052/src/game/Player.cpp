@@ -3595,6 +3595,7 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 				ts.procChance=5;
 				ts.caster=this->GetGUID();
 				ts.procFlags=PROC_ON_MELEE_ATTACK;
+				ts.ProcType = (item->GetProto()->Class == ITEM_CLASS_WEAPON)? 1 : 2;
 				ts.deleted = false;
 				this->m_procSpells.push_front(ts);			
 			}
