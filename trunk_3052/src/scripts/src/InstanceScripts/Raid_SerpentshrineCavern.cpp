@@ -100,10 +100,14 @@ public:
 			break;
 		}
 		RemoveAIUpdateEvent();
-		summon1->Despawn(100, 0);
-		summon2->Despawn(100, 0);
-		summon3->Despawn(100, 0);
-		summon4->Despawn(100, 0);
+		if (summon1)
+			summon1->Despawn(100, 0);
+		if (summon2)
+			summon2->Despawn(100, 0);
+		if (summon3)
+			summon3->Despawn(100, 0);
+		if (summon4)
+			summon4->Despawn(100, 0);
 	}
 	void OnTargetDied(Unit* mTarget)
 	{
@@ -1458,9 +1462,12 @@ public:
 	{
 		if (_unit->isAlive())
 		{
-			caribdis->Despawn(100, 0);
-			sharkkis->Despawn(100, 0);
-			tidalvess->Despawn(100, 0);
+			if (caribdis)
+				caribdis->Despawn(100, 0);
+			if (sharkkis)
+				sharkkis->Despawn(100, 0);
+			if (tidalvess)
+				tidalvess->Despawn(100, 0);
 			_unit->Despawn(100, 2500);
 		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
@@ -2373,14 +2380,17 @@ public:
 	{
 		if (_unit->isAlive())
 		{
-			if (shadow != NULL)
+			if (shadow)
 			{
 				shadow->Despawn(0, 0);
 				shadow = NULL;
 			}
-			channeler1->Despawn(100, 0);
-			channeler2->Despawn(100, 0);
-			channeler3->Despawn(100, 0);
+			if (channeler1)
+				channeler1->Despawn(100, 0);
+			if (channeler2)
+				channeler2->Despawn(100, 0);
+			if (channeler3)
+				channeler3->Despawn(100, 0);
 			_unit->Despawn(100, 2500);
 		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
@@ -2390,6 +2400,11 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
+		if (shadow)
+			{
+				shadow->Despawn(0, 0);
+				shadow = NULL;
+			}
 		_unit->PlaySoundToSet(11317);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You cannot kill me! Fools, I'll be back! I'll... aarghh...");
 		RemoveAIUpdateEvent();
@@ -2707,9 +2722,12 @@ public:
 			m_eventstarted = false;
 			if (_unit->isAlive())
 			{
-				channeler1->Despawn(100, 0);
-				channeler2->Despawn(100, 0);
-				channeler3->Despawn(100, 0);
+				if (channeler1)
+					channeler1->Despawn(100, 0);
+				if (channeler2)
+					channeler2->Despawn(100, 0);
+				if (channeler3)
+					channeler3->Despawn(100, 0);
 				RemoveAIUpdateEvent();
 				_unit->Despawn(100, 2500);
 			}
@@ -2831,6 +2849,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		_unit->Despawn(100, 0);
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
