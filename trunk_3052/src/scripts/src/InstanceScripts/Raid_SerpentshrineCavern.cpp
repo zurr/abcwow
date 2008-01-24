@@ -2549,6 +2549,7 @@ public:
 					break;
 				case 13:
 					whirlwinding = 0;
+					_unit->GetAIInterface()->StopMovement(0);
 					_unit->GetAIInterface()->disable_melee = false;
 					_unit->GetAIInterface()->WipeHateList();
 					break;

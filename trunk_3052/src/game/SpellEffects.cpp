@@ -1221,25 +1221,128 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	if (!unitTarget->IsPlayer())
 	{
 		Creature * c = (Creature*)( unitTarget );
-		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+		if (c)
 		{
-			switch(m_spellInfo->EffectApplyAuraName[i])
+			/*
+			if (c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			{
-			case 5:  // confuse
-			case 6:  // charm
-			case 7:  // fear
-			case 12: // stun
-			case 25: // pacify
-			case 26: // root
-			case 27: // silence
-			case 31: // increase speed
-			case 33: // decrease speed
-				SendCastResult(SPELL_FAILED_IMMUNE);
-				return;
+				switch(m_spellInfo->EffectApplyAuraName[i])
+				{
+				case 5:  // confuse
+				case 6:  // charm
+				case 7:  // fear
+				case 12: // stun
+				case 25: // pacify
+				case 26: // root
+				case 27: // silence
+				case 31: // increase speed
+				case 33: // decrease speed
+					SendCastResult(SPELL_FAILED_IMMUNE);
+					return;
+				}
 			}
+			*/
+
+			/*
+			Charm (Mind Control, enslave demon): 1
+			Confuse (Blind etc): 2
+			Fear: 4
+			Root: 8
+			Silence : 16
+			Stun: 32
+			Sheep: 64
+			Banish: 128
+			Taunt (applyaura): 256
+			Decrease Speed (hamstring) (applyaura): 512
+			Spell Haste (Curse of Tongues) (applyaura): 1024
+			Interupt Cast (applyaura): 2048
+			*/
+
+				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
+				if (c->proto->modImmunities)
+				{
+					bool immune;
+					switch(m_spellInfo->MechanicsType)
+					{
+					case MECHANIC_CHARMED:
+						if (c->proto->modImmunities & 1)
+							immune = true;
+						break;
+					case MECHANIC_DISORIENTED:
+						if (c->proto->modImmunities & 2)
+							immune = true;
+						break;
+					case MECHANIC_FLEEING:
+						if (c->proto->modImmunities & 4)
+							immune = true;
+						break;
+					case MECHANIC_ROOTED:
+						if (c->proto->modImmunities & 8)
+							immune = true;
+						break;
+					case MECHANIC_SILENCED:
+						if ( c->proto->modImmunities & 16)
+							immune = true;
+						break;
+					case MECHANIC_STUNNED:
+						if (c->proto->modImmunities & 32)
+							immune = true;
+						break;
+					case MECHANIC_POLYMORPHED:
+						if (2 & c->proto->modImmunities & 64)
+							immune = true;
+						break;
+					case MECHANIC_BANISHED:
+						if (c->proto->modImmunities & 128)
+							immune = true;
+						break;
+					}
+
+					if (!immune)
+					{
+						// Spells wich do more than just one thing (damage and the effect) dont have a mechanic and we should only cancel the aura to be placed
+						switch (m_spellInfo->EffectApplyAuraName[i])
+						{
+						case SPELL_AURA_MOD_CONFUSE:
+							if (c->proto->modImmunities & 2)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_FEAR:
+							if (c->proto->modImmunities & 4)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_TAUNT:
+							if (c->proto->modImmunities & 256)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_STUN: // no idea if its needed, just to be sure
+							if (c->proto->modImmunities & 32)
+								immune = true;
+						case SPELL_AURA_MOD_SILENCE:
+							if (c->proto->modImmunities & 2048 || c->proto->modImmunities & 16)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_DECREASE_SPEED:
+							if (c->proto->modImmunities & 512)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_CASTING_SPEED:
+							if (c->proto->modImmunities & 1024)
+								immune = true;
+						case SPELL_AURA_MOD_LANGUAGE: //hacky way to prefer that the COT icon is set to mob
+							if (c->proto->modImmunities & 1024)
+								immune = true;
+						}
+					}
+					if (immune)
+					{
+						SendCastResult(SPELL_FAILED_IMMUNE);
+						return;
+					}
+				}
 		}
 	}
-	
+
 	// avoid map corruption.
 	if(unitTarget->GetInstanceID()!=m_caster->GetInstanceID())
 		return;
@@ -3276,8 +3379,15 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 	if(unitTarget->GetTypeId()==TYPEID_UNIT)
 	{
 		Creature * c = (Creature*)( unitTarget );
-		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
-			return;
+		if (c)
+		{
+			/*
+			if (c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+				return;
+			*/
+			if (c->proto->modImmunities & 2048)
+				return;
+		}
 	}
 	// FIXME:This thing prevent target from spell casting too but cant find.
 	uint32 school=0;
