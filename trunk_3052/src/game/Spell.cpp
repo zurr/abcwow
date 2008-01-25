@@ -3937,8 +3937,11 @@ void Spell::Heal(int32 amount)
 		bonus += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
 		bonus += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
 
-		bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
-		bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+		if (p_caster)
+		{
+			bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
+			bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+		}
 
 		amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
 

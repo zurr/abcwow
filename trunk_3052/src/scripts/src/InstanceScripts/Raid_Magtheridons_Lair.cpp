@@ -149,6 +149,7 @@ public:
 		sEventMgr.RemoveEvents(this);
 		_unit->PlaySoundToSet(10258);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Legion... will consume you... all....");
+		door->SetUInt32Value(GAMEOBJECT_STATE, 0);
 		RemoveAIUpdateEvent();
 	}
 
@@ -809,7 +810,6 @@ public:
 						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
 						if (target)
 						{
-							_unit->GetAIInterface()->SetNextTarget(target);
 							_unit->CastSpell(target, spells[i].info, spells[i].instant);
 						}
 						break;
@@ -938,10 +938,9 @@ public:
 					case TARGET_DESTINATION:
 						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					case TARGET_RANDOM_SINGLE:
-						Unit *target = RandomTarget(true, true, spells[i].info->base_range_or_radius_sqr);
+						target = RandomTarget(true, true, spells[i].info->base_range_or_radius_sqr);
 						if (target)
 						{
-							_unit->GetAIInterface()->SetNextTarget(target);
 							_unit->CastSpell(target, spells[i].info, spells[i].instant);
 						}
 					}
