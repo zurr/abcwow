@@ -4336,8 +4336,8 @@ class UNDERBOGCOLOSSUSAI : public CreatureAIScript
 {
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(UNDERBOGCOLOSSUSAI);
-	SP_AI_Spell spells[1];
-	bool m_spellcheck[1];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
 	UNDERBOGCOLOSSUSAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
@@ -4365,7 +4365,7 @@ public:
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = false;
 			spells[0].cooldown = 36;
-			spells[0].perctrigger = 5.0f;
+			spells[0].perctrigger = 3.0f;
 			spells[0].attackstoptimer = 8000;
 			break;
 		case 2:
@@ -4648,14 +4648,14 @@ public:
 			spells[0].targettype = TARGET_ATTACKING;
 			spells[0].instant = true;
 			spells[0].cooldown = 18;
-			spells[0].perctrigger = 6.0f;
+			spells[0].perctrigger = 1.5f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FROSTBOLTVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = true;
 			spells[1].cooldown = 12;
-			spells[1].perctrigger = 6.0f;
+			spells[1].perctrigger = 2.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		case 1:
@@ -4666,14 +4666,14 @@ public:
 			spells[0].targettype = TARGET_RANDOM_DESTINATION;
 			spells[0].instant = true;
 			spells[0].cooldown = 18;
-			spells[0].perctrigger = 6.0f;
+			spells[0].perctrigger = 1.5f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FIREBALLVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = true;
 			spells[1].cooldown = 12;
-			spells[1].perctrigger = 6.0f;
+			spells[1].perctrigger = 2.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		case 2:
@@ -4683,14 +4683,14 @@ public:
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = true;
 			spells[0].cooldown = 18;
-			spells[0].perctrigger = 6.0f;
+			spells[0].perctrigger = 1.5f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(ARCANEVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = true;
 			spells[1].cooldown = 12;
-			spells[1].perctrigger = 6.0f;
+			spells[1].perctrigger = 2.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		}
@@ -4868,6 +4868,6 @@ void SetupSerpentshrineCavern(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_TOXICSPOREBAT, &TOXICSPOREBATAI::Create);
 
 	//Trash Mobs
-	mgr->register_creature_script(CN_UNDERBOGCOLOSSUS, &UNDERBOGCOLOSSUSAI::Create);
+	//mgr->register_creature_script(CN_UNDERBOGCOLOSSUS, &UNDERBOGCOLOSSUSAI::Create);
 	mgr->register_creature_script(CN_GREYHEARTNETHERMAGE, &GREYHEARTNETHERMAGEAI::Create);
 }
