@@ -418,8 +418,10 @@ public:
 			{
 				for (int i = 0; i < 5; i++)
 				{
-					channelers[i]->Despawn(100, 0);
-					cubes[i]->Despawn(0);
+					if (channelers[i])
+						channelers[i]->Despawn(100, 0);
+					if (cubes[i])
+						cubes[i]->Despawn(0);
 				}
 				door->SetUInt32Value(GAMEOBJECT_STATE, 0);
 				RemoveAIUpdateEvent();
