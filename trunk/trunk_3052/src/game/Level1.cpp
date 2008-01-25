@@ -224,6 +224,21 @@ bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_sess
 
 			item->ApplyRandomProperties(false);
 		}
+		else
+		{
+			if (it->RandomPropId)
+			{
+				RandomProps * iRandomProperty = lootmgr.GetRandomProperties(it);
+				item->SetRandomProperty(iRandomProperty->ID);
+				item->ApplyRandomProperties(false);
+			}
+			if (it->RandomSuffixId)
+			{
+				ItemRandomSuffixEntry * iRandomSuffix = lootmgr.GetRandomSuffix(it);
+				item->SetRandomSuffix(iRandomSuffix->id);
+				item->ApplyRandomProperties(false);
+			}
+		}
 	  
 		if(!chr->GetItemInterface()->AddItemToFreeSlot(item))
 		{

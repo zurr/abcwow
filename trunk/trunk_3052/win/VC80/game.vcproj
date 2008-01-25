@@ -873,14 +873,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\game\Professions.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\game\Professions.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\src\game\QueryHandler.cpp"
 			>
 		</File>

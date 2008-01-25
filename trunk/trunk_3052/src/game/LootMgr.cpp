@@ -509,11 +509,31 @@ void LootMgr::FillSkinningLoot(Loot * loot,uint32 loot_id)
 
 void LootMgr::FillPickpocketingLoot(Loot * loot,uint32 loot_id)
 {
- loot->items.clear ();
+ loot->items.clear();
  loot->gold =0;
 
  LootStore::iterator tab =PickpocketingLoot.find(loot_id);
  if( PickpocketingLoot.end()==tab)return;
+ else PushLoot(&tab->second,loot,false);
+}
+
+void LootMgr::FillDisenchantingLoot(Loot *loot, uint32 loot_id)
+{
+ loot->items.clear();
+ loot->gold =0;
+
+ LootStore::iterator tab = DisenchantingLoot.find(loot_id);
+ if( DisenchantingLoot.end()==tab)return;
+ else PushLoot(&tab->second,loot,false);
+}
+
+void LootMgr::FillProspectingLoot(Loot *loot, uint32 loot_id)
+{
+ loot->items.clear();
+ loot->gold =0;
+
+ LootStore::iterator tab = ProspectingLoot.find(loot_id);
+ if( ProspectingLoot.end()==tab)return;
  else PushLoot(&tab->second,loot,false);
 }
 
