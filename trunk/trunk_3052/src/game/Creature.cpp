@@ -1353,6 +1353,17 @@ void Creature::Despawn(uint32 delay, uint32 respawntime)
 		Unit::RemoveFromWorld(true);
 		SafeDelete();
 	}
+
+	if(this->GetMapMgr() && this->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
+	{
+		if(this->GetTypeId() == TYPEID_UNIT)
+		{
+			if(this->GetCreatureName() && this->GetCreatureName()->Rank == 3)
+			{
+				this->GetMapMgr()->RemoveCombatInProgress(this->GetGUID());
+			}
+		}
+	}
 }
 
 void Creature::TriggerScriptEvent(string func)
