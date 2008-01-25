@@ -224,475 +224,12 @@ protected:
 /*                           */
 /*****************************/
 
-// Kiggler The CrazedAI
-#define CN_KIGGLER_THE_CRAZED 18835
-
-#define LIGHTNING_BOLT	36152
-#define GREATER_POLYMORPH 33173
-#define ARCANE_EXPLOSION 33237
-#define	ARCANE_SHOCK	33175
-//#define HEX				36700
-//#define ARCANE_BLAST		31457	 //have none 10yd SPELL
-
-class KigglerTheCrazedAI : public CreatureAIScript
-{
-public:
-	ADD_CREATURE_FACTORY_FUNCTION(KigglerTheCrazedAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
-
-	KigglerTheCrazedAI(Creature* pCreature) : CreatureAIScript(pCreature)
-	{
-		nrspells = 4;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-
-		} 
-
-		spells[0].info = dbcSpell.LookupEntry(LIGHTNING_BOLT);
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = false;
-		spells[0].perctrigger = 12.0f;
-		spells[0].attackstoptimer = 1000;
-
-		spells[1].info = dbcSpell.LookupEntry(GREATER_POLYMORPH);
-		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
-		spells[1].perctrigger = 8.0f;
-		spells[1].attackstoptimer = 1000;
-
-		spells[2].info = dbcSpell.LookupEntry(ARCANE_EXPLOSION);
-		spells[2].targettype = TARGET_VARIOUS;
-		spells[2].instant = true;
-		spells[2].perctrigger = 12.0f;
-		spells[2].attackstoptimer = 1000; 
-
-
-		spells[3].info = dbcSpell.LookupEntry(ARCANE_SHOCK);
-		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
-		spells[3].perctrigger = 8.0f;
-		spells[3].attackstoptimer = 1000;
-
-	}
-	void OnCombatStart(Unit* mTarget)
-	{
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-	}
-
-	void OnCombatStop(Unit *mTarget)
-	{
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		RemoveAIUpdateEvent();
-	}
-
-	void OnDied(Unit * mKiller)
-	{
-		RemoveAIUpdateEvent();
-	}
-
-	void AIUpdate()
-	{
-		/*
-		if(_unit->GetDistanceSq(target)<20)  <--- why do you need this??
-		_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
-		*/
-		/*		
-		if(m_spellcheck[1] == true) //<^-------- Both functions crash server in this place
-		_unit->GetAIInterface()->GetNextTarget();  
-		*/
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
-	}
-
-	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
-			float comulativeperc = 0;
-			Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-		}
-	}
-
-protected:
-
-	Unit *target;
-	int nrspells;
-};
-// Blindeye The SeerAI
-#define CN_BLINDEYE_THE_SEER 18836
-
-#define PRAYER_OF_HEALING 33152
-#define GREAT_POWER_WORD_SHIELD	33147
-#define HEAL 33144
-
-class BlindeyeTheSeerAI : public CreatureAIScript
-{
-public:
-	ADD_CREATURE_FACTORY_FUNCTION(BlindeyeTheSeerAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
-
-	BlindeyeTheSeerAI(Creature* pCreature) : CreatureAIScript(pCreature)
-	{
-		nrspells = 3;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-
-		} 
-
-		spells[0].info = dbcSpell.LookupEntry(PRAYER_OF_HEALING);
-		spells[0].targettype = TARGET_VARIOUS;
-		spells[0].instant = false;
-		spells[0].perctrigger = 10.0f;
-		spells[0].attackstoptimer = 1000;
-
-		spells[1].info = dbcSpell.LookupEntry(GREAT_POWER_WORD_SHIELD);
-		spells[1].targettype = TARGET_SELF;
-		spells[1].instant = true;
-		spells[1].perctrigger = 5.0f;
-		spells[1].attackstoptimer = 1000;
-
-		spells[2].info = dbcSpell.LookupEntry(HEAL);
-		spells[2].targettype = TARGET_SELF;
-		spells[2].instant = false;
-		spells[2].perctrigger = 5.0f;
-		spells[2].attackstoptimer = 1000;
-
-	}
-	void OnCombatStart(Unit* mTarget)
-	{
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-	}
-
-	void OnCombatStop(Unit *mTarget)
-	{
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		RemoveAIUpdateEvent();
-	}
-
-	void OnDied(Unit * mKiller)
-	{
-		RemoveAIUpdateEvent();
-	}
-
-	void AIUpdate()
-	{
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
-	}
-	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
-			float comulativeperc = 0;
-			Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-		}
-	}
-
-protected:
-
-	int nrspells;
-};
-// Olm The SummonerAI
-#define CN_OLM_THE_SUMMONER 18834
-
-#define DEATH_COIL		33130 // ?
-#define SUMMON_WILD_FEL_STALKER	33131 // Need to add AI for it to make it blizzlike anyway (it's wild felhunter and should be fel stalker?)
-#define DARK_DECAY		33129
-#define HEAL_OLM		31730	// not sure if this should be that healing spell
-
-class OlmTheSummonerAI : public CreatureAIScript
-{
-public:
-	ADD_CREATURE_FACTORY_FUNCTION(OlmTheSummonerAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
-
-	OlmTheSummonerAI(Creature* pCreature) : CreatureAIScript(pCreature)
-	{
-		nrspells = 4;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-
-		} 
-
-		spells[0].info = dbcSpell.LookupEntry(DEATH_COIL);
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
-		spells[0].perctrigger = 7.0f;
-		spells[0].attackstoptimer = 1000;
-
-		spells[1].info = dbcSpell.LookupEntry(SUMMON_WILD_FEL_STALKER);
-		spells[1].targettype = TARGET_SELF;
-		spells[1].instant = false;
-		spells[1].perctrigger = 2.0f;
-		spells[1].attackstoptimer = 1000;
-
-		spells[2].info = dbcSpell.LookupEntry(DARK_DECAY);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].perctrigger = 10.0f;
-		spells[2].attackstoptimer = 1000;
-
-		spells[3].info = dbcSpell.LookupEntry(HEAL_OLM);
-		spells[3].targettype = TARGET_SELF;
-		spells[3].instant = false;
-		spells[3].perctrigger = 10.0f;
-		spells[3].attackstoptimer = 1000;
-
-	}
-	void OnCombatStart(Unit* mTarget)
-	{
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-	}
-
-	void OnCombatStop(Unit *mTarget)
-	{
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		RemoveAIUpdateEvent();
-	}
-
-	void OnDied(Unit * mKiller)
-	{
-		RemoveAIUpdateEvent();
-	}
-
-	void AIUpdate()
-	{
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
-	}
-	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
-			float comulativeperc = 0;
-			Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-		}
-	}
-
-protected:
-
-	int nrspells;
-};
-// Krosh FirehandAI
-#define CN_KROSH_FIREHAND 18832
-
-#define GREAT_FIREBALL	33051
-#define BALST_WAVE		33061
-#define FIRE_WARD		37844
-//#define FIREBALL 37463
-//#define SPELLSHIELD 33054
-
-class KroshFirehandAI : public CreatureAIScript
-{
-public:
-	ADD_CREATURE_FACTORY_FUNCTION(KroshFirehandAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
-
-	KroshFirehandAI(Creature* pCreature) : CreatureAIScript(pCreature)
-	{
-		FireWardCooldown=30;
-		nrspells = 3;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-
-		} 
-
-		spells[0].info = dbcSpell.LookupEntry(GREAT_FIREBALL);
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = false;
-		spells[0].perctrigger = 20.0f;
-		spells[0].attackstoptimer = 1000;
-
-		spells[1].info = dbcSpell.LookupEntry(BALST_WAVE);
-		spells[1].targettype = TARGET_DESTINATION;
-		spells[1].instant = true;
-		spells[1].perctrigger = 15.0f;
-		spells[1].attackstoptimer = 1000;
-
-		spells[2].info = dbcSpell.LookupEntry(FIRE_WARD);
-		spells[2].targettype = TARGET_SELF;
-		spells[2].instant = true;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-	}
-	void OnCombatStart(Unit* mTarget)
-	{
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-	}
-
-	void OnCombatStop(Unit *mTarget)
-	{
-		FireWardCooldown=30;
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		RemoveAIUpdateEvent();
-	}
-
-	void OnDied(Unit * mKiller)
-	{
-		FireWardCooldown=30;
-		RemoveAIUpdateEvent();
-	}
-
-	void AIUpdate()
-	{
-		FireWardCooldown--;
-		if(!FireWardCooldown)//_unit->getAttackTarget())
-		{
-			_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
-			FireWardCooldown=30;
-		}
-		/*
-		if(_unit->GetDistanceSq(target)<20) // bad idea, as long as I can see that
-		_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
-		*/
-		else
-		{
-			float val = (float)RandomFloat(100.0f);
-			SpellCast(val);
-		}
-	}
-	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
-			float comulativeperc = 0;
-			target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-		}
-	}
-
-protected:
-
-	Unit *target;
-	uint32 FireWardCooldown;
-	int nrspells;
-};
-
 // MaulgarAI
 #define CN_HIGH_KING_MAULAGR 18831
+#define CN_OLM_THE_SUMMONER 18834
+#define CN_BLINDEYE_THE_SEER 18836
+#define CN_KIGGLER_THE_CRAZED 18835
+#define CN_KROSH_FIREHAND 18832
 
 #define ARCINGSMASH		38761
 #define MIGHTYBLOW		33230
@@ -718,38 +255,59 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(ARCINGSMASH);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
-		spells[0].perctrigger = 15.0f;
+		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(MIGHTYBLOW);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
-		spells[1].perctrigger = 10.0f;
+		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(WHIRLWIND);
 		spells[2].targettype = TARGET_VARIOUS; // Should attk party member with second the highest aggro in melee range
 		spells[2].instant = true;
-		spells[2].perctrigger = 9.0f;
+		spells[2].perctrigger = 3.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(ENRAGE);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
-		spells[3].perctrigger = 5.0f;
+		spells[3].perctrigger = 2.0f;
 		spells[3].attackstoptimer = 1000;
 		spells[3].speech = "You will not defeat the hand of Gruul!";
 		spells[3].soundid = 11368;
+
+		summoner = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_OLM_THE_SUMMONER, 150.858536f, 185.975540f, -11.091244f, 3.3f, true, false, 0, 0);
+		mage = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_KROSH_FIREHAND, 148.062469f, 179.211060f, -10.799615f, 3.3f, true, false, 0, 0);
+		priest = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_BLINDEYE_THE_SEER, 149.994278f, 203.461243f, -9.410825f, 3.3f, true, false, 0, 0);
+		shaman = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_KIGGLER_THE_CRAZED, 147.571167f, 209.742279f, -7.748757f, 3.3f, true, false, 0, 0);
+
+		m_eventstarted = false;
 	}
 	void OnCombatStart(Unit* mTarget)
 	{
+		EventStart(mTarget);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Gronn are the real power in Outland!");
 		_unit->PlaySoundToSet(11367);
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		RegisterAIUpdateEvent(1000);
 	}
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		m_eventstarted = false;
+		if (_unit->isAlive())
+		{
+			if (summoner)
+				summoner->Despawn(100, 0);
+			if (mage)
+				mage->Despawn(100, 0);
+			if (priest)
+				priest->Despawn(100, 0);
+			if (shaman)
+				shaman->Despawn(100, 0);
+			_unit->Despawn(100, 2500);
+		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -837,11 +395,562 @@ public:
 			}
 		}
 	}
+	void EventStart(Unit* mTarget)
+	{
+		if (!m_eventstarted)
+		{
+			m_eventstarted = true;
+			_unit->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			summoner->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			mage->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			priest->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			shaman->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+		}
+	}
+	void EventStop(Unit* mTarget)
+	{
+		if (m_eventstarted)
+		{
+			m_eventstarted = false;
+			if (_unit->isAlive())
+			{
+				if (summoner)
+					summoner->Despawn(100, 0);
+				if (mage)
+					mage->Despawn(100, 0);
+				if (priest)
+					priest->Despawn(100, 0);
+				if (shaman)
+					shaman->Despawn(100, 0);
+				RemoveAIUpdateEvent();
+				_unit->Despawn(100, 2500);
+			}
+		}
+	}
+
+protected:
+	int nrspells;
+	bool m_eventstarted;
+	Creature *summoner;
+	Creature *mage;
+	Creature *priest;
+	Creature *shaman;
+};
+
+// Kiggler The CrazedAI
+#define CN_KIGGLER_THE_CRAZED 18835
+
+#define LIGHTNING_BOLT	36152
+#define GREATER_POLYMORPH 33173
+#define ARCANE_EXPLOSION 33237
+#define	ARCANE_SHOCK	33175
+//#define HEX				36700
+//#define ARCANE_BLAST		31457	 //have none 10yd SPELL
+
+class KigglerTheCrazedAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(KigglerTheCrazedAI);
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
+
+	KigglerTheCrazedAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+		nrspells = 4;
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+
+		} 
+
+		spells[0].info = dbcSpell.LookupEntry(LIGHTNING_BOLT);
+		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].instant = false;
+		spells[0].perctrigger = 3.0f;
+		spells[0].attackstoptimer = 1000;
+
+		spells[1].info = dbcSpell.LookupEntry(GREATER_POLYMORPH);
+		spells[1].targettype = TARGET_ATTACKING;
+		spells[1].instant = true;
+		spells[1].perctrigger = 2.0f;
+		spells[1].attackstoptimer = 1000;
+
+		spells[2].info = dbcSpell.LookupEntry(ARCANE_EXPLOSION);
+		spells[2].targettype = TARGET_VARIOUS;
+		spells[2].instant = true;
+		spells[2].perctrigger = 4.0f;
+		spells[2].attackstoptimer = 1000; 
+
+
+		spells[3].info = dbcSpell.LookupEntry(ARCANE_SHOCK);
+		spells[3].targettype = TARGET_ATTACKING;
+		spells[3].instant = true;
+		spells[3].perctrigger = 3.0f;
+		spells[3].attackstoptimer = 1000;
+
+		maulgar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(148.645508f, 194.516510f, -10.934792f, CN_HIGH_KING_MAULAGR);
+
+	}
+	void OnCombatStart(Unit* mTarget)
+	{
+		if (maulgar)
+		{
+			CreatureAIScript *mob_script = maulgar->GetScript();
+			((HighKingMaulgarAI*)mob_script)->EventStart(mTarget);
+		}
+		RegisterAIUpdateEvent(1000);
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		if (_unit->isAlive() && maulgar->isAlive())
+		{
+			CreatureAIScript *mob_script = maulgar->GetScript();
+			((HighKingMaulgarAI*)mob_script)->EventStop(mTarget);
+		}
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void AIUpdate()
+	{
+		/*
+		if(_unit->GetDistanceSq(target)<20)  <--- why do you need this??
+		_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+		*/
+		/*		
+		if(m_spellcheck[1] == true) //<^-------- Both functions crash server in this place
+		_unit->GetAIInterface()->GetNextTarget();  
+		*/
+		float val = (float)RandomFloat(100.0f);
+		SpellCast(val);
+	}
+
+	void SpellCast(float val)
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
+			float comulativeperc = 0;
+			Unit *target = NULL;
+			for(int i=0;i<nrspells;i++)
+			{
+				if(!spells[i].perctrigger) continue;
+
+				if(m_spellcheck[i])
+				{
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+					case TARGET_SELF:
+					case TARGET_VARIOUS:
+						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+					case TARGET_ATTACKING:
+						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+					case TARGET_DESTINATION:
+						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					}
+					m_spellcheck[i] = false;
+					return;
+				}
+
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+		}
+	}
+
+protected:
+
+	Unit *target;
+	Creature *maulgar;
+	int nrspells;
+};
+// Blindeye The SeerAI
+#define CN_BLINDEYE_THE_SEER 18836
+
+#define PRAYER_OF_HEALING 33152
+#define GREAT_POWER_WORD_SHIELD	33147
+#define HEAL 33144
+
+class BlindeyeTheSeerAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(BlindeyeTheSeerAI);
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
+
+	BlindeyeTheSeerAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+		nrspells = 3;
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+
+		} 
+
+		spells[0].info = dbcSpell.LookupEntry(PRAYER_OF_HEALING);
+		spells[0].targettype = TARGET_VARIOUS;
+		spells[0].instant = false;
+		spells[0].perctrigger = 2.0f;
+		spells[0].attackstoptimer = 1000;
+
+		spells[1].info = dbcSpell.LookupEntry(GREAT_POWER_WORD_SHIELD);
+		spells[1].targettype = TARGET_SELF;
+		spells[1].instant = true;
+		spells[1].perctrigger = 4.0f;
+		spells[1].attackstoptimer = 1000;
+
+		spells[2].info = dbcSpell.LookupEntry(HEAL);
+		spells[2].targettype = TARGET_SELF;
+		spells[2].instant = false;
+		spells[2].perctrigger = 3.0f;
+		spells[2].attackstoptimer = 1000;
+
+		maulgar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(148.645508f, 194.516510f, -10.934792f, CN_HIGH_KING_MAULAGR);
+
+	}
+	void OnCombatStart(Unit* mTarget)
+	{
+		if (maulgar)
+		{
+			CreatureAIScript *mob_script = maulgar->GetScript();
+			((HighKingMaulgarAI*)mob_script)->EventStart(mTarget);
+		}
+		RegisterAIUpdateEvent(1000);
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		if (_unit->isAlive() && maulgar->isAlive())
+		{
+			CreatureAIScript *mob_script = maulgar->GetScript();
+			((HighKingMaulgarAI*)mob_script)->EventStop(mTarget);
+		}
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void AIUpdate()
+	{
+		float val = (float)RandomFloat(100.0f);
+		SpellCast(val);
+	}
+	void SpellCast(float val)
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
+			float comulativeperc = 0;
+			Unit *target = NULL;
+			for(int i=0;i<nrspells;i++)
+			{
+				if(!spells[i].perctrigger) continue;
+
+				if(m_spellcheck[i])
+				{
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+					case TARGET_SELF:
+					case TARGET_VARIOUS:
+						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+					case TARGET_ATTACKING:
+						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+					case TARGET_DESTINATION:
+						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					}
+					m_spellcheck[i] = false;
+					return;
+				}
+
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+		}
+	}
 
 protected:
 
 	int nrspells;
+	Creature *maulgar;
 };
+// Olm The SummonerAI
+#define CN_OLM_THE_SUMMONER 18834
+
+#define DEATH_COIL		33130 // ?
+#define SUMMON_WILD_FEL_STALKER	33131 // Need to add AI for it to make it blizzlike anyway (it's wild felhunter and should be fel stalker?)
+#define DARK_DECAY		33129
+#define HEAL_OLM		31730	// not sure if this should be that healing spell
+
+class OlmTheSummonerAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(OlmTheSummonerAI);
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
+
+	OlmTheSummonerAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+		nrspells = 4;
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+
+		} 
+
+		spells[0].info = dbcSpell.LookupEntry(DEATH_COIL);
+		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].instant = true;
+		spells[0].perctrigger = 2.0f;
+		spells[0].attackstoptimer = 1000;
+
+		spells[1].info = dbcSpell.LookupEntry(SUMMON_WILD_FEL_STALKER);
+		spells[1].targettype = TARGET_SELF;
+		spells[1].instant = false;
+		spells[1].perctrigger = 2.0f;
+		spells[1].attackstoptimer = 1000;
+
+		spells[2].info = dbcSpell.LookupEntry(DARK_DECAY);
+		spells[2].targettype = TARGET_ATTACKING;
+		spells[2].instant = true;
+		spells[2].perctrigger = 3.0f;
+		spells[2].attackstoptimer = 1000;
+
+		spells[3].info = dbcSpell.LookupEntry(HEAL_OLM);
+		spells[3].targettype = TARGET_SELF;
+		spells[3].instant = false;
+		spells[3].perctrigger = 5.0f;
+		spells[3].attackstoptimer = 1000;
+
+		maulgar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(148.645508f, 194.516510f, -10.934792f, CN_HIGH_KING_MAULAGR);
+
+	}
+	void OnCombatStart(Unit* mTarget)
+	{
+		if (maulgar)
+		{
+			CreatureAIScript *mob_script = maulgar->GetScript();
+			((HighKingMaulgarAI*)mob_script)->EventStart(mTarget);
+		}
+		RegisterAIUpdateEvent(1000);
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		if (_unit->isAlive() && maulgar->isAlive())
+		{
+			CreatureAIScript *mob_script = maulgar->GetScript();
+			((HighKingMaulgarAI*)mob_script)->EventStop(mTarget);
+		}
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void AIUpdate()
+	{
+		float val = (float)RandomFloat(100.0f);
+		SpellCast(val);
+	}
+	void SpellCast(float val)
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
+			float comulativeperc = 0;
+			Unit *target = NULL;
+			for(int i=0;i<nrspells;i++)
+			{
+				if(!spells[i].perctrigger) continue;
+
+				if(m_spellcheck[i])
+				{
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+					case TARGET_SELF:
+					case TARGET_VARIOUS:
+						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+					case TARGET_ATTACKING:
+						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+					case TARGET_DESTINATION:
+						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					}
+					m_spellcheck[i] = false;
+					return;
+				}
+
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+		}
+	}
+
+protected:
+
+	int nrspells;
+	Creature *maulgar;
+};
+// Krosh FirehandAI
+#define CN_KROSH_FIREHAND 18832
+
+#define GREAT_FIREBALL	33051
+#define BLAST_WAVE		33061
+#define FIRE_WARD		37844
+#define SPELLSHIELD 33054
+
+class KroshFirehandAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(KroshFirehandAI);
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
+
+	KroshFirehandAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+		nrspells = 1;
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+
+		} 
+
+		spells[0].info = dbcSpell.LookupEntry(GREAT_FIREBALL);
+		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].instant = false;
+		spells[0].perctrigger = 10.0f;
+		spells[0].attackstoptimer = 1000;
+
+		spells[1].info = dbcSpell.LookupEntry(BLAST_WAVE);
+		spells[1].targettype = TARGET_VARIOUS;
+		spells[1].instant = true;
+		spells[1].perctrigger = 2.0f;
+		spells[1].attackstoptimer = 1000;
+
+		spells[2].info = dbcSpell.LookupEntry(SPELLSHIELD);
+		spells[2].targettype = TARGET_SELF;
+		spells[2].instant = true;
+		spells[2].perctrigger = 0.0f;
+		spells[2].attackstoptimer = 1000;
+
+		maulgar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(148.645508f, 194.516510f, -10.934792f, CN_HIGH_KING_MAULAGR);
+		FireWardCooldown = 1;
+
+	}
+	void OnCombatStart(Unit* mTarget)
+	{
+		if (maulgar)
+		{
+			CreatureAIScript *mob_script = maulgar->GetScript();
+			((HighKingMaulgarAI*)mob_script)->EventStart(mTarget);
+		}
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+		RegisterAIUpdateEvent(1000);
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		if (_unit->isAlive() && maulgar->isAlive())
+		{
+			CreatureAIScript *mob_script = maulgar->GetScript();
+			((HighKingMaulgarAI*)mob_script)->EventStop(mTarget);
+		}
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void AIUpdate()
+	{
+		FireWardCooldown--;
+		if(!FireWardCooldown)
+		{
+			//_unit->CastSpell(_unit, SPELLSHIELD, true);
+			FireWardCooldown=30;
+		}
+		else
+		{
+			float val = (float)RandomFloat(100.0f);
+			SpellCast(val);
+		}
+	}
+	void SpellCast(float val)
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
+			float comulativeperc = 0;
+			target = NULL;
+			for(int i=0;i<nrspells;i++)
+			{
+				if(!spells[i].perctrigger) continue;
+
+				if(m_spellcheck[i])
+				{
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+					case TARGET_SELF:
+					case TARGET_VARIOUS:
+						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+					case TARGET_ATTACKING:
+						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+					case TARGET_DESTINATION:
+						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					}
+					m_spellcheck[i] = false;
+					return;
+				}
+
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+		}
+	}
+
+protected:
+
+	Unit *target;
+	uint32 FireWardCooldown;
+	int nrspells;
+	Creature *maulgar;
+};
+
 // GruulsAI
 
 #define CN_GRUUL_THE_DRAGONKILLER 19044
@@ -937,7 +1046,7 @@ public:
 	{
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come and die.");
 		_unit->PlaySoundToSet(11355);
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		RegisterAIUpdateEvent(1000);
 
 		GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(166.897f, 368.226f, 16.9209f, 184662);
 		if(pDoor)
@@ -994,7 +1103,7 @@ public:
 	void AIUpdate()
 	{
 		GrowthCooldown--;
-		if(!GrowthCooldown)//_unit->getAttackTarget())
+		if(!GrowthCooldown)
 		{
 			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
 			GrowthCooldown=30;
