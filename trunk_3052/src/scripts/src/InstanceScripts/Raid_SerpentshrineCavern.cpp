@@ -4646,14 +4646,14 @@ public:
 
 			spells[0].info = dbcSpell.LookupEntry(CONEOFCOLD);
 			spells[0].targettype = TARGET_ATTACKING;
-			spells[0].instant = true;
+			spells[0].instant = false;
 			spells[0].cooldown = 18;
 			spells[0].perctrigger = 1.5f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FROSTBOLTVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
-			spells[1].instant = true;
+			spells[1].instant = false;
 			spells[1].cooldown = 12;
 			spells[1].perctrigger = 2.0f;
 			spells[1].attackstoptimer = 1000;
@@ -4664,14 +4664,14 @@ public:
 
 			spells[0].info = dbcSpell.LookupEntry(RAINOFFIRE);
 			spells[0].targettype = TARGET_RANDOM_DESTINATION;
-			spells[0].instant = true;
+			spells[0].instant = false;
 			spells[0].cooldown = 18;
 			spells[0].perctrigger = 1.5f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FIREBALLVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
-			spells[1].instant = true;
+			spells[1].instant = false;
 			spells[1].cooldown = 12;
 			spells[1].perctrigger = 2.0f;
 			spells[1].attackstoptimer = 1000;
@@ -4688,7 +4688,7 @@ public:
 
 			spells[1].info = dbcSpell.LookupEntry(ARCANEVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
-			spells[1].instant = true;
+			spells[1].instant = false;
 			spells[1].cooldown = 12;
 			spells[1].perctrigger = 2.0f;
 			spells[1].attackstoptimer = 1000;
@@ -4868,6 +4868,6 @@ void SetupSerpentshrineCavern(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_TOXICSPOREBAT, &TOXICSPOREBATAI::Create);
 
 	//Trash Mobs
-	//mgr->register_creature_script(CN_UNDERBOGCOLOSSUS, &UNDERBOGCOLOSSUSAI::Create);
+	mgr->register_creature_script(CN_UNDERBOGCOLOSSUS, &UNDERBOGCOLOSSUSAI::Create);
 	mgr->register_creature_script(CN_GREYHEARTNETHERMAGE, &GREYHEARTNETHERMAGEAI::Create);
 }

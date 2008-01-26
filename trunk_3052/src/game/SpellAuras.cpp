@@ -950,7 +950,7 @@ void Aura::SpellAuraModPossess(bool apply)
 
 	if(apply)
 	{
-		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER ) 
+		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER && (caster->getLevel() + 4) >= m_target->getLevel()) 
 			static_cast<Player*>(caster)->Possess( m_target );
 	}
 	else
