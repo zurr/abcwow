@@ -191,6 +191,20 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
                             SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 33004 : 33005);
                             gPlayer->CastSpell(gPlayer, halaa_spell, true);
                         }
+                        // If we are in Hellfire Peninsula
+                        if(pPlayer->GetZoneId() == 3483)
+                        {
+                            // Add Mark of Thrallmar/Honor Hold
+                            SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 32158 : 32155);
+                            gPlayer->CastSpell(gPlayer, halaa_spell, true);
+                        }
+                        // If we are in Zangarmarsh
+                        if(pPlayer->GetZoneId() == 3521)
+                        {
+                            // Add Mark of Thrallmar/Honor Hold
+                            SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 32158 : 32155);
+                            gPlayer->CastSpell(gPlayer, halaa_spell, true);
+                        }
                     }
 
                 }
