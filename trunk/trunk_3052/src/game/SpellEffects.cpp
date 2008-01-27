@@ -1221,12 +1221,14 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	// can't apply stuns/fear/polymorph/root etc on boss
 	if (!unitTarget->IsPlayer())
 	{
-		Creature * c = (Creature*)( unitTarget );
-		if (c)
+		if (u_caster && (u_caster != unitTarget))
 		{
-			/*
-			if (c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+			Creature * c = (Creature*)( unitTarget );
+			if (c)
 			{
+				/*
+				if (c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+				{
 				switch(m_spellInfo->EffectApplyAuraName[i])
 				{
 				case 5:  // confuse
@@ -1238,26 +1240,26 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 				case 27: // silence
 				case 31: // increase speed
 				case 33: // decrease speed
-					SendCastResult(SPELL_FAILED_IMMUNE);
-					return;
+				SendCastResult(SPELL_FAILED_IMMUNE);
+				return;
 				}
-			}
-			*/
+				}
+				*/
 
-			/*
-			Charm (Mind Control, enslave demon): 1
-			Confuse (Blind etc): 2
-			Fear: 4
-			Root: 8
-			Silence : 16
-			Stun: 32
-			Sheep: 64
-			Banish: 128
-			Taunt (applyaura): 256
-			Decrease Speed (hamstring) (applyaura): 512
-			Spell Haste (Curse of Tongues) (applyaura): 1024
-			Interupt Cast (applyaura): 2048
-			*/
+				/*
+				Charm (Mind Control, enslave demon): 1
+				Confuse (Blind etc): 2
+				Fear: 4
+				Root: 8
+				Silence : 16
+				Stun: 32
+				Sheep: 64
+				Banish: 128
+				Taunt (applyaura): 256
+				Decrease Speed (hamstring) (applyaura): 512
+				Spell Haste (Curse of Tongues) (applyaura): 1024
+				Interupt Cast (applyaura): 2048
+				*/
 
 				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
 				if (c->proto && c->proto->modImmunities)
@@ -1344,6 +1346,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 						return;
 					}
 				}
+			}
 		}
 	}
 
@@ -3382,17 +3385,20 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 	// can't apply stuns/fear/polymorph/root etc on boss
 	if(unitTarget->GetTypeId()==TYPEID_UNIT)
 	{
-		Creature * c = (Creature*)( unitTarget );
-		if (c)
+		if (u_caster && (u_caster != unitTarget))
 		{
-			/*
-			if (c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
-			return;
-			*/
-			if (c->proto && c->proto->modImmunities)
+			Creature * c = (Creature*)( unitTarget );
+			if (c)
 			{
-				if (c->proto->modImmunities & 2048)
-					return;
+				/*
+				if (c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+				return;
+				*/
+				if (c->proto && c->proto->modImmunities)
+				{
+					if (c->proto->modImmunities & 2048)
+						return;
+				}
 			}
 		}
 	}
