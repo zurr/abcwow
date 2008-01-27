@@ -1354,13 +1354,13 @@ void Creature::Despawn(uint32 delay, uint32 respawntime)
 		SafeDelete();
 	}
 
-	if(this->GetMapMgr() && this->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
+	if(GetMapMgr() && GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
 	{
-		if(this->GetTypeId() == TYPEID_UNIT)
+		if(GetTypeId() == TYPEID_UNIT)
 		{
-			if(this->GetCreatureName() && this->GetCreatureName()->Rank == 3)
+			if(GetCreatureName() && GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			{
-				this->GetMapMgr()->RemoveCombatInProgress(this->GetGUID());
+				GetMapMgr()->RemoveCombatInProgress(GetGUID());
 			}
 		}
 	}
