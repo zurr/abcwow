@@ -1075,41 +1075,40 @@ public:
 			Creature *murloc;
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 513.671875f, -724.752747f, -7.144188f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 513.671875f, -724.752747f, -7.144188f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 513.671875f, -724.752747f, -7.144188f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 513.671875f, -724.752747f, -7.144188f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 513.671875f, -724.752747f, -7.144188f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 513.671875f, -724.752747f, -7.144188f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 259.144714f, -724.210083f, -3.336553f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 259.144714f, -724.210083f, -3.336553f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 259.144714f, -724.210083f, -3.336553f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
-			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 259.144714f, -724.210083f, -3.336553f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 259.144714f, -724.210083f, -3.336553f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 259.144714f, -724.210083f, -3.336553f, 0, true, false, 0, 0);
 			murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			murloc->GetAIInterface()->AttackReaction(tank, 1000, 0);
+			murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			earthquakecd = 45 + RandomUInt(100)%15;
 		}
 		else
@@ -1195,13 +1194,13 @@ public:
 				{
 					target4 = (Player *) RandomTarget(false, true, 10000);
 				}
-				target1->_Relocate(_unit->GetMapId(), LocationVector(366.443512f, -708.822388f, -14.357947f, target1->GetOrientation()), false, false, _unit->GetInstanceID());
+				target1->_Relocate(_unit->GetMapId(), LocationVector(366.443512f, -708.822388f, -4.357947f, target1->GetOrientation()), false, false, _unit->GetInstanceID());
 				_unit->CastSpell(target1, MOROGRIM_WATERYGRAVE, true);
-				target2->_Relocate(_unit->GetMapId(), LocationVector(373.805511f, -691.146116f, -14.446006f, target2->GetOrientation()), false, false, _unit->GetInstanceID());
+				target2->_Relocate(_unit->GetMapId(), LocationVector(373.805511f, -691.146116f, -4.446006f, target2->GetOrientation()), false, false, _unit->GetInstanceID());
 				_unit->CastSpell(target2, MOROGRIM_WATERYGRAVE, true);
-				target3->_Relocate(_unit->GetMapId(), LocationVector(365.522644f, -737.217712f, -14.444579f, target3->GetOrientation()), false, false, _unit->GetInstanceID());
+				target3->_Relocate(_unit->GetMapId(), LocationVector(365.522644f, -737.217712f, -4.444579f, target3->GetOrientation()), false, false, _unit->GetInstanceID());
 				_unit->CastSpell(target3, MOROGRIM_WATERYGRAVE, true);
-				target4->_Relocate(_unit->GetMapId(), LocationVector(337.470581f, -732.931885f, -14.173863f, target4->GetOrientation()), false, false, _unit->GetInstanceID());
+				target4->_Relocate(_unit->GetMapId(), LocationVector(337.470581f, -732.931885f, -4.173863f, target4->GetOrientation()), false, false, _unit->GetInstanceID());
 				_unit->CastSpell(target4, MOROGRIM_WATERYGRAVE, true);
 			}
 			waterygravecd = 25 + RandomUInt(100)%10;
@@ -2467,7 +2466,9 @@ public:
 					_unit->GetAIInterface()->AttackReaction(target, 0, 0);
 				}
 				else
+				{
 					EventStop(NULL);
+				}
 			}
 		}
 		else
@@ -2942,7 +2943,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
-		if (leotheras)
+		if (_unit->isAlive() && leotheras && leotheras->isAlive())
 		{
 			CreatureAIScript *mob_script = leotheras->GetScript();
 			((LEOTHERASAI*)mob_script)->EventStop(mTarget);

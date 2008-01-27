@@ -1790,7 +1790,7 @@ protected:
 // Imps
 #define CN_FIENDISH_IMP 17267
 
-#define FIREBALL 38692
+#define IMP_FIREBALL 38692
 
 class FiendishImpAI : public CreatureAIScript
 	{
@@ -1807,7 +1807,7 @@ class FiendishImpAI : public CreatureAIScript
 				m_spellcheck[i] = false;
 			}
 
-			spells[0].info = dbcSpell.LookupEntry(FIREBALL);
+			spells[0].info = dbcSpell.LookupEntry(IMP_FIREBALL);
 			spells[0].targettype = TARGET_ATTACKING;
 			spells[0].instant = false;
 			spells[0].cooldown = 0;
