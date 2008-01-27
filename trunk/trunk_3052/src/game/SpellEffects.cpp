@@ -1260,7 +1260,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 			*/
 
 				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
-				if (c->proto->modImmunities)
+				if (c->proto && c->proto->modImmunities)
 				{
 					bool immune;
 					switch(m_spellInfo->MechanicsType)
@@ -3386,7 +3386,7 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 			if (c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 				return;
 			*/
-			if (c->proto->modImmunities & 2048)
+			if (c->proto && (c->proto->modImmunities & 2048))
 				return;
 		}
 	}
