@@ -8874,11 +8874,10 @@ void Player::UnPossess()
 		{
 			std::vector<Unit*> targetTable;
 			TargetMap *targets = pTarget->GetAIInterface()->GetAITargets();
-			TargetMap::iterator itr;
-			for (itr = targets->begin(); itr != targets->end(); itr++)
+			for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 			{
 				Unit *temp = itr->first;
-				if (temp->GetTypeId() == TYPEID_UNIT)
+				if (temp->GetTypeId() == TYPEID_UNIT && temp->isAlive())
 				{
 					temp->GetAIInterface()->RemoveThreatByPtr(this);
 					if (temp->GetAIInterface()->GetNextTarget() == pTarget)

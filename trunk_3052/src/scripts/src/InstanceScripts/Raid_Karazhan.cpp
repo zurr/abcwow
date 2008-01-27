@@ -1237,6 +1237,8 @@ public:
 		info_mass_polymorph = dbcSpell.LookupEntry(MASS_POLYMORPH);
 		info_conjure = dbcSpell.LookupEntry(CONJURE);
 		info_pyroblast = dbcSpell.LookupEntry(AOE_PYROBLAST);
+
+		GameObject* pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-11162.56f, -1913.954f, 232.008f, 184517);
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -1274,6 +1276,9 @@ public:
 		summoned = false;
 		explode = false;
 		slow = false;
+
+		if (pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 1);
 	}
 
 	void OnCombatStop(Unit *mTarget)
@@ -1281,6 +1286,8 @@ public:
 		if (_unit->isAlive())
 			_unit->SetUInt32Value(UNIT_FIELD_POWER1, _unit->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 		CastTime();
+		if (pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -1291,6 +1298,8 @@ public:
 		CastTime();
 		_unit->PlaySoundToSet(9244);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "At last... The nightmare is.. over...");
+		if (pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
 		RemoveAIUpdateEvent();
 	}
 
@@ -1578,6 +1587,8 @@ protected:
 	SpellEntry *info_summon_elementals;
 	SpellEntry *info_pyroblast;
 	SpellEntry *info_mass_polymorph;
+
+	GameObject *pDoor;
 };
 
 // Terestian Illhoof
@@ -1621,6 +1632,8 @@ public:
 
 	void OnCombatStart(Unit* mTarget)
 	{
+		summonImp = 0;
+		summonSpeech = 0;
 		CastTime();
 		_unit->PlaySoundToSet(9260);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ah, you're just in time. The rituals are about to begin.");
@@ -1664,27 +1677,38 @@ public:
 
 	void AIUpdate()
 	{
+		summonImp++;
+		if (summonImp > 3) //its already nerfed (hope enough)
+		{
+			SummonImp();
+			summonImp = 0;
+		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
 	}
 
 	void SummonImp()
 	{
-		uint32 sound, val = (uint32) RandomUInt(100)%2;
-		char *text;
-		switch(val)
+		summonSpeech++;
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(17267, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.0f, false, false, 0, 0);
+		if(summonSpeech == 1)
 		{
-		case 0:
-			sound = 9265;
-			text = "Come, you dwellers in the dark. Rally to my call!";
-			break;
-		case 1:
-			sound = 9331;
-			text = "Gather, my pets. There is plenty for all.";
-			break;
+			uint32 sound, val = (uint32) RandomUInt(100)%2;
+			char *text;
+			switch(val)
+			{
+			case 0:
+				sound = 9265;
+				text = "Come, you dwellers in the dark. Rally to my call!";
+				break;
+			case 1:
+				sound = 9331;
+				text = "Gather, my pets. There is plenty for all.";
+				break;
+			}
+			_unit->PlaySoundToSet(sound);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, text);
 		}
-		_unit->PlaySoundToSet(sound);
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, text);
 	}
 
 	void SacrificePlayer()
@@ -1759,7 +1783,120 @@ public:
 
 protected:
 	int nrspells;
+	int summonImp;
+	int summonSpeech;
 };
+
+// Imps
+#define CN_FIENDISH_IMP 17267
+
+#define FIREBALL 38692
+
+class FiendishImpAI : public CreatureAIScript
+	{
+	public:
+		ADD_CREATURE_FACTORY_FUNCTION(FiendishImpAI);
+		bool m_spellcheck[1];
+		SP_AI_Spell spells[1];
+
+		FiendishImpAI(Creature* pCreature) : CreatureAIScript(pCreature)
+		{
+			nrspells = 1;
+			for(int i=0;i<nrspells;i++)
+			{
+				m_spellcheck[i] = false;
+			}
+
+			spells[0].info = dbcSpell.LookupEntry(FIREBALL);
+			spells[0].targettype = TARGET_ATTACKING;
+			spells[0].instant = false;
+			spells[0].cooldown = 0;
+			spells[0].perctrigger = 100.0f;
+			spells[0].attackstoptimer = 1000;
+		}
+
+		void OnCombatStart(Unit* mTarget)
+		{
+			CastTime();
+			RegisterAIUpdateEvent(1000);
+		}
+
+		void OnCombatStop(Unit *mTarget)
+		{
+			CastTime();
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+			RemoveAIUpdateEvent();
+			if(_unit)
+			_unit->SafeDelete();
+		}
+
+		void OnDied(Unit * mKiller)
+		{
+			CastTime();
+			RemoveAIUpdateEvent();
+		}
+
+		void AIUpdate()
+		{
+			float val = (float)RandomFloat(100.0f);
+			SpellCast(val);
+		}
+
+		void CastTime()
+		{
+			for(int i=0;i<nrspells;i++)
+				spells[i].casttime = spells[i].cooldown;
+		}
+
+		void SpellCast(float val)
+			{
+			if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+				{
+				float comulativeperc = 0;
+				Unit *target = NULL;
+				for(int i=0;i<nrspells;i++)
+					{
+					spells[i].casttime--;
+
+					if (m_spellcheck[i])
+						{
+						spells[i].casttime = spells[i].cooldown;
+						target = _unit->GetAIInterface()->GetNextTarget();
+						switch(spells[i].targettype)
+							{
+							case TARGET_SELF:
+							case TARGET_VARIOUS:
+								_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+							case TARGET_ATTACKING:
+								_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+							case TARGET_DESTINATION:
+								_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+							}
+
+						if (spells[i].speech != "")
+							{
+							_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
+							_unit->PlaySoundToSet(spells[i].soundid); 
+							}
+
+						m_spellcheck[i] = false;
+						return;
+						}
+
+					if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+						{
+						_unit->setAttackTimer(spells[i].attackstoptimer, false);
+						m_spellcheck[i] = true;
+						}
+					comulativeperc += spells[i].perctrigger;
+					}
+				}
+			}
+
+	protected:
+		int nrspells;
+	};
 
 // Kil'Rek
 #define CN_KIL_REK 17229
