@@ -323,7 +323,7 @@ protected:
 
 #define CN_SUN_RESEARCHER 18421
 
-#define POISON_SHIELD 39027 // self
+#define POISON_SHIELD 34355 // self
 #define MIND_SHOCK 34352 // 1 target
 #define FROST_SHOCK 39062 // 1 target
 #define FLAME_SHOCK 22423 // 1 target

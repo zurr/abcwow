@@ -1319,8 +1319,9 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 						case SPELL_AURA_MOD_STUN: // no idea if its needed, just to be sure
 							if (c->proto->modImmunities & 32)
 								immune = true;
+							break;
 						case SPELL_AURA_MOD_SILENCE:
-							if (c->proto->modImmunities & 2048 || c->proto->modImmunities & 16)
+							if ((c->proto->modImmunities & 2048) || (c->proto->modImmunities & 16))
 								immune = true;
 							break;
 						case SPELL_AURA_MOD_DECREASE_SPEED:
@@ -1330,9 +1331,11 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 						case SPELL_AURA_MOD_CASTING_SPEED:
 							if (c->proto->modImmunities & 1024)
 								immune = true;
+							break;
 						case SPELL_AURA_MOD_LANGUAGE: //hacky way to prefer that the COT icon is set to mob
 							if (c->proto->modImmunities & 1024)
 								immune = true;
+							break;
 						}
 					}
 					if (immune)
@@ -3384,10 +3387,13 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 		{
 			/*
 			if (c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
-				return;
+			return;
 			*/
-			if (c->proto && (c->proto->modImmunities & 2048))
-				return;
+			if (c->proto && c->proto->modImmunities)
+			{
+				if (c->proto->modImmunities & 2048)
+					return;
+			}
 		}
 	}
 	// FIXME:This thing prevent target from spell casting too but cant find.
