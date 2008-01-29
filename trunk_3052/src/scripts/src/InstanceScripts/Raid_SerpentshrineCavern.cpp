@@ -418,7 +418,7 @@ protected:
 #define CN_COILFANGGUARDIAN 21873
 
 #define LURKER_WATERBOLT 37138
-#define LURKER_WHIRL 37363
+#define LURKER_WHIRL 37660
 #define LURKER_GEYSER 37478
 #define LURKER_SPOUT 37431
 
@@ -456,7 +456,6 @@ public:
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
 		_unit->GetAIInterface()->setWaypointToMove(1);
 
-		_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
 		_unit->GetAIInterface()->m_moveFly = true;
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		submergetimer = 90;
@@ -481,7 +480,9 @@ public:
 		if (_unit->isAlive())
 		{
 			_unit->Emote(EMOTE_ONESHOT_SUBMERGE);
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
+			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
@@ -521,15 +522,11 @@ public:
 			}
 			else
 			{
+				whirlcd--;
 				if (!whirlcd)
 				{
-					_unit->Emote(EMOTE_STATE_WHIRLWIND);
 					_unit->CastSpell(_unit, LURKER_WHIRL, true);
 					whirlcd = 18;
-				}
-				else
-				{
-					whirlcd--;
 				}
 				if (_unit->GetAIInterface()->GetMostHated() && (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetMostHated()) > 450))
 				{
@@ -687,13 +684,23 @@ public:
 		return (int)targetTable.size();
 	}
 
+	void OnDamageTaken(Unit* mAttacker, float fAmount)
+	{
+		if (!_unit->GetAIInterface()->GetAllowedToEnterCombat())
+		{
+			_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+			_unit->GetAIInterface()->AttackReaction(mAttacker, (uint32)fAmount, 0);
+		}
+	}
+
 	void OnReachWP(uint32 iWaypointId, bool bForwards)
 	{
-		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+		//_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 		_unit->GetAIInterface()->m_canMove = false;
+		_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
 	}
 	inline WayPoint* CreateWaypoint(int id, uint32 waittime, uint32 flags)
 	{
@@ -752,6 +759,11 @@ public:
 		spells[0].attackstoptimer = 4500;
 
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_RANGED);
+		_unit->GetAIInterface()->m_canRangedAttack = true;
+
+		Unit *target = GetAttackTarget();
+		if (target)
+			_unit->GetAIInterface()->AttackReaction(target, 0, 0);
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -829,6 +841,28 @@ public:
 				comulativeperc += spells[i].perctrigger;
 			}
 		}
+	}
+	Unit *GetAttackTarget()
+	{
+		Unit *target;
+		float range = 1000000;
+		if (_unit->GetInRangePlayersCount() == 0)
+			return NULL;
+
+		TargetMap::iterator itr;
+		for (set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); itr++)
+		{
+			Unit *temp = (Unit*)(*itr);
+			if (temp->isAlive())
+				if (_unit->GetDistance2dSq(temp) < range)
+				{
+					target = temp;
+					range = _unit->GetDistance2dSq(temp);
+				}
+		}
+		if (!target)
+			return NULL;
+		return target;
 	}
 
 protected:
@@ -872,6 +906,9 @@ public:
 		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 1000;
 
+		Unit *target = GetAttackTarget();
+		if (target)
+			_unit->GetAIInterface()->AttackReaction(target, 0, 0);
 
 	}
 
@@ -952,13 +989,35 @@ public:
 		}
 	}
 
+	Unit *GetAttackTarget()
+	{
+		Unit *target;
+		float range = 1000000;
+		if (_unit->GetInRangePlayersCount() == 0)
+			return NULL;
+
+		TargetMap::iterator itr;
+		for (set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); itr++)
+		{
+			Unit *temp = (Unit*)(*itr);
+			if (temp->isAlive())
+				if (_unit->GetDistance2dSq(temp) < range)
+				{
+					target = temp;
+					range = _unit->GetDistance2dSq(temp);
+				}
+		}
+		if (!target)
+			return NULL;
+		return target;
+	}
+
 protected:
 
 	int nrspells;
 };
 
 
-//TODO: Emotes for bossmods
 //Morogrim Tidewalker
 
 #define CN_MOROGRIM 21213
@@ -1058,6 +1117,7 @@ public:
 		}
 		if (!earthquakecd)
 		{
+			//TODO: ADD EMOTE, too much core change @ packet atm
 			_unit->CastSpell(_unit, MOROGRIM_EARTHQUAKE, true);
 			int val = RandomUInt(100)%2;
 			switch (val)
@@ -1178,6 +1238,7 @@ public:
 		{
 			if (GetPlayerCount() >= 5)
 			{
+				_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " sends his enemies to their watery graves!");
 				Player *target1 = (Player *) RandomTarget(false, true, 10000);
 				Player *target2 = (Player *) RandomTarget(false, true, 10000);
 				while(target2 == target1)
@@ -1194,13 +1255,13 @@ public:
 				{
 					target4 = (Player *) RandomTarget(false, true, 10000);
 				}
-				target1->_Relocate(_unit->GetMapId(), LocationVector(366.443512f, -708.822388f, -4.357947f, target1->GetOrientation()), false, false, _unit->GetInstanceID());
+				target1->_Relocate(_unit->GetMapId(), LocationVector(366.443512f, -708.822388f, -12.0f, target1->GetOrientation()), false, false, _unit->GetInstanceID());
 				_unit->CastSpell(target1, MOROGRIM_WATERYGRAVE, true);
-				target2->_Relocate(_unit->GetMapId(), LocationVector(373.805511f, -691.146116f, -4.446006f, target2->GetOrientation()), false, false, _unit->GetInstanceID());
+				target2->_Relocate(_unit->GetMapId(), LocationVector(373.805511f, -691.146116f, -12.0f, target2->GetOrientation()), false, false, _unit->GetInstanceID());
 				_unit->CastSpell(target2, MOROGRIM_WATERYGRAVE, true);
-				target3->_Relocate(_unit->GetMapId(), LocationVector(365.522644f, -737.217712f, -4.444579f, target3->GetOrientation()), false, false, _unit->GetInstanceID());
+				target3->_Relocate(_unit->GetMapId(), LocationVector(365.522644f, -737.217712f, -12.0f, target3->GetOrientation()), false, false, _unit->GetInstanceID());
 				_unit->CastSpell(target3, MOROGRIM_WATERYGRAVE, true);
-				target4->_Relocate(_unit->GetMapId(), LocationVector(337.470581f, -732.931885f, -4.173863f, target4->GetOrientation()), false, false, _unit->GetInstanceID());
+				target4->_Relocate(_unit->GetMapId(), LocationVector(337.470581f, -732.931885f, -12.0f, target4->GetOrientation()), false, false, _unit->GetInstanceID());
 				_unit->CastSpell(target4, MOROGRIM_WATERYGRAVE, true);
 			}
 			waterygravecd = 25 + RandomUInt(100)%10;
@@ -1216,6 +1277,7 @@ public:
 		{
 			if (GetPlayerCount() >= 4)
 			{
+				/*
 				int val = RandomUInt(100)%2;
 				switch (val)
 				{
@@ -1228,6 +1290,8 @@ public:
 					_unit->PlaySoundToSet(11324);
 					break;
 				}
+				*/
+				_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " summons watery globules!");
 				Player *target1 = (Player *) RandomTarget(true, true, 10000);
 				Player *target2 = (Player *) RandomTarget(true, true, 10000);
 				while(target2 == target1)
@@ -2489,17 +2553,16 @@ public:
 			if (_unit->GetHealthPct() <= 15 && m_phase < 3)
 			{
 				if (_unit->GetCurrentSpell())
-				{
 					_unit->GetCurrentSpell()->cancel();
-				}
-				_unit->PlaySoundToSet(11313);
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "No... no! What have you done? I am the master! Do you hear me? I am... aaggh! Can't... contain him");
 				_unit->RemoveAura(LEOTHERAS_WHIRLWIND);
 				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20514);
+				_unit->PlaySoundToSet(11313);
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "No... no! What have you done? I am the master! Do you hear me? I am... aaggh! Can't... contain him");
 				_unit->GetAIInterface()->disable_melee = false;
 				_unit->setAttackTimer(5000, false);
 				m_phase = 3;
 				whirlwindcd = 16;
+				whirlwinding = 0;
 				shadow = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_LEOTHERASSHADOW,_unit->GetPositionX(), _unit->GetPositionY(),_unit->GetPositionZ(), _unit->GetOrientation(),true, false, 0, 0);
 			}
 			switch (m_phase)
@@ -2518,25 +2581,26 @@ public:
 	}
 	void PhaseOne()
 	{
+		phasecd--;
 		if (!phasecd)
 		{
 			m_phase = 2;
 			_unit->RemoveAura(LEOTHERAS_WHIRLWIND);
+			_unit->GetAIInterface()->StopMovement(0);
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20125);
 			_unit->GetAIInterface()->disable_melee = true;
 			_unit->GetAIInterface()->WipeHateList();
 			_unit->PlaySoundToSet(11304);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Be gone, trifling elf. I am in control now.");
 			phasecd = 60;
-			chaosblastcd = 0;
-			innerdemonscd = 20;
+			innerdemonscd = 10;
 			innerdemons = 0;
 		}
 		else 
 		{
+			whirlwindcd--;
 			if (!whirlwinding)
 			{
-				whirlwindcd--;
 				if (!whirlwindcd)
 				{
 					_unit->CastSpell(_unit, LEOTHERAS_WHIRLWIND, true);
@@ -2544,7 +2608,6 @@ public:
 					Unit *target = RandomTarget(true, true, 10000);
 					if (target)
 						_unit->GetAIInterface()->_CalcDestinationAndMove(target, 2);
-					whirlwindcd = 16;
 					whirlwinding = 1;
 				}
 			}
@@ -2565,29 +2628,31 @@ public:
 					break;
 				case 13:
 					whirlwinding = 0;
-					_unit->GetAIInterface()->StopMovement(0);
+					whirlwindcd = 16;
 					_unit->GetAIInterface()->disable_melee = false;
 					_unit->GetAIInterface()->WipeHateList();
+					_unit->GetAIInterface()->StopMovement(0);
 					break;
 				}
 			}
-			phasecd--;
 		}
 	}
 	void PhaseTwo()
 	{
+		phasecd--;
+		innerdemonscd--;
 		if (!phasecd)
 		{
 
 			m_phase = 1;
 			if (_unit->GetCurrentSpell())
-			{
 				_unit->GetCurrentSpell()->cancel();
-			}
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20514);
 			_unit->GetAIInterface()->disable_melee = false;
 			_unit->GetAIInterface()->WipeHateList();
 			phasecd = 45;
+			whirlwindcd = 19;
+			whirlwinding = 0;
 		}
 		else 
 		{
@@ -2639,33 +2704,24 @@ public:
 			}
 			else
 			{
-				if (!chaosblastcd)
+				if(_unit->GetCurrentSpell() == NULL)
 				{
-					if(_unit->GetCurrentSpell() == NULL)
+					Unit *target = _unit->GetAIInterface()->GetNextTarget();
+					LocationVector locvec( target->GetPositionX() , target->GetPositionY() , target->GetPositionZ() );
+					uint32 dist = FL2UINT(_unit->CalcDistance(locvec));
+					if (dist < 40)
 					{
-						Unit *target = _unit->GetAIInterface()->GetNextTarget();
-						LocationVector locvec( target->GetPositionX() , target->GetPositionY() , target->GetPositionZ() );
-						uint32 dist = FL2UINT(_unit->CalcDistance(locvec));
-						if (dist < 40)
-						{
-							_unit->CastSpell(target, LEOTHERAS_CHAOSBLAST, false);
-							chaosblastcd = 2;
-						}
-						else
-						{
-							_unit->GetAIInterface()->_CalcDestinationAndMove(target, 32);
-						}
+						_unit->CastSpell(target, LEOTHERAS_CHAOSBLAST, false);
+					}
+					else
+					{
+						_unit->GetAIInterface()->_CalcDestinationAndMove(target, 32);
 					}
 				}
-				else
-				{
-					chaosblastcd--;
-				}
-				innerdemonscd--;
 			}
-			phasecd--;
 		}
 	}
+
 	void PhaseThree()
 	{
 		if (!whirlwinding)
