@@ -367,7 +367,7 @@ protected:
 
 void SetupZulFarrak(ScriptMgr * mgr)
 {
-	mgr->register_creature_script(8127, &antusulAI::Create);
-	mgr->register_creature_script(7272, &thekaAI::Create);
-	mgr->register_creature_script(133337, &antusulTriggerAI::Create);
+	//mgr->register_creature_script(8127, &antusulAI::Create);
+	//mgr->register_creature_script(7272, &thekaAI::Create);
+	//mgr->register_creature_script(133337, &antusulTriggerAI::Create);
 }
