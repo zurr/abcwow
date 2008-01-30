@@ -2312,7 +2312,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 	if( c != NULL )
 	{
-		bonus += m_target->HealTakenMod[m_spellProto->School] + (amount * c->HealDonePctMod[m_spellProto->School]) / 100;
+		bonus += m_target->HealTakenMod[m_spellProto->School];
 	}
 
 	if( c != NULL && m_spellProto->SpellGroupType )
@@ -2374,7 +2374,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	int add = ( bonus + amount > 0 ) ? bonus + amount : 0;
 	if( c != NULL )
 		add += float2int32( add * ( m_target->HealTakenPctMod[m_spellProto->School]+ c->HealDonePctMod[GetSpellProto()->School] / 100.0f));
-	
+
 	uint32 newHealth = m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) + (uint32)add;
 	
 	if( newHealth <= m_target->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) )

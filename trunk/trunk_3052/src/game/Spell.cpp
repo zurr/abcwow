@@ -3914,8 +3914,7 @@ void Spell::Heal(int32 amount)
 			healdoneaffectperc *= downrank1 * downrank2;
 		}*/
 
-		//caster sided bonus
-		bonus += u_caster->HealDoneMod[m_spellInfo->School] + (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
+		bonus += u_caster->HealDoneMod[m_spellInfo->School];
 
 		if(m_spellInfo->SpellGroupType)
 		{
@@ -3935,7 +3934,6 @@ void Spell::Heal(int32 amount)
 #endif
 		}
 		bonus += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
-		bonus += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
 
 		if (p_caster)
 		{
@@ -3956,6 +3954,8 @@ void Spell::Heal(int32 amount)
 			unitTarget->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, u_caster, m_spellInfo, amount);
 			u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT, unitTarget, m_spellInfo, amount);
 		}
+
+		amount += float2int32(( u_caster->HealDonePctMod[m_spellInfo->School]/100.0f + unitTarget->HealTakenPctMod[m_spellInfo->School])*amount);
 	}
 
 	if(amount < 0) 
