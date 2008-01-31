@@ -82,7 +82,7 @@ void Arena::OnAddPlayer(Player * plr)
 		}
 	}
 	plr->GetItemInterface()->RemoveAllConjured();
-	plr->ResetAllCooldowns();
+	//plr->ResetAllCooldowns();
 
 	plr->CastSpell(plr, ARENA_PREPARATION, true);
 	UpdatePlayerCounts();
