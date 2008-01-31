@@ -1265,9 +1265,10 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 				Sheep: 64
 				Banish: 128
 				Taunt (applyaura): 256
-				Decrease Speed (hamstring) (applyaura): 512
+				Decrease Speed (Hamstring) (applyaura): 512
 				Spell Haste (Curse of Tongues) (applyaura): 1024
-				Interupt Cast (applyaura): 2048
+				Interupt Cast: 2048
+				Mod Healing % (Mortal Strike) (applyaura):4096
 				*/
 
 				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
@@ -1345,6 +1346,10 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 							break;
 						case SPELL_AURA_MOD_LANGUAGE: //hacky way to prefer that the COT icon is set to mob
 							if (c->proto->modImmunities & 1024)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
+							if (c->proto->modImmunities & 4096)
 								immune = true;
 							break;
 						}
