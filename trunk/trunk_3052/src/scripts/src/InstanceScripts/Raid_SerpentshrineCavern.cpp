@@ -1051,7 +1051,7 @@ public:
 		spells[0].attackstoptimer = 2000;
 
 		m_phase = 1;
-		earthquakecd = 55 + RandomUInt(100)%10;
+		earthquakecd = 50 + RandomUInt(100)%10;
 		waterygravecd = 30 + RandomUInt(100)%5;
 	}
 
@@ -1133,16 +1133,18 @@ public:
 			}
 			Unit *tank = _unit->GetAIInterface()->GetMostHated();
 			Creature *murloc;
+			//MapCell *cell1 = _unit->GetMapMgr()->GetCellByCoords(513.671875f, -724.752747f);
+			//MapCell *cell2 = _unit->GetMapMgr()->GetCellByCoords(259.144714f, -724.210083f);
 			for (int z = 0; z < 7; z++)
 			{
-				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 513.671875f, -724.752747f, -7.144188f, 0, true, false, 0, 0);
+				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 445.17f, 719.20f, -7.14f, 0, true, false, 0, 0);
 				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 				murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
-				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 259.144714f, -724.210083f, -3.336553f, 0, true, false, 0, 0);
+				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 314.42f, 729.91f, -13.15f, 0, true, false, 0, 0);
 				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 				murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			}
-			earthquakecd = 55 + RandomUInt(100)%10;
+			earthquakecd = 50 + RandomUInt(100)%10;
 		}
 		else
 		{
@@ -1228,16 +1230,16 @@ public:
 				{
 					target4 = (Player *) RandomTarget(false, true, 10000);
 				}
-				target1->SafeTeleport(target1->GetMapId(), target1->GetInstanceID(), 366.443512f, -708.822388f, -12.0f, target1->GetOrientation());
+				target1->SafeTeleport(target1->GetMapId(), target1->GetInstanceID(), 366.443512f, -708.822388f, -13.0f, target1->GetOrientation());
 				//target1->_Relocate(_unit->GetMapId(), LocationVector(366.443512f, -708.822388f, -12.0f, target1->GetOrientation()), false, false, _unit->GetInstanceID());
 				target1->CastSpell(target1, MOROGRIM_WATERYGRAVE, true);
-				target2->SafeTeleport(target2->GetMapId(), target2->GetInstanceID(), 373.805511f, -691.146116f, -12.0f, target2->GetOrientation());
+				target2->SafeTeleport(target2->GetMapId(), target2->GetInstanceID(), 373.805511f, -691.146116f, -13.0f, target2->GetOrientation());
 				//target2->_Relocate(_unit->GetMapId(), LocationVector(373.805511f, -691.146116f, -12.0f, target2->GetOrientation()), false, false, _unit->GetInstanceID());
 				target2->CastSpell(target2, MOROGRIM_WATERYGRAVE, true);
-				target3->SafeTeleport(target3->GetMapId(), target3->GetInstanceID(), 365.522644f, -737.217712f, -12.0f, target3->GetOrientation());
+				target3->SafeTeleport(target3->GetMapId(), target3->GetInstanceID(), 365.522644f, -737.217712f, -13.0f, target3->GetOrientation());
 				//target3->_Relocate(_unit->GetMapId(), LocationVector(365.522644f, -737.217712f, -12.0f, target3->GetOrientation()), false, false, _unit->GetInstanceID());
 				target3->CastSpell(target3, MOROGRIM_WATERYGRAVE, true);
-				target4->SafeTeleport(target4->GetMapId(), target4->GetInstanceID(), 337.470581f, -732.931885f, -12.0f, target4->GetOrientation());
+				target4->SafeTeleport(target4->GetMapId(), target4->GetInstanceID(), 337.470581f, -732.931885f, -13.0f, target4->GetOrientation());
 				//target4->_Relocate(_unit->GetMapId(), LocationVector(337.470581f, -732.931885f, -12.0f, target4->GetOrientation()), false, false, _unit->GetInstanceID());
 				target4->CastSpell(target4, MOROGRIM_WATERYGRAVE, true);
 			}
