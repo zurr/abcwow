@@ -921,7 +921,7 @@ void WorldSession::HandleBugOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 {
-	if(_player->isAlive())
+	if(_player == NULL || _player->isAlive())
 		return;
 
 	sLog.outDetail("WORLD: Received CMSG_RECLAIM_CORPSE");
@@ -943,10 +943,9 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 		return;
 	}
 
-	if(GetPlayer()->m_bg)
-		GetPlayer()->RemoveAura(2584);
-	GetPlayer()->ResurrectPlayer();
-	GetPlayer()->SetUInt32Value(UNIT_FIELD_HEALTH, GetPlayer()->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/2 );
+	_player->RemoveAura(2584);
+	_player->ResurrectPlayer();
+	_player->SetUInt32Value(UNIT_FIELD_HEALTH, _player->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/2 );
 }
 
 void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
