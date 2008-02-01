@@ -1275,42 +1275,44 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 				if (c->proto && c->proto->modImmunities)
 				{
 					bool immune;
-					switch(m_spellInfo->MechanicsType)
+					if (m_spellInfo->MechanicsType)
 					{
-					case MECHANIC_CHARMED:
-						if (c->proto->modImmunities & 1)
-							immune = true;
-						break;
-					case MECHANIC_DISORIENTED:
-						if (c->proto->modImmunities & 2)
-							immune = true;
-						break;
-					case MECHANIC_FLEEING:
-						if (c->proto->modImmunities & 4)
-							immune = true;
-						break;
-					case MECHANIC_ROOTED:
-						if (c->proto->modImmunities & 8)
-							immune = true;
-						break;
-					case MECHANIC_SILENCED:
-						if ( c->proto->modImmunities & 16)
-							immune = true;
-						break;
-					case MECHANIC_STUNNED:
-						if (c->proto->modImmunities & 32)
-							immune = true;
-						break;
-					case MECHANIC_POLYMORPHED:
-						if (2 & c->proto->modImmunities & 64)
-							immune = true;
-						break;
-					case MECHANIC_BANISHED:
-						if (c->proto->modImmunities & 128)
-							immune = true;
-						break;
+						switch(m_spellInfo->MechanicsType)
+						{
+						case MECHANIC_CHARMED:
+							if (c->proto->modImmunities & 1)
+								immune = true;
+							break;
+						case MECHANIC_DISORIENTED:
+							if (c->proto->modImmunities & 2)
+								immune = true;
+							break;
+						case MECHANIC_FLEEING:
+							if (c->proto->modImmunities & 4)
+								immune = true;
+							break;
+						case MECHANIC_ROOTED:
+							if (c->proto->modImmunities & 8)
+								immune = true;
+							break;
+						case MECHANIC_SILENCED:
+							if ( c->proto->modImmunities & 16)
+								immune = true;
+							break;
+						case MECHANIC_STUNNED:
+							if (c->proto->modImmunities & 32)
+								immune = true;
+							break;
+						case MECHANIC_POLYMORPHED:
+							if (2 & c->proto->modImmunities & 64)
+								immune = true;
+							break;
+						case MECHANIC_BANISHED:
+							if (c->proto->modImmunities & 128)
+								immune = true;
+							break;
+						}
 					}
-
 					if (!immune)
 					{
 						// Spells wich do more than just one thing (damage and the effect) dont have a mechanic and we should only cancel the aura to be placed
