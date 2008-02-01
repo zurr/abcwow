@@ -30,7 +30,7 @@
 #define CN_CARRION_SPINNER 15975
 
 #define POISON_BOLT 26052
-#define WEB_WRAP 28618 // TODO: PULL EFFECT *FUN*
+#define WEB_WRAP 28622 // TODO: PULL EFFECT *FUN*
 
 class CarrionSpinnerAI : public CreatureAIScript
 {
@@ -645,7 +645,7 @@ protected:
 // Maexxna AI *BOSS*
 #define CN_MAEXXNA 15952
 
-#define WEB_WRAP_MAEXX 28619 // 1 target
+#define WEB_WRAP_MAEXX 28622 // 1 target
 #define WEB_SPRAY 29484 // various
 #define POISON_SHOCK 28741 // various
 #define NECROTIC_POISON 28776 // 1 target

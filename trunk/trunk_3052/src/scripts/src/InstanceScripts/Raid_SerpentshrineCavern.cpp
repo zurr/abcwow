@@ -2584,6 +2584,7 @@ public:
 				{
 					_unit->CastSpell(_unit, LEOTHERAS_WHIRLWIND, true);
 					_unit->GetAIInterface()->disable_melee = true;
+					_unit->GetAIInterface()->m_moveRun = false;
 					Unit *target = RandomTarget(true, true, 10000);
 					if (target)
 						_unit->GetAIInterface()->_CalcDestinationAndMove(target, 2);
@@ -2609,6 +2610,7 @@ public:
 					whirlwinding = 0;
 					whirlwindcd = 20;
 					_unit->GetAIInterface()->disable_melee = false;
+					_unit->GetAIInterface()->m_moveRun = true;
 					_unit->GetAIInterface()->WipeHateList();
 					_unit->GetAIInterface()->StopMovement(0);
 					break;
