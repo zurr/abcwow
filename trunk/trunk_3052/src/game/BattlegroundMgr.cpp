@@ -512,9 +512,11 @@ CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 
 	m_countdownStage = 0;
 	m_ended = false;
 	m_winningteam = 0;
+	m_A_spirithealer_guid = 0;
+	m_H_spirithealer_guid = 0;
 	m_startTime = (uint32)UNIXTIME;
 	m_lastResurrect = (uint32)UNIXTIME;
-	sEventMgr.AddEvent(this, &CBattleground::EventResurrectPlayers, EVENT_BATTLEGROUND_QUEUE_UPDATE, 30000, 0,0);
+	sEventMgr.AddEvent(this, &CBattleground::EventResurrectPlayers, EVENT_BATTLEGROUND_QUEUE_UPDATE, 40000, 0,0);
 
 	/* create raid groups */
 	/*for(uint32 i = 0; i < 2; ++i)
@@ -1256,6 +1258,10 @@ Creature * CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, u
 
 	pCreature->DisableAI();
 	pCreature->PushToWorld(m_mapMgr);
+
+	if (horde) this->m_H_spirithealer_guid = (uint32)pCreature->GetGUID();
+	else this->m_A_spirithealer_guid = (uint32)pCreature->GetGUID();
+
 	return pCreature;
 }
 
@@ -1322,6 +1328,7 @@ void CBattleground::EventResurrectPlayers()
 					<< plr->GetGUID();
 				plr->SendMessageToSet(&data, true);
 
+				plr->RemoveAura(2584);
 				plr->ResurrectPlayer();
 				plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 				plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
