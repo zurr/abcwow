@@ -1133,14 +1133,12 @@ public:
 			}
 			Unit *tank = _unit->GetAIInterface()->GetMostHated();
 			Creature *murloc;
-			//MapCell *cell1 = _unit->GetMapMgr()->GetCellByCoords(513.671875f, -724.752747f);
-			//MapCell *cell2 = _unit->GetMapMgr()->GetCellByCoords(259.144714f, -724.210083f);
 			for (int z = 0; z < 7; z++)
 			{
-				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 445.17f, 719.20f, -7.14f, 0, true, false, 0, 0);
+				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 445.17f, -719.20f, -7.14f, 0, true, false, 0, 0);
 				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 				murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
-				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 314.42f, 729.91f, -13.15f, 0, true, false, 0, 0);
+				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 314.42f, -729.91f, -13.15f, 0, true, false, 0, 0);
 				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 				murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			}
@@ -1209,6 +1207,7 @@ public:
 
 	void PhaseOne()
 	{
+		waterygravecd--;
 		if (!waterygravecd)
 		{
 			if (GetPlayerCount() >= 5)
@@ -1245,13 +1244,10 @@ public:
 			}
 			waterygravecd = 30 + RandomUInt(100)%5;
 		}
-		else
-		{
-			waterygravecd--;
-		}
 	}
 	void PhaseTwo()
 	{
+		waterglobulecd--;
 		if (!waterglobulecd)
 		{
 			if (GetPlayerCount() >= 4)
@@ -1297,10 +1293,6 @@ public:
 				summon4->GetAIInterface()->AttackReaction(target4, 100000, 0);
 			}
 			waterglobulecd = 25 + RandomUInt(100)%10;
-		}
-		else
-		{
-			waterglobulecd--;
 		}
 	}
 
@@ -1883,7 +1875,7 @@ protected:
 
 #define SHARKKIS_VIPERSTING 39413
 #define SHARKKIS_BEASTWITHIN 38373
-#define SHARKKIS_MULTISHOT 34879
+#define SHARKKIS_MULTISHOT 41187
 
 class SHARKKISAI : public CreatureAIScript
 {
