@@ -3860,6 +3860,16 @@ void Player::RepopRequestedPlayer()
 		RepopAtGraveyard(GetPositionX(),GetPositionY(),GetPositionZ(),GetMapId());
 	}
 	
+	if(m_bg != NULL) // add to ress queue in BG
+	{
+		Creature * psg = GetMapMgr()->GetCreature((GetTeam()? m_bg->m_A_spirithealer_guid : m_bg->m_H_spirithealer_guid));
+		if(psg == NULL)
+			return;
+
+		m_bg->QueuePlayerForResurrect(this, psg);
+		CastSpell(this,2584,true);
+	}
+
 	if( corpse )
 	{
 		SpawnCorpseBody();

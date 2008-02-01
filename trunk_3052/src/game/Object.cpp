@@ -1932,7 +1932,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			//bool isCritter = (pVictim->GetCreatureName() != NULL)? pVictim->GetCreatureName()->Type : 0;
 
 			//-----------------------------------LOOOT--------------------------------------------
-			if ((!pVictim->IsPet())&& (!pVictim->IsPlayer()) && ( !isCritter ))
+			if ((!pVictim->IsPet()) && ( !isCritter ))
 			{
 				Creature * victim = static_cast<Creature*>(pVictim);
 				// fill loot vector.

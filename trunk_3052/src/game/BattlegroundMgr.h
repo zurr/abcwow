@@ -189,6 +189,8 @@ protected:
 	uint32 m_levelGroup;
 
 public:
+	uint32 m_A_spirithealer_guid;
+	uint32 m_H_spirithealer_guid;
 	/* Team->Player Map */
 	set<Player*> m_players[2];
 	void Lock() { m_mainLock.Acquire(); }

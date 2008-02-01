@@ -943,7 +943,8 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 		return;
 	}
 
-
+	if(GetPlayer()->m_bg)
+		GetPlayer()->RemoveAura(2584);
 	GetPlayer()->ResurrectPlayer();
 	GetPlayer()->SetUInt32Value(UNIT_FIELD_HEALTH, GetPlayer()->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/2 );
 }
