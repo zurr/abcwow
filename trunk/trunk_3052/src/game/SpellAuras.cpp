@@ -2074,7 +2074,8 @@ void Aura::SpellAuraDummy(bool apply)
 			if(pCreature==NULL || pTarget->m_bg==NULL)
 				return;
 
-			pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
+			if(pTarget->isDead())
+				pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
 		}break;
 
 	}
