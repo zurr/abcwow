@@ -5077,13 +5077,26 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 				data << (uint32)1;
 				data << aur->GetSpellId();
 				m_caster->SendMessageToSet(&data,true);
-				Aura *aura = new Aura(aur->GetSpellProto(), aur->GetDuration(), u_caster, u_caster);
-				if (aura->GetDuration() > 120000)
-					aura->SetDuration(120000);
-				u_caster->AddAura(aura);
+				uint32 dur = aur->GetDuration();
+				if (dur > 120000)
+					dur = 120000;
+				u_caster->CastSpell(u_caster, aur->GetSpellProto(), true);
 				unitTarget->RemoveAura(aur);
+				Aura *aura = u_caster->FindAura(aur->GetSpellId());
+				if (aura)
+				{
+					aura->SetDuration(dur);
+					sEventMgr.ModifyEventTimeLeft(aura, EVENT_AURA_REMOVE, dur);
+					if(u_caster->IsPlayer())
+					{
+						WorldPacket data(5);
+						data.SetOpcode(SMSG_UPDATE_AURA_DURATION);
+						data << (uint8)(aura)->GetAuraSlot() << dur;
+						((Player*)u_caster)->GetSession()->SendPacket(&data);
+					}
+				}
 				return;
-			}			
+			}
 		}
 	}   
 }

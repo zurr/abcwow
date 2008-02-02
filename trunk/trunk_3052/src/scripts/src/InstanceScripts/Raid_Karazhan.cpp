@@ -1678,7 +1678,7 @@ public:
 	void AIUpdate()
 	{
 		summonImp++;
-		if (summonImp > 1) //its already nerfed (hope enough)
+		if (summonImp > 2) //its already nerfed (hope enough)
 		{
 			SummonImp();
 			summonImp = 0;
@@ -1827,8 +1827,7 @@ class FiendishImpAI : public CreatureAIScript
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 			RemoveAIUpdateEvent();
-			if(_unit)
-			_unit->SafeDelete();
+			_unit->Despawn(100, 0);
 		}
 
 		void OnDied(Unit * mKiller)
