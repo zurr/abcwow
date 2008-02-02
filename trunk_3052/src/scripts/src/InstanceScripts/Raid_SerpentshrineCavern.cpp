@@ -2526,10 +2526,11 @@ public:
 				if (_unit->GetCurrentSpell())
 					_unit->GetCurrentSpell()->cancel();
 				_unit->RemoveAura(LEOTHERAS_WHIRLWIND);
+				_unit->GetAIInterface()->m_moveRun = true;
+				_unit->GetAIInterface()->disable_melee = false;
 				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20514);
 				_unit->PlaySoundToSet(11313);
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "No... no! What have you done? I am the master! Do you hear me? I am... aaggh! Can't... contain him");
-				_unit->GetAIInterface()->disable_melee = false;
 				_unit->setAttackTimer(5000, false);
 				m_phase = 3;
 				whirlwindcd = 22;
@@ -2704,6 +2705,7 @@ public:
 			{
 				_unit->CastSpell(_unit, LEOTHERAS_WHIRLWIND, true);
 				_unit->GetAIInterface()->disable_melee = true;
+				_unit->GetAIInterface()->m_moveRun = false;
 				Unit *target = RandomTarget(true, true, 10000);
 				if (target)
 					_unit->GetAIInterface()->_CalcDestinationAndMove(target, 2);
@@ -2729,6 +2731,7 @@ public:
 			case 13:
 				whirlwinding = 0;
 				_unit->GetAIInterface()->disable_melee = false;
+				_unit->GetAIInterface()->m_moveRun = true;
 				_unit->GetAIInterface()->WipeHateList();
 				break;
 			}
