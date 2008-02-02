@@ -516,7 +516,7 @@ CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 
 	m_H_spirithealer_guid = 0;
 	m_startTime = (uint32)UNIXTIME;
 	m_lastResurrect = (uint32)UNIXTIME;
-	sEventMgr.AddEvent(this, &CBattleground::EventResurrectPlayers, EVENT_BATTLEGROUND_QUEUE_UPDATE, 35000, 0,0);
+	sEventMgr.AddEvent(this, &CBattleground::EventResurrectPlayers, EVENT_BATTLEGROUND_QUEUE_UPDATE, 30000, 0,0);
 
 	/* create raid groups */
 	/*for(uint32 i = 0; i < 2; ++i)
@@ -1415,6 +1415,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 					return;
 				}
 
+				/*
 				if((*itx)->m_loggedInPlayer)
 				{
 					if((*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bgIsQueued)
@@ -1426,6 +1427,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 
 					--maxplayers;
 				}
+				*/
 			}
 			WorldPacket data(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
 			data << uint32(6);		// all arenas
