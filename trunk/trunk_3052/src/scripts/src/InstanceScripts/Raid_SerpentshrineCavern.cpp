@@ -2661,18 +2661,22 @@ public:
 					Creature *summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target1->GetPositionX(), target1->GetPositionY(), target1->GetPositionZ(), target1->GetOrientation(), true, false, 0, 0);
 					summon1->GetAIInterface()->SetSoulLinkedWith(target1);
 					summon1->GetAIInterface()->AttackReaction( target1, 10000, 0);
+
 					Creature *summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target2->GetPositionX(), target2->GetPositionY(), target2->GetPositionZ(), target2->GetOrientation(), true, false, 0, 0);
 					summon2->GetAIInterface()->SetSoulLinkedWith(target2);
 					summon2->GetAIInterface()->AttackReaction( target2, 10000, 0);
+
 					Creature *summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target3->GetPositionX(), target3->GetPositionY(), target3->GetPositionZ(), target3->GetOrientation(), true, false, 0, 0);
 					summon3->GetAIInterface()->SetSoulLinkedWith(target3);
 					summon3->GetAIInterface()->AttackReaction( target3, 10000, 0);
+
 					Creature *summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target4->GetPositionX(), target4->GetPositionY(), target4->GetPositionZ(), target4->GetOrientation(), true, false, 0, 0);
 					summon4->GetAIInterface()->SetSoulLinkedWith(target4);
 					summon4->GetAIInterface()->AttackReaction( target4, 10000, 0);
+
 					Creature *summon5 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target5->GetPositionX(), target5->GetPositionY(), target5->GetPositionZ(), target5->GetOrientation(), true, false, 0, 0);
 					summon5->GetAIInterface()->SetSoulLinkedWith(target5);
-					summon5->GetAIInterface()->AttackReaction( target5, 100000, 0);
+					summon5->GetAIInterface()->AttackReaction( target5, 10000, 0);
 				}
 				innerdemons = 1;
 			}

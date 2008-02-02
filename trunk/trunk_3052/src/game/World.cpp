@@ -1646,17 +1646,6 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[1]=0;
 		sp->EffectImplicitTargetB[2]=0;
 	}
-	// Drums of Panic targets sorounding creatures instead of us
-	sp = dbcSpell.LookupEntryForced( 35474 );
-	if( sp != NULL )
-	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
-	}
 	// Drums of Restoration targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 35478 );
 	if( sp != NULL )
