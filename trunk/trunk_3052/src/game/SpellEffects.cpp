@@ -1304,7 +1304,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 								immune = true;
 							break;
 						case MECHANIC_POLYMORPHED:
-							if (2 & c->proto->modImmunities & 64)
+							if (c->proto->modImmunities & 64)
 								immune = true;
 							break;
 						case MECHANIC_BANISHED:
