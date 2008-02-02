@@ -4466,12 +4466,15 @@ void Aura::SpellAuraTransform(bool apply)
 				else
 				{
 					m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
-					if (m_target->IsPlayer() && m_target->getRace() == RACE_TAUREN)
-						m_target->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.3f);
+					if (m_target->GetTypeId() == TYPE_PLAYER)
+					{
+						if (m_target->getRace() == RACE_TAUREN)
+							m_target->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.3f);
+					}
 					else
 					{
 						Creature *c = (Creature*)(m_target);
-						if (c && c->proto)
+						if (c && c->proto && c->proto->Scale)
 							c->SetFloatValue(OBJECT_FIELD_SCALE_X, c->proto->Scale);
 					}
 					m_target->polySpell = 0;
