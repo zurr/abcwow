@@ -1678,7 +1678,7 @@ public:
 	void AIUpdate()
 	{
 		summonImp++;
-		if (summonImp > 3) //its already nerfed (hope enough)
+		if (summonImp > 1) //its already nerfed (hope enough)
 		{
 			SummonImp();
 			summonImp = 0;
@@ -2798,6 +2798,7 @@ void SetupKarazhan(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_SHADEOFARAN, &SHADEOFARANAI::Create);
 	mgr->register_creature_script(CN_ILLHOOF, &ILLHOOFAI::Create);
 	mgr->register_creature_script(CN_KIL_REK, &KILREKAI::Create);
+	mgr->register_creature_script(CN_FIENDISH_IMP, &FiendishImpAI::Create);
 	mgr->register_creature_script(CN_MALCHEZAAR, &MALCHEZAARAI::Create);
 	mgr->register_creature_script(CN_NETHERSPITE, &NETHERSPITEAI::Create);
 	mgr->register_creature_script(CN_NIGHTBANE, &NIGHTBANEAI::Create);

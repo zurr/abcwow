@@ -1342,7 +1342,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 							if (c->proto->modImmunities & 512)
 								immune = true;
 							break;
-						case SPELL_AURA_MOD_CASTING_SPEED:
+						case SPELL_AURA_INCREASE_CASTING_TIME_PCT:
 							if (c->proto->modImmunities & 1024)
 								immune = true;
 							break;
@@ -5077,7 +5077,9 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 				data << (uint32)1;
 				data << aur->GetSpellId();
 				m_caster->SendMessageToSet(&data,true);
-				Aura *aura = new Aura(aur->GetSpellProto(), (aur->GetDuration()>120000) ? 120000 : aur->GetDuration(), u_caster, u_caster);
+				Aura *aura = new Aura(aur->GetSpellProto(), aur->GetDuration(), u_caster, u_caster);
+				if (aura->GetDuration() > 120000)
+					aura->SetDuration(120000);
 				u_caster->AddAura(aura);
 				unitTarget->RemoveAura(aur);
 				return;
