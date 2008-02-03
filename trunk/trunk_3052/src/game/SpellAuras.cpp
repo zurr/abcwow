@@ -4450,7 +4450,7 @@ void Aura::SpellAuraTransform(bool apply)
 				if(apply)
 				{
 					m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, displayId);
-					m_target->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
+					//m_target->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
 
 					// remove the current spell (for channelers)
 					if(m_target->m_currentSpell && m_target->GetGUID() != m_casterGuid && 
@@ -4466,6 +4466,8 @@ void Aura::SpellAuraTransform(bool apply)
 				else
 				{
 					m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
+
+					/* //if (m_target && m_target->IsPlayer())
 					if (m_target->GetTypeId() == TYPE_PLAYER)
 					{
 						if (m_target->getRace() == RACE_TAUREN)
@@ -4477,6 +4479,7 @@ void Aura::SpellAuraTransform(bool apply)
 						if (c && c->proto && c->proto->Scale)
 							c->SetFloatValue(OBJECT_FIELD_SCALE_X, c->proto->Scale);
 					}
+					*/
 					m_target->polySpell = 0;
 				}
 			}break;
