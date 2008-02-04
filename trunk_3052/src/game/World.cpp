@@ -1646,6 +1646,17 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[1]=0;
 		sp->EffectImplicitTargetB[2]=0;
 	}
+ 	// Drums of Panic targets sorounding creatures instead of us
+ 	sp = dbcSpell.LookupEntryForced( 35474 );
+ 	if( sp != NULL )
+ 	{
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
+ 	}
 	// Drums of Restoration targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 35478 );
 	if( sp != NULL )
@@ -1667,6 +1678,17 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[0]=0;
 		sp->EffectImplicitTargetB[1]=0;
 		sp->EffectImplicitTargetB[2]=0;
+	}
+	// Netherweave Net roots target instead of self
+	sp = dbcSpell.LookupEntryForced( 31368 );
+	if( sp != NULL )
+	{
+		sp->EffectImplicitTargetA[0] = 0;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
 
 	//paladin - Blessing of Light. Changed to scripted because it needs to mod target and should not influence holy nova
