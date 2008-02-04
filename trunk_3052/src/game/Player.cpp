@@ -3860,8 +3860,10 @@ void Player::RepopRequestedPlayer()
 		RepopAtGraveyard(GetPositionX(),GetPositionY(),GetPositionZ(),GetMapId());
 	}
 	
-	if(m_bg != NULL) // add to ress queue in BG
+	if(m_bg != NULL && !(m_bg->GetType()>=BATTLEGROUND_ARENA_2V2 && m_bg->GetType()<=BATTLEGROUND_ARENA_5V5)) // add to ress queue in BG
 	{
+		if (!m_bg->m_A_spirithealer_guid || !m_bg->m_H_spirithealer_guid)
+			return;
 		Creature * psg = GetMapMgr()->GetCreature((GetTeam()? m_bg->m_A_spirithealer_guid : m_bg->m_H_spirithealer_guid));
 		if(psg == NULL)
 			return;

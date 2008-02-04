@@ -1274,7 +1274,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
 				if (c->proto && c->proto->modImmunities)
 				{
-					bool immune;
+					bool immune = false;
 					if (m_spellInfo->MechanicsType)
 					{
 						switch(m_spellInfo->MechanicsType)
@@ -1313,7 +1313,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 							break;
 						}
 					}
-					else if (!immune)
+					else
 					{
 						// Spells wich do more than just one thing (damage and the effect) dont have a mechanic and we should only cancel the aura to be placed
 						switch (m_spellInfo->EffectApplyAuraName[i])
