@@ -1678,7 +1678,7 @@ public:
 	void AIUpdate()
 	{
 		summonImp++;
-		if (summonImp > 2) //its already nerfed (hope enough)
+		if (summonImp >= 10) //its already nerfed (hope enough)
 		{
 			SummonImp();
 			summonImp = 0;
