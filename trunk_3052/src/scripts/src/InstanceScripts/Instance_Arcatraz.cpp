@@ -4890,21 +4890,18 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(SEED_OF_CORRUPTION);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
-		spells[0].cooldown = -1;
 		spells[0].perctrigger = 6.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(SHADOW_NOVA);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = false;
-		spells[1].cooldown = -1;
 		spells[1].perctrigger = 15.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(VOID_ZONE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = false;
-		spells[2].cooldown = -1;
 		spells[2].perctrigger = 9.0f;
 		spells[2].attackstoptimer = 1000;
 

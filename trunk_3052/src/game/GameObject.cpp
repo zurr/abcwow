@@ -473,7 +473,7 @@ void GameObject::DeleteFromDB()
 void GameObject::EventCloseDoor()
 {
 	SetUInt32Value(GAMEOBJECT_STATE, 1);
-	if(m_spawn)
+	if(m_spawn && m_spawn->flags)
 		SetUInt32Value(GAMEOBJECT_FLAGS, m_spawn->flags);
 	else
 		SetUInt32Value(GAMEOBJECT_FLAGS, 0);
