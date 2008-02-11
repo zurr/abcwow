@@ -297,6 +297,8 @@ void DayWatcherThread::update_arena()
 		delete result;
 	}
 
+	objmgr.UpdateArenaTeamWeekly();
+
 	//===========================================================================
 	last_arena_time = UNIXTIME;
 	dupe_tm_pointer(localtime(&last_arena_time), &local_last_arena_time);
