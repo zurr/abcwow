@@ -3098,9 +3098,11 @@ void Unit::AddAura(Aura *aur)
 							data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
 							((Player*)this)->GetSession()->SendPacket(&data);
 						}
+						/*
 						data.Initialize(SMSG_PET_LEARNT_SPELL);
 						data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
 						SendMessageToSet(&data,false);
+						*/
 					}
 					if(maxStack <= f)
 					{
@@ -3454,10 +3456,11 @@ bool Unit::SetAurDuration(uint32 spellId,Unit* caster,uint32 duration)
 		((Player*)this)->GetSession()->SendPacket(&data);
 	}
 
+	/*
 	WorldPacket data(SMSG_PET_LEARNT_SPELL,21);
 	data << GetNewGUID() << aur->m_visualSlot << uint32(spellId) << uint32(duration) << uint32(duration);
 	SendMessageToSet(&data,false);
-			
+	*/		
 	return true;
 }
 
@@ -3479,10 +3482,11 @@ bool Unit::SetAurDuration(uint32 spellId,uint32 duration)
 		data << (uint8)(aur)->GetAuraSlot() << duration;
 		((Player*)this)->GetSession()->SendPacket(&data);
 	}
+	/*
 	WorldPacket data(SMSG_PET_LEARNT_SPELL,21);
 	data << GetNewGUID() << aur->m_visualSlot << uint32(spellId) << uint32(duration) << uint32(duration);
 	SendMessageToSet(&data,false);
-
+*/
 
 	return true;
 }
