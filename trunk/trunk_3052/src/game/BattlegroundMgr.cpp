@@ -1259,8 +1259,16 @@ Creature * CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, u
 	pCreature->DisableAI();
 	pCreature->PushToWorld(m_mapMgr);
 
-	if (horde) this->m_H_spirithealer_guid = (uint32)pCreature->GetGUID();
-	else this->m_A_spirithealer_guid = (uint32)pCreature->GetGUID();
+	if (horde)
+	{
+		if(!m_H_spirithealer_guid)
+			m_H_spirithealer_guid = (uint32)pCreature->GetGUID();
+	}
+	else
+	{
+		if(!m_A_spirithealer_guid)
+			m_A_spirithealer_guid = (uint32)pCreature->GetGUID();
+	}
 
 	return pCreature;
 }
