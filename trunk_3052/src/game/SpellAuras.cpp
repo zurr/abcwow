@@ -630,54 +630,17 @@ void Aura::AddAuraVisual()
 	}
 	m_visualSlot = m_target->AddAuraVisual(m_spellProto->Id, 1, IsPositive());
 
-	/*m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, m_spellProto->Id);
-
-	uint8 flagslot = slot >> 3;
-
-	uint32 value = m_target->GetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot));
-
-	uint8 aurapos = (slot & 7) << 2;
-	uint32 value1 = (uint32)AFLAG_SET << aurapos;
-	value |= value1;
-
-	m_target->SetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot), value);
-	
-	uint32 index = (slot / 8);
-	uint32 byte  = (slot % 8);
-
-	uint32 x = 0, y = 0;
-	uint32 val = m_target->GetUInt32Value(UNIT_FIELD_AURALEVELS + index);
-	if(x != 0)
-	{
-		val |= (x << (byte * 8));
-		m_target->SetUInt32Value(UNIT_FIELD_AURALEVELS + index, val);
-	}
-
-	val = m_target->GetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index);
-	if(y != 0)
-	{
-		val |= (y << (byte * 8));
-		m_target->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index, val);
-	}
-	sLog.outDebug("Adding Aura Visual - target: %d , slot: %d , flagslot: %d , flagsvalue: 0x%.4X",m_target->GetGUID(),slot,flagslot,value);*/
-   
-	//  0000 0000 original
-	//  0000 1001 AFLAG_SET
-	//  1111 1111 0xFF
-
-	//uint8 appslot = slot >> 1;
-
 	if( m_target->IsPlayer())
 	{
 		WorldPacket data(SMSG_UPDATE_AURA_DURATION, 5);
 		data << m_visualSlot << (uint32)m_duration;
 		((Player*)m_target)->GetSession()->SendPacket(&data);
 	}
-		/*
-	WorldPacket data(SMSG_PET_LEARNT_SPELL, 21);
+
+	WorldPacket data(SMSG_SET_AURA_SINGLE, 22);
 	data << m_target->GetNewGUID() << m_visualSlot << uint32(m_spellProto->Id) << uint32(m_duration) << uint32(m_duration);
 	m_target->SendMessageToSet(&data,false);
-*/
+
 	m_auraSlot = slot;
 }
 
