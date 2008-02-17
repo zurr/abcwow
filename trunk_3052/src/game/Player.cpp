@@ -3337,6 +3337,9 @@ void Player::RemoveFromWorld()
 // TODO: perhaps item should just have a list of mods, that will simplify code
 void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedown /* = false */, bool skip_stat_apply /* = false  */)
 {
+	if (slot > EQUIPMENT_SLOT_END)
+		return;
+
 	ASSERT( item );
 	ItemPrototype* proto = item->GetProto();
 
