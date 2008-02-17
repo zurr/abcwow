@@ -2291,10 +2291,10 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 	}
 	else if(srcslot >= INVENTORY_SLOT_BAG_END && dstslot < INVENTORY_SLOT_BAG_END) //item was not equiped but we are quiping it now
 	{
-		if(m_pItems[(int)srcslot])		
-			m_pOwner->ApplyItemMods(m_pItems[(int)srcslot], dstslot, false);
+		if(m_pItems[(int)srcslot])
+			m_pOwner->ApplyItemMods(m_pItems[(int)srcslot], srcslot, false);
 		if(m_pItems[(int)dstslot])		
-			m_pOwner->ApplyItemMods(m_pItems[(int)dstslot], srcslot, true);
+			m_pOwner->ApplyItemMods(m_pItems[(int)dstslot], dstslot, true);
 	}
 
 
