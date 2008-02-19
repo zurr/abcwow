@@ -472,7 +472,11 @@ void GameObject::DeleteFromDB()
 
 void GameObject::EventCloseDoor()
 {
-	SetUInt32Value(GAMEOBJECT_STATE, 0);
+	SetUInt32Value(GAMEOBJECT_STATE, 1);
+	if(m_spawn && m_spawn->flags)
+		SetUInt32Value(GAMEOBJECT_FLAGS, m_spawn->flags);
+	else
+		SetUInt32Value(GAMEOBJECT_FLAGS, 0);
 }
 
 void GameObject::UseFishingNode(Player *player)
@@ -696,3 +700,21 @@ bool GameObject::HasLoot()
     return (count>0);
 
 }
+
+uint32 GameObject::GetGOReqSkill()  
+{
+	if(GetEntry() == 180215) return 300;
+
+	if(GetInfo() == NULL)
+		return 0;
+
+	Lock *lock = dbcLock.LookupEntry( GetInfo()->SpellFocus );
+	if(!lock) return 0;
+	for(uint32 i=0;i<5;i++)
+		if(lock->locktype[i] == 2 && lock->minlockskill[i])
+		{
+			return lock->minlockskill[i];
+		}
+	return 0;
+}
+

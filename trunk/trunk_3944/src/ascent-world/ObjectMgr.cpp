@@ -1824,6 +1824,32 @@ void ObjectMgr::LoadSpellFixes()
 	} while(result->NextRow());
 	delete result;
 	Log.Notice("ObjectMgr", "%u spell fixes loaded.", fixed_count);
+
+	/*##########################################################################################*/
+
+	// Loads data from spell_data_extra table
+	QueryResult * result1 = WorldDatabase.Query("SELECT * FROM spell_data_extra");
+	if(result1 == 0) return;
+
+	uint32 override_count = 0;
+	do
+	{
+		Field * fields1 = result1->Fetch();
+		uint32 spell_id = fields1[0].GetUInt32();
+		SpellEntry * sp = dbcSpell.LookupEntry(spell_id);
+		if(sp == 0) 
+			continue;
+
+		if(sp->dmg_bonus == 0)
+		{
+			sp->dmg_bonus = fields1[1].GetUInt32();
+			override_count++;
+		}
+
+	} while (result1->NextRow());
+
+	delete result1;
+	Log.Notice("ObjectMgr", "%u spell data extra loaded.", override_count);
 }
 
 void ObjectMgr::LoadSpellOverride()
@@ -2608,6 +2634,27 @@ void ObjectMgr::UpdateArenaTeamRankings()
 				(*itr)->SaveToDB();
 			}
 			++rank;
+		}
+	}
+	m_arenaTeamLock.Release();
+}
+
+void ObjectMgr::UpdateArenaTeamWeekly()
+{	// reset weekly matches count for all teams and all members
+	m_arenaTeamLock.Acquire();
+	for(uint32 i = 0; i < NUM_ARENA_TEAM_TYPES; ++i)
+	{
+		for(HM_NAMESPACE::hash_map<uint32,ArenaTeam*>::iterator itr = m_arenaTeamMap[i].begin(); itr != m_arenaTeamMap[i].end(); ++itr)
+		{
+			ArenaTeam *team = itr->second;
+			if(team)
+			{
+				team->m_stat_gamesplayedweek = 0;
+				for(uint32 j = 0; j < team->m_memberCount; ++j)
+					team->m_members[j].Played_ThisWeek = 0;
+
+				team->SaveToDB();
+			}
 		}
 	}
 	m_arenaTeamLock.Release();

@@ -608,7 +608,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 	bool can_delete = !bProcInUse; //if this is a nested proc then we should have this set to TRUE by the father proc
 	bProcInUse = true; //locking the proc list
 
-	std::list< uint32 > remove;
 	std::list< struct ProcTriggerSpell >::iterator itr,itr2;
 	for( itr = m_procSpells.begin(); itr != m_procSpells.end(); )  // Proc Trigger Spells for Victim
 	{
@@ -754,6 +753,20 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 				//these are player talents. Fuckem they pull the emu speed down 
 				if( IsPlayer() )
 				{
+					if (itr2->ProcType == 1 && static_cast<Player*>(this)->IsInFeralForm()) 
+					{
+						switch (static_cast<Player*>(this)->GetShapeShift())
+						{
+							case FORM_CAT:
+							case FORM_BEAR:
+							case FORM_DIREBEAR:
+								continue;
+								break;
+							default:
+								break;
+						}
+					}
+
 					uint32 talentlevel = 0;
 					switch( origId )
 					{
@@ -869,8 +882,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
 								if( it != NULL && it->GetProto() )
 								{
-									//class 2 means weapons ;)
-									if( it->GetProto()->Class != 2 )
+									if(it->GetProto()->Class != ITEM_CLASS_WEAPON)
 										continue;
 								}
 								else continue; //no weapon no joy
@@ -1282,7 +1294,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								uint32 AP_owerride = GetAP() + spellInfo->EffectBasePoints[0] + 1;
 								uint32 dmg = static_cast< Player* >( this )->GetMainMeleeDamage( AP_owerride );
 								SpellEntry* sp_for_the_logs = dbcSpell.LookupEntry( spellId );
-								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
 								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
 								//nothing else to be done for this trigger
 								continue;
@@ -3453,15 +3464,19 @@ void Unit::AddAura(Aura *aur)
 						//update duration,the same aura (update the whole stack whenever we cast a new one)
 						m_auras[x]->SetDuration(aur->GetDuration());
 						sEventMgr.ModifyEventTimeLeft(m_auras[x], EVENT_AURA_REMOVE, aur->GetDuration());
-						if(this->IsPlayer())
-						{
-							data.Initialize(SMSG_UPDATE_AURA_DURATION);
-							data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
-							static_cast< Player* >( this )->GetSession()->SendPacket( &data );
-						}
-						data.Initialize(SMSG_PET_LEARNT_SPELL);
-						data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
-						SendMessageToSet(&data,false);
+						if(maxStack <= 1)
+ 						{
+							if(this->IsPlayer())
+							{
+								data.Initialize(SMSG_UPDATE_AURA_DURATION);
+								data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
+								((Player*)this)->GetSession()->SendPacket(&data);
+							}
+							
+							data.Initialize(SMSG_SET_AURA_SINGLE);
+							data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
+							SendMessageToSet(&data,false);
+ 						}
 					}
 					if(maxStack <= f)
 					{
@@ -3821,7 +3836,7 @@ bool Unit::SetAurDuration(uint32 spellId,Unit* caster,uint32 duration)
 		static_cast< Player* >( this )->GetSession()->SendPacket( &data );
 	}
 
-	WorldPacket data(SMSG_PET_LEARNT_SPELL,21);
+	WorldPacket data(SMSG_SET_AURA_SINGLE,21);
 	data << GetNewGUID() << aur->m_visualSlot << uint32(spellId) << uint32(duration) << uint32(duration);
 	SendMessageToSet(&data,false);
 			
@@ -3846,7 +3861,7 @@ bool Unit::SetAurDuration(uint32 spellId,uint32 duration)
 		data << (uint8)(aur)->GetAuraSlot() << duration;
 		static_cast< Player* >( this )->GetSession()->SendPacket( &data );
 	}
-	WorldPacket data(SMSG_PET_LEARNT_SPELL,21);
+	WorldPacket data(SMSG_SET_AURA_SINGLE,21);
 	data << GetNewGUID() << aur->m_visualSlot << uint32(spellId) << uint32(duration) << uint32(duration);
 	SendMessageToSet(&data,false);
 
@@ -3929,7 +3944,7 @@ void Unit::castSpell( Spell * pSpell )
 	pLastSpell = pSpell->m_spellInfo;
 }
 
-int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg)
+int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg, uint32 isDot)
 {
 	int32 plus_damage = 0;
 	Unit* caster = this;
@@ -3953,21 +3968,32 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 //==============================+Spell Damage Bonus Modifications===========================
 //==========================================================================================
 //------------------------------by cast duration--------------------------------------------
-	SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
-	float castaff = float(GetCastTime(sd));
-	if(castaff < 1500) castaff = 1500;
-	else
-		if(castaff > 7000) castaff = 7000;
+	float dmgdoneaffectperc = 1.0f;
+	// exception for spell with both dot and direct dmg - use bonus only for direct dmg for now
+	if (spellInfo->dmg_bonus && ((isDot && spellInfo->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
+		spellInfo->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && spellInfo->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE)
+		|| !isDot))
+	{
+		dmgdoneaffectperc = spellInfo->dmg_bonus/100.0f;
+	}
+	else if (!isDot) // this isnt valid for DoTs
+	{
+		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
+		float castaff = float(GetCastTime(sd));
+		if(castaff < 1500) castaff = 1500;
+		else
+			if(castaff > 7000) castaff = 7000;
 
-	float dmgdoneaffectperc = castaff / 3500;
-
+		dmgdoneaffectperc = castaff / 3500.0f;
+	}
+ 	else
+	{
+		//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
+		float td = float( GetDuration( dbcSpellDuration.LookupEntry( spellInfo->DurationIndex )  ));
+		if( spellInfo->NameHash == SPELL_HASH_MOONFIRE || spellInfo->NameHash == SPELL_HASH_IMMOLATE || spellInfo->NameHash == SPELL_HASH_ICE_LANCE || spellInfo->NameHash == SPELL_HASH_PYROBLAST )
+			dmgdoneaffectperc *= float( 1.0f - ( ( td / 15000.0f ) / ( ( td / 15000.0f ) + dmgdoneaffectperc ) ) );
+	}
 	//------------------------------by downranking----------------------------------------------
-	//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
-
-	float td = float( GetDuration( dbcSpellDuration.LookupEntry( spellInfo->DurationIndex )  ));
-	if( spellInfo->NameHash == SPELL_HASH_MOONFIRE || spellInfo->NameHash == SPELL_HASH_IMMOLATE || spellInfo->NameHash == SPELL_HASH_ICE_LANCE || spellInfo->NameHash == SPELL_HASH_PYROBLAST )
-		dmgdoneaffectperc *= float( 1.0f - ( ( td / 15000.0f ) / ( ( td / 15000.0f ) + dmgdoneaffectperc ) ) );
-
 	if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
 	{
 		float downrank1 = 1.0f;

@@ -129,7 +129,8 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 	}
 
 	// Hook for Scripted Areatriggers
-	_player->GetMapMgr()->HookOnAreaTrigger(_player, id);
+	if (_player->GetMapMgr())
+		_player->GetMapMgr()->HookOnAreaTrigger(_player, id);
 
 	switch(pAreaTrigger->Type)
 	{

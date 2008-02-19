@@ -2645,6 +2645,7 @@ uint8 Spell::CanCast(bool tolerate)
 			}
 		}
 
+		/*
 		// check for duel areas
 		if( m_spellInfo->Id == 7266)
 		{
@@ -2652,7 +2653,7 @@ uint8 Spell::CanCast(bool tolerate)
 			if( at->AreaFlags & AREA_CITY_AREA )
 				return SPELL_FAILED_NO_DUELING;
 		}
-
+		*/
 		// check if spell is allowed while player is on a taxi
 		if( p_caster->m_onTaxi )
 		{
@@ -4017,16 +4018,22 @@ void Spell::Heal(int32 amount)
 	float healdoneaffectperc = 0;
 	if( u_caster != NULL )
 	{
-		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
-
-		// affect the plus damage by duration
-		float castaff = float(GetCastTime(sd));
-		if(castaff > 3500) 
-            castaff = 3500;
-		else if(castaff < 1500) 
-            castaff = 1500;
-
-		healdoneaffectperc = castaff / 3500.0f;
+		if(!m_spellInfo->dmg_bonus)
+		{
+			SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
+			// affect the plus damage by duration
+			float castaff = float(GetCastTime(sd));
+			if(castaff > 3500) 
+				castaff = 3500;
+			else if(castaff < 1500) 
+				castaff = 1500;
+ 
+			healdoneaffectperc = castaff / 3500.0f;
+		}
+		else
+		{
+			healdoneaffectperc = m_spellInfo->dmg_bonus/100.0f;
+		}
 		
 		//Downranking
 		/*if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
@@ -4040,8 +4047,7 @@ void Spell::Heal(int32 amount)
 			healdoneaffectperc *= downrank1 * downrank2;
 		}*/
 
-		//caster sided bonus
-		bonus += u_caster->HealDoneMod[m_spellInfo->School] + (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
+		bonus += u_caster->HealDoneMod[m_spellInfo->School];
 
 		if(m_spellInfo->SpellGroupType)
 		{
@@ -4060,12 +4066,16 @@ void Spell::Heal(int32 amount)
 				printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,m_spellInfo->SpellGroupType);
 #endif
 		}
-//		amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
-//		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
+
 		bonus += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
-		bonus += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
 
-
+		if (p_caster)
+		{
+			bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
+			bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+		}
+ 
+		amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
 
 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
         SM_FFValue(u_caster->SM_CriticalChance, &spellCrit, m_spellInfo->SpellGroupType);
@@ -4082,10 +4092,6 @@ void Spell::Heal(int32 amount)
 			if( m_spellInfo->SpellGroupType )
 				SM_PIValue( static_cast< Unit* >( u_caster )->SM_PCriticalDamage, &critbonus, m_spellInfo->SpellGroupType );
 			amount += critbonus;
-			//Shady: does it correct> caster casts heal and proc ..._VICTIM ? 
-			// Or mb i'm completely wrong? So if true  - just replace with old string. 
-			//u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, unitTarget, m_spellInfo, amount);
-			//Replaced with following one:
 			
 			unitTarget->HandleProc( PROC_ON_SPELL_CRIT_HIT_VICTIM, u_caster, m_spellInfo, amount );
 			u_caster->HandleProc( PROC_ON_SPELL_CRIT_HIT, unitTarget, m_spellInfo, amount );
@@ -4093,13 +4099,7 @@ void Spell::Heal(int32 amount)
 		
 	}
 
-	if( p_caster != NULL )  
-	{
-		bonus += float2int32( p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value( UNIT_FIELD_STAT3 ) );
-		bonus += float2int32( p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value( UNIT_FIELD_STAT4 ) );
-	}
-
-	amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
+	amount += float2int32(( u_caster->HealDonePctMod[m_spellInfo->School]/100.0f + unitTarget->HealTakenPctMod[m_spellInfo->School])*amount);
 
 	if( amount < 0 ) 
 		amount = 0;

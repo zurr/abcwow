@@ -148,7 +148,11 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 
 		if(objA->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP) && objB->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		{
-			if( static_cast< Player* >( objA )->m_bg != NULL )
+			if(static_cast< Player* >( objA )->m_bg != NULL && static_cast< Player* >( objB )->m_bg != NULL)
+				if(static_cast< Player* >( objA )->m_bgTeam == static_cast< Player* >( objB )->m_bgTeam)
+					return false;
+
+			if(static_cast< Player* >( objA )->GetGroup() != NULL)
 				if( static_cast< Player* >( objA )->GetGroup() == static_cast< Player* >( objB )->GetGroup() )
 					return false;
 

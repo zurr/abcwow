@@ -21,7 +21,7 @@
 
 #define ENABLE_AB
 //#define ENABLE_EOTS
-//#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
+#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
 
 initialiseSingleton(CBattlegroundManager);
 typedef CBattleground*(*CreateBattlegroundFunc)(MapMgr* mgr,uint32 iid,uint32 group, uint32 type);
@@ -287,7 +287,6 @@ void CBattlegroundManager::EventQueueUpdate()
 						plr = *tempPlayerVec[0].begin();
 						tempPlayerVec[0].pop_front();
 
-						plr->m_bgTeam=team;
 						arena->AddPlayer(plr, team);
 						team = arena->GetFreeTeam();
 
@@ -318,7 +317,6 @@ void CBattlegroundManager::EventQueueUpdate()
 							{
 								plr = *tempPlayerVec[k].begin();
 								tempPlayerVec[k].pop_front();
-								plr->m_bgTeam=k;
 								bg->AddPlayer(plr, k);
 								ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 							}
@@ -515,6 +513,7 @@ CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 
 	m_nextPvPUpdateTime = 0;
 	m_countdownStage = 0;
 	m_ended = false;
+	m_started = false;
 	m_winningteam = 0;
 	m_startTime = (uint32)UNIXTIME;
 	m_lastResurrect = (uint32)UNIXTIME;
@@ -684,6 +683,8 @@ void CBattleground::AddPlayer(Player * plr, uint32 team)
 {
 	m_mainLock.Acquire();
 
+	plr->m_bgTeam = team;
+
 	/* This is called when the player is added, not when they port. So, they're essentially still queued, but not inside the bg yet */
 	m_pendPlayers[team].insert(plr->GetGUIDLow());
 
@@ -729,7 +730,6 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		return;
 	}
 
-	plr->SetTeam(plr->m_bgTeam);
 	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
 	data << plr->GetGUID();
 	DistributePacketToAll(&data);
@@ -761,13 +761,13 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	UpdatePvPData();
 
 	/* add the player to the group */
-	/*if(plr->GetGroup())
+	if(plr->GetGroup())
 	{
 		// remove them from their group
-		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
+		plr->GetGroup()->RemovePlayer(plr->m_playerInfo);
 	}
 
-	m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);*/
+	//m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);
 
 	if(!m_countdownStage)
 	{
@@ -801,7 +801,6 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 		/* arenas follow a different procedure. */
 		static const uint32 arena_map_ids[3] = { 559, 562, 572 };
 		uint32 mapid = arena_map_ids[RandomUInt(2)];
-		mapid=562;
 		uint32 players_per_side;
 		mgr = sInstanceMgr.CreateBattlegroundInstance(mapid);
 		if(mgr == NULL)
@@ -1048,7 +1047,7 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);*/
 
 	// reset team
-	plr->ResetTeam();
+	plr->m_bgTeam=plr->GetTeam();
 
 	/* revive the player if he is dead */
 	if(!plr->isAlive())
@@ -1086,7 +1085,6 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 		sEventMgr.AddEvent( this, &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1, 0 ); // 2 mins
 	}
 
-	plr->m_bgTeam=plr->GetTeam();
 	m_mainLock.Release();
 }
 
@@ -1306,7 +1304,6 @@ void CBattleground::RemoveSpiritGuide(Creature * pCreature)
 	m_mainLock.Release();
 }
 
-#define RESURRECT_SPELL 21074   // Spirit Healer Res
 void CBattleground::EventResurrectPlayers()
 {
 	m_mainLock.Acquire();
@@ -1334,6 +1331,7 @@ void CBattleground::EventResurrectPlayers()
 				plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 				plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 				plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
+				plr->CastSpell(plr, BG_REVIVE_PREPARATION, true);
 			}
 		}
 		i->second.clear();
@@ -1415,7 +1413,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 					pGroup->Unlock();
 					return;
 				}
-
+				/*
 				if((*itx)->m_loggedInPlayer)
 				{
 					if((*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bgIsQueued)
@@ -1427,6 +1425,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 
 					--maxplayers;
 				}
+				*/
 			}
 			WorldPacket data(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
 			data << uint32(6);		// all arenas

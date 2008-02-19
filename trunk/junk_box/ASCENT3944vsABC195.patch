@@ -1,0 +1,2163 @@
+Index: src/ascent-shared/Database/DBCStores.h
+===================================================================
+--- src/ascent-shared/Database/DBCStores.h	(revision 196)
++++ src/ascent-shared/Database/DBCStores.h	(working copy)
+@@ -358,6 +358,7 @@
+     uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
+ 	uint32 ThreatForSpell;
+ 	bool can_be_dispelled;					//!!! CUSTOM
++	uint32 dmg_bonus;						//!!! CUSTOM, spell co-efficiency ( dmg/healing % taken from gear )
+ };
+ 
+ struct ItemExtendedCostEntry
+Index: src/ascent-world/ArathiBasin.cpp
+===================================================================
+--- src/ascent-world/ArathiBasin.cpp	(revision 196)
++++ src/ascent-world/ArathiBasin.cpp	(working copy)
+@@ -406,6 +406,14 @@
+ 
+ void ArathiBasin::OnStart()
+ {
++	m_started = true;
++
++	for(uint32 i = 0; i < 2; ++i) {
++		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
++			(*itr)->RemoveAura(BG_PREPARATION);
++		}
++	}
++
+ 	// open gates
+ 	for(list<GameObject*>::iterator itr = m_gates.begin(); itr != m_gates.end(); ++itr)
+ 	{
+@@ -551,12 +559,13 @@
+ 
+ void ArathiBasin::OnAddPlayer(Player * plr)
+ {
+-	// nothing?
++	if(!m_started)
++		plr->CastSpell(plr, BG_PREPARATION, true);
+ }
+ 
+ void ArathiBasin::OnRemovePlayer(Player * plr)
+ {
+-	// nothing?
++	plr->RemoveAura(BG_PREPARATION);
+ }
+ 
+ void ArathiBasin::HookFlagDrop(Player * plr, GameObject * obj)
+Index: src/ascent-world/AreaTrigger.cpp
+===================================================================
+--- src/ascent-world/AreaTrigger.cpp	(revision 196)
++++ src/ascent-world/AreaTrigger.cpp	(working copy)
+@@ -129,7 +129,8 @@
+ 	}
+ 
+ 	// Hook for Scripted Areatriggers
+-	_player->GetMapMgr()->HookOnAreaTrigger(_player, id);
++	if (_player->GetMapMgr())
++		_player->GetMapMgr()->HookOnAreaTrigger(_player, id);
+ 
+ 	switch(pAreaTrigger->Type)
+ 	{
+Index: src/ascent-world/ArenaTeam.cpp
+===================================================================
+--- src/ascent-world/ArenaTeam.cpp	(revision 196)
++++ src/ascent-world/ArenaTeam.cpp	(working copy)
+@@ -304,6 +304,16 @@
+ 	return NULL;
+ }
+ 
++ArenaTeamMember * ArenaTeam::GetMemberByGuid(uint32 guid)
++{
++	for(uint32 i = 0; i < m_memberCount; ++i)
++	{
++		if(m_members[i].Info && m_members[i].Info->guid == guid)
++			return &m_members[i];
++	}
++	return NULL;
++}
++
+ void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recv_data)
+ {
+ 	uint8 slot;
+Index: src/ascent-world/ArenaTeam.h
+===================================================================
+--- src/ascent-world/ArenaTeam.h	(revision 196)
++++ src/ascent-world/ArenaTeam.h	(working copy)
+@@ -90,6 +90,7 @@
+ 	bool HasMember(uint32 guid);
+ 	void SetLeader(PlayerInfo * info);
+ 	ArenaTeamMember * GetMember(PlayerInfo * info);
++	ArenaTeamMember * GetMemberByGuid(uint32 guid);
+ 
+ 	uint32 GetPlayersPerTeam()
+ 	{
+Index: src/ascent-world/BattlegroundMgr.cpp
+===================================================================
+--- src/ascent-world/BattlegroundMgr.cpp	(revision 196)
++++ src/ascent-world/BattlegroundMgr.cpp	(working copy)
+@@ -21,7 +21,7 @@
+ 
+ #define ENABLE_AB
+ //#define ENABLE_EOTS
+-//#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
++#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
+ 
+ initialiseSingleton(CBattlegroundManager);
+ typedef CBattleground*(*CreateBattlegroundFunc)(MapMgr* mgr,uint32 iid,uint32 group, uint32 type);
+@@ -287,7 +287,6 @@
+ 						plr = *tempPlayerVec[0].begin();
+ 						tempPlayerVec[0].pop_front();
+ 
+-						plr->m_bgTeam=team;
+ 						arena->AddPlayer(plr, team);
+ 						team = arena->GetFreeTeam();
+ 
+@@ -318,7 +317,6 @@
+ 							{
+ 								plr = *tempPlayerVec[k].begin();
+ 								tempPlayerVec[k].pop_front();
+-								plr->m_bgTeam=k;
+ 								bg->AddPlayer(plr, k);
+ 								ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
+ 							}
+@@ -515,6 +513,7 @@
+ 	m_nextPvPUpdateTime = 0;
+ 	m_countdownStage = 0;
+ 	m_ended = false;
++	m_started = false;
+ 	m_winningteam = 0;
+ 	m_startTime = (uint32)UNIXTIME;
+ 	m_lastResurrect = (uint32)UNIXTIME;
+@@ -684,6 +683,8 @@
+ {
+ 	m_mainLock.Acquire();
+ 
++	plr->m_bgTeam = team;
++
+ 	/* This is called when the player is added, not when they port. So, they're essentially still queued, but not inside the bg yet */
+ 	m_pendPlayers[team].insert(plr->GetGUIDLow());
+ 
+@@ -729,7 +730,6 @@
+ 		return;
+ 	}
+ 
+-	plr->SetTeam(plr->m_bgTeam);
+ 	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
+ 	data << plr->GetGUID();
+ 	DistributePacketToAll(&data);
+@@ -761,13 +761,13 @@
+ 	UpdatePvPData();
+ 
+ 	/* add the player to the group */
+-	/*if(plr->GetGroup())
++	if(plr->GetGroup())
+ 	{
+ 		// remove them from their group
+-		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
++		plr->GetGroup()->RemovePlayer(plr->m_playerInfo);
+ 	}
+ 
+-	m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);*/
++	//m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);
+ 
+ 	if(!m_countdownStage)
+ 	{
+@@ -801,7 +801,6 @@
+ 		/* arenas follow a different procedure. */
+ 		static const uint32 arena_map_ids[3] = { 559, 562, 572 };
+ 		uint32 mapid = arena_map_ids[RandomUInt(2)];
+-		mapid=562;
+ 		uint32 players_per_side;
+ 		mgr = sInstanceMgr.CreateBattlegroundInstance(mapid);
+ 		if(mgr == NULL)
+@@ -1048,7 +1047,7 @@
+ 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);*/
+ 
+ 	// reset team
+-	plr->ResetTeam();
++	plr->m_bgTeam=plr->GetTeam();
+ 
+ 	/* revive the player if he is dead */
+ 	if(!plr->isAlive())
+@@ -1086,7 +1085,6 @@
+ 		sEventMgr.AddEvent( this, &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1, 0 ); // 2 mins
+ 	}
+ 
+-	plr->m_bgTeam=plr->GetTeam();
+ 	m_mainLock.Release();
+ }
+ 
+@@ -1306,7 +1304,6 @@
+ 	m_mainLock.Release();
+ }
+ 
+-#define RESURRECT_SPELL 21074   // Spirit Healer Res
+ void CBattleground::EventResurrectPlayers()
+ {
+ 	m_mainLock.Acquire();
+@@ -1334,6 +1331,7 @@
+ 				plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+ 				plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+ 				plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
++				plr->CastSpell(plr, BG_REVIVE_PREPARATION, true);
+ 			}
+ 		}
+ 		i->second.clear();
+@@ -1415,7 +1413,7 @@
+ 					pGroup->Unlock();
+ 					return;
+ 				}
+-
++				/*
+ 				if((*itx)->m_loggedInPlayer)
+ 				{
+ 					if((*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bgIsQueued)
+@@ -1427,6 +1425,7 @@
+ 
+ 					--maxplayers;
+ 				}
++				*/
+ 			}
+ 			WorldPacket data(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
+ 			data << uint32(6);		// all arenas
+Index: src/ascent-world/BattlegroundMgr.h
+===================================================================
+--- src/ascent-world/BattlegroundMgr.h	(revision 196)
++++ src/ascent-world/BattlegroundMgr.h	(working copy)
+@@ -68,6 +68,10 @@
+ #define AB_ALLIANCE_CAPTUREBASE			 0x6F3
+ #define AB_MAX_SCORE						0x6F4
+ 
++#define BG_PREPARATION			44521
++#define BG_REVIVE_PREPARATION	44535
++#define RESURRECT_SPELL			21074   // Spirit Healer Res
++
+ // WSG define's
+ #define WSG_ALLIANCE_FLAG_CAPTURED		  0x922
+ #define WSG_HORDE_FLAG_CAPTURED			 0x923
+@@ -210,6 +214,7 @@
+ 
+ 	/* starting time */
+ 	uint32 m_startTime;
++	bool m_started;
+ 
+ 	/* countdown stuff */
+ 	uint32 m_countdownStage;
+Index: src/ascent-world/CharacterHandler.cpp
+===================================================================
+--- src/ascent-world/CharacterHandler.cpp	(revision 196)
++++ src/ascent-world/CharacterHandler.cpp	(working copy)
+@@ -336,7 +336,7 @@
+ 
+ 	//Same Faction limitation only applies to PVP and RPPVP realms :)
+ 	uint32 realmType = sLogonCommHandler.GetRealmType();
+-	if( !HasGMPermissions() && realmType == REALM_PVP && _side < 0 )
++	if(!HasGMPermissions() && (realmType==REALMTYPE_PVP||realmType==REALMTYPE_RPPVP) && sWorld.PvpFactionLimitation)
+ 	{
+ 		if( ((pNewChar->GetTeam()== 0) && (_side == 1)) || ((pNewChar->GetTeam()== 1) && (_side == 0)) )
+ 		{
+Index: src/ascent-world/Creature.cpp
+===================================================================
+--- src/ascent-world/Creature.cpp	(revision 196)
++++ src/ascent-world/Creature.cpp	(working copy)
+@@ -202,6 +202,7 @@
+ 	sLog.outDetail("Respawning "I64FMT"...", GetGUID());
+ 	SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+ 	SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0); // not tagging shiat
++	SetUInt32Value(UNIT_FIELD_DISPLAYID, GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
+ 	if(proto && m_spawn)
+ 	{
+ 		SetUInt32Value(UNIT_NPC_FLAGS, proto->NPCFLags);
+@@ -1344,6 +1345,15 @@
+ 		Unit::RemoveFromWorld(true);
+ 		SafeDelete();
+ 	}
++
++	if(GetMapMgr() && GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
++	{
++		if(GetTypeId() == TYPEID_UNIT)
++		{
++			if(GetCreatureName() && GetCreatureName()->Rank == ELITE_WORLDBOSS)
++				GetMapMgr()->RemoveCombatInProgress(GetGUID());
++		}
++	}
+ }
+ 
+ void Creature::TriggerScriptEvent(string func)
+Index: src/ascent-world/Creature.h
+===================================================================
+--- src/ascent-world/Creature.h	(revision 196)
++++ src/ascent-world/Creature.h	(working copy)
+@@ -143,6 +143,7 @@
+ 	float	run_speed;//most of the time mobs use this
+ 	float fly_speed;
+ 	uint32 extra_a9_flags;
++	uint32 modImmunities;
+ 
+ 	/* AI Stuff */
+ 	bool m_canRangedAttack;
+Index: src/ascent-world/DayWatcherThread.cpp
+===================================================================
+--- src/ascent-world/DayWatcherThread.cpp	(revision 196)
++++ src/ascent-world/DayWatcherThread.cpp	(working copy)
+@@ -217,9 +217,9 @@
+ 				team = objmgr.GetArenaTeamByGuid(guid, i);
+ 				if(team)
+ 				{
+-					/* TODO: In the future we might want to do a check that says is the player active in this arena team.
+-					 * Private servers are kinda smaller so this probably isn't such a good idea.
+-					 * - Burlex */
++					ArenaTeamMember *member = team->GetMemberByGuid(guid);
++					if(member == NULL || team->m_stat_gamesplayedweek < 10 || (100 / team->m_stat_gamesplayedweek * member->Played_ThisWeek) < 30)
++						continue;
+ 
+ 					/* we're in an arena team of this type! */
+ 					/* Source: http://www.wowwiki.com/Arena_point */
+@@ -297,6 +297,8 @@
+ 		delete result;
+ 	}
+ 
++	objmgr.UpdateArenaTeamWeekly();
++
+ 	//===========================================================================
+ 	last_arena_time = UNIXTIME;
+ 	dupe_tm_pointer(localtime(&last_arena_time), &local_last_arena_time);
+Index: src/ascent-world/faction.cpp
+===================================================================
+--- src/ascent-world/faction.cpp	(revision 196)
++++ src/ascent-world/faction.cpp	(working copy)
+@@ -148,7 +148,11 @@
+ 
+ 		if(objA->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP) && objB->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP))
+ 		{
+-			if( static_cast< Player* >( objA )->m_bg != NULL )
++			if(static_cast< Player* >( objA )->m_bg != NULL && static_cast< Player* >( objB )->m_bg != NULL)
++				if(static_cast< Player* >( objA )->m_bgTeam == static_cast< Player* >( objB )->m_bgTeam)
++					return false;
++
++			if(static_cast< Player* >( objA )->GetGroup() != NULL)
+ 				if( static_cast< Player* >( objA )->GetGroup() == static_cast< Player* >( objB )->GetGroup() )
+ 					return false;
+ 
+Index: src/ascent-world/GameObject.cpp
+===================================================================
+--- src/ascent-world/GameObject.cpp	(revision 196)
++++ src/ascent-world/GameObject.cpp	(working copy)
+@@ -472,7 +472,11 @@
+ 
+ void GameObject::EventCloseDoor()
+ {
+-	SetUInt32Value(GAMEOBJECT_STATE, 0);
++	SetUInt32Value(GAMEOBJECT_STATE, 1);
++	if(m_spawn && m_spawn->flags)
++		SetUInt32Value(GAMEOBJECT_FLAGS, m_spawn->flags);
++	else
++		SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+ }
+ 
+ void GameObject::UseFishingNode(Player *player)
+@@ -696,3 +700,21 @@
+     return (count>0);
+ 
+ }
++
++uint32 GameObject::GetGOReqSkill()  
++{
++	if(GetEntry() == 180215) return 300;
++
++	if(GetInfo() == NULL)
++		return 0;
++
++	Lock *lock = dbcLock.LookupEntry( GetInfo()->SpellFocus );
++	if(!lock) return 0;
++	for(uint32 i=0;i<5;i++)
++		if(lock->locktype[i] == 2 && lock->minlockskill[i])
++		{
++			return lock->minlockskill[i];
++		}
++	return 0;
++}
++
+Index: src/ascent-world/GameObject.h
+===================================================================
+--- src/ascent-world/GameObject.h	(revision 196)
++++ src/ascent-world/GameObject.h	(working copy)
+@@ -259,6 +259,7 @@
+ 	}
+ 	bool HasLoot();
+ 	MapCell * m_respawnCell;
++	uint32 GetGOReqSkill();
+ 
+ protected:
+ 
+Index: src/ascent-world/HonorHandler.cpp
+===================================================================
+--- src/ascent-world/HonorHandler.cpp	(revision 196)
++++ src/ascent-world/HonorHandler.cpp	(working copy)
+@@ -191,6 +191,20 @@
+                             SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 33004 : 33005);
+                             gPlayer->CastSpell(gPlayer, halaa_spell, true);
+                         }
++						// If we are in Hellfire Peninsula
++                        if(pPlayer->GetZoneId() == 3483)
++                        {
++                            // Add Mark of Thrallmar/Honor Hold
++                            SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 32158 : 32155);
++                            gPlayer->CastSpell(gPlayer, halaa_spell, true);
++                        }
++                        // If we are in Zangarmarsh
++                        if(pPlayer->GetZoneId() == 3521)
++                        {
++                            // Add Mark of Thrallmar/Honor Hold
++                            SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 32158 : 32155);
++                            gPlayer->CastSpell(gPlayer, halaa_spell, true);
++                        }
+                     }
+ 
+                 }
+Index: src/ascent-world/Item.cpp
+===================================================================
+--- src/ascent-world/Item.cpp	(revision 196)
++++ src/ascent-world/Item.cpp	(working copy)
+@@ -693,6 +693,7 @@
+ 							TS.procChance = Entry->min[c];
+ 						Log.Debug( "Enchant", "Setting procChance to %u%%.", TS.procChance );
+ 						TS.deleted = false;
++						TS.ProcType = (GetProto()->Class == ITEM_CLASS_WEAPON)? 1 : 2;
+ 						TS.spellId = Entry->spell[c];
+ 						m_owner->m_procSpells.push_back( TS );
+ 					}
+Index: src/ascent-world/ItemInterface.cpp
+===================================================================
+--- src/ascent-world/ItemInterface.cpp	(revision 196)
++++ src/ascent-world/ItemInterface.cpp	(working copy)
+@@ -1383,7 +1383,7 @@
+ 
+ 	if((slot < INVENTORY_SLOT_BAG_END && DstInvSlot == INVENTORY_SLOT_NOT_SET) || (slot >= BANK_SLOT_BAG_START && slot < BANK_SLOT_BAG_END && DstInvSlot == INVENTORY_SLOT_NOT_SET))
+ 	{
+-		if (!ignore_combat && m_pOwner->CombatStatus.IsInCombat())
++		if (!ignore_combat && m_pOwner->CombatStatus.IsInCombat() && (slot < EQUIPMENT_SLOT_MAINHAND || slot > EQUIPMENT_SLOT_RANGED))
+ 			return INV_ERR_CANT_DO_IN_COMBAT;
+ 
+ 		if(proto->Flags & ITEM_FLAG_UNIQUE_EQUIP && IsEquipped(proto->ItemId))
+Index: src/ascent-world/Level1.cpp
+===================================================================
+--- src/ascent-world/Level1.cpp	(revision 196)
++++ src/ascent-world/Level1.cpp	(working copy)
+@@ -224,6 +224,21 @@
+ 
+ 			item->ApplyRandomProperties(false);
+ 		}
++		else
++		{
++			if (it->RandomPropId)
++			{
++				RandomProps * iRandomProperty = lootmgr.GetRandomProperties(it);
++				item->SetRandomProperty(iRandomProperty->ID);
++				item->ApplyRandomProperties(false);
++			}
++			if (it->RandomSuffixId)
++			{
++				ItemRandomSuffixEntry * iRandomSuffix = lootmgr.GetRandomSuffix(it);
++				item->SetRandomSuffix(iRandomSuffix->id);
++				item->ApplyRandomProperties(false);
++			}
++		}
+ 	  
+ 		if(!chr->GetItemInterface()->AddItemToFreeSlot(item))
+ 		{
+Index: src/ascent-world/LootMgr.cpp
+===================================================================
+--- src/ascent-world/LootMgr.cpp	(revision 196)
++++ src/ascent-world/LootMgr.cpp	(working copy)
+@@ -104,6 +104,7 @@
+ 	LoadLootTables("fishingloot",&FishingLoot);
+ 	LoadLootTables("itemloot", &ItemLoot);
+ 	LoadLootTables("prospectingloot", &ProspectingLoot);
++	LoadLootTables("disenchantingloot", &DisenchantingLoot);
+ 	LoadLootTables("pickpocketingloot", &PickpocketingLoot);
+ 	is_loading = false;
+ }
+@@ -230,8 +231,11 @@
+   for(LootStore::iterator iter=ProspectingLoot.begin(); iter != ProspectingLoot.end(); ++iter)
+   delete [] iter->second.items;
+ 
+- for(LootStore::iterator iter=PickpocketingLoot.begin(); iter != PickpocketingLoot.end(); ++iter)
+- delete [] iter->second.items;
++ for(LootStore::iterator iter=DisenchantingLoot.begin(); iter != DisenchantingLoot.end(); ++iter)
++	delete [] iter->second.items;
++
++  for(LootStore::iterator iter=PickpocketingLoot.begin(); iter != PickpocketingLoot.end(); ++iter)
++	delete [] iter->second.items;
+ }
+ 
+ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
+@@ -513,6 +517,26 @@
+  else PushLoot(&tab->second,loot,false);
+ }
+ 
++void LootMgr::FillDisenchantingLoot(Loot *loot, uint32 loot_id)
++{
++ loot->items.clear();
++ loot->gold =0;
++
++ LootStore::iterator tab = DisenchantingLoot.find(loot_id);
++ if( DisenchantingLoot.end()==tab)return;
++ else PushLoot(&tab->second,loot,false);
++}
++
++void LootMgr::FillProspectingLoot(Loot *loot, uint32 loot_id)
++{
++ loot->items.clear();
++ loot->gold =0;
++
++ LootStore::iterator tab = ProspectingLoot.find(loot_id);
++ if( ProspectingLoot.end()==tab)return;
++ else PushLoot(&tab->second,loot,false);
++}
++
+ bool LootMgr::CanGODrop(uint32 LootId,uint32 itemid)
+ {
+ 	LootStore::iterator tab =GOLoot.find(LootId);
+Index: src/ascent-world/LootMgr.h
+===================================================================
+--- src/ascent-world/LootMgr.h	(revision 196)
++++ src/ascent-world/LootMgr.h	(working copy)
+@@ -130,6 +130,8 @@
+ 	void FillFishingLoot(Loot * loot,uint32 loot_id);
+ 	void FillSkinningLoot(Loot * loot,uint32 loot_id);
+ 	void FillPickpocketingLoot(Loot *loot, uint32 loot_id);
++	void FillDisenchantingLoot(Loot *loot, uint32 loot_id);
++	void FillProspectingLoot(Loot *loot, uint32 loot_id);
+ 
+ 	bool CanGODrop(uint32 LootId,uint32 itemid);
+ 	bool IsPickpocketable(uint32 creatureId);
+@@ -146,7 +148,8 @@
+ 	LootStore	GOLoot;
+ 	LootStore	ItemLoot;
+ 	LootStore	ProspectingLoot;
+-	LootStore PickpocketingLoot;
++	LootStore	PickpocketingLoot;
++	LootStore	DisenchantingLoot;
+ 	std::map<uint32, std::set<uint32> > quest_loot_go;
+ 
+ 	RandomProps * GetRandomProperties(ItemPrototype * proto);
+Index: src/ascent-world/MiscHandler.cpp
+===================================================================
+--- src/ascent-world/MiscHandler.cpp	(revision 196)
++++ src/ascent-world/MiscHandler.cpp	(working copy)
+@@ -64,6 +64,11 @@
+ 		if(!pItem)
+ 			return;
+ 		pLoot = pItem->loot;
++	}else if( UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_PLAYER )
++	{
++		Player * pl = _player->GetMapMgr()->GetPlayer((uint32)GetPlayer()->GetLootGUID());
++		if(!pl) return;
++		pLoot = &pl->loot;
+ 	}
+ 
+ 	if(!pLoot) return;
+@@ -540,6 +545,7 @@
+ 		if(plr)
+ 		{
+ 			plr->bShouldHaveLootableOnCorpse = false;
++			plr->loot.items.clear();
+ 			plr->RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
+ 		}
+ 	}
+@@ -926,7 +932,7 @@
+ 
+ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
+ {
+-	if(_player->isAlive())
++	if(_player == NULL || _player->isAlive())
+ 		return;
+ 
+ 	sLog.outDetail("WORLD: Received CMSG_RECLAIM_CORPSE");
+Index: src/ascent-world/Object.cpp
+===================================================================
+--- src/ascent-world/Object.cpp	(revision 196)
++++ src/ascent-world/Object.cpp	(working copy)
+@@ -2204,7 +2204,7 @@
+ 	{
+ 		Unit* caster = static_cast< Unit* >( this );
+ 		caster->RemoveAurasByInterruptFlag( AURA_INTERRUPT_ON_START_ATTACK );
+-		res += caster->GetSpellDmgBonus( pVictim, spellInfo, ( int )res );
++		res += caster->GetSpellDmgBonus( pVictim, spellInfo, ( int )res ,0);
+ 
+ 		//==========================================================================================
+ 		//==============================Post +SpellDamage Bonus Modifications=======================
+Index: src/ascent-world/ObjectMgr.cpp
+===================================================================
+--- src/ascent-world/ObjectMgr.cpp	(revision 196)
++++ src/ascent-world/ObjectMgr.cpp	(working copy)
+@@ -1824,6 +1824,32 @@
+ 	} while(result->NextRow());
+ 	delete result;
+ 	Log.Notice("ObjectMgr", "%u spell fixes loaded.", fixed_count);
++
++	/*##########################################################################################*/
++
++	// Loads data from spell_data_extra table
++	QueryResult * result1 = WorldDatabase.Query("SELECT * FROM spell_data_extra");
++	if(result1 == 0) return;
++
++	uint32 override_count = 0;
++	do
++	{
++		Field * fields1 = result1->Fetch();
++		uint32 spell_id = fields1[0].GetUInt32();
++		SpellEntry * sp = dbcSpell.LookupEntry(spell_id);
++		if(sp == 0) 
++			continue;
++
++		if(sp->dmg_bonus == 0)
++		{
++			sp->dmg_bonus = fields1[1].GetUInt32();
++			override_count++;
++		}
++
++	} while (result1->NextRow());
++
++	delete result1;
++	Log.Notice("ObjectMgr", "%u spell data extra loaded.", override_count);
+ }
+ 
+ void ObjectMgr::LoadSpellOverride()
+@@ -2613,3 +2639,24 @@
+ 	m_arenaTeamLock.Release();
+ }
+ 
++void ObjectMgr::UpdateArenaTeamWeekly()
++{	// reset weekly matches count for all teams and all members
++	m_arenaTeamLock.Acquire();
++	for(uint32 i = 0; i < NUM_ARENA_TEAM_TYPES; ++i)
++	{
++		for(HM_NAMESPACE::hash_map<uint32,ArenaTeam*>::iterator itr = m_arenaTeamMap[i].begin(); itr != m_arenaTeamMap[i].end(); ++itr)
++		{
++			ArenaTeam *team = itr->second;
++			if(team)
++			{
++				team->m_stat_gamesplayedweek = 0;
++				for(uint32 j = 0; j < team->m_memberCount; ++j)
++					team->m_members[j].Played_ThisWeek = 0;
++
++				team->SaveToDB();
++			}
++		}
++	}
++	m_arenaTeamLock.Release();
++}
++
+Index: src/ascent-world/ObjectMgr.h
+===================================================================
+--- src/ascent-world/ObjectMgr.h	(revision 196)
++++ src/ascent-world/ObjectMgr.h	(working copy)
+@@ -505,6 +505,7 @@
+ 	ArenaTeam * GetArenaTeamById(uint32 id);
+ 	ArenaTeam * GetArenaTeamByGuid(uint32 guid, uint32 Type);
+ 	void UpdateArenaTeamRankings();
++	void UpdateArenaTeamWeekly();
+ 	void LoadArenaTeams();
+ 	HM_NAMESPACE::hash_map<uint32, ArenaTeam*> m_arenaTeamMap[3];
+ 	HM_NAMESPACE::hash_map<uint32, ArenaTeam*> m_arenaTeams;
+Index: src/ascent-world/ObjectStorage.cpp
+===================================================================
+--- src/ascent-world/ObjectStorage.cpp	(revision 196)
++++ src/ascent-world/ObjectStorage.cpp	(working copy)
+@@ -24,7 +24,7 @@
+ const char * gItemPrototypeFormat						= "uuuussssuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffuffuffuffuffuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuusuuuuuuuuuuuuuuuuuuuuuuuuuuuu";
+ const char * gCreatureNameFormat						= "usssuuuuuuuuuuffcc";
+ const char * gGameObjectNameFormat						= "uuusuuuuuuuuuuuuuuuuuuuuuuuu";
+-const char * gCreatureProtoFormat						= "uuuuuuufuuuffuffuuuuuuuuuuuuuuuuuuffsuuuufffu";
++const char * gCreatureProtoFormat						= "uuuuuuufuuuffuffuuuuuuuuuuuuuuuuuuffsuuuufffuu";
+ const char * gAreaTriggerFormat							= "ucuusffffuu";
+ const char * gItemPageFormat							= "usu";
+ const char * gNpcTextFormat								= "ufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuu";
+Index: src/ascent-world/Opcodes.cpp
+===================================================================
+--- src/ascent-world/Opcodes.cpp	(revision 196)
++++ src/ascent-world/Opcodes.cpp	(working copy)
+@@ -868,7 +868,7 @@
+ 	{SMSG_MOVE_UNLOCK_MOVEMENT,                    "SMSG_MOVE_UNLOCK_MOVEMENT"},
+ 	{CMSG_MOVE_UNLOCK_MOVEMENT_ACK,                "CMSG_MOVE_UNLOCK_MOVEMENT_ACK"},
+ 	{SMSG_SET_COMBO_POINTS,                        "SMSG_SET_COMBO_POINTS"},
+-	{SMSG_PET_LEARNT_SPELL,                        "SMSG_PET_LEARNT_SPELL"},
++	{SMSG_SET_AURA_SINGLE,                         "SMSG_SET_AURA_SINGLE"},
+ 	{SMSG_TARGET_CAST_RESULT,                      "SMSG_TARGET_CAST_RESULT"},
+ 	{CMSG_REPORT_SPAM,                             "CMSG_REPORT_SPAM"},
+ 	{SMSG_REPORT_SPAM_RESPONSE,                    "SMSG_REPORT_SPAM_RESPONSE"},
+Index: src/ascent-world/Opcodes.h
+===================================================================
+--- src/ascent-world/Opcodes.h	(revision 196)
++++ src/ascent-world/Opcodes.h	(working copy)
+@@ -885,7 +885,8 @@
+ 	CMSG_MOVE_UNLOCK_MOVEMENT_ACK					= 913,	//(0x0391)
+ 	SMSG_SET_COMBO_POINTS							= 925,	//(0x039D)
+ 	SMSG_VOICE_SESSION								= 926,	//(0x039E)
+-	SMSG_PET_LEARNT_SPELL							= 932,	//(0x03A4)
++	//SMSG_SET_AURA_MULTIPLE							= 931,  //TODO
++	SMSG_SET_AURA_SINGLE							= 932,	//(0x03A4)
+ 	SMSG_TARGET_CAST_RESULT							= 934,	//(0x03A6)
+ 	MSG_MOVE_FLY_DOWN_UNK							= 935,  //(0x03A7)
+ 	// 938
+Index: src/ascent-world/Player.cpp
+===================================================================
+--- src/ascent-world/Player.cpp	(revision 196)
++++ src/ascent-world/Player.cpp	(working copy)
+@@ -3359,6 +3359,9 @@
+ // TODO: perhaps item should just have a list of mods, that will simplify code
+ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedown /* = false */, bool skip_stat_apply /* = false  */)
+ {
++	//if (slot > EQUIPMENT_SLOT_END)
++	//	return;
++
+ 	ASSERT( item );
+ 	ItemPrototype* proto = item->GetProto();
+ 
+@@ -3627,6 +3630,7 @@
+ 				ts.procChance = 5;
+ 				ts.caster = this->GetGUID();
+ 				ts.procFlags = PROC_ON_MELEE_ATTACK;
++				ts.ProcType = (item->GetProto()->Class == ITEM_CLASS_WEAPON)? 1 : 2;
+ 				ts.deleted = false;
+ 				m_procSpells.push_front( ts );			
+ 			}
+@@ -5321,7 +5325,7 @@
+         } 
+ 
+ 		slottype = 0;
+-		if( m_Group != NULL )
++		if(m_Group != NULL && loot_type < 2)
+ 		{
+ 			switch( m_Group->GetMethod() )
+ 			{
+@@ -8258,7 +8262,7 @@
+ 		case EXPERTISE_RATING_2:
+ 			{
+ 				ModUInt32Value( PLAYER_RATING_MODIFIER_EXPERTISE, val );
+-				ModUInt32Value( PLAYER_EXPERTISE, float2int32( CalcRating( PLAYER_RATING_MODIFIER_EXPERTISE ) ) );
++				ModUInt32Value( PLAYER_EXPERTISE, val );
+ 			}break;
+ 		case RESILIENCE_RATING:
+ 			{
+@@ -8879,6 +8883,34 @@
+ 	pTarget->_setFaction();
+ 	pTarget->UpdateOppFactionSet();
+ 
++	if (pTarget->GetTypeId() == TYPEID_UNIT)
++	{
++		if (pTarget->GetAIInterface()->getAITargetsCount())
++		{
++			std::vector<Unit*> targetTable;
++			TargetMap *targets = pTarget->GetAIInterface()->GetAITargets();
++			for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
++			{
++				Unit *temp = itr->first;
++				if (temp->GetTypeId() == TYPEID_UNIT && temp->isAlive())
++				{
++					temp->GetAIInterface()->RemoveThreatByPtr(this);
++					if (temp->GetAIInterface()->GetNextTarget() == pTarget)
++						temp->GetAIInterface()->SetNextTarget(NULL);
++					if (pTarget->m_faction == temp->m_faction)
++					{
++						temp->GetAIInterface()->AttackReaction(this, 1, 0);
++						temp->GetAIInterface()->SetNextTarget(this);
++					}
++				}
++			}
++		}
++
++		pTarget->GetAIInterface()->ClearHateList();
++		pTarget->GetAIInterface()->AttackReaction(this, (this->getLevel()*75), 0); // "When the spell ends, the MCed unit (if not a player) will have a large amount of threat on the priest who controlled it" no idea if (lvl*75) is right but it does his job
++		pTarget->GetAIInterface()->SetNextTarget(this);
++	}
++
+ 	list<uint32> avail_spells;
+ 	for(list<AI_Spell*>::iterator itr = pTarget->GetAIInterface()->m_spells.begin(); itr != pTarget->GetAIInterface()->m_spells.end(); ++itr)
+ 	{
+Index: src/ascent-world/SocialMgr.cpp
+===================================================================
+--- src/ascent-world/SocialMgr.cpp	(revision 196)
++++ src/ascent-world/SocialMgr.cpp	(working copy)
+@@ -165,9 +165,9 @@
+ 		plr->GetSession()->SendPacket( &data );
+ 		return;
+ 	}
+-	if( friendInfo->team != playerInfo->team )
++	if( friendInfo->team != playerInfo->team && sWorld.FriendFactionLimitation )
+ 	{
+-		sLog.outDebug("SocialMgr: %s tried to add an ennemy to his friendlist", plr->GetName());
++		sLog.outDebug("SocialMgr: %s tried to add an enemy to his friendlist", plr->GetName());
+ 		data << (uint8)FRIEND_ENEMY << (uint64)friendInfo->guid;
+ 		plr->GetSession()->SendPacket( &data );
+ 		return;
+@@ -179,7 +179,7 @@
+ 
+ 	if ( pGuid == fGuid )
+ 	{
+-		sLog.outDebug("SocialMgr: %s tried to add himself to his friendlist", plr->GetName());
++		sLog.outDebug("SocialMgr: %s tried to add himself to his ignorelist", plr->GetName());
+ 		data << (uint8)FRIEND_SELF << (uint64)fGuid;
+ 		plr->GetSession()->SendPacket(&data);
+ 		return;
+Index: src/ascent-world/Spell.cpp
+===================================================================
+--- src/ascent-world/Spell.cpp	(revision 196)
++++ src/ascent-world/Spell.cpp	(working copy)
+@@ -2645,6 +2645,7 @@
+ 			}
+ 		}
+ 
++		/*
+ 		// check for duel areas
+ 		if( m_spellInfo->Id == 7266)
+ 		{
+@@ -2652,7 +2653,7 @@
+ 			if( at->AreaFlags & AREA_CITY_AREA )
+ 				return SPELL_FAILED_NO_DUELING;
+ 		}
+-
++		*/
+ 		// check if spell is allowed while player is on a taxi
+ 		if( p_caster->m_onTaxi )
+ 		{
+@@ -4017,16 +4018,22 @@
+ 	float healdoneaffectperc = 0;
+ 	if( u_caster != NULL )
+ 	{
+-		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
+-
+-		// affect the plus damage by duration
+-		float castaff = float(GetCastTime(sd));
+-		if(castaff > 3500) 
+-            castaff = 3500;
+-		else if(castaff < 1500) 
+-            castaff = 1500;
+-
+-		healdoneaffectperc = castaff / 3500.0f;
++		if(!m_spellInfo->dmg_bonus)
++		{
++			SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
++			// affect the plus damage by duration
++			float castaff = float(GetCastTime(sd));
++			if(castaff > 3500) 
++				castaff = 3500;
++			else if(castaff < 1500) 
++				castaff = 1500;
++ 
++			healdoneaffectperc = castaff / 3500.0f;
++		}
++		else
++		{
++			healdoneaffectperc = m_spellInfo->dmg_bonus/100.0f;
++		}
+ 		
+ 		//Downranking
+ 		/*if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
+@@ -4040,8 +4047,7 @@
+ 			healdoneaffectperc *= downrank1 * downrank2;
+ 		}*/
+ 
+-		//caster sided bonus
+-		bonus += u_caster->HealDoneMod[m_spellInfo->School] + (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
++		bonus += u_caster->HealDoneMod[m_spellInfo->School];
+ 
+ 		if(m_spellInfo->SpellGroupType)
+ 		{
+@@ -4060,13 +4066,17 @@
+ 				printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,m_spellInfo->SpellGroupType);
+ #endif
+ 		}
+-//		amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
+-//		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
++
+ 		bonus += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
+-		bonus += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
+ 
++		if (p_caster)
++		{
++			bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
++			bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
++		}
++ 
++		amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
+ 
+-
+ 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
+         SM_FFValue(u_caster->SM_CriticalChance, &spellCrit, m_spellInfo->SpellGroupType);
+ #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+@@ -4082,10 +4092,6 @@
+ 			if( m_spellInfo->SpellGroupType )
+ 				SM_PIValue( static_cast< Unit* >( u_caster )->SM_PCriticalDamage, &critbonus, m_spellInfo->SpellGroupType );
+ 			amount += critbonus;
+-			//Shady: does it correct> caster casts heal and proc ..._VICTIM ? 
+-			// Or mb i'm completely wrong? So if true  - just replace with old string. 
+-			//u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, unitTarget, m_spellInfo, amount);
+-			//Replaced with following one:
+ 			
+ 			unitTarget->HandleProc( PROC_ON_SPELL_CRIT_HIT_VICTIM, u_caster, m_spellInfo, amount );
+ 			u_caster->HandleProc( PROC_ON_SPELL_CRIT_HIT, unitTarget, m_spellInfo, amount );
+@@ -4093,14 +4099,8 @@
+ 		
+ 	}
+ 
+-	if( p_caster != NULL )  
+-	{
+-		bonus += float2int32( p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value( UNIT_FIELD_STAT3 ) );
+-		bonus += float2int32( p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value( UNIT_FIELD_STAT4 ) );
+-	}
++	amount += float2int32(( u_caster->HealDonePctMod[m_spellInfo->School]/100.0f + unitTarget->HealTakenPctMod[m_spellInfo->School])*amount);
+ 
+-	amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
+-
+ 	if( amount < 0 ) 
+ 		amount = 0;
+ 
+Index: src/ascent-world/SpellAuras.cpp
+===================================================================
+--- src/ascent-world/SpellAuras.cpp	(revision 196)
++++ src/ascent-world/SpellAuras.cpp	(working copy)
+@@ -598,6 +598,7 @@
+ 			pts.procCharges = GetSpellProto()->procCharges;
+ 			pts.LastTrigger = 0;
+ 			pts.deleted = false;
++			pts.ProcType = 0;
+ 			m_target->m_procSpells.push_front(pts);
+ 		}
+ 		else
+@@ -650,43 +651,6 @@
+ 	}
+ 	m_visualSlot = m_target->AddAuraVisual(m_spellProto->Id, 1, IsPositive());
+ 
+-	/*m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, m_spellProto->Id);
+-
+-	uint8 flagslot = slot >> 3;
+-
+-	uint32 value = m_target->GetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot));
+-
+-	uint8 aurapos = (slot & 7) << 2;
+-	uint32 value1 = (uint32)AFLAG_SET << aurapos;
+-	value |= value1;
+-
+-	m_target->SetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot), value);
+-	
+-	uint32 index = (slot / 8);
+-	uint32 byte  = (slot % 8);
+-
+-	uint32 x = 0, y = 0;
+-	uint32 val = m_target->GetUInt32Value(UNIT_FIELD_AURALEVELS + index);
+-	if(x != 0)
+-	{
+-		val |= (x << (byte * 8));
+-		m_target->SetUInt32Value(UNIT_FIELD_AURALEVELS + index, val);
+-	}
+-
+-	val = m_target->GetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index);
+-	if(y != 0)
+-	{
+-		val |= (y << (byte * 8));
+-		m_target->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index, val);
+-	}
+-	sLog.outDebug("Adding Aura Visual - target: %d , slot: %d , flagslot: %d , flagsvalue: 0x%.4X",m_target->GetGUID(),slot,flagslot,value);*/
+-   
+-	//  0000 0000 original
+-	//  0000 1001 AFLAG_SET
+-	//  1111 1111 0xFF
+-
+-	//uint8 appslot = slot >> 1;
+-
+ 	if( m_target->IsPlayer())
+ 	{
+ 		WorldPacket data(SMSG_UPDATE_AURA_DURATION, 5);
+@@ -694,7 +658,7 @@
+ 		static_cast< Player* >( m_target )->GetSession()->SendPacket(&data);
+ 	}
+ 		
+-	WorldPacket data(SMSG_PET_LEARNT_SPELL, 21);
++	WorldPacket data(SMSG_SET_AURA_SINGLE, 21);
+ 	data << m_target->GetNewGUID() << m_visualSlot << uint32(m_spellProto->Id) << uint32(m_duration) << uint32(m_duration);
+ 	m_target->SendMessageToSet(&data,false);
+ 
+@@ -1002,7 +966,7 @@
+ 
+ 	if( apply )
+ 	{
+-		if( caster != NULL && caster->IsInWorld() && caster->IsPlayer() ) 
++		if( caster != NULL && caster->IsInWorld() && caster->IsPlayer() && (caster->getLevel() + 4) >= m_target->getLevel() ) 
+ 			static_cast< Player* >(caster)->Possess( m_target );
+ 	}
+ 	else
+@@ -1181,11 +1145,12 @@
+ 			{
+ 				if( GetSpellProto() && GetSpellProto()->NameHash == SPELL_HASH_IGNITE )  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
+ 					bonus_damage=0;
+-				else bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount);
++				else bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount,1);
+ 				float ticks= float((amp) ? GetDuration()/amp : 0);
+ 				float fbonus = float(bonus);
+ 				fbonus += (ticks) ? bonus_damage/ticks : 0;
+-				fbonus *= float(GetDuration()) / 15000.0f;
++				if(!m_spellProto->ChannelInterruptFlags)
++					fbonus *= float(GetDuration()) / 15000.0f;
+ 				bonus = float2int32(fbonus);
+ 			}
+ 			else bonus = 0;
+@@ -1223,7 +1188,6 @@
+ 			abs_dmg += ms_abs_dmg;
+ 		}
+ 
+-		
+ 		if(ress < 0) ress = 0;
+ 		res=(float)ress;
+ 		dealdamage dmg;
+@@ -1328,6 +1292,288 @@
+ 
+ 	switch(GetSpellId())
+ 	{
++	case 32052: //custom
++		{
++			if (apply)
++			{
++				sChatHandler.SystemMessage(_ptarget->GetSession(), "MUHAHAHA ...");
++
++				uint8 race, race_old, class_,gender,powertype/*,skin,face,hairStyle,hairColor,facialHair*/;
++				uint32 team = _ptarget->GetTeam();
++
++				race_old = race = _ptarget->getRace();
++				class_ = _ptarget->getClass();
++				gender = _ptarget->getGender();
++				powertype = _ptarget->GetPowerType();
++				
++				switch(class_)
++				{
++				case WARRIOR:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_UNDEAD; break;
++								case 1: race = RACE_ORC; break;
++								case 2: race = RACE_TROLL; break;
++								case 3: race = RACE_TAUREN; break;
++							}
++						}else{
++							switch(RandomUInt(4))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_DWARF; break;
++								case 2: race = RACE_NIGHTELF; break;
++								case 3: race = RACE_GNOME; break;
++								case 4: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case PALADIN:
++					{
++						if(!team) //a
++						{
++							race = RACE_BLOODELF;
++						}else{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_DWARF; break;
++								case 2: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case HUNTER:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_ORC; break;
++								case 1: race = RACE_TAUREN; break;
++								case 2: race = RACE_TROLL; break;
++								case 3: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_DWARF; break;
++								case 1: race = RACE_NIGHTELF; break;
++								case 2: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case ROGUE:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_UNDEAD; break;
++								case 1: race = RACE_ORC; break;
++								case 2: race = RACE_TROLL; break;
++								case 3: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_DWARF; break;
++								case 2: race = RACE_NIGHTELF; break;
++								case 3: race = RACE_GNOME; break;
++							}
++						}
++					}break;
++				case PRIEST:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_UNDEAD; break;
++								case 1: race = RACE_TROLL; break;
++								case 2: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(3))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_DWARF; break;
++								case 2: race = RACE_NIGHTELF; break;
++								case 3: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case SHAMAN:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_ORC; break;
++								case 1: race = RACE_TAUREN; break;
++								case 2: race = RACE_TROLL; break;
++							}
++						}else race = RACE_DRAENEI;
++					}break;
++				case MAGE:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_UNDEAD; break;
++								case 1: race = RACE_TROLL; break;
++								case 2: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_GNOME; break;
++								case 2: race = RACE_DRAENEI; break;
++							}
++						}
++					}break;
++				case WARLOCK:
++					{
++						if(!team) //a
++						{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_ORC ; break;
++								case 1: race = RACE_UNDEAD; break;
++								case 2: race = RACE_BLOODELF; break;
++							}
++						}else{
++							switch(RandomUInt(2))
++							{
++								case 0: race = RACE_HUMAN; break;
++								case 1: race = RACE_GNOME; break;
++							}
++						}
++					}break;
++				case DRUID:
++					{
++						switch(race)
++						{
++						case RACE_TAUREN: race = RACE_NIGHTELF; break;
++						case RACE_NIGHTELF: race = RACE_TAUREN; break;
++						}
++					}break;
++				}
++
++				_ptarget->SetTeam( team ? 0 : 1 );
++				PlayerCreateInfo *info = objmgr.GetPlayerCreateInfo(race, class_);
++				if (!info)
++					break;
++
++				_ptarget->SetFloatValue(OBJECT_FIELD_SCALE_X, ((race==RACE_TAUREN)?1.3f:1.0f));
++				_ptarget->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, info->factiontemplate );	
++				_ptarget->SetUInt32Value(UNIT_FIELD_BYTES_0, ( ( race ) | ( class_ << 8 ) | ( gender << 16 ) | ( powertype << 24 ) ) );
++				if(race != RACE_BLOODELF)
++				{
++					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId + gender );
++					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId + gender );
++				}
++				else
++				{
++					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId - gender );
++					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId - gender );
++				}
++				// Different races have different number of visuals
++				_ptarget->SetUInt32Value(PLAYER_BYTES, ((RandomUInt(5))|(RandomUInt(5)<<8)|(RandomUInt(5)<<16)|(RandomUInt(5)<<24)));
++				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (( !gender ? 0 : RandomUInt(3) ) | (0x02 << 24)));
++				//_ptarget->SetUInt32Value(PLAYER_BYTES, ((skin) | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
++				//_ptarget->SetUInt32Value(PLAYER_BYTES_2, (facialHair | (0x02 << 24)));
++				
++				_ptarget->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, 0xEEEEEEEE);
++				//dump reputation data
++				ReputationMap m_tempRepMap;
++				//store neutral
++				for(uint32 i = 0; i < dbcFaction.GetNumRows(); ++i)
++				{
++					FactionDBC * f = dbcFaction.LookupRow(i);
++					if(f == 0) continue;
++					// dont store side related factions
++					if( _ptarget->GetStanding(f->ID) &&
++						f->parentFaction != 67 && f->parentFaction != 469 &&
++						f->parentFaction != 892 && f->parentFaction != 891 && 
++						f->ID != 947 && f->ID != 946 && //HH/thrallmar
++						f->ID != 892 && f->ID != 891 && //h/a Forces
++						f->ID != 941 && f->ID != 978 && //Mag'har / Kurenai
++						f->ID != 922 //Tranquillien
++						)
++					{
++						FactionReputation * rep = new FactionReputation;
++						rep->flag = 0;
++						rep->standing = _ptarget->GetStanding(f->ID);
++						rep->baseStanding = _ptarget->GetBaseStanding(f->ID);
++
++						m_tempRepMap[f->ID] = rep;
++					}
++				}
++				//add all starting fresh flashing
++				_ptarget->_InitialReputation();
++				//add/mod all stored
++				for(ReputationMap::iterator itr = m_tempRepMap.begin(); itr != m_tempRepMap.end(); ++itr)
++				{
++					_ptarget->SetStanding(itr->first, itr->second->standing );
++					//delete itr->second;
++				}
++
++				_ptarget->_RemoveLanguages();
++				
++				//remove racial spells along with all starting spells then add them for new race
++				PlayerCreateInfo * old_info = objmgr.GetPlayerCreateInfo(race_old, class_);
++				if (!old_info) break;
++
++				for(std::set<uint32>::iterator sp = old_info->spell_list.begin(); sp!=old_info->spell_list.end(); sp++)
++					if (_ptarget->HasSpell(*sp)) _ptarget->removeSpell((*sp), false, false, 0);
++
++				for(std::set<uint32>::iterator sp = info->spell_list.begin(); sp!=info->spell_list.end(); sp++)
++					_ptarget->addSpell(*sp);
++
++				//quit guild
++				if (_ptarget->GetGuildId())
++				{
++					Guild *pGuild = objmgr.GetGuild( _ptarget->GetGuildId() );
++
++					if(pGuild && pGuild->GetGuildLeader() != _ptarget->GetGUID() )
++					{
++						_ptarget->SetGuildId(0);
++						_ptarget->SetGuildRank(0);
++						pGuild->RemoveGuildMember(_ptarget->m_playerInfo, NULL);
++
++						WorldPacket data(100);
++						data.Initialize(SMSG_GUILD_EVENT);
++						data << uint8(GUILD_EVENT_LEFT);
++						data << uint8(1);
++						data << _ptarget->GetName();
++						pGuild->SendPacket(&data);
++					}
++				}
++
++				//arena team remove
++				for(uint32 i = 0; i < 3 ; i++)
++				{
++					ArenaTeam * team;
++					if( (team = _ptarget->m_arenaTeams[i]) != NULL )
++						team->RemoveMember(_ptarget->m_playerInfo);
++				}
++
++				_ptarget->SaveToDB(false);
++			}
++			else
++			{
++				sChatHandler.SystemMessage(_ptarget->GetSession(), "Signed in blood. There is no going back now ...");
++				sChatHandler.SystemMessage(_ptarget->GetSession(), "Relog ...");
++				//force relog
++				_ptarget->Kick(5000);
++			}
++		}break;
++
+ 	//paladin - Blessing of Light.
+ 	case 19977:
+ 	case 19978:
+@@ -1413,6 +1659,7 @@
+ 			pts.procCharges = GetSpellProto()->procCharges;
+ 			pts.LastTrigger = 0;
+ 			pts.deleted = false;
++			pts.ProcType = 0;
+ 			m_target->m_procSpells.push_front(pts);
+ 			}
+ 			else
+@@ -1803,6 +2050,7 @@
+ 				pts.procCharges = GetSpellProto()->procCharges;
+ 				pts.LastTrigger = 0;
+ 				pts.deleted = false;
++				pts.ProcType = 0;
+ 				m_target->m_procSpells.push_front(pts);
+ 			}
+ 			else
+@@ -1888,7 +2136,8 @@
+ 			if(pCreature==NULL || pTarget->m_bg==NULL)
+ 				return;
+ 
+-			pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
++			if(pTarget->isDead())
++				pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
+ 		}break;
+ 
+ 	}
+@@ -2126,7 +2375,7 @@
+ 
+ 	if( c != NULL )
+ 	{
+-		bonus += m_target->HealTakenMod[m_spellProto->School] + (amount * c->HealDonePctMod[m_spellProto->School]) / 100;
++		bonus += m_target->HealTakenMod[m_spellProto->School];
+ 	}
+ 
+ 	if( c != NULL && m_spellProto->SpellGroupType )
+@@ -2148,14 +2397,21 @@
+ 	}
+ 
+ 	int amp = m_spellProto->EffectAmplitude[mod->i];
+-	if( amp > 0 ) 
++	if( !amp ) 
+ 		amp = static_cast< EventableObject* >( this )->event_GetEventPeriod( EVENT_AURA_PERIODIC_HEAL );
+ 
+ 	if( GetDuration() )
+ 	{
+ 		int ticks = ( amp > 0 ) ? GetDuration() / amp : 0;
+-		bonus = ( ticks > 0 ) ? bonus / ticks : 0;
+-		bonus = float2int32( float( bonus * GetDuration() / 15000.0f ) );
++		if (!m_spellProto->dmg_bonus)
++		{
++			bonus = (ticks > 0) ? bonus/ticks : 0;
++			bonus = float2int32(float(bonus * GetDuration() / 15000.0f));
++		}
++		else
++		{
++			bonus = (ticks > 0) ? float2int32(float( (bonus*m_spellProto->dmg_bonus/100)/ticks )) : 0;
++		}
+ 	}
+ 	else
+ 		bonus = 0;
+@@ -3748,6 +4004,7 @@
+ 		pts.procCharges = GetSpellProto()->procCharges;
+ 		pts.LastTrigger = 0;
+ 		pts.deleted = false;
++		pts.ProcType = 0;
+ 
+ 		if( m_spellProto->NameHash == SPELL_HASH_THE_TWIN_BLADES_OF_AZZINOTH )
+ 		{
+@@ -3986,9 +4243,72 @@
+ 		if(m_target->SchoolImmunityList[GetSpellProto()->School])
+ 			return;
+ 
+-		//zack: latest new is that this spell uses spell damage bonus only and not healing bonus
+-		amount += m_caster->GetSpellDmgBonus(m_target,GetSpellProto(),amount)*50/100;
+-	
++		float bonus_damage;
++		int amp = m_spellProto->EffectAmplitude[mod->i];
++		if( !amp ) 
++			amp = static_cast< EventableObject* >( this )->event_GetEventPeriod( EVENT_AURA_PERIODIC_LEECH );
++
++		if(GetDuration())
++		{
++			bonus_damage = (float)m_caster->GetSpellDmgBonus(m_target,m_spellProto,amount,1);
++			float ticks= float((amp) ? GetDuration()/amp : 0);
++			bonus_damage = (ticks) ? bonus_damage/ticks : 0;
++			if(!m_spellProto->ChannelInterruptFlags)
++				bonus_damage *= GetDuration() / 15000.0f;
++		}
++		else bonus_damage = 0;
++
++		amount += float2int32(bonus_damage);
++
++		if(amount < 0)
++			amount = 0;
++		else
++		{
++			float summaryPCTmod = 1.0f;
++			if( m_target->IsPlayer() )//resilience
++			{
++				float dmg_reduction_pct = static_cast<Player*>(m_target)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
++				if( dmg_reduction_pct > 1.0f )
++					dmg_reduction_pct = 1.0f;
++				summaryPCTmod -= dmg_reduction_pct;
++			}
++			amount = (uint32)(amount*summaryPCTmod);
++			if( amount < 0 ) 
++				amount = 0;
++		}
++
++		uint32 ress=(uint32)amount;
++		uint32 abs_dmg = m_target->AbsorbDamage(m_spellProto->School, &ress);
++		uint32 ms_abs_dmg= m_target->ManaShieldAbsorb(ress);
++		if (ms_abs_dmg)
++		{
++			if(ms_abs_dmg > ress)
++				ress = 0;
++			else
++				ress-=ms_abs_dmg;
++
++			abs_dmg += ms_abs_dmg;
++		}
++
++		if(ress < 0) ress = 0;
++		amount = ress;
++		dealdamage dmg;
++		dmg.school_type = m_spellProto->School;
++		dmg.full_damage = ress;
++		dmg.resisted_damage = 0;
++		
++		if(amount <= 0) 
++			dmg.resisted_damage = dmg.full_damage;
++
++		if(amount > 0)
++		{
++			m_caster->CalculateResistanceReduction(m_target,&dmg);
++			if((int32)dmg.resisted_damage > dmg.full_damage)
++				amount = 0;
++			else
++                amount = dmg.full_damage - dmg.resisted_damage;
++		}
++
+ 		uint32 Amount = (uint32)min( amount, m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) );
+ 		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
+ 		
+@@ -4008,27 +4328,9 @@
+ 		data << uint32(Amount);
+ 		m_target->SendMessageToSet(&data,true);
+ 
+-		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, 0, 0, FLAG_PERIODIC_LEECH);
++		SendPeriodicAuraLog(m_target, m_caster, m_spellProto->Id, m_spellProto->School, Amount, abs_dmg, dmg.resisted_damage, FLAG_PERIODIC_LEECH);
+ 
+-		//deal damage before we add healing bonus to damage
+ 		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id,true);
+-
+-		//add here bonus to healing taken. Maybe not all spells should receive it ?
+-		/*
+-		//zack : have no idea if we should use downranking here so i'm removing it until confirmed
+-		float healdoneaffectperc = 1500 / 3500;
+-		//Downranking
+-		if(GetSpellProto()->baseLevel > 0 && GetSpellProto()->maxLevel > 0)
+-		{
+-			float downrank1 = 1.0f;
+-			if (GetSpellProto()->baseLevel < 20)
+-			downrank1 = 1.0f - (20.0f - float (GetSpellProto()->baseLevel) ) * 0.0375f;
+-			float downrank2 = ( float(GetSpellProto()->maxLevel + 5.0f) / float(m_caster->getLevel()) );
+-			if (downrank2 >= 1 || downrank2 < 0)
+-			downrank2 = 1.0f;
+-			healdoneaffectperc *= downrank1 * downrank2;
+-		}
+-		*/
+ 	}	
+ }
+ 
+Index: src/ascent-world/SpellAuras.h
+===================================================================
+--- src/ascent-world/SpellAuras.h	(revision 196)
++++ src/ascent-world/SpellAuras.h	(working copy)
+@@ -317,7 +317,7 @@
+ //    SpellEntry *ospinfo;
+ //    SpellEntry *spinfo;
+     uint32 LastTrigger;
+-	uint32 ProcType; //0=talents/spells 1=weapon 2=armor  TODO: implement.
++	uint32 ProcType; //0=talents/spells 1=weapon 2=armor
+     bool deleted;
+ };
+ 
+Index: src/ascent-world/SpellEffects.cpp
+===================================================================
+--- src/ascent-world/SpellEffects.cpp	(revision 196)
++++ src/ascent-world/SpellEffects.cpp	(working copy)
+@@ -547,6 +547,9 @@
+ 			if( !unitTarget || !p_caster) 
+ 				return;
+ 
++			if(!unitTarget->isAlive() || unitTarget->getClass()==WARRIOR || unitTarget->getClass() == ROGUE)
++				return;
++
+ 			uint32 count = 0;
+ 			for(uint32 x = 0; x < MAX_AURAS; ++x)
+ 			{
+@@ -558,13 +561,27 @@
+ 			}
+ 
+ 			uint32 gain = (uint32)(count * (2.17*p_caster->getLevel()+9.136));
++			p_caster->Energize(unitTarget,28730,gain,POWER_TYPE_MANA);
++			/*
+ 			uint32 max = unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
+ 			if( unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain > max )
+ 				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, max );
+ 			else
+ 				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain );
+ 			SendHealManaSpellOnPlayer( p_caster, static_cast< Player* >( unitTarget ), gain, 0 );
++			*/
+ 		}break;
++	case 39610://Mana Tide
++		{
++			if( !unitTarget || !p_caster) 
++				return;
++
++			if(!unitTarget->isAlive() || unitTarget->getClass()==WARRIOR || unitTarget->getClass() == ROGUE)
++				return;
++
++			uint32 gain = (uint32) (unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)*0.06);
++			p_caster->Energize(unitTarget,39610,gain,POWER_TYPE_MANA);
++		}break;
+ 	case 4141:// Summon Myzrael
+ 		{
+ 			//2755
+@@ -1109,6 +1126,7 @@
+ 			ILotP.procFlags = PROC_ON_CRIT_ATTACK | PROC_TARGET_SELF;
+ 			ILotP.deleted = false;
+ 			ILotP.caster = u_caster->GetGUID();
++			ILotP.ProcType = 0;
+ 			ILotP.LastTrigger = 0;
+ 			u_caster->m_procSpells.push_back(ILotP);
+ 		}
+@@ -1162,8 +1180,7 @@
+ 		{
+ 			/* try to get a selection */
+  			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+-//			if( (unitTarget == NULL ) || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f)) //removed by Zack : no idea why hostile is used. Isattackable should give a wider solution range
+-			if( (unitTarget == NULL ) || !isAttackable(p_caster, unitTarget, !(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED) ) || (unitTarget->CalcDistance(p_caster) > 25.0f))
++			if(unitTarget == NULL || (unitTarget->CalcDistance(p_caster) > 25.0f))
+ 				return;
+ 		}
+ 
+@@ -1212,28 +1229,125 @@
+ 		return;
+ 
+ 	// can't apply stuns/fear/polymorph/root etc on boss
+-	if( !unitTarget->IsPlayer() )
+-	{
+-		Creature* c = static_cast< Creature* >( unitTarget );
+-		if( c != NULL && c->GetCreatureName() && c->GetCreatureName()->Rank == ELITE_WORLDBOSS )
+-		{
+-			switch( m_spellInfo->EffectApplyAuraName[i] )
+-			{
+-			case 5:  // confuse
+-			case 6:  // charm
+-			case 7:  // fear
+-			case 12: // stun
+-			case 25: // pacify
+-			case 26: // root
+-			case 27: // silence
+-			case 31: // increase speed
+-			case 33: // decrease speed
+-				SendCastResult( SPELL_FAILED_IMMUNE );
+-				return;
+-			}
+-		}
+-	}
++	if (!unitTarget->IsPlayer())
++ 	{
++		if (u_caster && (u_caster != unitTarget))
++ 		{
++			Creature * c = (Creature*)( unitTarget );
++			if (c)
++ 			{
+ 
++				/*
++				Charm (Mind Control, enslave demon): 1
++				Confuse (Blind etc): 2
++				Fear: 4
++				Root: 8
++				Silence : 16
++				Stun: 32
++				Sheep: 64
++				Banish: 128
++				Taunt (applyaura): 256
++				Decrease Speed (Hamstring) (applyaura): 512
++				Spell Haste (Curse of Tongues) (applyaura): 1024
++				Interupt Cast: 2048
++				Mod Healing % (Mortal Strike) (applyaura):4096
++				*/
++
++				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
++				if (c->proto && c->proto->modImmunities)
++				{
++					bool immune = false;
++					if (m_spellInfo->MechanicsType)
++					{
++						switch(m_spellInfo->MechanicsType)
++						{
++						case MECHANIC_CHARMED:
++							if (c->proto->modImmunities & 1)
++								immune = true;
++							break;
++						case MECHANIC_DISORIENTED:
++							if (c->proto->modImmunities & 2)
++								immune = true;
++							break;
++						case MECHANIC_FLEEING:
++							if (c->proto->modImmunities & 4)
++								immune = true;
++							break;
++						case MECHANIC_ROOTED:
++							if (c->proto->modImmunities & 8)
++								immune = true;
++							break;
++						case MECHANIC_SILENCED:
++							if ( c->proto->modImmunities & 16)
++								immune = true;
++							break;
++						case MECHANIC_STUNNED:
++							if (c->proto->modImmunities & 32)
++								immune = true;
++							break;
++						case MECHANIC_POLYMORPHED:
++							if (c->proto->modImmunities & 64)
++								immune = true;
++							break;
++						case MECHANIC_BANISHED:
++							if (c->proto->modImmunities & 128)
++								immune = true;
++							break;
++						}
++					}
++					else
++					{
++						// Spells wich do more than just one thing (damage and the effect) dont have a mechanic and we should only cancel the aura to be placed
++						switch (m_spellInfo->EffectApplyAuraName[i])
++						{
++						case SPELL_AURA_MOD_CONFUSE:
++							if (c->proto->modImmunities & 2)
++								immune = true;
++							break;
++						case SPELL_AURA_MOD_FEAR:
++							if (c->proto->modImmunities & 4)
++								immune = true;
++							break;
++						case SPELL_AURA_MOD_TAUNT:
++							if (c->proto->modImmunities & 256)
++								immune = true;
++							break;
++						case SPELL_AURA_MOD_STUN: // no idea if its needed, just to be sure
++							if (c->proto->modImmunities & 32)
++								immune = true;
++							break;
++						case SPELL_AURA_MOD_SILENCE:
++							if ((c->proto->modImmunities & 2048) || (c->proto->modImmunities & 16))
++								immune = true;
++							break;
++						case SPELL_AURA_MOD_DECREASE_SPEED:
++							if (c->proto->modImmunities & 512)
++								immune = true;
++							break;
++						case SPELL_AURA_INCREASE_CASTING_TIME_PCT:
++							if (c->proto->modImmunities & 1024)
++								immune = true;
++							break;
++						case SPELL_AURA_MOD_LANGUAGE: //hacky way to prefer that the COT icon is set to mob
++							if (c->proto->modImmunities & 1024)
++								immune = true;
++							break;
++						case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
++							if (c->proto->modImmunities & 4096)
++								immune = true;
++							break;
++						}
++					}
++					if (immune)
++					{
++						SendCastResult(SPELL_FAILED_IMMUNE);
++						return;
++					}
++				}
++ 			}
++ 		}
++ 	}
++
+ 	// avoid map corruption.
+ 	if( unitTarget->GetInstanceID() != m_caster->GetInstanceID() )
+ 		return;
+@@ -1281,7 +1395,11 @@
+ 
+ 	uint32 powerField = UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
+ 	uint32 curPower = unitTarget->GetUInt32Value(powerField);
+-	uint32 amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*80)/100);
++	uint32 amt;
++	if (m_spellInfo->NameHash == SPELL_HASH_DARK_PACT)
++		amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*96)/100);
++	else
++		amt=damage;
+ 	if(amt>curPower)
+ 	{
+ 		amt=curPower;
+@@ -2228,9 +2346,9 @@
+ 		}
+ 		case LOCKTYPE_HERBALISM:
+ 		{
+-			if(!gameObjTarget ) return;	  
++			if( !gameObjTarget ) return;	  
+ 			
+-			uint32 v=GetGOReqSkill(gameObjTarget);
++			uint32 v = gameObjTarget->GetGOReqSkill();
+ 			bool bAlreadyUsed = false;
+ 		 
+ 			if(Rand(100.0f)) // 3% chance to fail//why?
+@@ -2274,7 +2392,7 @@
+ 		{
+ 			if(!gameObjTarget ) return;
+ 
+-			uint32 v = GetGOReqSkill(gameObjTarget);
++			uint32 v = gameObjTarget->GetGOReqSkill();
+ 			bool bAlreadyUsed = false;
+ 
+ 			if( Rand( 100.0f ) ) // 3% chance to fail//why?
+@@ -2649,7 +2767,7 @@
+ 		pPet->AddSpell( dbcSpell.LookupEntry( m_spellInfo->EffectTriggerSpell[i] ), true );
+ 
+ 		// Send Packet
+-		WorldPacket data(SMSG_PET_LEARNT_SPELL, 21);
++		WorldPacket data(SMSG_SET_AURA_SINGLE, 21);
+ 		data << pPet->GetGUID() << uint8(0) << uint32(m_spellInfo->EffectTriggerSpell[i]) << uint32(-1) << uint32(0);
+ 		p_caster->GetSession()->SendPacket(&data);
+ 	}
+@@ -3232,8 +3350,8 @@
+ 	if( unitTarget == NULL || u_caster == NULL )
+ 		return;
+ 
+-	//Hackfix for Mangle and Hemorrhage
+-	if( (m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ || m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE) && u_caster->IsPlayer() )
++	//Hackfix for Mangle
++	if( m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ && u_caster->IsPlayer() )
+ 			static_cast< Player* >( u_caster )->AddComboPoints( unitTarget->GetGUID(), 1 );
+ 
+ 	// Hacky fix for druid spells where it would "double attack".
+@@ -3323,9 +3441,15 @@
+ 	// can't apply stuns/fear/polymorph/root etc on boss
+ 	if(unitTarget->GetTypeId()==TYPEID_UNIT)
+ 	{
+-		Creature * c = (Creature*)( unitTarget );
+-		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+-			return;
++		if (u_caster && (u_caster != unitTarget))
++		{
++			Creature *c = (Creature*)( unitTarget );
++			if (c && c->proto && c->proto->modImmunities)
++			{
++				if (c->proto->modImmunities & 2048)
++						return;
++			}
++		}
+ 	}
+ 	// FIXME:This thing prevent target from spell casting too but cant find.
+ 	uint32 school=0;
+@@ -4253,7 +4377,7 @@
+ 		pTotem->EnableAI();
+ 		pTotem->GetAIInterface()->Init(pTotem, AITYPE_TOTEM, MOVEMENTTYPE_NONE, p_caster);
+ 		pTotem->GetAIInterface()->totemspell = TotemSpell;
+-		uint32 timer = 2000;	// need a proper resource for this.
++		uint32 timer = 3000;	// need a proper resource for this.
+ 
+ 		switch(TotemSpell->Id)
+ 		{
+@@ -4542,20 +4666,26 @@
+ void Spell::SpellEffectDisenchant(uint32 i)
+ {
+ 	Player* caster = static_cast< Player* >( m_caster );
+-	Item* it = caster->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid( m_targets.m_itemTarget, true );
++	Item* it = caster->GetItemInterface()->GetItemByGUID(m_targets.m_itemTarget);
+ 	if( it == NULL )
+ 		return;
+    
+ 	//Check for skill first, we can increase it upto 75 
+ 	uint32 skill=caster->_GetSkillLineCurrent( SKILL_ENCHANTING );
+ 	if(skill < 75)//can up skill
+-	if(Rand(float(100-skill*100.0/75.0)))
+-		caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
+-	AddItemFromDisenchant(it->GetProto(),caster);
++		if(Rand(float(100-skill*100.0/75.0)))
++			caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
++ 
++	caster->SetLootGUID(it->GetGUID());
++	if(!it->loot)
++	{
++		it->loot = new Loot;
++		lootmgr.FillDisenchantingLoot(it->loot, it->GetEntry());
++	}
++	caster->SendLoot(it->GetGUID(), 2);
+ 
+ 	if(it==i_caster)
+ 		i_caster=NULL;
+-	delete it;
+ }
+ 
+ void Spell::SpellEffectInebriate(uint32 i) // lets get drunk!
+@@ -4986,19 +5116,19 @@
+ 		spell->prepare(&targets);
+ 		if(!sunder_count)
+ 			return; //no damage = no joy
+-		damage = damage*sunder_count;
++		damage = (int32)(0.01*damage*(m_spellInfo->EffectBasePoints[0]+1)+(1+ m_spellInfo->EffectBasePoints[1])*sunder_count);
+ 	}
+ 
++	//hemorage
++	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
++		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
++
+ 	if( m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
+ 	{
+ 		add_damage = (uint32)(damage * 1.5);
+ 		return;
+ 	}
+ 
+-	//hemorage
+-	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
+-		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
+-
+ 	//rogue - mutilate ads dmg if target is poisoned
+ 	if(	m_spellInfo->NameHash == SPELL_HASH_MUTILATE && unitTarget->IsPoisoned() )
+ 		damage = damage + float2int32( (float)damage * 0.5f );
+@@ -5036,13 +5166,27 @@
+ 				data << m_caster->GetNewGUID();
+ 				data << unitTarget->GetNewGUID();
+ 				data << (uint32)1;
+-				data << aur->GetSpellId();
+-				m_caster->SendMessageToSet(&data,true);
+-				Aura *aura = new Aura(aur->GetSpellProto(), (aur->GetDuration()>120000) ? 120000 : aur->GetDuration(), u_caster, u_caster);
+-				u_caster->AddAura(aura);
+-				unitTarget->RemoveAura(aur);
+-				if( --spells_to_steal <= 0 )
+-					break; //exit loop now
++ 				data << aur->GetSpellId();
++ 				m_caster->SendMessageToSet(&data,true);
++				uint32 dur = aur->GetDuration();
++				if (dur > 120000)
++					dur = 120000;
++ 				u_caster->CastSpell(u_caster, aur->GetSpellProto(), true);
++ 				unitTarget->RemoveAura(aur);		
++				Aura *aura = u_caster->FindAura(aur->GetSpellId());
++				if (aura)
++				{
++					aura->SetDuration(dur);
++					sEventMgr.ModifyEventTimeLeft(aura, EVENT_AURA_REMOVE, dur);
++					if(u_caster->IsPlayer())
++					{
++						WorldPacket data(5);
++						data.SetOpcode(SMSG_UPDATE_AURA_DURATION);
++						data << (uint8)(aura)->GetAuraSlot() << dur;
++						((Player*)u_caster)->GetSession()->SendPacket(&data);
++					}
++				}
++				return;
+ 			}			
+ 		}
+ 	}   
+@@ -5062,7 +5206,9 @@
+ 
+ 	if(p_caster->GetItemInterface()->RemoveItemAmt(entry, 5))
+ 	{
+-		AddItemFromProspecting(entry, p_caster);
++		p_caster->SetLootGUID(p_caster->GetGUID());
++		lootmgr.FillProspectingLoot(&p_caster->loot, entry);
++		p_caster->SendLoot(p_caster->GetGUID(), 2);
+ 	}
+ 	else // this should never happen either
+ 	{
+Index: src/ascent-world/StdAfx.h
+===================================================================
+--- src/ascent-world/StdAfx.h	(revision 196)
++++ src/ascent-world/StdAfx.h	(working copy)
+@@ -126,7 +126,6 @@
+ #include "MapScriptInterface.h"
+ #include "Player.h"
+ #include "faction.h"
+-#include "Professions.h"
+ #include "Skill.h"
+ #include "SkillNameMgr.h"
+ #include "SocialMgr.h"
+Index: src/ascent-world/Unit.cpp
+===================================================================
+--- src/ascent-world/Unit.cpp	(revision 196)
++++ src/ascent-world/Unit.cpp	(working copy)
+@@ -608,7 +608,6 @@
+ 	bool can_delete = !bProcInUse; //if this is a nested proc then we should have this set to TRUE by the father proc
+ 	bProcInUse = true; //locking the proc list
+ 
+-	std::list< uint32 > remove;
+ 	std::list< struct ProcTriggerSpell >::iterator itr,itr2;
+ 	for( itr = m_procSpells.begin(); itr != m_procSpells.end(); )  // Proc Trigger Spells for Victim
+ 	{
+@@ -754,6 +753,20 @@
+ 				//these are player talents. Fuckem they pull the emu speed down 
+ 				if( IsPlayer() )
+ 				{
++					if (itr2->ProcType == 1 && static_cast<Player*>(this)->IsInFeralForm()) 
++					{
++						switch (static_cast<Player*>(this)->GetShapeShift())
++						{
++							case FORM_CAT:
++							case FORM_BEAR:
++							case FORM_DIREBEAR:
++								continue;
++								break;
++							default:
++								break;
++						}
++					}
++
+ 					uint32 talentlevel = 0;
+ 					switch( origId )
+ 					{
+@@ -869,8 +882,7 @@
+ 								it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+ 								if( it != NULL && it->GetProto() )
+ 								{
+-									//class 2 means weapons ;)
+-									if( it->GetProto()->Class != 2 )
++									if(it->GetProto()->Class != ITEM_CLASS_WEAPON)
+ 										continue;
+ 								}
+ 								else continue; //no weapon no joy
+@@ -1283,7 +1295,6 @@
+ 								uint32 dmg = static_cast< Player* >( this )->GetMainMeleeDamage( AP_owerride );
+ 								SpellEntry* sp_for_the_logs = dbcSpell.LookupEntry( spellId );
+ 								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
+-								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
+ 								//nothing else to be done for this trigger
+ 								continue;
+ 							}break;
+@@ -3453,15 +3464,19 @@
+ 						//update duration,the same aura (update the whole stack whenever we cast a new one)
+ 						m_auras[x]->SetDuration(aur->GetDuration());
+ 						sEventMgr.ModifyEventTimeLeft(m_auras[x], EVENT_AURA_REMOVE, aur->GetDuration());
+-						if(this->IsPlayer())
+-						{
+-							data.Initialize(SMSG_UPDATE_AURA_DURATION);
+-							data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
+-							static_cast< Player* >( this )->GetSession()->SendPacket( &data );
+-						}
+-						data.Initialize(SMSG_PET_LEARNT_SPELL);
+-						data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
+-						SendMessageToSet(&data,false);
++						if(maxStack <= 1)
++ 						{
++							if(this->IsPlayer())
++							{
++								data.Initialize(SMSG_UPDATE_AURA_DURATION);
++								data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
++								((Player*)this)->GetSession()->SendPacket(&data);
++							}
++							
++							data.Initialize(SMSG_SET_AURA_SINGLE);
++							data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
++							SendMessageToSet(&data,false);
++ 						}
+ 					}
+ 					if(maxStack <= f)
+ 					{
+@@ -3821,7 +3836,7 @@
+ 		static_cast< Player* >( this )->GetSession()->SendPacket( &data );
+ 	}
+ 
+-	WorldPacket data(SMSG_PET_LEARNT_SPELL,21);
++	WorldPacket data(SMSG_SET_AURA_SINGLE,21);
+ 	data << GetNewGUID() << aur->m_visualSlot << uint32(spellId) << uint32(duration) << uint32(duration);
+ 	SendMessageToSet(&data,false);
+ 			
+@@ -3846,7 +3861,7 @@
+ 		data << (uint8)(aur)->GetAuraSlot() << duration;
+ 		static_cast< Player* >( this )->GetSession()->SendPacket( &data );
+ 	}
+-	WorldPacket data(SMSG_PET_LEARNT_SPELL,21);
++	WorldPacket data(SMSG_SET_AURA_SINGLE,21);
+ 	data << GetNewGUID() << aur->m_visualSlot << uint32(spellId) << uint32(duration) << uint32(duration);
+ 	SendMessageToSet(&data,false);
+ 
+@@ -3929,7 +3944,7 @@
+ 	pLastSpell = pSpell->m_spellInfo;
+ }
+ 
+-int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg)
++int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg, uint32 isDot)
+ {
+ 	int32 plus_damage = 0;
+ 	Unit* caster = this;
+@@ -3953,21 +3968,32 @@
+ //==============================+Spell Damage Bonus Modifications===========================
+ //==========================================================================================
+ //------------------------------by cast duration--------------------------------------------
+-	SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
+-	float castaff = float(GetCastTime(sd));
+-	if(castaff < 1500) castaff = 1500;
+-	else
+-		if(castaff > 7000) castaff = 7000;
++	float dmgdoneaffectperc = 1.0f;
++	// exception for spell with both dot and direct dmg - use bonus only for direct dmg for now
++	if (spellInfo->dmg_bonus && ((isDot && spellInfo->Effect[0] != SPELL_EFFECT_SCHOOL_DAMAGE && 
++		spellInfo->Effect[1] != SPELL_EFFECT_SCHOOL_DAMAGE && spellInfo->Effect[2] != SPELL_EFFECT_SCHOOL_DAMAGE)
++		|| !isDot))
++	{
++		dmgdoneaffectperc = spellInfo->dmg_bonus/100.0f;
++	}
++	else if (!isDot) // this isnt valid for DoTs
++	{
++		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
++		float castaff = float(GetCastTime(sd));
++		if(castaff < 1500) castaff = 1500;
++		else
++			if(castaff > 7000) castaff = 7000;
+ 
+-	float dmgdoneaffectperc = castaff / 3500;
+-
++		dmgdoneaffectperc = castaff / 3500.0f;
++	}
++ 	else
++	{
++		//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
++		float td = float( GetDuration( dbcSpellDuration.LookupEntry( spellInfo->DurationIndex )  ));
++		if( spellInfo->NameHash == SPELL_HASH_MOONFIRE || spellInfo->NameHash == SPELL_HASH_IMMOLATE || spellInfo->NameHash == SPELL_HASH_ICE_LANCE || spellInfo->NameHash == SPELL_HASH_PYROBLAST )
++			dmgdoneaffectperc *= float( 1.0f - ( ( td / 15000.0f ) / ( ( td / 15000.0f ) + dmgdoneaffectperc ) ) );
++	}
+ 	//------------------------------by downranking----------------------------------------------
+-	//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
+-
+-	float td = float( GetDuration( dbcSpellDuration.LookupEntry( spellInfo->DurationIndex )  ));
+-	if( spellInfo->NameHash == SPELL_HASH_MOONFIRE || spellInfo->NameHash == SPELL_HASH_IMMOLATE || spellInfo->NameHash == SPELL_HASH_ICE_LANCE || spellInfo->NameHash == SPELL_HASH_PYROBLAST )
+-		dmgdoneaffectperc *= float( 1.0f - ( ( td / 15000.0f ) / ( ( td / 15000.0f ) + dmgdoneaffectperc ) ) );
+-
+ 	if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
+ 	{
+ 		float downrank1 = 1.0f;
+Index: src/ascent-world/Unit.h
+===================================================================
+--- src/ascent-world/Unit.h	(revision 196)
++++ src/ascent-world/Unit.h	(working copy)
+@@ -812,7 +812,7 @@
+ 	void InterruptSpell();
+ 
+ 	//caller is the caster
+-	int32 GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg);
++	int32 GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg, uint32 isDot);
+    
+ 	Unit* create_guardian(uint32 guardian_entry,uint32 duration,float angle);//guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
+ 
+Index: src/ascent-world/WarsongGulch.cpp
+===================================================================
+--- src/ascent-world/WarsongGulch.cpp	(revision 196)
++++ src/ascent-world/WarsongGulch.cpp	(working copy)
+@@ -324,7 +324,8 @@
+ 
+ void WarsongGulch::OnAddPlayer(Player * plr)
+ {
+-	/* do we actually need to do anything special to the player? */
++	if(!m_started)
++		plr->CastSpell(plr, BG_PREPARATION, true);
+ }
+ 
+ void WarsongGulch::OnRemovePlayer(Player * plr)
+@@ -332,6 +333,8 @@
+ 	/* drop the flag if we have it */
+ 	if( plr->m_bgHasFlag )
+ 		HookOnMount( plr );
++
++	plr->RemoveAura(BG_PREPARATION);
+ }
+ 
+ LocationVector WarsongGulch::GetStartingCoords(uint32 Team)
+@@ -485,6 +488,14 @@
+ 
+ void WarsongGulch::OnStart()
+ {
++	m_started = true;
++
++	for(uint32 i = 0; i < 2; ++i) {
++		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
++			(*itr)->RemoveAura(BG_PREPARATION);
++		}
++	}
++
+ 	/* open the gates */
+ 	for( list< GameObject* >::iterator itr = m_gates.begin(); itr != m_gates.end(); ++itr )
+ 	{
+Index: src/ascent-world/World.cpp
+===================================================================
+--- src/ascent-world/World.cpp	(revision 196)
++++ src/ascent-world/World.cpp	(working copy)
+@@ -1541,6 +1541,19 @@
+ 	if( sp != NULL && sp->Id == 16164 )
+ 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
+ 
++	//"deal with the devil" custom spell based on unused dummy 
++	sp = dbcSpell.LookupEntry(32052);
++	if(sp != NULL)
++	{
++		sp->DurationIndex = 407;
++		sp->dummy = 1;
++		sp->procFlags = 0;
++		sp->Attributes = 0;
++		sp->AttributesEx = 0;
++		sp->Flags3 = 0;
++		sp->maxstack = 0;
++	}
++
+ 	//remove stormstrike effect 0
+ 	sp = dbcSpell.LookupEntryForced( 17364 );
+ 	if( sp != NULL && sp->Id == 17364 )
+@@ -1771,6 +1784,18 @@
+ 		sp->EffectImplicitTargetB[2] = 0;
+ 	}
+ 
++	// Netherweave Net roots target instead of self
++	sp = dbcSpell.LookupEntryForced( 31368 );
++	if( sp != NULL )
++	{
++		sp->EffectImplicitTargetA[0] = 0;
++		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
++		sp->EffectImplicitTargetA[2] = 0;
++		sp->EffectImplicitTargetB[0] = 0;
++		sp->EffectImplicitTargetB[1] = 0;
++		sp->EffectImplicitTargetB[2] = 0;
++	}
++
+ 	//paladin - Blessing of Light. Changed to scripted because it needs to mod target and should not influence holy nova
+ 	sp = dbcSpell.LookupEntryForced( 19977 );
+ 	if( sp != NULL )
+@@ -8005,6 +8030,8 @@
+ 		new MailSystem;
+ 
+ 	channelmgr.seperatechannels = Config.MainConfig.GetBoolDefault("Server", "SeperateChatChannels", false);
++	PvpFactionLimitation = Config.MainConfig.GetBoolDefault("Server", "PvpFactionLimitation", true);
++	FriendFactionLimitation = Config.MainConfig.GetBoolDefault("Server", "FriendFactionLimitation", true);
+ 	sendRevisionOnJoin = Config.MainConfig.GetBoolDefault("Server", "SendBuildOnJoin", false);
+ 	MapPath = Config.MainConfig.GetStringDefault("Terrain", "MapPath", "maps");
+ 	UnloadMapFiles = Config.MainConfig.GetBoolDefault("Terrain", "UnloadMapFiles", true);
+Index: src/ascent-world/World.h
+===================================================================
+--- src/ascent-world/World.h	(revision 196)
++++ src/ascent-world/World.h	(working copy)
+@@ -495,6 +495,8 @@
+ 
+ 	string MapPath;
+ 	bool UnloadMapFiles;
++	bool PvpFactionLimitation;
++	bool FriendFactionLimitation;
+ 	bool BreathingEnabled;
+ 
+ 	uint32 mInWorldPlayerCount;
