@@ -547,6 +547,9 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			if( !unitTarget || !p_caster) 
 				return;
 
+			if(!unitTarget->isAlive() || unitTarget->getClass()==WARRIOR || unitTarget->getClass() == ROGUE)
+				return;
+
 			uint32 count = 0;
 			for(uint32 x = 0; x < MAX_AURAS; ++x)
 			{
@@ -558,12 +561,26 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			}
 
 			uint32 gain = (uint32)(count * (2.17*p_caster->getLevel()+9.136));
+			p_caster->Energize(unitTarget,28730,gain,POWER_TYPE_MANA);
+			/*
 			uint32 max = unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
 			if( unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain > max )
 				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, max );
 			else
 				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain );
 			SendHealManaSpellOnPlayer( p_caster, static_cast< Player* >( unitTarget ), gain, 0 );
+			*/
+		}break;
+	case 39610://Mana Tide
+		{
+			if( !unitTarget || !p_caster) 
+				return;
+
+			if(!unitTarget->isAlive() || unitTarget->getClass()==WARRIOR || unitTarget->getClass() == ROGUE)
+				return;
+
+			uint32 gain = (uint32) (unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)*0.06);
+			p_caster->Energize(unitTarget,39610,gain,POWER_TYPE_MANA);
 		}break;
 	case 4141:// Summon Myzrael
 		{
@@ -1109,6 +1126,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ILotP.procFlags = PROC_ON_CRIT_ATTACK | PROC_TARGET_SELF;
 			ILotP.deleted = false;
 			ILotP.caster = u_caster->GetGUID();
+			ILotP.ProcType = 0;
 			ILotP.LastTrigger = 0;
 			u_caster->m_procSpells.push_back(ILotP);
 		}
@@ -1162,8 +1180,7 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 		{
 			/* try to get a selection */
  			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
-//			if( (unitTarget == NULL ) || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f)) //removed by Zack : no idea why hostile is used. Isattackable should give a wider solution range
-			if( (unitTarget == NULL ) || !isAttackable(p_caster, unitTarget, !(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED) ) || (unitTarget->CalcDistance(p_caster) > 25.0f))
+			if(unitTarget == NULL || (unitTarget->CalcDistance(p_caster) > 25.0f))
 				return;
 		}
 
@@ -1212,27 +1229,124 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 		return;
 
 	// can't apply stuns/fear/polymorph/root etc on boss
-	if( !unitTarget->IsPlayer() )
-	{
-		Creature* c = static_cast< Creature* >( unitTarget );
-		if( c != NULL && c->GetCreatureName() && c->GetCreatureName()->Rank == ELITE_WORLDBOSS )
-		{
-			switch( m_spellInfo->EffectApplyAuraName[i] )
-			{
-			case 5:  // confuse
-			case 6:  // charm
-			case 7:  // fear
-			case 12: // stun
-			case 25: // pacify
-			case 26: // root
-			case 27: // silence
-			case 31: // increase speed
-			case 33: // decrease speed
-				SendCastResult( SPELL_FAILED_IMMUNE );
-				return;
-			}
-		}
-	}
+	if (!unitTarget->IsPlayer())
+ 	{
+		if (u_caster && (u_caster != unitTarget))
+ 		{
+			Creature * c = (Creature*)( unitTarget );
+			if (c)
+ 			{
+
+				/*
+				Charm (Mind Control, enslave demon): 1
+				Confuse (Blind etc): 2
+				Fear: 4
+				Root: 8
+				Silence : 16
+				Stun: 32
+				Sheep: 64
+				Banish: 128
+				Taunt (applyaura): 256
+				Decrease Speed (Hamstring) (applyaura): 512
+				Spell Haste (Curse of Tongues) (applyaura): 1024
+				Interupt Cast: 2048
+				Mod Healing % (Mortal Strike) (applyaura):4096
+				*/
+
+				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
+				if (c->proto && c->proto->modImmunities)
+				{
+					bool immune = false;
+					if (m_spellInfo->MechanicsType)
+					{
+						switch(m_spellInfo->MechanicsType)
+						{
+						case MECHANIC_CHARMED:
+							if (c->proto->modImmunities & 1)
+								immune = true;
+							break;
+						case MECHANIC_DISORIENTED:
+							if (c->proto->modImmunities & 2)
+								immune = true;
+							break;
+						case MECHANIC_FLEEING:
+							if (c->proto->modImmunities & 4)
+								immune = true;
+							break;
+						case MECHANIC_ROOTED:
+							if (c->proto->modImmunities & 8)
+								immune = true;
+							break;
+						case MECHANIC_SILENCED:
+							if ( c->proto->modImmunities & 16)
+								immune = true;
+							break;
+						case MECHANIC_STUNNED:
+							if (c->proto->modImmunities & 32)
+								immune = true;
+							break;
+						case MECHANIC_POLYMORPHED:
+							if (c->proto->modImmunities & 64)
+								immune = true;
+							break;
+						case MECHANIC_BANISHED:
+							if (c->proto->modImmunities & 128)
+								immune = true;
+							break;
+						}
+					}
+					else
+					{
+						// Spells wich do more than just one thing (damage and the effect) dont have a mechanic and we should only cancel the aura to be placed
+						switch (m_spellInfo->EffectApplyAuraName[i])
+						{
+						case SPELL_AURA_MOD_CONFUSE:
+							if (c->proto->modImmunities & 2)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_FEAR:
+							if (c->proto->modImmunities & 4)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_TAUNT:
+							if (c->proto->modImmunities & 256)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_STUN: // no idea if its needed, just to be sure
+							if (c->proto->modImmunities & 32)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_SILENCE:
+							if ((c->proto->modImmunities & 2048) || (c->proto->modImmunities & 16))
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_DECREASE_SPEED:
+							if (c->proto->modImmunities & 512)
+								immune = true;
+							break;
+						case SPELL_AURA_INCREASE_CASTING_TIME_PCT:
+							if (c->proto->modImmunities & 1024)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_LANGUAGE: //hacky way to prefer that the COT icon is set to mob
+							if (c->proto->modImmunities & 1024)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
+							if (c->proto->modImmunities & 4096)
+								immune = true;
+							break;
+						}
+					}
+					if (immune)
+					{
+						SendCastResult(SPELL_FAILED_IMMUNE);
+						return;
+					}
+				}
+ 			}
+ 		}
+ 	}
 
 	// avoid map corruption.
 	if( unitTarget->GetInstanceID() != m_caster->GetInstanceID() )
@@ -1281,7 +1395,11 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 
 	uint32 powerField = UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
 	uint32 curPower = unitTarget->GetUInt32Value(powerField);
-	uint32 amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*80)/100);
+	uint32 amt;
+	if (m_spellInfo->NameHash == SPELL_HASH_DARK_PACT)
+		amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*96)/100);
+	else
+		amt=damage;
 	if(amt>curPower)
 	{
 		amt=curPower;
@@ -2228,9 +2346,9 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		}
 		case LOCKTYPE_HERBALISM:
 		{
-			if(!gameObjTarget ) return;	  
+			if( !gameObjTarget ) return;	  
 			
-			uint32 v=GetGOReqSkill(gameObjTarget);
+			uint32 v = gameObjTarget->GetGOReqSkill();
 			bool bAlreadyUsed = false;
 		 
 			if(Rand(100.0f)) // 3% chance to fail//why?
@@ -2274,7 +2392,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		{
 			if(!gameObjTarget ) return;
 
-			uint32 v = GetGOReqSkill(gameObjTarget);
+			uint32 v = gameObjTarget->GetGOReqSkill();
 			bool bAlreadyUsed = false;
 
 			if( Rand( 100.0f ) ) // 3% chance to fail//why?
@@ -2649,7 +2767,7 @@ void Spell::SpellEffectLearnPetSpell(uint32 i)
 		pPet->AddSpell( dbcSpell.LookupEntry( m_spellInfo->EffectTriggerSpell[i] ), true );
 
 		// Send Packet
-		WorldPacket data(SMSG_PET_LEARNT_SPELL, 21);
+		WorldPacket data(SMSG_SET_AURA_SINGLE, 21);
 		data << pPet->GetGUID() << uint8(0) << uint32(m_spellInfo->EffectTriggerSpell[i]) << uint32(-1) << uint32(0);
 		p_caster->GetSession()->SendPacket(&data);
 	}
@@ -3232,8 +3350,8 @@ void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
 	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
-	//Hackfix for Mangle and Hemorrhage
-	if( (m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ || m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE) && u_caster->IsPlayer() )
+	//Hackfix for Mangle
+	if( m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ && u_caster->IsPlayer() )
 			static_cast< Player* >( u_caster )->AddComboPoints( unitTarget->GetGUID(), 1 );
 
 	// Hacky fix for druid spells where it would "double attack".
@@ -3323,9 +3441,15 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 	// can't apply stuns/fear/polymorph/root etc on boss
 	if(unitTarget->GetTypeId()==TYPEID_UNIT)
 	{
-		Creature * c = (Creature*)( unitTarget );
-		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
-			return;
+		if (u_caster && (u_caster != unitTarget))
+		{
+			Creature *c = (Creature*)( unitTarget );
+			if (c && c->proto && c->proto->modImmunities)
+			{
+				if (c->proto->modImmunities & 2048)
+						return;
+			}
+		}
 	}
 	// FIXME:This thing prevent target from spell casting too but cant find.
 	uint32 school=0;
@@ -4253,7 +4377,7 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 		pTotem->EnableAI();
 		pTotem->GetAIInterface()->Init(pTotem, AITYPE_TOTEM, MOVEMENTTYPE_NONE, p_caster);
 		pTotem->GetAIInterface()->totemspell = TotemSpell;
-		uint32 timer = 2000;	// need a proper resource for this.
+		uint32 timer = 3000;	// need a proper resource for this.
 
 		switch(TotemSpell->Id)
 		{
@@ -4542,20 +4666,26 @@ void Spell::SpellEffectKnockBack(uint32 i)
 void Spell::SpellEffectDisenchant(uint32 i)
 {
 	Player* caster = static_cast< Player* >( m_caster );
-	Item* it = caster->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid( m_targets.m_itemTarget, true );
+	Item* it = caster->GetItemInterface()->GetItemByGUID(m_targets.m_itemTarget);
 	if( it == NULL )
 		return;
    
 	//Check for skill first, we can increase it upto 75 
 	uint32 skill=caster->_GetSkillLineCurrent( SKILL_ENCHANTING );
 	if(skill < 75)//can up skill
-	if(Rand(float(100-skill*100.0/75.0)))
-		caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
-	AddItemFromDisenchant(it->GetProto(),caster);
+		if(Rand(float(100-skill*100.0/75.0)))
+			caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
+ 
+	caster->SetLootGUID(it->GetGUID());
+	if(!it->loot)
+	{
+		it->loot = new Loot;
+		lootmgr.FillDisenchantingLoot(it->loot, it->GetEntry());
+	}
+	caster->SendLoot(it->GetGUID(), 2);
 
 	if(it==i_caster)
 		i_caster=NULL;
-	delete it;
 }
 
 void Spell::SpellEffectInebriate(uint32 i) // lets get drunk!
@@ -4986,18 +5116,18 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		spell->prepare(&targets);
 		if(!sunder_count)
 			return; //no damage = no joy
-		damage = damage*sunder_count;
+		damage = (int32)(0.01*damage*(m_spellInfo->EffectBasePoints[0]+1)+(1+ m_spellInfo->EffectBasePoints[1])*sunder_count);
 	}
+
+	//hemorage
+	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
+		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
 
 	if( m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
 	{
 		add_damage = (uint32)(damage * 1.5);
 		return;
 	}
-
-	//hemorage
-	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
-		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
 
 	//rogue - mutilate ads dmg if target is poisoned
 	if(	m_spellInfo->NameHash == SPELL_HASH_MUTILATE && unitTarget->IsPoisoned() )
@@ -5036,13 +5166,27 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 				data << m_caster->GetNewGUID();
 				data << unitTarget->GetNewGUID();
 				data << (uint32)1;
-				data << aur->GetSpellId();
-				m_caster->SendMessageToSet(&data,true);
-				Aura *aura = new Aura(aur->GetSpellProto(), (aur->GetDuration()>120000) ? 120000 : aur->GetDuration(), u_caster, u_caster);
-				u_caster->AddAura(aura);
-				unitTarget->RemoveAura(aur);
-				if( --spells_to_steal <= 0 )
-					break; //exit loop now
+ 				data << aur->GetSpellId();
+ 				m_caster->SendMessageToSet(&data,true);
+				uint32 dur = aur->GetDuration();
+				if (dur > 120000)
+					dur = 120000;
+ 				u_caster->CastSpell(u_caster, aur->GetSpellProto(), true);
+ 				unitTarget->RemoveAura(aur);		
+				Aura *aura = u_caster->FindAura(aur->GetSpellId());
+				if (aura)
+				{
+					aura->SetDuration(dur);
+					sEventMgr.ModifyEventTimeLeft(aura, EVENT_AURA_REMOVE, dur);
+					if(u_caster->IsPlayer())
+					{
+						WorldPacket data(5);
+						data.SetOpcode(SMSG_UPDATE_AURA_DURATION);
+						data << (uint8)(aura)->GetAuraSlot() << dur;
+						((Player*)u_caster)->GetSession()->SendPacket(&data);
+					}
+				}
+				return;
 			}			
 		}
 	}   
@@ -5062,7 +5206,9 @@ void Spell::SpellEffectProspecting(uint32 i)
 
 	if(p_caster->GetItemInterface()->RemoveItemAmt(entry, 5))
 	{
-		AddItemFromProspecting(entry, p_caster);
+		p_caster->SetLootGUID(p_caster->GetGUID());
+		lootmgr.FillProspectingLoot(&p_caster->loot, entry);
+		p_caster->SendLoot(p_caster->GetGUID(), 2);
 	}
 	else // this should never happen either
 	{

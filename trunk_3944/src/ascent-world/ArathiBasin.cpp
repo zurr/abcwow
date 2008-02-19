@@ -406,6 +406,14 @@ void ArathiBasin::OnCreate()
 
 void ArathiBasin::OnStart()
 {
+	m_started = true;
+
+	for(uint32 i = 0; i < 2; ++i) {
+		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
+			(*itr)->RemoveAura(BG_PREPARATION);
+		}
+	}
+
 	// open gates
 	for(list<GameObject*>::iterator itr = m_gates.begin(); itr != m_gates.end(); ++itr)
 	{
@@ -551,12 +559,13 @@ void ArathiBasin::HookOnHK(Player * plr)
 
 void ArathiBasin::OnAddPlayer(Player * plr)
 {
-	// nothing?
+	if(!m_started)
+		plr->CastSpell(plr, BG_PREPARATION, true);
 }
 
 void ArathiBasin::OnRemovePlayer(Player * plr)
 {
-	// nothing?
+	plr->RemoveAura(BG_PREPARATION);
 }
 
 void ArathiBasin::HookFlagDrop(Player * plr, GameObject * obj)

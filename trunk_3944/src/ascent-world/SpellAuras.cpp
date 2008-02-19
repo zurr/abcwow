@@ -598,6 +598,7 @@ void Aura::ApplyModifiers( bool apply )
 			pts.procCharges = GetSpellProto()->procCharges;
 			pts.LastTrigger = 0;
 			pts.deleted = false;
+			pts.ProcType = 0;
 			m_target->m_procSpells.push_front(pts);
 		}
 		else
@@ -650,43 +651,6 @@ void Aura::AddAuraVisual()
 	}
 	m_visualSlot = m_target->AddAuraVisual(m_spellProto->Id, 1, IsPositive());
 
-	/*m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, m_spellProto->Id);
-
-	uint8 flagslot = slot >> 3;
-
-	uint32 value = m_target->GetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot));
-
-	uint8 aurapos = (slot & 7) << 2;
-	uint32 value1 = (uint32)AFLAG_SET << aurapos;
-	value |= value1;
-
-	m_target->SetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot), value);
-	
-	uint32 index = (slot / 8);
-	uint32 byte  = (slot % 8);
-
-	uint32 x = 0, y = 0;
-	uint32 val = m_target->GetUInt32Value(UNIT_FIELD_AURALEVELS + index);
-	if(x != 0)
-	{
-		val |= (x << (byte * 8));
-		m_target->SetUInt32Value(UNIT_FIELD_AURALEVELS + index, val);
-	}
-
-	val = m_target->GetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index);
-	if(y != 0)
-	{
-		val |= (y << (byte * 8));
-		m_target->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index, val);
-	}
-	sLog.outDebug("Adding Aura Visual - target: %d , slot: %d , flagslot: %d , flagsvalue: 0x%.4X",m_target->GetGUID(),slot,flagslot,value);*/
-   
-	//  0000 0000 original
-	//  0000 1001 AFLAG_SET
-	//  1111 1111 0xFF
-
-	//uint8 appslot = slot >> 1;
-
 	if( m_target->IsPlayer())
 	{
 		WorldPacket data(SMSG_UPDATE_AURA_DURATION, 5);
@@ -694,7 +658,7 @@ void Aura::AddAuraVisual()
 		static_cast< Player* >( m_target )->GetSession()->SendPacket(&data);
 	}
 		
-	WorldPacket data(SMSG_PET_LEARNT_SPELL, 21);
+	WorldPacket data(SMSG_SET_AURA_SINGLE, 21);
 	data << m_target->GetNewGUID() << m_visualSlot << uint32(m_spellProto->Id) << uint32(m_duration) << uint32(m_duration);
 	m_target->SendMessageToSet(&data,false);
 
@@ -1002,7 +966,7 @@ void Aura::SpellAuraModPossess(bool apply)
 
 	if( apply )
 	{
-		if( caster != NULL && caster->IsInWorld() && caster->IsPlayer() ) 
+		if( caster != NULL && caster->IsInWorld() && caster->IsPlayer() && (caster->getLevel() + 4) >= m_target->getLevel() ) 
 			static_cast< Player* >(caster)->Possess( m_target );
 	}
 	else
@@ -1181,11 +1145,12 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			{
 				if( GetSpellProto() && GetSpellProto()->NameHash == SPELL_HASH_IGNITE )  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
 					bonus_damage=0;
-				else bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount);
+				else bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount,1);
 				float ticks= float((amp) ? GetDuration()/amp : 0);
 				float fbonus = float(bonus);
 				fbonus += (ticks) ? bonus_damage/ticks : 0;
-				fbonus *= float(GetDuration()) / 15000.0f;
+				if(!m_spellProto->ChannelInterruptFlags)
+					fbonus *= float(GetDuration()) / 15000.0f;
 				bonus = float2int32(fbonus);
 			}
 			else bonus = 0;
@@ -1223,7 +1188,6 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			abs_dmg += ms_abs_dmg;
 		}
 
-		
 		if(ress < 0) ress = 0;
 		res=(float)ress;
 		dealdamage dmg;
@@ -1328,6 +1292,288 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
+	case 32052: //custom
+		{
+			if (apply)
+			{
+				sChatHandler.SystemMessage(_ptarget->GetSession(), "MUHAHAHA ...");
+
+				uint8 race, race_old, class_,gender,powertype/*,skin,face,hairStyle,hairColor,facialHair*/;
+				uint32 team = _ptarget->GetTeam();
+
+				race_old = race = _ptarget->getRace();
+				class_ = _ptarget->getClass();
+				gender = _ptarget->getGender();
+				powertype = _ptarget->GetPowerType();
+				
+				switch(class_)
+				{
+				case WARRIOR:
+					{
+						if(!team) //a
+						{
+							switch(RandomUInt(3))
+							{
+								case 0: race = RACE_UNDEAD; break;
+								case 1: race = RACE_ORC; break;
+								case 2: race = RACE_TROLL; break;
+								case 3: race = RACE_TAUREN; break;
+							}
+						}else{
+							switch(RandomUInt(4))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_DWARF; break;
+								case 2: race = RACE_NIGHTELF; break;
+								case 3: race = RACE_GNOME; break;
+								case 4: race = RACE_DRAENEI; break;
+							}
+						}
+					}break;
+				case PALADIN:
+					{
+						if(!team) //a
+						{
+							race = RACE_BLOODELF;
+						}else{
+							switch(RandomUInt(2))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_DWARF; break;
+								case 2: race = RACE_DRAENEI; break;
+							}
+						}
+					}break;
+				case HUNTER:
+					{
+						if(!team) //a
+						{
+							switch(RandomUInt(3))
+							{
+								case 0: race = RACE_ORC; break;
+								case 1: race = RACE_TAUREN; break;
+								case 2: race = RACE_TROLL; break;
+								case 3: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(RandomUInt(2))
+							{
+								case 0: race = RACE_DWARF; break;
+								case 1: race = RACE_NIGHTELF; break;
+								case 2: race = RACE_DRAENEI; break;
+							}
+						}
+					}break;
+				case ROGUE:
+					{
+						if(!team) //a
+						{
+							switch(RandomUInt(3))
+							{
+								case 0: race = RACE_UNDEAD; break;
+								case 1: race = RACE_ORC; break;
+								case 2: race = RACE_TROLL; break;
+								case 3: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(RandomUInt(3))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_DWARF; break;
+								case 2: race = RACE_NIGHTELF; break;
+								case 3: race = RACE_GNOME; break;
+							}
+						}
+					}break;
+				case PRIEST:
+					{
+						if(!team) //a
+						{
+							switch(RandomUInt(2))
+							{
+								case 0: race = RACE_UNDEAD; break;
+								case 1: race = RACE_TROLL; break;
+								case 2: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(RandomUInt(3))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_DWARF; break;
+								case 2: race = RACE_NIGHTELF; break;
+								case 3: race = RACE_DRAENEI; break;
+							}
+						}
+					}break;
+				case SHAMAN:
+					{
+						if(!team) //a
+						{
+							switch(RandomUInt(2))
+							{
+								case 0: race = RACE_ORC; break;
+								case 1: race = RACE_TAUREN; break;
+								case 2: race = RACE_TROLL; break;
+							}
+						}else race = RACE_DRAENEI;
+					}break;
+				case MAGE:
+					{
+						if(!team) //a
+						{
+							switch(RandomUInt(2))
+							{
+								case 0: race = RACE_UNDEAD; break;
+								case 1: race = RACE_TROLL; break;
+								case 2: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(RandomUInt(2))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_GNOME; break;
+								case 2: race = RACE_DRAENEI; break;
+							}
+						}
+					}break;
+				case WARLOCK:
+					{
+						if(!team) //a
+						{
+							switch(RandomUInt(2))
+							{
+								case 0: race = RACE_ORC ; break;
+								case 1: race = RACE_UNDEAD; break;
+								case 2: race = RACE_BLOODELF; break;
+							}
+						}else{
+							switch(RandomUInt(2))
+							{
+								case 0: race = RACE_HUMAN; break;
+								case 1: race = RACE_GNOME; break;
+							}
+						}
+					}break;
+				case DRUID:
+					{
+						switch(race)
+						{
+						case RACE_TAUREN: race = RACE_NIGHTELF; break;
+						case RACE_NIGHTELF: race = RACE_TAUREN; break;
+						}
+					}break;
+				}
+
+				_ptarget->SetTeam( team ? 0 : 1 );
+				PlayerCreateInfo *info = objmgr.GetPlayerCreateInfo(race, class_);
+				if (!info)
+					break;
+
+				_ptarget->SetFloatValue(OBJECT_FIELD_SCALE_X, ((race==RACE_TAUREN)?1.3f:1.0f));
+				_ptarget->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, info->factiontemplate );	
+				_ptarget->SetUInt32Value(UNIT_FIELD_BYTES_0, ( ( race ) | ( class_ << 8 ) | ( gender << 16 ) | ( powertype << 24 ) ) );
+				if(race != RACE_BLOODELF)
+				{
+					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId + gender );
+					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId + gender );
+				}
+				else
+				{
+					_ptarget->SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId - gender );
+					_ptarget->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, info->displayId - gender );
+				}
+				// Different races have different number of visuals
+				_ptarget->SetUInt32Value(PLAYER_BYTES, ((RandomUInt(5))|(RandomUInt(5)<<8)|(RandomUInt(5)<<16)|(RandomUInt(5)<<24)));
+				_ptarget->SetUInt32Value(PLAYER_BYTES_2, (( !gender ? 0 : RandomUInt(3) ) | (0x02 << 24)));
+				//_ptarget->SetUInt32Value(PLAYER_BYTES, ((skin) | (face << 8) | (hairStyle << 16) | (hairColor << 24)));
+				//_ptarget->SetUInt32Value(PLAYER_BYTES_2, (facialHair | (0x02 << 24)));
+				
+				_ptarget->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, 0xEEEEEEEE);
+				//dump reputation data
+				ReputationMap m_tempRepMap;
+				//store neutral
+				for(uint32 i = 0; i < dbcFaction.GetNumRows(); ++i)
+				{
+					FactionDBC * f = dbcFaction.LookupRow(i);
+					if(f == 0) continue;
+					// dont store side related factions
+					if( _ptarget->GetStanding(f->ID) &&
+						f->parentFaction != 67 && f->parentFaction != 469 &&
+						f->parentFaction != 892 && f->parentFaction != 891 && 
+						f->ID != 947 && f->ID != 946 && //HH/thrallmar
+						f->ID != 892 && f->ID != 891 && //h/a Forces
+						f->ID != 941 && f->ID != 978 && //Mag'har / Kurenai
+						f->ID != 922 //Tranquillien
+						)
+					{
+						FactionReputation * rep = new FactionReputation;
+						rep->flag = 0;
+						rep->standing = _ptarget->GetStanding(f->ID);
+						rep->baseStanding = _ptarget->GetBaseStanding(f->ID);
+
+						m_tempRepMap[f->ID] = rep;
+					}
+				}
+				//add all starting fresh flashing
+				_ptarget->_InitialReputation();
+				//add/mod all stored
+				for(ReputationMap::iterator itr = m_tempRepMap.begin(); itr != m_tempRepMap.end(); ++itr)
+				{
+					_ptarget->SetStanding(itr->first, itr->second->standing );
+					//delete itr->second;
+				}
+
+				_ptarget->_RemoveLanguages();
+				
+				//remove racial spells along with all starting spells then add them for new race
+				PlayerCreateInfo * old_info = objmgr.GetPlayerCreateInfo(race_old, class_);
+				if (!old_info) break;
+
+				for(std::set<uint32>::iterator sp = old_info->spell_list.begin(); sp!=old_info->spell_list.end(); sp++)
+					if (_ptarget->HasSpell(*sp)) _ptarget->removeSpell((*sp), false, false, 0);
+
+				for(std::set<uint32>::iterator sp = info->spell_list.begin(); sp!=info->spell_list.end(); sp++)
+					_ptarget->addSpell(*sp);
+
+				//quit guild
+				if (_ptarget->GetGuildId())
+				{
+					Guild *pGuild = objmgr.GetGuild( _ptarget->GetGuildId() );
+
+					if(pGuild && pGuild->GetGuildLeader() != _ptarget->GetGUID() )
+					{
+						_ptarget->SetGuildId(0);
+						_ptarget->SetGuildRank(0);
+						pGuild->RemoveGuildMember(_ptarget->m_playerInfo, NULL);
+
+						WorldPacket data(100);
+						data.Initialize(SMSG_GUILD_EVENT);
+						data << uint8(GUILD_EVENT_LEFT);
+						data << uint8(1);
+						data << _ptarget->GetName();
+						pGuild->SendPacket(&data);
+					}
+				}
+
+				//arena team remove
+				for(uint32 i = 0; i < 3 ; i++)
+				{
+					ArenaTeam * team;
+					if( (team = _ptarget->m_arenaTeams[i]) != NULL )
+						team->RemoveMember(_ptarget->m_playerInfo);
+				}
+
+				_ptarget->SaveToDB(false);
+			}
+			else
+			{
+				sChatHandler.SystemMessage(_ptarget->GetSession(), "Signed in blood. There is no going back now ...");
+				sChatHandler.SystemMessage(_ptarget->GetSession(), "Relog ...");
+				//force relog
+				_ptarget->Kick(5000);
+			}
+		}break;
+
 	//paladin - Blessing of Light.
 	case 19977:
 	case 19978:
@@ -1413,6 +1659,7 @@ void Aura::SpellAuraDummy(bool apply)
 			pts.procCharges = GetSpellProto()->procCharges;
 			pts.LastTrigger = 0;
 			pts.deleted = false;
+			pts.ProcType = 0;
 			m_target->m_procSpells.push_front(pts);
 			}
 			else
@@ -1803,6 +2050,7 @@ void Aura::SpellAuraDummy(bool apply)
 				pts.procCharges = GetSpellProto()->procCharges;
 				pts.LastTrigger = 0;
 				pts.deleted = false;
+				pts.ProcType = 0;
 				m_target->m_procSpells.push_front(pts);
 			}
 			else
@@ -1888,7 +2136,8 @@ void Aura::SpellAuraDummy(bool apply)
 			if(pCreature==NULL || pTarget->m_bg==NULL)
 				return;
 
-			pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
+			if(pTarget->isDead())
+				pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
 		}break;
 
 	}
@@ -2126,7 +2375,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 	if( c != NULL )
 	{
-		bonus += m_target->HealTakenMod[m_spellProto->School] + (amount * c->HealDonePctMod[m_spellProto->School]) / 100;
+		bonus += m_target->HealTakenMod[m_spellProto->School];
 	}
 
 	if( c != NULL && m_spellProto->SpellGroupType )
@@ -2148,14 +2397,21 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	}
 
 	int amp = m_spellProto->EffectAmplitude[mod->i];
-	if( amp > 0 ) 
+	if( !amp ) 
 		amp = static_cast< EventableObject* >( this )->event_GetEventPeriod( EVENT_AURA_PERIODIC_HEAL );
 
 	if( GetDuration() )
 	{
 		int ticks = ( amp > 0 ) ? GetDuration() / amp : 0;
-		bonus = ( ticks > 0 ) ? bonus / ticks : 0;
-		bonus = float2int32( float( bonus * GetDuration() / 15000.0f ) );
+		if (!m_spellProto->dmg_bonus)
+		{
+			bonus = (ticks > 0) ? bonus/ticks : 0;
+			bonus = float2int32(float(bonus * GetDuration() / 15000.0f));
+		}
+		else
+		{
+			bonus = (ticks > 0) ? float2int32(float( (bonus*m_spellProto->dmg_bonus/100)/ticks )) : 0;
+		}
 	}
 	else
 		bonus = 0;
@@ -3748,6 +4004,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 		pts.procCharges = GetSpellProto()->procCharges;
 		pts.LastTrigger = 0;
 		pts.deleted = false;
+		pts.ProcType = 0;
 
 		if( m_spellProto->NameHash == SPELL_HASH_THE_TWIN_BLADES_OF_AZZINOTH )
 		{
@@ -3986,9 +4243,72 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		if(m_target->SchoolImmunityList[GetSpellProto()->School])
 			return;
 
-		//zack: latest new is that this spell uses spell damage bonus only and not healing bonus
-		amount += m_caster->GetSpellDmgBonus(m_target,GetSpellProto(),amount)*50/100;
-	
+		float bonus_damage;
+		int amp = m_spellProto->EffectAmplitude[mod->i];
+		if( !amp ) 
+			amp = static_cast< EventableObject* >( this )->event_GetEventPeriod( EVENT_AURA_PERIODIC_LEECH );
+
+		if(GetDuration())
+		{
+			bonus_damage = (float)m_caster->GetSpellDmgBonus(m_target,m_spellProto,amount,1);
+			float ticks= float((amp) ? GetDuration()/amp : 0);
+			bonus_damage = (ticks) ? bonus_damage/ticks : 0;
+			if(!m_spellProto->ChannelInterruptFlags)
+				bonus_damage *= GetDuration() / 15000.0f;
+		}
+		else bonus_damage = 0;
+
+		amount += float2int32(bonus_damage);
+
+		if(amount < 0)
+			amount = 0;
+		else
+		{
+			float summaryPCTmod = 1.0f;
+			if( m_target->IsPlayer() )//resilience
+			{
+				float dmg_reduction_pct = static_cast<Player*>(m_target)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
+				if( dmg_reduction_pct > 1.0f )
+					dmg_reduction_pct = 1.0f;
+				summaryPCTmod -= dmg_reduction_pct;
+			}
+			amount = (uint32)(amount*summaryPCTmod);
+			if( amount < 0 ) 
+				amount = 0;
+		}
+
+		uint32 ress=(uint32)amount;
+		uint32 abs_dmg = m_target->AbsorbDamage(m_spellProto->School, &ress);
+		uint32 ms_abs_dmg= m_target->ManaShieldAbsorb(ress);
+		if (ms_abs_dmg)
+		{
+			if(ms_abs_dmg > ress)
+				ress = 0;
+			else
+				ress-=ms_abs_dmg;
+
+			abs_dmg += ms_abs_dmg;
+		}
+
+		if(ress < 0) ress = 0;
+		amount = ress;
+		dealdamage dmg;
+		dmg.school_type = m_spellProto->School;
+		dmg.full_damage = ress;
+		dmg.resisted_damage = 0;
+		
+		if(amount <= 0) 
+			dmg.resisted_damage = dmg.full_damage;
+
+		if(amount > 0)
+		{
+			m_caster->CalculateResistanceReduction(m_target,&dmg);
+			if((int32)dmg.resisted_damage > dmg.full_damage)
+				amount = 0;
+			else
+                amount = dmg.full_damage - dmg.resisted_damage;
+		}
+
 		uint32 Amount = (uint32)min( amount, m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) );
 		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
 		
@@ -4008,27 +4328,9 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		data << uint32(Amount);
 		m_target->SendMessageToSet(&data,true);
 
-		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, 0, 0, FLAG_PERIODIC_LEECH);
+		SendPeriodicAuraLog(m_target, m_caster, m_spellProto->Id, m_spellProto->School, Amount, abs_dmg, dmg.resisted_damage, FLAG_PERIODIC_LEECH);
 
-		//deal damage before we add healing bonus to damage
 		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id,true);
-
-		//add here bonus to healing taken. Maybe not all spells should receive it ?
-		/*
-		//zack : have no idea if we should use downranking here so i'm removing it until confirmed
-		float healdoneaffectperc = 1500 / 3500;
-		//Downranking
-		if(GetSpellProto()->baseLevel > 0 && GetSpellProto()->maxLevel > 0)
-		{
-			float downrank1 = 1.0f;
-			if (GetSpellProto()->baseLevel < 20)
-			downrank1 = 1.0f - (20.0f - float (GetSpellProto()->baseLevel) ) * 0.0375f;
-			float downrank2 = ( float(GetSpellProto()->maxLevel + 5.0f) / float(m_caster->getLevel()) );
-			if (downrank2 >= 1 || downrank2 < 0)
-			downrank2 = 1.0f;
-			healdoneaffectperc *= downrank1 * downrank2;
-		}
-		*/
 	}	
 }
 

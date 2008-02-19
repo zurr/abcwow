@@ -3359,6 +3359,9 @@ void Player::RemoveFromWorld()
 // TODO: perhaps item should just have a list of mods, that will simplify code
 void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedown /* = false */, bool skip_stat_apply /* = false  */)
 {
+	//if (slot > EQUIPMENT_SLOT_END)
+	//	return;
+
 	ASSERT( item );
 	ItemPrototype* proto = item->GetProto();
 
@@ -3627,6 +3630,7 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 				ts.procChance = 5;
 				ts.caster = this->GetGUID();
 				ts.procFlags = PROC_ON_MELEE_ATTACK;
+				ts.ProcType = (item->GetProto()->Class == ITEM_CLASS_WEAPON)? 1 : 2;
 				ts.deleted = false;
 				m_procSpells.push_front( ts );			
 			}
@@ -5321,7 +5325,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
         } 
 
 		slottype = 0;
-		if( m_Group != NULL )
+		if(m_Group != NULL && loot_type < 2)
 		{
 			switch( m_Group->GetMethod() )
 			{
@@ -8258,7 +8262,7 @@ void Player::ModifyBonuses(uint32 type,int32 val)
 		case EXPERTISE_RATING_2:
 			{
 				ModUInt32Value( PLAYER_RATING_MODIFIER_EXPERTISE, val );
-				ModUInt32Value( PLAYER_EXPERTISE, float2int32( CalcRating( PLAYER_RATING_MODIFIER_EXPERTISE ) ) );
+				ModUInt32Value( PLAYER_EXPERTISE, val );
 			}break;
 		case RESILIENCE_RATING:
 			{
@@ -8878,6 +8882,34 @@ void Player::Possess(Unit * pTarget)
 	/* update target faction set */
 	pTarget->_setFaction();
 	pTarget->UpdateOppFactionSet();
+
+	if (pTarget->GetTypeId() == TYPEID_UNIT)
+	{
+		if (pTarget->GetAIInterface()->getAITargetsCount())
+		{
+			std::vector<Unit*> targetTable;
+			TargetMap *targets = pTarget->GetAIInterface()->GetAITargets();
+			for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+			{
+				Unit *temp = itr->first;
+				if (temp->GetTypeId() == TYPEID_UNIT && temp->isAlive())
+				{
+					temp->GetAIInterface()->RemoveThreatByPtr(this);
+					if (temp->GetAIInterface()->GetNextTarget() == pTarget)
+						temp->GetAIInterface()->SetNextTarget(NULL);
+					if (pTarget->m_faction == temp->m_faction)
+					{
+						temp->GetAIInterface()->AttackReaction(this, 1, 0);
+						temp->GetAIInterface()->SetNextTarget(this);
+					}
+				}
+			}
+		}
+
+		pTarget->GetAIInterface()->ClearHateList();
+		pTarget->GetAIInterface()->AttackReaction(this, (this->getLevel()*75), 0); // "When the spell ends, the MCed unit (if not a player) will have a large amount of threat on the priest who controlled it" no idea if (lvl*75) is right but it does his job
+		pTarget->GetAIInterface()->SetNextTarget(this);
+	}
 
 	list<uint32> avail_spells;
 	for(list<AI_Spell*>::iterator itr = pTarget->GetAIInterface()->m_spells.begin(); itr != pTarget->GetAIInterface()->m_spells.end(); ++itr)

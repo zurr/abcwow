@@ -1541,6 +1541,19 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL && sp->Id == 16164 )
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
 
+	//"deal with the devil" custom spell based on unused dummy 
+	sp = dbcSpell.LookupEntry(32052);
+	if(sp != NULL)
+	{
+		sp->DurationIndex = 407;
+		sp->dummy = 1;
+		sp->procFlags = 0;
+		sp->Attributes = 0;
+		sp->AttributesEx = 0;
+		sp->Flags3 = 0;
+		sp->maxstack = 0;
+	}
+
 	//remove stormstrike effect 0
 	sp = dbcSpell.LookupEntryForced( 17364 );
 	if( sp != NULL && sp->Id == 17364 )
@@ -1765,6 +1778,18 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
 		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
+	}
+
+	// Netherweave Net roots target instead of self
+	sp = dbcSpell.LookupEntryForced( 31368 );
+	if( sp != NULL )
+	{
+		sp->EffectImplicitTargetA[0] = 0;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
 		sp->EffectImplicitTargetA[2] = 0;
 		sp->EffectImplicitTargetB[0] = 0;
 		sp->EffectImplicitTargetB[1] = 0;
@@ -8005,6 +8030,8 @@ void World::Rehash(bool load)
 		new MailSystem;
 
 	channelmgr.seperatechannels = Config.MainConfig.GetBoolDefault("Server", "SeperateChatChannels", false);
+	PvpFactionLimitation = Config.MainConfig.GetBoolDefault("Server", "PvpFactionLimitation", true);
+	FriendFactionLimitation = Config.MainConfig.GetBoolDefault("Server", "FriendFactionLimitation", true);
 	sendRevisionOnJoin = Config.MainConfig.GetBoolDefault("Server", "SendBuildOnJoin", false);
 	MapPath = Config.MainConfig.GetStringDefault("Terrain", "MapPath", "maps");
 	UnloadMapFiles = Config.MainConfig.GetBoolDefault("Terrain", "UnloadMapFiles", true);

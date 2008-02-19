@@ -104,6 +104,7 @@ void LootMgr::LoadLoot()
 	LoadLootTables("fishingloot",&FishingLoot);
 	LoadLootTables("itemloot", &ItemLoot);
 	LoadLootTables("prospectingloot", &ProspectingLoot);
+	LoadLootTables("disenchantingloot", &DisenchantingLoot);
 	LoadLootTables("pickpocketingloot", &PickpocketingLoot);
 	is_loading = false;
 }
@@ -230,8 +231,11 @@ LootMgr::~LootMgr()
   for(LootStore::iterator iter=ProspectingLoot.begin(); iter != ProspectingLoot.end(); ++iter)
   delete [] iter->second.items;
 
- for(LootStore::iterator iter=PickpocketingLoot.begin(); iter != PickpocketingLoot.end(); ++iter)
- delete [] iter->second.items;
+ for(LootStore::iterator iter=DisenchantingLoot.begin(); iter != DisenchantingLoot.end(); ++iter)
+	delete [] iter->second.items;
+
+  for(LootStore::iterator iter=PickpocketingLoot.begin(); iter != PickpocketingLoot.end(); ++iter)
+	delete [] iter->second.items;
 }
 
 void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
@@ -510,6 +514,26 @@ void LootMgr::FillPickpocketingLoot(Loot * loot,uint32 loot_id)
 
  LootStore::iterator tab =PickpocketingLoot.find(loot_id);
  if( PickpocketingLoot.end()==tab)return;
+ else PushLoot(&tab->second,loot,false);
+}
+
+void LootMgr::FillDisenchantingLoot(Loot *loot, uint32 loot_id)
+{
+ loot->items.clear();
+ loot->gold =0;
+
+ LootStore::iterator tab = DisenchantingLoot.find(loot_id);
+ if( DisenchantingLoot.end()==tab)return;
+ else PushLoot(&tab->second,loot,false);
+}
+
+void LootMgr::FillProspectingLoot(Loot *loot, uint32 loot_id)
+{
+ loot->items.clear();
+ loot->gold =0;
+
+ LootStore::iterator tab = ProspectingLoot.find(loot_id);
+ if( ProspectingLoot.end()==tab)return;
  else PushLoot(&tab->second,loot,false);
 }
 

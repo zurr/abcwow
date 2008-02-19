@@ -259,6 +259,7 @@ public:
 	}
 	bool HasLoot();
 	MapCell * m_respawnCell;
+	uint32 GetGOReqSkill();
 
 protected:
 
