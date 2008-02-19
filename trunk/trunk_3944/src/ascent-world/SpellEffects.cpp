@@ -575,12 +575,11 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		{
 			if( !unitTarget || !p_caster) 
 				return;
-
 			if(!unitTarget->isAlive() || unitTarget->getClass()==WARRIOR || unitTarget->getClass() == ROGUE)
 				return;
 
 			uint32 gain = (uint32) (unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)*0.06);
-			p_caster->Energize(unitTarget,39610,gain,POWER_TYPE_MANA);
+			p_caster->Energize(unitTarget,16191,gain,POWER_TYPE_MANA);
 		}break;
 	case 4141:// Summon Myzrael
 		{
