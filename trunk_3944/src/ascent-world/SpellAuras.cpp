@@ -3028,14 +3028,17 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 	if(m_spellProto->EffectTriggerSpell[mod->i] == 0)
 		return;
 
+	//SELECT * FROM dbc_spell where (EffectApplyAuraName_0 = 23 or  EffectApplyAuraName_1 = 23 or EffectApplyAuraName_2 = 23) and (Attributes & 64)
+	/*
 	if(IsPassive() && m_spellProto->dummy != 2010  && m_spellProto->dummy != 2020 && m_spellProto->dummy != 2255) //this spells are passive and are not done on the attack...
 	{
+		printf("Aura::SpellAuraPeriodicTriggerSpell 0001\n");
 		Unit * target = (m_target != 0) ? m_target : GetUnitCaster();
 		if(target == 0 || !target->IsPlayer())
 			return; //what about creatures ?
 
 		SpellEntry *proto = dbcSpell.LookupEntry( m_spellProto->EffectTriggerSpell[mod->i] );
-
+		printf("Aura::SpellAuraPeriodicTriggerSpell 1\n");
 		if( apply )
 			static_cast< Player* >( target )->AddOnStrikeSpell( proto, m_spellProto->EffectAmplitude[mod->i] );
 		else
@@ -3043,7 +3046,7 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 
 		return;
 	}
-	
+	*/
 	if( apply )
 	{
 		//FIXME: positive or negative?

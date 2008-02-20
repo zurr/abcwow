@@ -562,24 +562,14 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 			uint32 gain = (uint32)(count * (2.17*p_caster->getLevel()+9.136));
 			p_caster->Energize(unitTarget,28730,gain,POWER_TYPE_MANA);
-			/*
-			uint32 max = unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-			if( unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain > max )
-				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, max );
-			else
-				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain );
-			SendHealManaSpellOnPlayer( p_caster, static_cast< Player* >( unitTarget ), gain, 0 );
-			*/
 		}break;
 	case 39610://Mana Tide
 		{
-			if( !unitTarget || !p_caster) 
-				return;
-			if(!unitTarget->isAlive() || unitTarget->getClass()==WARRIOR || unitTarget->getClass() == ROGUE)
+			if(unitTarget == NULL || unitTarget->isDead() || unitTarget->getClass()==WARRIOR || unitTarget->getClass() == ROGUE)
 				return;
 
 			uint32 gain = (uint32) (unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)*0.06);
-			p_caster->Energize(unitTarget,16191,gain,POWER_TYPE_MANA);
+			unitTarget->Energize(unitTarget,16191,gain,POWER_TYPE_MANA);
 		}break;
 	case 4141:// Summon Myzrael
 		{
