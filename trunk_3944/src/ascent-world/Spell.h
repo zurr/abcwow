@@ -369,7 +369,7 @@ enum AttributesEx
     ATTRIBUTESEX_UNK4                         = 0x4,
     ATTRIBUTESEX_UNK5                         = 0x8,
     ATTRIBUTESEX_UNK6                         = 0x10,
-    ATTRIBUTESEX_DELAY_SOME_TRIGGERS          = 0x20,
+    ATTRIBUTESEX_NOT_BREAK_STEALTH			  = 0x20,
     ATTRIBUTESEX_UNK8                         = 0x40,
     ATTRIBUTESEX_UNK9                         = 0x80,
     ATTRIBUTESEX_UNK10                        = 0x100,
