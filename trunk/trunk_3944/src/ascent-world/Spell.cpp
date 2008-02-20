@@ -4379,61 +4379,45 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	{
 	case SPELL_HASH_SAP:					// Sap
 	case SPELL_HASH_GOUGE:					// Gouge
+	case SPELL_HASH_REPENTANCE:			// Repentance
 		{
 			grp = 0;
 		}break;
 
 	case SPELL_HASH_CHEAP_SHOT:				// Cheap Shot
+	case SPELL_HASH_KIDNEY_SHOT:			// Kidney Shot
+	case SPELL_HASH_HAMMER_OF_JUSTICE:		// Hammer of Justice
+	case SPELL_HASH_CHARGE:					// Charge
+	case SPELL_HASH_INTERCEPT :				// Intercept
+	case SPELL_HASH_CONCUSSION_BLOW:		// Concussion Blow
+	case SPELL_HASH_CELESTIAL_FOCUS:		// Celestial Focus
+	case SPELL_HASH_IMPACT:					// Impact
+	case SPELL_HASH_BLACKOUT:				// Blackout
 		{
 			grp = 1;
 			pve = true;
 		}break;
 
-	case SPELL_HASH_KIDNEY_SHOT:			// Kidney Shot
-		{
-			grp = 2;
-			pve = true;
-		}break;
-
+	case SPELL_HASH_STUN:					// Stuns (all of them)
 	case SPELL_HASH_BASH:					// Bash
 		{
-			grp = 3;
+			grp = 1;
 		}break;
 
+	case SPELL_HASH_FROST_NOVA:				// Frost Nova
+	case SPELL_HASH_FROSTBITE:				// Frostbite
 	case SPELL_HASH_ENTANGLING_ROOTS:		// Entangling Roots
 		{
 			grp = 4;
 		}break;
 
-	case SPELL_HASH_HAMMER_OF_JUSTICE:		// Hammer of Justice
-		{
-			grp = 5;
-			pve = true;
-		}break;
-
-	case SPELL_HASH_STUN:					// Stuns (all of them)
-		{
-			grp = 6;
-		}break;
-
-	case SPELL_HASH_CHARGE:					// Charge
-	case SPELL_HASH_INTERCEPT :				// Intercept
-	case SPELL_HASH_CONCUSSION_BLOW:		// Concussion Blow
-		{
-			grp = 7;
-			pve = true;
-		}break;
-
 	case SPELL_HASH_FEAR:					// Fear
-	case SPELL_HASH_SEDUCTION:				// Seduction
 	case SPELL_HASH_HOWL_OF_TERROR:			// Howl of Terror
+	case SPELL_HASH_DEATH_COIL:			// Death Coil
+	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
+	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
 		{
 			grp = 8;
-		}break;
-
-	case SPELL_HASH_FROST_NOVA:				// Frost Nova
-		{
-			grp = 9;
 		}break;
 
 	case SPELL_HASH_POLYMORPH:				// Polymorph
@@ -4443,23 +4427,20 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_POLYMORPH__SHEEP:		// Good ol' sheep
 		{
 			grp = 10;
+		}break;
+
+	case SPELL_HASH_BLIND:		// Blind
+		{
+			grp = 11;
 			pve = true;   
 		}break;
 
-	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
-		{
-			grp = 11;
-		}break;
-
+	case SPELL_HASH_SEDUCTION:				// Seduction
+	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
 	case SPELL_HASH_MIND_CONTROL:			// Mind Control
 		{
 			grp = 12;
 		}break;
-
-	//With Patch 2.3, Frost Shock no longer suffers from diminishing returns. Prior to that it suffered from Diminishing Returns, which rendered each application of the snare weaker and weaker until the third use, at which point the target was immune for 15 seconds.
-	//case SPELL_HASH_FROST_SHOCK:			// Frost Shock
-	//	grp = 13;
-	//	break;
 
 	case SPELL_HASH_HIBERNATE:				// Hibernate
 		{
@@ -4472,24 +4453,6 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			pve = true;
 		}break;
 
-	case SPELL_HASH_CELESTIAL_FOCUS:		// Celestial Focus
-		{
-			grp = 16;
-			pve = true;
-		}break;
-
-	case SPELL_HASH_IMPACT:					// Impact
-		{
-			grp = 17;
-			pve = true;
-		}break;
-
-	case SPELL_HASH_BLACKOUT:				// Blackout
-		{
-			grp = 18;
-			pve = true;
-		}break;
-
 	case SPELL_HASH_BANISH:					// Banish
 		{
 			grp = 19;
@@ -4498,16 +4461,6 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
 		{
 			grp = 20;
-		}break;
-
-	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
-		{
-			grp = 21;
-		}break;
-
-	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
-		{
-			grp = 22;
 		}break;
 
 	}
