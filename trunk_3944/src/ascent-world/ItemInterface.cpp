@@ -2477,7 +2477,7 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 	if( dstslot < INVENTORY_SLOT_BAG_END ) 
 	{
 		if( m_pItems[(int)dstslot] != NULL )		
-			m_pOwner->ApplyItemMods( m_pItems[(int)dstslot], srcslot, true );
+			m_pOwner->ApplyItemMods( m_pItems[(int)dstslot], dstslot/*srcslot*/, true );
 	}
 
 }
