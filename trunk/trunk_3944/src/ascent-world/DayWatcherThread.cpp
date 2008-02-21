@@ -218,7 +218,7 @@ void DayWatcherThread::update_arena()
 				if(team)
 				{
 					ArenaTeamMember *member = team->GetMemberByGuid(guid);
-					if(member == NULL || team->m_stat_gamesplayedweek < 10 || (100 / team->m_stat_gamesplayedweek * member->Played_ThisWeek) < 30)
+					if(member == NULL || team->m_stat_gamesplayedweek < 10 ||(member->Played_ThisWeek*100)/team->m_stat_gamesplayedweek < 30)
 						continue;
 
 					/* we're in an arena team of this type! */

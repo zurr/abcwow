@@ -1609,6 +1609,8 @@ void Aura::SpellAuraDummy(bool apply)
 		{
 	      if( apply )
 			 m_target->m_extrastriketargets++;
+		  else
+			 m_target->m_extrastriketargets--;
 		}break;
 	//taming rod spells
 	case 19548:	triggerSpId=19597;

@@ -3285,7 +3285,7 @@ else
 		m_extraAttackCounter = false;
 	}
 
-	if(m_extrastriketargets)
+	if(m_extrastriketargets > 0)
 	{
 		int32 m_extra = m_extrastriketargets;
 		int32 m_temp = m_extrastriketargets;
@@ -3293,16 +3293,16 @@ else
 
 		for(set<Object*>::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end() && m_extra; ++itr)
 		{
-			if(m_extra == 0)
+			if(m_extra <= 0)
 				break;
 
 			if((*itr) != pVictim && (*itr)->IsUnit() && CalcDistance(*itr) < 10.0f && isAttackable(this, (*itr)) && (*itr)->isInFront(this) && !((Unit*)(*itr))->IsPacified())
 			{
-				Strike( static_cast< Unit* >( *itr ), weapon_damage_type, ability, add_damage, pct_dmg_mod, exclusive_damage, false ,false );
+				Strike( static_cast< Unit* >( *itr ), weapon_damage_type, ability, 0, pct_dmg_mod, exclusive_damage, false ,false );
 				--m_extra;
 			}
 		}
-		m_extrastriketargets = m_temp;
+		m_extrastriketargets += m_temp;
 	}
 }	
 
