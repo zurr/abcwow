@@ -1034,6 +1034,7 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	data << plr->GetGUID();
 
 	m_mainLock.Acquire();
+	if(plr->m_bgTeam > 1) plr->m_bgTeam = plr->GetTeam();
 	m_players[plr->m_bgTeam].erase(plr);
 	DistributePacketToAll(&data);
 
