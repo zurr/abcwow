@@ -5935,7 +5935,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->Effect[2] = 6;
 		sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[2] = 9174; //not sure if this is the one. In my time this adds 30 rage
+		sp->EffectTriggerSpell[2] = 23691;
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 	}
 
@@ -5946,16 +5946,6 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 20501 );
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
-
-	//warrior - berserker rage is missing 1 effect = regenerate rage
-	sp = dbcSpell.LookupEntryForced( 18499 );
-	if( sp != NULL )
-	{
-		sp->Effect[2] = 6;
-		sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[2] = 9174; //not sure if this is the one. In my time this adds 30 rage
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
-	}
 
 	//warrior - Blood Frenzy
 	sp = dbcSpell.LookupEntryForced( 29836 );
