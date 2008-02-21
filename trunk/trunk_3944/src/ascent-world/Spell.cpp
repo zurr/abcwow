@@ -4078,8 +4078,8 @@ void Spell::Heal(int32 amount)
 
 		if (p_caster)
 		{
-			bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
-			bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+			for(uint32 a = 0; a < 6; a++)
+				bonus += float2int32(p_caster->SpellHealDoneByAttribute[a][m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT0 + a));
 		}
  
 		amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
