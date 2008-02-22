@@ -78,6 +78,16 @@ INSERT INTO `spell_data_extra` (`spellid`,`dmg_bonus`) VALUES
  (25316,29),
  (25308,29);
  
+ -- Touch of Weakness
+INSERT INTO `spell_data_extra` (`spellid`,`dmg_bonus`) VALUES
+ (2943,9),
+ (19249,9),
+ (19251,9),
+ (19252,9),
+ (19253,9),
+ (19254,9),
+ (25460,9);
+ 
 -- Mage
 
 -- Pyroblast (115% dd, 20% dot)
