@@ -137,6 +137,7 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 {
 
 	// no water breathing is required
+	/*
 	if( !sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || _player->isDead() || _player->GodModeCheat )
 	{
 		// player is flagged as in water
@@ -203,7 +204,7 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 			}
 		}
 	}
-
+	*/
 	//player is swiming and not flagged as in the water
 	if( movement_info.flags & MOVEFLAG_SWIMMING && !( _player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING ) )
 	{

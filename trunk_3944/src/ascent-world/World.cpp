@@ -1563,13 +1563,22 @@ bool World::SetInitialWorldSettings()
 	//Warlock: Nether Protection
 	sp = dbcSpell.LookupEntryForced( 30299 );
 	if (sp != NULL)
+	{
 		sp->procChance = 10;
+		sp->proc_interval = 20000; //15 sec.
+	}
 	sp = dbcSpell.LookupEntryForced( 30301 );
 	if (sp != NULL)
+	{
 		sp->procChance = 20;
+		sp->proc_interval = 20000; //20 sec.
+	}
 	sp = dbcSpell.LookupEntryForced( 30302 );
 	if (sp != NULL)
+	{
 		sp->procChance = 30;
+		sp->proc_interval = 20000; //15 sec.
+	}
 
 	//Warlock: Backlash
 	sp = dbcSpell.LookupEntryForced( 34935 );
