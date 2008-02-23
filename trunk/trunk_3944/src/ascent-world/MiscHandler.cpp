@@ -495,14 +495,14 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                                         return;
                                     }
                     			    uint32 DespawnTime = 0;
-			                        if(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()))
-				                        DespawnTime = 120000;	   // 5 min for quest GO,
-			                        else
-			                        {
-				                        DespawnTime = 900000;	   // 15 for else
-			                        }
-
-
+									if( !IS_INSTANCE(pGO->GetMapId()) )
+									{
+										if(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()))
+											DespawnTime = 120000;	   // 5 min for quest GO,
+										else
+											DespawnTime = 900000;	   // 15 for else
+									}
+	
 			                        pGO->Despawn(DespawnTime);
 									return;
                                 }
@@ -518,16 +518,14 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                         return;
                     }
                     uint32 DespawnTime = 0;
-			        if(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()))
-				        DespawnTime = 120000;	   // 5 min for quest GO,
-			        else
-			        {
-				        DespawnTime = 900000;	   // 15 for else
-			        }
-
-
+					if( !IS_INSTANCE(pGO->GetMapId()) )
+					{
+						if(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()))
+							DespawnTime = 120000;	   // 5 min for quest GO,
+						else
+							DespawnTime = 900000;	   // 15 for else
+					}
 			        pGO->Despawn(DespawnTime);
-
                 }
             }
         default: break;
