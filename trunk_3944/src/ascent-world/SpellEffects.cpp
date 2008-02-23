@@ -1209,7 +1209,7 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 		}
 
 		// avoid teleporting into the model on scaled models
-		const static float shadowstep_distance = 1.35f * max(unitTarget->GetFloatValue(OBJECT_FIELD_SCALE_X),1);
+		const static float shadowstep_distance = 1.35f * max(unitTarget->GetFloatValue(OBJECT_FIELD_SCALE_X), 1.0f);
 		float new_x = unitTarget->GetPositionX() - (shadowstep_distance * cosf(ang));
 		float new_y = unitTarget->GetPositionY() - (shadowstep_distance * sinf(ang));
 		
