@@ -2842,10 +2842,25 @@ void Aura::SpellAuraModStealth(bool apply)
 		m_target->RemoveFlag(UNIT_FIELD_BYTES_1,0x02000000);
 		if( m_target->IsPlayer() )
 		{
+			Player* p_caster = static_cast< Player* >( m_target );
+
 			WorldPacket data(12);
 			data.SetOpcode(SMSG_COOLDOWN_EVENT);
 			data << (uint32)GetSpellProto()->Id << m_target->GetGUID();
-			static_cast< Player* >( m_target )->GetSession()->SendPacket (&data);
+			p_caster->GetSession()->SendPacket (&data);
+
+			//wipe aggro and remove all cast target victim
+			for(std::set<Object*>::iterator itr = p_caster->GetInRangeSetBegin(); itr != p_caster->GetInRangeSetEnd(); itr++ )
+			{
+				if( (*itr) && (*itr)->IsUnit() && static_cast< Unit* >( *itr )->isAlive() )
+				{
+					if( (*itr)->GetTypeId() == TYPEID_UNIT )
+						static_cast< Unit* >( *itr )->GetAIInterface()->RemoveThreatByPtr( p_caster );
+
+					if( ( (*itr) )->IsPlayer() && static_cast< Player* >( *itr )->isCasting() )
+						static_cast< Player* >( *itr )->CancelSpell( NULL );
+				}
+			}
 		}
 
 		// hack fix for vanish stuff
@@ -3956,6 +3971,22 @@ void Aura::SpellAuraModSchoolImmunity(bool apply)
 				m_target->RemoveAurasOfSchool(i, false, true);
 			}
 		}
+
+		//hack for ice block
+		if(m_spellProto->NameHash == SPELL_HASH_ICE_BLOCK)
+		{
+			if( m_target == NULL || !m_target->isAlive() )
+				return;
+
+			Aura * pAura;
+			for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
+			{
+				pAura = m_target->m_auras[i];
+				if( pAura != NULL && !pAura->IsPassive() && !pAura->IsPositive() && pAura->GetSpellProto()->can_be_dispelled )
+					pAura->Remove();
+			}
+		}
+
 	}
 	else
 	{
