@@ -1237,8 +1237,6 @@ public:
 		info_mass_polymorph = dbcSpell.LookupEntry(MASS_POLYMORPH);
 		info_conjure = dbcSpell.LookupEntry(CONJURE);
 		info_pyroblast = dbcSpell.LookupEntry(AOE_PYROBLAST);
-
-		GameObject* pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-11162.56f, -1913.954f, 232.008f, 184517);
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -1276,8 +1274,8 @@ public:
 		summoned = false;
 		explode = false;
 		slow = false;
-		GameObject* pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-11162.56f, -1913.954f, 232.008f, 184517);
 
+		GameObject* pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-11162.56f, -1913.954f, 232.008f, 184517);
 		if (pDoor)
 		{
 			sEventMgr.RemoveEvents(pDoor);
@@ -1291,8 +1289,14 @@ public:
 		if (_unit->isAlive())
 			_unit->SetUInt32Value(UNIT_FIELD_POWER1, _unit->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 		CastTime();
+
+		GameObject* pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-11162.56f, -1913.954f, 232.008f, 184517);
 		if (pDoor)
+		{
+			sEventMgr.RemoveEvents(pDoor);
 			pDoor->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+		}
+
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -1303,8 +1307,13 @@ public:
 		CastTime();
 		_unit->PlaySoundToSet(9244);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "At last... The nightmare is.. over...");
+
+		GameObject* pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-11162.56f, -1913.954f, 232.008f, 184517);
 		if (pDoor)
+		{
+			sEventMgr.RemoveEvents(pDoor);
 			pDoor->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+		}
 		RemoveAIUpdateEvent();
 	}
 
