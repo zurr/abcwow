@@ -2704,7 +2704,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 	}
 
 	//Fear Code
-	if(m_AIState == STATE_FEAR && UnitToFear != NULL && m_creatureState == STOPPED)
+	if(m_AIState == STATE_FEAR && UnitToFear != NULL && !m_Unit->IsPlayer() && m_creatureState == STOPPED)
 	{
 		if(getMSTime() > m_FearTimer)   // Wait at point for x ms ;)
 		{
@@ -2768,7 +2768,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 	}
 
 	// Wander AI movement code
-	if(m_AIState == STATE_WANDER && m_creatureState == STOPPED)
+	if(m_AIState == STATE_WANDER && !m_Unit->IsPlayer() && m_creatureState == STOPPED)
 	{
 		if(getMSTime() < m_WanderTimer) // is it time to move again?
 			return;
