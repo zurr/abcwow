@@ -6325,7 +6325,7 @@ void Player::RegenerateHealth( bool inCombat )
 	float amt = (Spirit*HPRegen->val+HPRegenBase->val*100)*(1+PctRegenModifier);
 	amt *= sWorld.getRate(RATE_HEALTH);//Apply shit from conf file
 
-	if(m_interruptRegen)
+	if(inCombat)
 		amt *= PctIgnoreRegenModifier;
 
 	if(amt != 0)
