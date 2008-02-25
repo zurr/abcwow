@@ -515,7 +515,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 						
 						if( coeff > 0.0 )
 						{
-							uint32 damage = (uint32)( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) * coeff );
+							uint32 damage = (uint32)( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) * coeff * 0.6f);
 
 							if( _player->bSafeFall )
 								damage = float2int32( float( damage ) * 0.83f );
@@ -630,6 +630,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		{
 			if( _player->_lastHeartbeatT == 0 )
 			{
+				/*
 				if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
 				{
 					if( _player->_lastHeartbeatV >= speed )
@@ -682,6 +683,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 						}
 					}
 				}
+				*/
 			}
 			else
 			{
@@ -704,7 +706,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Anti-Flying Hack                                                     */
 	/************************************************************************/
-
+/*
 	if( sWorld.antihack_flight )
 	{
 		//if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
@@ -734,11 +736,11 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			}
 		}
 	}
-
+*/
 	/************************************************************************/
 	/* Anti-Fall Damage hack                                                */
 	/************************************************************************/
-
+/*
 	if( sWorld.antihack_fall_damage )
 	{
 		if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
@@ -761,7 +763,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			}
 		}
 	}
-
+*/
 	/************************************************************************/
 	/* Anti-Packet Hack Checks                                              */
 	/************************************************************************/
