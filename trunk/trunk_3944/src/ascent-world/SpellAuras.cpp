@@ -2859,6 +2859,7 @@ void Aura::SpellAuraModStealth(bool apply)
 			data << (uint32)GetSpellProto()->Id << m_target->GetGUID();
 			p_caster->GetSession()->SendPacket (&data);
 
+			/*
 			//wipe aggro and remove all cast target victim
 			for(std::set<Object*>::iterator itr = p_caster->GetInRangeSetBegin(); itr != p_caster->GetInRangeSetEnd(); itr++ )
 			{
@@ -2871,6 +2872,7 @@ void Aura::SpellAuraModStealth(bool apply)
 						static_cast< Player* >( *itr )->CancelSpell( NULL );
 				}
 			}
+			*/
 		}
 
 		// hack fix for vanish stuff
