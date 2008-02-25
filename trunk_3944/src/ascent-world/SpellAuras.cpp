@@ -2112,7 +2112,17 @@ void Aura::SpellAuraDummy(bool apply)
 
 	case 33763:		// lifebloom
 		{
-			if( apply || m_target == NULL )
+			if( apply || m_target == NULL || m_target->isDead() )
+				return;
+
+			uint32 count = 0;
+			for(uint32 x = 0; x < MAX_POSITIVE_AURAS; ++x)
+			{
+				if(m_target->m_auras[x] && m_target->m_auras[x]->GetSpellProto()->NameHash == SPELL_HASH_LIFEBLOOM)
+					count++;
+			}
+
+			if (count > 1)
 				return;
 
 			Unit* pCaster = GetUnitCaster();
