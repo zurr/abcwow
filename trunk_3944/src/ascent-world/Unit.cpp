@@ -3295,8 +3295,11 @@ else
 		{
 			if(m_extra <= 0)
 				break;
+			if (!(*itr) || (*itr) == pVictim || !(*itr)->IsUnit())
+				continue;
 
-			if((*itr) != pVictim && (*itr)->IsUnit() && CalcDistance(*itr) < 10.0f && isAttackable(this, (*itr)) && (*itr)->isInFront(this) && !((Unit*)(*itr))->IsPacified())
+			//if((*itr) != pVictim && (*itr)->IsUnit() && CalcDistance(*itr) < 10.0f && isAttackable(this, (*itr)) && (*itr)->isInFront(this) && !((Unit*)(*itr))->IsPacified())
+			if(CalcDistance(*itr) < 10.0f && isAttackable(this, (*itr)) && (*itr)->isInFront(this) && !((Unit*)(*itr))->IsPacified())
 			{
 				Strike( static_cast< Unit* >( *itr ), weapon_damage_type, ability, 0, pct_dmg_mod, exclusive_damage, false ,false );
 				--m_extra;
