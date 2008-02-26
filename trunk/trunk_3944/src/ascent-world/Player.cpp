@@ -6385,22 +6385,11 @@ void Player::LooseRage()
 	//The Anger Management talent changes this to 2 rage every 3 seconds.
 	uint32 cur = GetUInt32Value(UNIT_FIELD_POWER2);
 	uint32 decayValue = 30; // default not modified
-	
-	if(cur) {
-	  uint32 cl=getClass();
 
-	  switch(cl) {
-	  case WARRIOR:
-	    // Check for talent modifiers when the talent code is completed
-	    break;
-	  case DRUID:
-	    // For now, i don't think there is anything that might change druids
-	    // rage per decay anywhere
-	    break;
-	  }
-
-	  SetUInt32Value(UNIT_FIELD_POWER2, (cur <= decayValue) ? 0 : (cur - decayValue));
-	}
+	uint32 newrage = ((int)cur <= decayValue) ? 0 : cur-decayValue;
+    if (newrage > 1000 )
+	  newrage = 1000;
+	SetUInt32Value(UNIT_FIELD_POWER2,newrage);
 }
 
 void Player::RegenerateEnergy()
@@ -8695,6 +8684,7 @@ void Player::CalcDamage()
 		SetUInt32Value( PLAYER_RATING_MODIFIER_RANGED_SKILL, cr );
 
 /////////////////////////////////RANGED end
+		/*
 		tmp = 1;
 		for(i = damagedone.begin();i != damagedone.end();i++)
 		if(i->second.wclass==(uint32)-1)  //any weapon
@@ -8702,7 +8692,7 @@ void Player::CalcDamage()
 		
 		//display only modifiers for any weapon
 		SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT ,tmp);
- 
+ */
 }
 
 uint32 Player::GetMainMeleeDamage(uint32 AP_owerride)
