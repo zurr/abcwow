@@ -1638,23 +1638,23 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		}
 	}
 
-        ///Rage
-        float val;
+	// Rage generating - I am receiving damage!
+	if( damage && pVictim->IsPlayer() && pVictim->GetPowerType() == POWER_TYPE_RAGE && pVictim->CombatStatus.IsInCombat() )
+	{
+		float val;
+		float level = (float)pVictim->getLevel();
 
-		if( pVictim->GetPowerType() == POWER_TYPE_RAGE 
-			//&& !spellId //zack : general opinion is that spells should generate rage. I share the feeling
-			&& pVictim != this
-			&& pVictim->IsPlayer())
-		{
-			float level = (float)pVictim->getLevel();
-			float c = 0.0091107836f * level * level + 3.225598133f * level + 4.2652911f;
-			val = 2.5f * damage / c;
-			uint32 rage = pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
-			if( rage + float2int32( val ) > 1000 )
-			  val = 1000.0f - (float)pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
+		// Conversion Value
+		float c = 0.0091107836f * level * level + 3.225598133f * level + 4.2652911f;
 
-			ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
-		}
+		val = 2.5f * damage / c;
+		val *= 10;
+
+		pVictim->ModUInt32Value( UNIT_FIELD_POWER2, (int32)val );
+		if( pVictim->GetUInt32Value( UNIT_FIELD_POWER2) > 1000 )
+			pVictim->ModUInt32Value( UNIT_FIELD_POWER2, 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 ) );
+	}
+
 
 	if( pVictim->IsPlayer() )
 	{

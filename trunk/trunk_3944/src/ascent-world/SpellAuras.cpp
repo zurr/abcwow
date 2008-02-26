@@ -1716,7 +1716,7 @@ void Aura::SpellAuraDummy(bool apply)
 	case 12678:
 		{
 			if( apply )
-				_ptarget->m_retainedrage += mod->m_amount*10; //don't really know if value is all value or needs to be multiplyed with 10
+				_ptarget->m_retainedrage += mod->m_amount*10;
 			else
 				_ptarget->m_retainedrage -= mod->m_amount*10;
 		}break;
@@ -3840,8 +3840,9 @@ void Aura::SpellAuraModShapeshift(bool apply)
 
 	if( apply )
 	{
-		if( m_target->getClass() == WARRIOR && m_target->GetUInt32Value( UNIT_FIELD_POWER2 ) > static_cast< Player* >( m_target )->m_retainedrage )
-			m_target->SetUInt32Value(UNIT_FIELD_POWER2, static_cast< Player* >( m_target )->m_retainedrage );
+		if( m_target->getClass() == WARRIOR && (m_target->GetUInt32Value( UNIT_FIELD_POWER2 ) + static_cast< Player* >( m_target )->m_retainedrage) < 1000 )
+			//m_target->SetUInt32Value(UNIT_FIELD_POWER2, m_target->GetUInt32Value(UNIT_FIELD_POWER2) + static_cast< Player* >( m_target )->m_retainedrage );
+			m_target->Energize(m_target,12295, static_cast< Player* >( m_target )->m_retainedrage, POWER_TYPE_RAGE);
 
 		if( m_target->getClass() == DRUID )
 		{
