@@ -3962,6 +3962,7 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//Mage - Spell Power
+	/*
 	sp = dbcSpell.LookupEntryForced( 35578 );
 	if( sp != NULL )
 	{
@@ -3974,7 +3975,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 		//sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF;
 	}
-
+*/
 	//Mage - Frost Channeling
 	sp = dbcSpell.LookupEntryForced( 11160 );
 	if( sp != NULL )

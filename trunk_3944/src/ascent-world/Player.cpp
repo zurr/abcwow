@@ -7182,7 +7182,6 @@ void Player::RequestDuel(Player *pTarget)
 	data << GetGUID();
 	pTarget->GetSession()->SendPacket(&data);
 
-	m_duelCountdownTimer = 3000;
 }
 
 void Player::DuelCountdown()
