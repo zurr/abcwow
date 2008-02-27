@@ -276,6 +276,7 @@ void Spell::SpellTargetDefault(uint32 i, uint32 j)
 void Spell::SpellTargetSelf(uint32 i, uint32 j)
 {
 	TargetsList *tmpMap=&m_targetUnits[i];
+	/*
 	if(p_caster)
 	{
 		if(m_spellInfo->RequiredShapeShift && (p_caster->getClass()==DRUID || p_caster->getClass()==WARRIOR))
@@ -289,6 +290,7 @@ void Spell::SpellTargetSelf(uint32 i, uint32 j)
 			}
 		}
 	}
+	*/
 	SafeAddTarget(tmpMap,m_caster->GetGUID());
 }
 void Spell::SpellTargetInvisibleAOE(uint32 i, uint32 j)
