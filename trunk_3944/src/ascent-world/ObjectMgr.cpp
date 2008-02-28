@@ -2650,6 +2650,7 @@ void ObjectMgr::UpdateArenaTeamWeekly()
 			if(team)
 			{
 				team->m_stat_gamesplayedweek = 0;
+				team->m_stat_gameswonweek = 0;
 				for(uint32 j = 0; j < team->m_memberCount; ++j)
 				{
 					team->m_members[j].Played_ThisWeek = 0;
