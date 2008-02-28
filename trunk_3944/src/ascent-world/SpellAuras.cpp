@@ -569,7 +569,7 @@ void Aura::ApplyModifiers( bool apply )
 		else
 			sLog.outError("Unknown Aura id %d", (uint32)mod->m_type);
 	}
-	
+	/*
 	if(GetSpellProto()->procFlags)
 	{
 		for( uint32 x = 0; x < 3; x++ )
@@ -613,6 +613,7 @@ void Aura::ApplyModifiers( bool apply )
 			}
 		}
 	}
+	*/
 }
 
 void Aura::AddAuraVisual()
@@ -4039,11 +4040,19 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 {
 	if( apply )
 	{
+		uint32 trigger_spell_id = GetSpellProto()->EffectTriggerSpell[mod->i];
+		for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
+			if(itr->origId == GetSpellId() && itr->caster == m_casterGuid && itr->spellId == trigger_spell_id)
+			{
+				sLog.outDebug("Warning,tried to multiply register same spell trigger %u",GetSpellProto()->Id);
+				return;
+			}
+
 		ProcTriggerSpell pts;
 		pts.origId = GetSpellProto()->Id;
 		pts.caster = m_casterGuid;
-		if(GetSpellProto()->EffectTriggerSpell[mod->i])
-			pts.spellId=GetSpellProto()->EffectTriggerSpell[mod->i];
+		if( trigger_spell_id )
+			pts.spellId = trigger_spell_id;
 		else
 		{
 			sLog.outDebug("Warning,trigger spell is null for spell %u",GetSpellProto()->Id);
