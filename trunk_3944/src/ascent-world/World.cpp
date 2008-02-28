@@ -1475,6 +1475,7 @@ bool World::SetInitialWorldSettings()
 			sp->procChance = 25;
 			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
 			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
+			sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
 		}
 
 		//Seal of Jusice - Proc Chance
@@ -1554,6 +1555,16 @@ bool World::SetInitialWorldSettings()
 		sp->Flags3 = 0;
 		sp->maxstack = 0;
 	}
+
+	//Crusader Strike
+	sp = dbcSpell.LookupEntryForced( 35395 );
+	if( sp != NULL && sp->Id == 35395 )
+		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MELEE;
+
+	//Avenging Wrath
+	sp = dbcSpell.LookupEntryForced( 31884 );
+	if( sp != NULL && sp->Id == 31884 )
+		sp->MechanicsType = 25;
 
 	//remove stormstrike effect 0
 	sp = dbcSpell.LookupEntryForced( 17364 );
