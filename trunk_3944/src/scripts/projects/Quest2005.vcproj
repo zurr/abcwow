@@ -203,15 +203,51 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\src\QuestScripts\FelOrcScavengers.cpp"
+				RelativePath="..\src\QuestScripts\Azuremyst_Isle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\QuestScripts\GordunniOgres.cpp"
+				RelativePath="..\src\QuestScripts\BladeEdge_Mountains.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\QuestScripts\KilsorrowAgents.cpp"
+				RelativePath="..\src\QuestScripts\Druid.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Hellfire_Peninsula.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Mage.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Nagrand.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Paladin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Shadowmoon.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Silverpine_Forest.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Terrokar_Forest.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Undercity.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Zangarmarsh.cpp"
 				>
 			</File>
 		</Filter>

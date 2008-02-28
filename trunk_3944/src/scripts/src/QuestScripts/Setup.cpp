@@ -13,9 +13,18 @@ extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
 
 extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 {
-	SetupFelOrcScavengers(mgr);
-	SetupGordunniOgres(mgr);
-	SetupKilsorrowAgents(mgr);
+	SetupDruid(mgr);
+	SetupPaladin(mgr);
+	SetupShadowmoon(mgr);
+	SetupHellfirePeninsula(mgr);
+	SetupBladeEdgeMountains(mgr);
+	SetupTerrokarForest(mgr);
+	SetupNagrand(mgr);
+	SetupSilverpineForest(mgr);
+	SetupZangarmarsh(mgr);
+	SetupUndercity(mgr);
+	SetupAzuremystIsle(mgr);
+	SetupMage(mgr);
 }
 
 #ifdef WIN32
