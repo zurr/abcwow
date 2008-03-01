@@ -4422,6 +4422,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			grp = 4;
 		}break;
 
+	case SPELL_HASH_SEDUCTION:				// Seduction
 	case SPELL_HASH_FEAR:					// Fear
 	case SPELL_HASH_HOWL_OF_TERROR:			// Howl of Terror
 	case SPELL_HASH_DEATH_COIL:			// Death Coil
@@ -4446,7 +4447,6 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			pve = true;   
 		}break;
 
-	case SPELL_HASH_SEDUCTION:				// Seduction
 	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
 	case SPELL_HASH_MIND_CONTROL:			// Mind Control
 		{
