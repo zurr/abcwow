@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
+#include "EAS/EasyFunctions.h"
 
 // Fel Orc Scavengers Quest
 class FelOrcScavengersQAI : public CreatureAIScript
@@ -68,6 +69,45 @@ public:
 	}
 };
 
+bool TestingTheAntidote(uint32 i, Spell* pSpell)
+{
+  if(pSpell->GetUnitTarget()->GetTypeId() != TYPEID_UNIT)
+    return true;
+
+  Creature *target = static_cast<Creature*>(pSpell->GetUnitTarget());
+  if(target->GetEntry() != 16880) // Hulking Helboar
+    return true;
+
+  Creature *spawned = sEAS.SpawnCreature(pSpell->p_caster, 16992, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
+  target->Despawn(0, 2*60*1000);
+
+  if(pSpell->p_caster != NULL)
+    spawned->GetAIInterface()->SetNextTarget(pSpell->p_caster);
+
+  return true;
+}
+
+class Dreadtusk : public CreatureAIScript
+{
+public:
+  ADD_CREATURE_FACTORY_FUNCTION(Dreadtusk);
+  Dreadtusk(Creature* pCreature) : CreatureAIScript(pCreature)  {}
+
+  void OnDied(Unit *mKiller)
+  {
+    if(!mKiller->IsPlayer())
+      return;
+
+    QuestLogEntry *qle = static_cast<Player*>(mKiller)->GetQuestLogForEntry(10255);
+    if(qle == NULL)
+      return;
+
+    qle->SetMobCount(0,1);
+    qle->SendUpdateAddKill(0);
+    qle->UpdatePlayerFields();
+  }
+};
+
 void SetupHellfirePeninsula(ScriptMgr * mgr)
 {
 	mgr->register_creature_script(16772, &FelOrcScavengersQAI::Create);
@@ -84,4 +124,6 @@ void SetupHellfirePeninsula(ScriptMgr * mgr)
 	mgr->register_creature_script(19414, &BurdenOfSoulsQAI::Create);
 	mgr->register_creature_script(16878, &BurdenOfSoulsQAI::Create);
 	mgr->register_creature_script(19415, &BurdenOfSoulsQAI::Create);
+  mgr->register_dummy_spell(34665, &TestingTheAntidote);
+  mgr->register_creature_script(16992, &Dreadtusk::Create);
 }
