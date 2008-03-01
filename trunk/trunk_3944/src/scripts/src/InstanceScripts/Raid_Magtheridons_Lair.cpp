@@ -400,12 +400,13 @@ public:
 			m_eventstarted = true;
 			if (!door)
 				door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
-			door->SetUInt32Value(GAMEOBJECT_STATE, 1);
+			if (door)
+				door->SetUInt32Value(GAMEOBJECT_STATE, 1);
 			for (int i = 0; i < 5; i++)
 			{
 				if (!channelers[i]->GetAIInterface()->GetAllowedToEnterCombat())
 					channelers[i]->GetAIInterface()->SetAllowedToEnterCombat(true);
-				channelers[i]->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+				channelers[i]->GetAIInterface()->AttackReaction(mTarget, 1, 0);
 			}
 		}
 	}
@@ -423,7 +424,8 @@ public:
 					if (cubes[i])
 						cubes[i]->Despawn(0);
 				}
-				door->SetUInt32Value(GAMEOBJECT_STATE, 0);
+				if (door)
+					door->SetUInt32Value(GAMEOBJECT_STATE, 0);
 				RemoveAIUpdateEvent();
 				_unit->Despawn(100, 2500);
 			}
