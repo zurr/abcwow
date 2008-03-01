@@ -400,11 +400,15 @@ public:
 		if (!m_eventstarted)
 		{
 			m_eventstarted = true;
-			_unit->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			summoner->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			mage->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			priest->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			shaman->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			_unit->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (summoner)
+				summoner->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (mage)
+				mage->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (priest)
+				priest->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (shaman)
+				shaman->GetAIInterface()->AttackReaction(mTarget, 1, 0);
 		}
 	}
 	void EventStop(Unit* mTarget)
@@ -503,7 +507,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
-		if (_unit->isAlive() && maulgar->isAlive())
+		if (_unit->isAlive() && maulgar && maulgar->isAlive())
 		{
 			CreatureAIScript *mob_script = maulgar->GetScript();
 			((HighKingMaulgarAI*)mob_script)->EventStop(mTarget);
@@ -631,7 +635,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
-		if (_unit->isAlive() && maulgar->isAlive())
+		if (_unit->isAlive() && maulgar && maulgar->isAlive())
 		{
 			CreatureAIScript *mob_script = maulgar->GetScript();
 			((HighKingMaulgarAI*)mob_script)->EventStop(mTarget);
@@ -756,7 +760,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
-		if (_unit->isAlive() && maulgar->isAlive())
+		if (_unit->isAlive() && maulgar && maulgar->isAlive())
 		{
 			CreatureAIScript *mob_script = maulgar->GetScript();
 			((HighKingMaulgarAI*)mob_script)->EventStop(mTarget);
@@ -877,7 +881,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
-		if (_unit->isAlive() && maulgar->isAlive())
+		if (_unit->isAlive() && maulgar && maulgar->isAlive())
 		{
 			CreatureAIScript *mob_script = maulgar->GetScript();
 			((HighKingMaulgarAI*)mob_script)->EventStop(mTarget);

@@ -1687,10 +1687,32 @@ public:
 		if (!m_eventstarted)
 		{
 			m_eventstarted = true;
-			_unit->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			caribdis->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			sharkkis->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			tidalvess->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			_unit->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (caribdis)
+				caribdis->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (sharkkis)
+				sharkkis->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (tidalvess)
+				tidalvess->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+		}
+	}
+
+	void EventStop(Unit* mTarget)
+	{
+		if (m_eventstarted)
+		{
+			m_eventstarted = false;
+			if (_unit->isAlive())
+			{
+			if (caribdis)
+				caribdis->Despawn(100, 0);
+			if (sharkkis)
+				sharkkis->Despawn(100, 0);
+			if (tidalvess)
+				tidalvess->Despawn(100, 0);
+				RemoveAIUpdateEvent();
+				_unit->Despawn(100, 2500);
+			}
 		}
 	}
 
@@ -1771,6 +1793,11 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		if (_unit->isAlive() && karathress && karathress->isAlive())
+		{
+			CreatureAIScript *mob_script = karathress->GetScript();
+			((KARATHRESSAI*)mob_script)->EventStop(mTarget);
+		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -1924,6 +1951,11 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		if (_unit->isAlive() && karathress && karathress->isAlive())
+		{
+			CreatureAIScript *mob_script = karathress->GetScript();
+			((KARATHRESSAI*)mob_script)->EventStop(mTarget);
+		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -2181,6 +2213,11 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		if (_unit->isAlive() && karathress && karathress->isAlive())
+		{
+			CreatureAIScript *mob_script = karathress->GetScript();
+			((KARATHRESSAI*)mob_script)->EventStop(mTarget);
+		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -2747,9 +2784,9 @@ public:
 		if (!m_eventstarted)
 		{
 			m_eventstarted = true;
-			channeler1->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			channeler2->GetAIInterface()->AttackReaction(mTarget, 0, 0);
-			channeler3->GetAIInterface()->AttackReaction(mTarget, 0, 0);
+			channeler1->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			channeler2->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			channeler3->GetAIInterface()->AttackReaction(mTarget, 1, 0);
 		}
 	}
 	void EventStop(Unit* mTarget)
@@ -3096,7 +3133,7 @@ protected:
 #define VASHJ_FORKEDLIGHTNING 40088
 #define VASHJ_ENTANGLE 38316
 #define VASHJ_STATICCHARGE 38280
-#define VASHJ_SHIELD 41373
+#define VASHJ_SHIELD 38112
 
 class VASHJAI : public CreatureAIScript
 {
