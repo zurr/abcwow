@@ -1704,6 +1704,13 @@ bool World::SetInitialWorldSettings()
         sp->EffectTriggerSpell[1] = 25329;
     }
 
+    // Mote Extractor
+	sp = dbcSpell.LookupEntryForced( 30427 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = SPELL_EFFECT_DUMMY;
+	}
+ 
 	// Moroes' garrote targets a single enemy instead of us
 	sp = dbcSpell.LookupEntryForced( 37066 );
     if( sp != NULL )
