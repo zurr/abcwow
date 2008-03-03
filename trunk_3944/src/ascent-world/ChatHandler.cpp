@@ -341,10 +341,14 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			// Check that the player isn't a gm with his status on
 			if(!_player->GetSession()->GetPermissionCount() && player->bGMTagOn && player->gmTargets.count(_player) == 0)
 			{
+				// Send CHAT_MSG_WHISPER_INFORM packet
+				WorldPacket *data2;
+				data2 = sChatHandler.FillMessageData(CHAT_MSG_WHISPER_INFORM, LANG_UNIVERSAL,msg.c_str(), player->GetGUID(), 0);
+				SendPacket(data2);
+				delete data2; 
 				// Build automated reply
 				string Reply = "This Game Master does not currently have an open ticket from you and did not receive your whisper. Please submit a new GM Ticket request if you need to speak to a GM. This is an automatic message.";
-				data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, LANG_UNIVERSAL, Reply.c_str(), player->GetGUID(), 3);
-				SendPacket(data);
+				data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, LANG_UNIVERSAL, Reply.c_str(), player->GetGUID(), 4); 				SendPacket(data);
 				delete data;
 				break;
 			}
@@ -367,7 +371,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			delete data;
 			//Sent the to Users id as the channel, this should be fine as it's not used for wisper
 		  
-			data = sChatHandler.FillMessageData(CHAT_MSG_WHISPER_INFORM, LANG_UNIVERSAL,msg.c_str(), player->GetGUID(), player->bGMTagOn ? 4 : 0  );
+			data = sChatHandler.FillMessageData(CHAT_MSG_WHISPER_INFORM, LANG_UNIVERSAL,msg.c_str(), player->GetGUID(), 0  ); 
 			SendPacket(data);
 			delete data;
 
@@ -380,7 +384,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			}
 			else if(player->HasFlag(PLAYER_FLAGS, 0x04))
 			{
-				// Has AFK flag, autorespond.
+				// Has DND flag, autorespond. 
 				data = sChatHandler.FillMessageData(CHAT_MSG_DND, LANG_UNIVERSAL, player->m_afk_reason.c_str(),player->GetGUID(), _player->bGMTagOn ? 4 : 0);
 				SendPacket(data);
 				delete data;
