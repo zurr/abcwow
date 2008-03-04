@@ -240,12 +240,12 @@ class HighKingMaulgarAI : public CreatureAIScript
 {
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(HighKingMaulgarAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
 	HighKingMaulgarAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -270,20 +270,13 @@ public:
 		spells[2].perctrigger = 3.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(ENRAGE);
-		spells[3].targettype = TARGET_SELF;
-		spells[3].instant = true;
-		spells[3].perctrigger = 2.0f;
-		spells[3].attackstoptimer = 1000;
-		spells[3].speech = "You will not defeat the hand of Gruul!";
-		spells[3].soundid = 11368;
-
 		summoner = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_OLM_THE_SUMMONER, 150.858536f, 185.975540f, -11.091244f, 3.3f, true, false, 0, 0);
 		mage = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_KROSH_FIREHAND, 148.062469f, 179.211060f, -10.799615f, 3.3f, true, false, 0, 0);
 		priest = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_BLINDEYE_THE_SEER, 149.994278f, 203.461243f, -9.410825f, 3.3f, true, false, 0, 0);
 		shaman = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_KIGGLER_THE_CRAZED, 147.571167f, 209.742279f, -7.748757f, 3.3f, true, false, 0, 0);
 
 		m_eventstarted = false;
+		enraged = false;
 	}
 	void OnCombatStart(Unit* mTarget)
 	{
@@ -351,6 +344,13 @@ public:
 	{
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
+		if (!enraged && _unit->GetHealthPct() <= 50)
+		{
+			enraged = true;
+			_unit->CastSpell(_unit, ENRAGE, true);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You will not defeat the hand of Gruul!");
+			_unit->PlaySoundToSet(11368);
+		}
 	}
 	void SpellCast(float val)
 	{
@@ -435,6 +435,7 @@ public:
 protected:
 	int nrspells;
 	bool m_eventstarted;
+	bool enraged;
 	Creature *summoner;
 	Creature *mage;
 	Creature *priest;
@@ -959,95 +960,57 @@ protected:
 
 #define CN_GRUUL_THE_DRAGONKILLER 19044
 
-#define GROWTH            36300 
-#define CAVE_IN           36240 
-#define GROUND_SLAM       33525
-#define SHATTER           33671	// Should be used only when Stoned
-#define HURTFUL_STRIKE    33813 
-#define REVERBERATION     36297 
-#define STONED			  33652 
-#define GRONN_LORDS_GRASP 33572 // Should be used only after Ground Slam
-// % chances changed to let boss use normal attks too
-// Note: Maybe we should add additional spell description option to
-// define next spells.
+#define GROWTH				36300
+#define CAVE_IN				36240
+#define GROUND_SLAM			33525
+#define SHATTER				33671
+#define HURTFUL_STRIKE		33813
+#define REVERBERATION		36297
+#define STONED				33652
+#define GRONN_LORDS_GRASP	33572
 
-// TO DO: Find out what rest of sounds are for and add feature to random choose between
-// several spell sounds.
-
-class GruulsTheDragonkillerAI : public CreatureAIScript
+class GruulsTheDragonkillerAI : public CreatureAIScript, public EventableObject
 {
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(GruulsTheDragonkillerAI);
-	SP_AI_Spell spells[7];
-	bool m_spellcheck[7];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
 	GruulsTheDragonkillerAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
 		GrowthCooldown = 30;
-		nrspells = 7;
+		groundSlamcd = 45;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 
 		} 
-		spells[0].info = dbcSpell.LookupEntry(GROWTH);
-		spells[0].targettype = TARGET_SELF;
+
+		spells[0].info = dbcSpell.LookupEntry(CAVE_IN);
+		spells[0].targettype = TARGET_RANDOM_DESTINATION;
 		spells[0].instant = true;
-		spells[0].perctrigger = 0.0f;
+		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(CAVE_IN);
-		spells[1].targettype = TARGET_RANDOM_DESTINATION;
+		spells[1].info = dbcSpell.LookupEntry(HURTFUL_STRIKE);
+		spells[1].targettype = TARGET_ATTACKING; // Should attk party member with second the highest aggro in melee range
 		spells[1].instant = true;
-		spells[1].perctrigger = 5.0f;
+		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(HURTFUL_STRIKE);
-		spells[2].targettype = TARGET_ATTACKING; // Should attk party member with second the highest aggro in melee range
+		spells[2].info = dbcSpell.LookupEntry(REVERBERATION);
+		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
 		spells[2].perctrigger = 3.0f;
 		spells[2].attackstoptimer = 1000;
-
-		spells[3].info = dbcSpell.LookupEntry(REVERBERATION);
-		spells[3].targettype = TARGET_VARIOUS;
-		spells[3].instant = true;
-		spells[3].perctrigger = 3.0f;
-		spells[3].attackstoptimer = 1000;
-
-		spells[4].info = dbcSpell.LookupEntry(GROUND_SLAM);
-		spells[4].targettype = TARGET_DESTINATION;
-		spells[4].instant = false;
-		spells[4].perctrigger = 7.0f;
-		spells[4].attackstoptimer = 2000;
-		spells[4].speech = "Scary!"; // has 2 sounds for one spell :O
-		spells[4].soundid = 11357;
-		//spells[4].speech = ""No escape!; // has 2 sounds for one spell :O
-		//spells[4].soundid = 11356;
-
-		/* Dealer: disabled cause it does much more dmg than it should 
-		spells[5].info = dbcSpell.LookupEntry(SHATTER);
-		spells[5].targettype = TARGET_VARIOUS;
-		spells[5].instant = true;
-		spells[5].perctrigger = 6.0f;
-		spells[5].attackstoptimer = 1000;
-		*/
-
-		spells[5].info = dbcSpell.LookupEntry(STONED);
-		spells[5].targettype = TARGET_SELF;
-		spells[5].instant = true;
-		spells[5].perctrigger = 7.0f;
-		spells[5].attackstoptimer = 1000;
-
-		spells[6].info = dbcSpell.LookupEntry(GRONN_LORDS_GRASP);
-		spells[6].targettype = TARGET_SELF; // <-- not sure to that (description tells it works like that, but should it really be casted on boss?)
-		spells[6].instant = true;
-		spells[6].perctrigger = 6.0f;
-		spells[6].attackstoptimer = 1000;
 
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
+		GrowthCooldown = 30;
+		groundSlamcd = 45;
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come and die.");
 		_unit->PlaySoundToSet(11355);
 		RegisterAIUpdateEvent(1000);
@@ -1106,11 +1069,34 @@ public:
 
 	void AIUpdate()
 	{
+		groundSlamcd--;
 		GrowthCooldown--;
 		if(!GrowthCooldown)
 		{
-			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
+			_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " grows in size!");
+			_unit->CastSpell(_unit, GROWTH, true);
 			GrowthCooldown=30;
+		}
+		if (!groundSlamcd)
+		{
+			int RandomSpeech = RandomUInt(1000)%2;
+			switch (RandomSpeech)
+			{
+			case 0:
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL,"Scary!");
+				_unit->PlaySoundToSet(11357);
+				break;
+			case 1:
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL,"No escape!");
+				_unit->PlaySoundToSet(11356);
+				break;
+			}
+			_unit->setAttackTimer(12000, false);
+			_unit->GetAIInterface()->StopMovement(12000);
+			groundSlam();
+			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::stoned, EVENT_SCRIPT_UPDATE_EVENT, 6000, 1, 0);
+			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::shatter, EVENT_SCRIPT_UPDATE_EVENT, 8000, 1, 0);
+			groundSlamcd = 80;
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
@@ -1139,7 +1125,7 @@ public:
 					case TARGET_DESTINATION:
 						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					case TARGET_RANDOM_DESTINATION:
-						target = RandomTarget();
+						target = RandomTarget(false, true, 10000);
 						if (target)
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
@@ -1163,27 +1149,115 @@ public:
 			}
 		}
 	}
-	Unit *RandomTarget()
+
+	void groundSlam()
 	{
-		size_t targetsc = _unit->GetAIInterface()->getAITargetsCount();
-		if (targetsc > 0)
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return;
+
+		Unit *temp;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		TargetMap::iterator itr;
+		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
-			uint32 val;
-			val = (uint32) RandomUInt(100)%targetsc;
-			TargetMap::iterator itr;
-			uint32 nr = 0;
-			for (itr = targets->begin(); nr < val;nr++)
+			temp = itr->first;
+			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
-				itr++;
+				knockback(temp);
+				temp->CastSpell(temp, GROUND_SLAM, true);
 			}
-			return itr->first;
 		}
-		return NULL;
+	}
+
+	void knockback(Unit *target)
+	{
+		float ori = (float)RandomFloat(6.0f);
+		float dx,dy;
+		float affect = 20;
+
+		dx = sinf(ori);
+		dy = cosf(ori);
+
+		WorldPacket data(SMSG_MOVE_KNOCK_BACK, 50);
+		data << target->GetNewGUID();
+		data << getMSTime();
+		data << dy << dx;
+		data << affect;
+		data << -affect;
+		target->SendMessageToSet(&data, true);
+		if (target->GetTypeId() == TYPEID_PLAYER)
+			static_cast<Player*>(target)->blinked = true;
+	}
+
+	void stoned()
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return;
+
+		Unit *temp;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		TargetMap::iterator itr;
+		for (itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			temp = itr->first;
+			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
+			{
+				temp->CastSpell(temp, STONED, true);
+			}
+		}
+	}
+
+	void shatter()
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return;
+
+		Unit *temp;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		TargetMap::iterator itr;
+		for (itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			temp = itr->first;
+			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
+			{
+				Aura *aur = temp->FindAura(STONED);
+				if (aur)
+					aur->Remove();
+				//todo: add damage :>
+			}
+		}
+	}
+
+	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return NULL;
+
+		std::vector<Unit*> targetTable;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		TargetMap::iterator itr;
+		for (itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			Unit *temp = itr->first;
+			if (_unit->GetDistance2dSq(temp) <= dist)
+			{
+				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (!targetTable.size())
+			return NULL;
+
+		uint32 randt = RandomUInt(100)%targetTable.size();
+		Unit * randomtarget = targetTable[randt];
+		return randomtarget;
 	}
 protected:
 
 	uint32 GrowthCooldown;
+	uint32 groundSlamcd;
 	int nrspells;
 };
 void SetupGruulsLair(ScriptMgr * mgr)
