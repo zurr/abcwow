@@ -39,8 +39,6 @@ public:
 		spells[1].cooldown = 10;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -55,10 +53,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -70,7 +64,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -137,7 +131,6 @@ protected:
 #define CURSE_OF_TONGUES 13338
 #define CORRUPTION_WARLOCK 32197
 #define FEL_POWER 33111 // not sure to these ones (as always :P)
-//#define DAZED_WARLOCK 1604
 
 class SHADOWMOONWARLOCKAI : public CreatureAIScript
 {
@@ -180,15 +173,6 @@ public:
 		spells[3].cooldown = 45;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-/*
-        spells[4].info = dbcSpell.LookupEntry(DAZED_WARLOCK);
-		spells[4].targettype = TARGET_ATTACKING;
-		spells[4].instant = true;
-		spells[4].cooldown = 15;
-		spells[4].perctrigger = 0.0f;
-		spells[4].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -203,10 +187,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -218,7 +198,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -284,7 +264,6 @@ protected:
 #define THROW_DYNAMITE 7978
 #define THROW_PROXIMITY_BOMB 30846	// lack of core support =(
 #define SILENCE 6726				// those spell must be checked (as I am not sure if it uses all those)
-//#define DAZED_TECHNICIAN 1604
 
 class SHADOWMOONTECHNICIANAI : public CreatureAIScript
 {
@@ -300,6 +279,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(THROW_DYNAMITE);
 		spells[0].targettype = TARGET_DESTINATION;
 		spells[0].instant = false;
@@ -320,15 +300,6 @@ public:
 		spells[2].cooldown = 35;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-/*
-        spells[3].info = dbcSpell.LookupEntry(DAZED_TECHNICIAN);
-		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
-		spells[3].cooldown = 15;
-		spells[3].perctrigger = 0.0f;
-		spells[3].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -343,10 +314,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -358,7 +325,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -440,6 +407,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SUMMON_SEDUCTRESS);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = false;
@@ -467,8 +435,6 @@ public:
 		spells[3].cooldown = 25;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -483,10 +449,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -498,7 +460,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -563,7 +525,6 @@ protected:
 
 #define MARK_OF_SHADOW 30937	// wth it isn't casted by mob and work when used by player :| ?
 #define SHADOW_BOLT_SUMMONER 12739
-//#define DAZED_SUMMONER 1604
 #define STAR_BEAM 30888	// W00T? MUST CHECK IT MORE IN DBC (Idk have more infos about 
 						// this spell, so can't do nothing more for now [also lack of 
 						// core support?])
@@ -582,6 +543,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(MARK_OF_SHADOW);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
@@ -595,22 +557,13 @@ public:
 		spells[1].cooldown = 10;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
-        spells[2].info = dbcSpell.LookupEntry(DAZED_SUMMONER);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 15;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-*/
+
         spells[2].info = dbcSpell.LookupEntry(STAR_BEAM);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = false;
 		spells[2].cooldown = 45;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -625,10 +578,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -640,7 +589,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -705,7 +654,6 @@ protected:
 
 #define TRASH 3391 // ? doesn't work coz lack of core support?
 #define KICK 11978
-//#define DAZED_ADEPT 1604 // not sure to any spell of these :S
 
 class SHADOWMOONADEPTAI : public CreatureAIScript
 {
@@ -734,15 +682,6 @@ public:
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
-        spells[2].info = dbcSpell.LookupEntry(DAZED_ADEPT);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 15;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -757,10 +696,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -772,7 +707,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -852,6 +787,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SEDUCTION);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
@@ -865,8 +801,6 @@ public:
 		spells[1].cooldown = 10;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -881,10 +815,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -896,7 +826,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -961,7 +891,6 @@ protected:
 
 #define STOMP 31900
 #define CONCUSSION_BLOW 22427
-//#define DAZED_NASCENT_FEL_ORC 1604
 
 class NASCENTFELORCAI : public CreatureAIScript
 {
@@ -990,15 +919,6 @@ public:
 		spells[1].cooldown = 20;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
-        spells[2].info = dbcSpell.LookupEntry(DAZED_NASCENT_FEL_ORC);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 15;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1013,10 +933,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -1028,7 +944,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1129,8 +1045,6 @@ public:
 		spells[2].cooldown = 15;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1145,10 +1059,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -1160,7 +1070,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1224,7 +1134,6 @@ protected:
 #define CN_HELLFIRE_FAMILIAR 19016
 
 #define FIREBALL_FAMILIAR 11921
-//#define DAZED_FAMILIAR 1604
 
 class HELLFIREFAMILIARAI : public CreatureAIScript
 {
@@ -1246,15 +1155,6 @@ public:
 		spells[0].cooldown = 10;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
-/*
-        spells[1].info = dbcSpell.LookupEntry(DAZED_FAMILIAR);
-		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
-		spells[1].cooldown = 15;
-		spells[1].perctrigger = 0.0f;
-		spells[1].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1284,7 +1184,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1364,6 +1264,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(MANA_BURN);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
@@ -1377,8 +1278,6 @@ public:
 		spells[1].cooldown = 35;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1393,10 +1292,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -1408,7 +1303,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1473,7 +1368,6 @@ protected:
 
 #define UPPERCUT 18072
 #define PUMMEL 15615
-//#define DAZED_FELGUARD_BRUTE 1604
 
 class FELGUARDBRUTEAI : public CreatureAIScript
 {
@@ -1489,6 +1383,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(UPPERCUT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
@@ -1502,15 +1397,6 @@ public:
 		spells[1].cooldown = 20;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
-        spells[2].info = dbcSpell.LookupEntry(DAZED_FELGUARD_BRUTE);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 15;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1525,10 +1411,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -1540,7 +1422,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1605,7 +1487,6 @@ protected:
 
 #define UPPERCUT 18072
 #define PUMMEL 15615
-//#define DAZED_FELGUARD_ANNIHILATOR 1604
 #define INTERCEPT 27577 //DBC: 20615, 27577, 27826
 
 class FELGUARDANNIHILATORAI : public CreatureAIScript
@@ -1622,6 +1503,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(UPPERCUT);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
@@ -1635,15 +1517,8 @@ public:
 		spells[1].cooldown = 20;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
-        spells[2].info = dbcSpell.LookupEntry(DAZED_FELGUARD_ANNIHILATOR);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 15;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-*/
-        spells[2].info = dbcSpell.LookupEntry(INTERCEPT);
+
+		spells[2].info = dbcSpell.LookupEntry(INTERCEPT);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 35;
@@ -1665,10 +1540,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -1680,7 +1551,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1745,7 +1616,6 @@ protected:
 
 #define ENRAGE 8269
 #define CHARGE 22120
-//#define DAZED_NEOPHYTE 1604
 
 class FELORCNEOPHYTEAI : public CreatureAIScript
 {
@@ -1761,6 +1631,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(ENRAGE);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
@@ -1774,15 +1645,6 @@ public:
 		spells[1].cooldown = 35;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
-        spells[2].info = dbcSpell.LookupEntry(DAZED_NEOPHYTE);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 15;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1813,7 +1675,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -1877,7 +1739,6 @@ protected:
 #define CN_LAUGHING_SKULL_WARDEN 17624
 
 #define BATTLE_SHOUT 30833
-//#define DAZED_WARDEN 1604
 
 class LAUGHINGSKULLWARDENAI : public CreatureAIScript
 {
@@ -1893,21 +1754,13 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(BATTLE_SHOUT);
 		spells[0].targettype = TARGET_VARIOUS;	// Should affect mobs friendly to this one (not player :S)
 		spells[0].instant = true;
 		spells[0].cooldown = 70;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
-/*
-        spells[1].info = dbcSpell.LookupEntry(DAZED_WARDEN);
-		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
-		spells[1].cooldown = 15;
-		spells[1].perctrigger = 0.0f;
-		spells[1].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1923,10 +1776,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -1938,7 +1787,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -2003,7 +1852,6 @@ protected:
 
 #define POISON 34969
 #define KIDNEY_SHOT 30832
-//#define DAZED_ROGUE 1604
 #define SLICE_AND_DICE 6434
 #define STEALTH 30831
 
@@ -2016,12 +1864,12 @@ public:
 
     LAUGHINGSKULLROGUEAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		FIRST_ATTACK = 1;
 		nrspells = 4;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(POISON);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
@@ -2035,14 +1883,7 @@ public:
 		spells[1].cooldown = 35;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
-        spells[2].info = dbcSpell.LookupEntry(DAZED_ROGUE);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 15;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-*/
+
         spells[2].info = dbcSpell.LookupEntry(SLICE_AND_DICE);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
@@ -2057,15 +1898,16 @@ public:
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
 
-
 		_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
     }
     
     void OnCombatStart(Unit* mTarget)
     {
-		FIRST_ATTACK = 1;
 		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+
+		if (_unit->GetCurrentSpell() == NULL && mTarget)	// mTarget check is unneeded, because function defines attacker
+			_unit->CastSpell(mTarget, spells[1].info, spells[1].instant);
     }
 
 	void CastTime()
@@ -2074,42 +1916,27 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
-		FIRST_ATTACK = 1;
 		_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
+		CastTime();
+
         RemoveAIUpdateEvent();
     }
 
     void OnDied(Unit * mKiller)
     {
-		FIRST_ATTACK = 1;
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
 	{
-		if (FIRST_ATTACK && _unit->GetAIInterface()->GetNextTarget())
-		{
-			FIRST_ATTACK = 0;
-			Unit *target = NULL;
-			target = _unit->GetAIInterface()->GetNextTarget();
-			_unit->CastSpell(target, spells[1].info, spells[1].instant);
-		}
-
-		else
-		{
-			float val = (float)RandomFloat(100.0f);
-			SpellCast(val);
-		}
+		float val = (float)RandomFloat(100.0f);
+		SpellCast(val);
 	}
 
 	void SpellCast(float val)
@@ -2159,7 +1986,6 @@ public:
 
 protected:
 
-	int FIRST_ATTACK;
 	int nrspells;
 };
 
@@ -2170,7 +1996,6 @@ protected:
 #define ENRAGE_LEGIONNAIRE 8599
 #define UPPERCUT_LEGIONNAIRE 10966
 #define SWEEPING_STRIKES 18765	// DBC: 18765, 12723
-//#define DAZED_LEGIONNAIRE 1604
 
 class LAUGHINGSKULLLEGIONNAIREAI : public CreatureAIScript
 {
@@ -2186,6 +2011,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(ENRAGE_LEGIONNAIRE);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
@@ -2206,22 +2032,16 @@ public:
 		spells[2].cooldown = 50;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
-/*
-        spells[3].info = dbcSpell.LookupEntry(DAZED_LEGIONNAIRE);
-		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
-		spells[3].cooldown = 15;
-		spells[3].perctrigger = 0.0f;
-		spells[3].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
     {
 		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
+		if (RandomUInt(4) == 1 && _unit->GetCurrentSpell() == NULL)
+			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
+		else
+			spells[0].casttime = RandomUInt(30) + 30;
     }
 
 	void CastTime()
@@ -2229,10 +2049,6 @@ public:
 		for(int i=0;i<nrspells;i++)
 			spells[i].casttime = spells[i].cooldown;
 	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
 
     void OnCombatStop(Unit *mTarget)
     {
@@ -2245,7 +2061,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -2310,7 +2126,6 @@ protected:
 
 #define STRIKE 14516
 #define SHIELD_SLAM 30688
-//#define DAZED_ENFORCER 1604
 
 class LAUGHINGSKULLENFORCERAI : public CreatureAIScript
 {
@@ -2326,6 +2141,7 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(STRIKE);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
@@ -2339,15 +2155,6 @@ public:
 		spells[1].cooldown = 25;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
-/*
-        spells[2].info = dbcSpell.LookupEntry(DAZED_ENFORCER);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 15;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-*/
-
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -2362,10 +2169,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-    }
-
     void OnCombatStop(Unit *mTarget)
     {
 		CastTime();
@@ -2377,7 +2180,7 @@ public:
     void OnDied(Unit * mKiller)
     {
 		CastTime();
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -2459,42 +2262,45 @@ public:
 
     KELIDANTHEBREAKERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(SHADOW_BOLT_VOLLEY);
-		spells[0].targettype = TARGET_DESTINATION;
+		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
-		spells[0].cooldown = 15;
-		spells[0].perctrigger = 0.0f;
+		spells[0].cooldown = 10;
+		spells[0].perctrigger = 15.0f;
 		spells[0].attackstoptimer = 1000;
 
-        spells[1].info = dbcSpell.LookupEntry(BLAST_WAVE);
-		spells[1].targettype = TARGET_VARIOUS;
-		spells[1].instant = false;
+        spells[1].info = dbcSpell.LookupEntry(CORRUPTION);
+		spells[1].targettype = TARGET_RANDOM_SINGLE;
+		spells[1].instant = true;
 		spells[1].cooldown = 30;
-		spells[1].perctrigger = 0.0f;
+		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 1000;
-		spells[1].speech = "Closer... Come closer... And burn!";
-		spells[1].soundid = 10165;
+		spells[1].mindist2cast = 0.0f;
+		spells[1].maxdist2cast = 40.0f;
 
-        spells[2].info = dbcSpell.LookupEntry(CORRUPTION);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 45;
+		spells[2].info = dbcSpell.LookupEntry(BLAST_WAVE);
+		spells[2].targettype = TARGET_VARIOUS;
+		spells[2].instant = false;
+		spells[2].cooldown = 30;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
+		spells[2].speech = "Closer... Come closer... And burn!";
+		spells[2].soundid = 10165;
 
+		BlastWave = false;
     }
     
     void OnCombatStart(Unit* mTarget)
     {
 		CastTime();
-		int RandomSpeach;
-		RandomUInt(1000);
-		RandomSpeach=rand()%3;
+		spells[2].casttime = (uint32)time(NULL) + 30;
+		int RandomSpeach = rand()%3;
 		switch (RandomSpeach)
 		{
 		case 0:
@@ -2510,22 +2316,23 @@ public:
 			_unit->PlaySoundToSet(10168);
 			break;
 		}
+
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+
+		BlastWave = false;
     }
 
 	void CastTime()
 	{
 		for(int i=0;i<nrspells;i++)
-			spells[i].casttime = spells[i].cooldown;
+			spells[i].casttime = 0;
 	}
 
 	void OnTargetDied(Unit* mTarget)
     {
 		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%2;
+			int RandomSpeach = rand()%2;
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -2542,7 +2349,6 @@ public:
 
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
@@ -2550,49 +2356,74 @@ public:
 
     void OnDied(Unit * mKiller)
     {
-		CastTime();
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Good luck... You'll need it.");
 		_unit->PlaySoundToSet(10171);
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
 
-	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(325.40f, -85.95f, 24.65f, 181823);
-	   if(pDoor == 0)
-	   {
-		   return;
-	   }
+		GameObject *pDoor = NULL;
+		pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(263.873871f, -128.438812f, -25.098160f, 181823);
+		if(pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
 
-	   // Open the door
-	   pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
-
-	   GameObject * pDoor2 = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(29.0f, 136.0f, 46.0f, 181766);
-	   if(pDoor2 == 0)
-	   {
-		   return;
-	   }
-
-	   // Open the door
-	   pDoor2->SetUInt32Value(GAMEOBJECT_STATE, 0);
+		GameObject *pDoor2 = NULL;
+		pDoor2 = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-2.067811f, -111.613785f, -41.340549f, 181766);
+		if(pDoor2)
+			pDoor2->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
     void AIUpdate()
 	{
+		uint32 t = (uint32)time(NULL);
+		if (BlastWave && _unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
+			_unit->GetAIInterface()->StopMovement(1);
+			_unit->setAttackTimer(3000, false);
+
+			Unit *target = NULL;
+			target = _unit->GetAIInterface()->GetNextTarget();
+			if (_unit->GetDistance2dSq(target) <= 100.0f)
+			{
+				_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+			}
+
+			else
+			{
+				_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
+			}
+
+			spells[2].casttime = t + spells[2].cooldown;
+			BlastWave = false;
+			return;
+		}
+
+		if (t > spells[2].casttime && _unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget() && !BlastWave)
+		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Closer... Come closer... And burn!");
+			_unit->PlaySoundToSet(10165);
+
+			_unit->GetAIInterface()->StopMovement(2000);
+			_unit->setAttackTimer(2000, false);
+
+			BlastWave = true;
+			return;
+		}
+
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
     }
 
 	void SpellCast(float val)
-	{
+    {
         if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
 			float comulativeperc = 0;
 		    Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
-				spells[i].casttime--;
+				if(!spells[i].perctrigger) continue;
 				
-				if (m_spellcheck[i])
-				{					
-					spells[i].casttime = spells[i].cooldown;
+				if(m_spellcheck[i])
+				{
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
@@ -2603,30 +2434,80 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
+        }
+    }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
 		}
 	}
 
 protected:
 
+	bool BlastWave;
 	int nrspells;
 };
 
@@ -2652,28 +2533,29 @@ public:
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(POISON_BOLT);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
-		spells[0].perctrigger = 0.0f;
+		spells[0].perctrigger = 12.0f;
 		spells[0].attackstoptimer = 1000;
 
         spells[1].info = dbcSpell.LookupEntry(POISON_CLOUD);
-		spells[1].targettype = TARGET_DESTINATION;
+		spells[1].targettype = TARGET_RANDOM_DESTINATION;
 		spells[1].instant = true;
-		spells[1].cooldown = 70;
-		spells[1].perctrigger = 0.0f;
+		spells[1].cooldown = 40;
+		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
+		spells[1].mindist2cast = 0.0f;
+		spells[1].maxdist2cast = 40.0f;
 
         spells[2].info = dbcSpell.LookupEntry(SLIME_SPRAY);
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
 		spells[2].cooldown = 25;
-		spells[2].perctrigger = 0.0f;
+		spells[2].perctrigger = 10.0f;
 		spells[2].attackstoptimer = 1000;
-
-
 	}
 
     void OnCombatStart(Unit* mTarget)
@@ -2685,16 +2567,11 @@ public:
 	void CastTime()
 	{
 		for(int i=0;i<nrspells;i++)
-			spells[i].casttime = spells[i].cooldown;
+			spells[i].casttime = 0;
 	}
 
-	void OnTargetDied(Unit* mTarget)
+	void OnCombatStop(Unit *mTarget)
     {
-    }
-
-    void OnCombatStop(Unit *mTarget)
-    {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
@@ -2702,16 +2579,12 @@ public:
 
     void OnDied(Unit * mKiller)
     {
-		CastTime();
-       RemoveAIUpdateEvent();
-	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(455.65f, 52.69f, 9.61f, 181819);
-	   if(pDoor == 0)
-	   {
-		   return;
-	   }
+		RemoveAIUpdateEvent();
 
-	   // Open the door
-	   pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
+		GameObject *pDoor = NULL;
+		pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(456.157349f, 34.248005f, 9.559463f, 181819);
+		if(pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
     void AIUpdate()
@@ -2721,18 +2594,17 @@ public:
     }
 
 	void SpellCast(float val)
-	{
+    {
         if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
 			float comulativeperc = 0;
 		    Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
-				spells[i].casttime--;
+				if(!spells[i].perctrigger) continue;
 				
-				if (m_spellcheck[i])
-				{					
-					spells[i].casttime = spells[i].cooldown;
+				if(m_spellcheck[i])
+				{
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
@@ -2743,25 +2615,74 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
+        }
+    }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
 		}
 	}
 
@@ -2776,60 +2697,54 @@ protected:
 
 #define DOMINATION 30923 // 36866
 #define ACID_SPRAY 38973 // 38973 or 38153	// not sure about casting of this
-#define KNOCKDOWN 38576 // 38576 or 37317	// and this spell
-#define EXPLODING_BEAKER 30925 // Throw beaker <--- maybe this is it?
+//#define KNOCKDOWN 38576 // 38576 or 37317	// and this spell
+#define THROW_BEAKER 30925 // Throw beaker <--- maybe this is it?
 
 class THEMAKERAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(THEMAKERAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
     THEMAKERAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(DOMINATION);
-		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
-		spells[0].cooldown = 50;
-		spells[0].perctrigger = 0.0f;
+		spells[0].cooldown = 40;
+		spells[0].perctrigger = 8.0f;
 		spells[0].attackstoptimer = 1000;
+		spells[0].mindist2cast = 0.0f;
+		spells[0].maxdist2cast = 40.0f;
 
         spells[1].info = dbcSpell.LookupEntry(ACID_SPRAY);
-		spells[1].targettype = TARGET_VARIOUS; // maybe that?
+		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
-		spells[1].cooldown = 35;
-		spells[1].perctrigger = 0.0f;
+		spells[1].cooldown = 30;
+		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 1000;
 
-        spells[2].info = dbcSpell.LookupEntry(KNOCKDOWN);
-		spells[2].targettype = TARGET_VARIOUS;
+        spells[2].info = dbcSpell.LookupEntry(THROW_BEAKER);
+		spells[2].targettype = TARGET_RANDOM_DESTINATION;
 		spells[2].instant = true;
-		spells[2].cooldown = 25;
-		spells[2].perctrigger = 0.0f;
+		spells[2].cooldown = 20;
+		spells[2].perctrigger = 8.0f;
 		spells[2].attackstoptimer = 1000;
-
-        spells[3].info = dbcSpell.LookupEntry(EXPLODING_BEAKER);
-		spells[3].targettype = TARGET_DESTINATION;
-		spells[3].instant = true;
-		spells[3].cooldown = 15;
-		spells[3].perctrigger = 0.0f;
-		spells[3].attackstoptimer = 1000;
-
-
+		spells[2].mindist2cast = 0.0f;
+		spells[2].maxdist2cast = 40.0f;
     }
     
     void OnCombatStart(Unit* mTarget)
     {
 		CastTime();
-		int RandomSpeach;
-		RandomUInt(1000);
-		RandomSpeach=rand()%3;
+		int RandomSpeach = rand()%3;
 		switch (RandomSpeach)
 		{
 		case 0:
@@ -2851,16 +2766,14 @@ public:
 	void CastTime()
 	{
 		for(int i=0;i<nrspells;i++)
-			spells[i].casttime = spells[i].cooldown;
+			spells[i].casttime = 0;
 	}
 
 	void OnTargetDied(Unit* mTarget)
     {
 		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%2;
+			int RandomSpeach = rand()%2;
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -2877,7 +2790,6 @@ public:
 
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
@@ -2885,19 +2797,14 @@ public:
 
     void OnDied(Unit * mKiller)
     {
-		CastTime();
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Stay away from... me.");
 		_unit->PlaySoundToSet(10291);
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
 
-	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(327.442f, 146.96f, 9.59f, 181812);
-	   if(pDoor == 0)
-	   {
-		   return;
-	   }
-
-	   // Open the door
-	   pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
+		GameObject *pDoor = NULL;
+		pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(327.155487f, 149.753418f, 9.559869f, 181812);
+		if(pDoor)
+			pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
     }
 
     void AIUpdate()
@@ -2907,18 +2814,17 @@ public:
     }
 
 	void SpellCast(float val)
-	{
+    {
         if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
 			float comulativeperc = 0;
 		    Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
-				spells[i].casttime--;
+				if(!spells[i].perctrigger) continue;
 				
-				if (m_spellcheck[i])
-				{					
-					spells[i].casttime = spells[i].cooldown;
+				if(m_spellcheck[i])
+				{
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
@@ -2929,25 +2835,74 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
+        }
+    }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
 		}
 	}
 

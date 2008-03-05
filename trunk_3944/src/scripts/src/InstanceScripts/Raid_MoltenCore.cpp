@@ -1692,11 +1692,13 @@ public:
 		info_hammer = dbcSpell.LookupEntry(HAMMER_OF_RAGNAROS);
 		info_meltweapon = dbcSpell.LookupEntry(MELT_WEAPON);
 		info_summonsons = dbcSpell.LookupEntry(SUMMON_SONS_OF_FLAMES);
+		_unit->Root();
     }
     
     void OnCombatStart(Unit* mTarget)
     {
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		_unit->GetAIInterface()->skip_reset_hp=true;
     }
 
     void OnCombatStop(Unit *mTarget)

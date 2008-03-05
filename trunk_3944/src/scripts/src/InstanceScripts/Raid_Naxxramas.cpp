@@ -1,21 +1,3 @@
-/*
- * Moon++ Scripts for Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
- * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #include "StdAfx.h"
 #include "Setup.h"
 
@@ -30,7 +12,7 @@
 #define CN_CARRION_SPINNER 15975
 
 #define POISON_BOLT 26052
-#define WEB_WRAP 28622 // TODO: PULL EFFECT *FUN*
+#define WEB_WRAP 28618 // TODO: PULL EFFECT *FUN*
 
 class CarrionSpinnerAI : public CreatureAIScript
 {
@@ -61,7 +43,7 @@ public:
 		spells[1].info = dbcSpell.LookupEntry(WEB_WRAP);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
-		spells[1].perctrigger = 4.0f;
+		spells[1].perctrigger = 0.0f;	// 4.0f;
 		spells[1].attackstoptimer = 2000; // 2sec
     }
     
@@ -645,7 +627,7 @@ protected:
 // Maexxna AI *BOSS*
 #define CN_MAEXXNA 15952
 
-#define WEB_WRAP_MAEXX 28622 // 1 target
+#define WEB_WRAP_MAEXX 28619 // 1 target
 #define WEB_SPRAY 29484 // various
 #define POISON_SHOCK 28741 // various
 #define NECROTIC_POISON 28776 // 1 target
@@ -674,7 +656,7 @@ public:
         spells[0].info = dbcSpell.LookupEntry(WEB_WRAP_MAEXX);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
-		spells[0].perctrigger = 5.0f;
+		spells[0].perctrigger = 0.0f;	//5.0f;
 		spells[0].attackstoptimer = 4000; // 1sec
 
 		spells[1].info = dbcSpell.LookupEntry(WEB_SPRAY);
@@ -695,11 +677,13 @@ public:
 		spells[3].perctrigger = 10.0f;
 		spells[3].attackstoptimer = 1000; // 1sec
 
+		Enraged = false;
     }
     
     void OnCombatStart(Unit* mTarget)
     {
         RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		Enraged = false;
     }
 
     void OnCombatStop(Unit *mTarget)
@@ -716,6 +700,14 @@ public:
 
     void AIUpdate()
     {
+		if (_unit->GetHealthPct() <= 30 && !Enraged && _unit->GetCurrentSpell() == NULL)
+		{
+			_unit->CastSpell(_unit, 28747, true);
+
+			Enraged = true;
+			return;
+		}
+
 		float val = (float)RandomFloat(100.0f);
         SpellCast(val);
     }
@@ -759,6 +751,7 @@ public:
 
 protected:
 
+	bool Enraged;
 	int nrspells;
 };
 
@@ -3520,6 +3513,806 @@ protected:
 	int nrspells;
 };
 
+// -- Sapphiron Encounter by M4ksiu -- //
+
+// Settings
+
+#define DISABLE_FROST_BREATH
+
+// Frost Breath TrgiggerAI
+
+#define CN_FROST_BREATH_TRIGGER		50010	// Flying "ball" of frost energy
+#define CN_FROST_BREATH_TRIGGER2	50011	// Explosion
+#define CN_FROST_BREATH_TRIGGER3	50012	// Wing Buffet
+#define CN_CHILL_TRIGGER			50013	// Mass chill trigger (used, because we can't cast many aoe triggers on one character >_>)
+
+// Air phase spells
+#define FROST_BREATH		28524
+#define FROST_BREATH_EFFECT	30101
+#define FROST_BREATH_DAMAGE	29318
+
+// Additional spells
+#define SAPPHIRONS_WING_BUFFET	29328
+
+struct Spawns
+{
+	float x;
+	float y;
+	float z;
+	float o;
+};
+
+struct Spawns PhaseTwoWP[]=
+{
+	{  },
+	{ 3520.820068f, -5233.799805f, 137.626007f, 4.553010f }
+};
+
+/*struct Spawns IceBlocks[]=	// Those are not blizzlike pos, because those blocks are spawned randomly
+{
+	{  },
+	{ 3580.986084f, -5241.330078f, 137.627304f, 3.006957f },
+	{ 3562.967285f, -5257.952148f, 137.860916f, 2.468959f },
+	{ 3569.620850f, -5276.108398f, 137.582733f, 2.480744f },
+	{ 3551.420410f, -5283.535156f, 137.731903f, 2.009505f },
+	{ 3535.933594f, -5294.710938f, 138.080002f, 1.823366f },
+	{ 3522.235107f, -5286.610352f, 138.115601f, 1.532768f },
+	{ 3503.184814f, -5296.418945f, 138.111252f, 1.222535f },
+	{ 3489.055664f, -5278.863770f, 138.119934f, 0.884814f },
+	{ 3473.002686f, -5277.641602f, 137.733414f, 0.680609f },
+	{ 3472.302734f, -5255.734863f, 137.755569f, 0.331107f },
+	{ 3458.193848f, -5241.013672f, 137.566147f, 0.111195f },
+	{ 3463.324463f, -5221.530273f, 137.634888f, 6.084152f },
+	{ 3467.574219f, -5200.617676f, 137.559662f, 5.860314f },
+	{ 3479.394775f, -5178.301758f, 140.904312f, 5.405583f },
+	{ 3507.219727f, -5180.725098f, 140.625473f, 4.431685f },
+	{ 3518.371338f, -5172.666504f, 142.269135f, 4.694800f },
+	{ 3542.516846f, -5184.699707f, 140.655182f, 4.470973f },
+	{ 3559.013916f, -5183.916016f, 140.899689f, 4.644558f },
+	{ 3559.006592f, -5183.923340f, 140.895554f, 3.952624f },
+	{ 3571.978760f, -5209.633301f, 137.671906f, 3.514374f }
+};*/
+
+struct Spawns IceBlocks[]=	// Those are not blizzlike pos, because those blocks are spawned randomly
+{
+	{  },
+	{ 3580.986084f, -5241.330078f, 137.627304f, 3.006957f },
+	{ 3562.967285f, -5257.952148f, 137.860916f, 2.468959f },
+	{ 3569.620850f, -5276.108398f, 137.582733f, 2.480744f },
+
+	{ 3535.933594f, -5294.710938f, 138.080002f, 1.823366f },
+	{ 3522.235107f, -5286.610352f, 138.115601f, 1.532768f },
+	{ 3503.184814f, -5296.418945f, 138.111252f, 1.222535f },
+	
+	{ 3473.002686f, -5277.641602f, 137.733414f, 0.680609f },
+	{ 3472.302734f, -5255.734863f, 137.755569f, 0.331107f },
+	{ 3458.193848f, -5241.013672f, 137.566147f, 0.111195f },
+
+	{ 3467.574219f, -5200.617676f, 137.559662f, 5.860314f },
+	{ 3479.394775f, -5178.301758f, 140.904312f, 5.405583f },
+	{ 3507.219727f, -5180.725098f, 140.625473f, 4.431685f },
+
+	{ 3542.516846f, -5184.699707f, 140.655182f, 4.470973f },
+	{ 3559.013916f, -5183.916016f, 140.899689f, 4.644558f },
+	{ 3559.006592f, -5183.923340f, 140.895554f, 3.952624f },
+
+	{ 3551.420410f, -5283.535156f, 137.731903f, 2.009505f },
+	{ 3489.055664f, -5278.863770f, 138.119934f, 0.884814f },
+	{ 3463.324463f, -5221.530273f, 137.634888f, 6.084152f },
+	{ 3518.371338f, -5172.666504f, 142.269135f, 4.694800f },
+	{ 3571.978760f, -5209.633301f, 137.671906f, 3.514374f }
+};
+
+class FrostBreathTriggerAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(FrostBreathTriggerAI);
+
+    FrostBreathTriggerAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->GetAIInterface()->MoveTo(PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z + 10.5f, PhaseTwoWP[1].o);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->GetAIInterface()->m_moveFly = true;
+		_unit->m_noRespawn = true;
+		_unit->Despawn(7000, 0);
+
+		RegisterAIUpdateEvent(1000);
+
+		AICounter = 7;
+    }
+    
+    void OnCombatStart(Unit* mTarget) {}
+
+    void OnCombatStop(Unit *mTarget)
+    {
+        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+    }
+
+    void OnDied(Unit * mKiller)
+    {
+       RemoveAIUpdateEvent();
+    }
+
+    void AIUpdate()
+    {
+		_unit->CastSpell(_unit, FROST_BREATH_EFFECT, true);
+
+		AICounter--;
+		if (AICounter == 6)
+			_unit->GetAIInterface()->MoveTo(PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z + AICounter * 1.5f, PhaseTwoWP[1].o);
+		else
+			_unit->GetAIInterface()->MoveTo(PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z, PhaseTwoWP[1].o);
+	}
+	
+protected:
+
+	int AICounter;
+};
+
+class FrostBreathTrigger2AI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(FrostBreathTrigger2AI);
+
+    FrostBreathTrigger2AI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+#ifdef DISABLE_FROST_BREATH
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+#else
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+#endif
+		_unit->GetAIInterface()->disable_melee = true;
+		_unit->GetAIInterface()->m_canMove = false;
+		_unit->m_noRespawn = true;
+		_unit->Despawn(8000, 0);
+
+		_unit->CastSpell(_unit, FROST_BREATH, false);
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+    }
+
+    void OnDied(Unit * mKiller)
+    {
+       RemoveAIUpdateEvent();
+    }
+};
+
+class FrostBreathTrigger3AI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(FrostBreathTrigger3AI);
+
+    FrostBreathTrigger3AI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		_unit->CastSpell(_unit, SAPPHIRONS_WING_BUFFET, true);
+		_unit->GetAIInterface()->disable_melee = true;
+		_unit->GetAIInterface()->m_canMove = false;
+		_unit->m_noRespawn = true;
+
+		RegisterAIUpdateEvent(1000);
+    }
+
+    void OnCombatStop(Unit *mTarget)
+    {
+        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+    }
+
+    void OnDied(Unit * mKiller)
+    {
+       RemoveAIUpdateEvent();
+    }
+
+    void AIUpdate()
+    {
+		_unit->CastSpell(_unit, SAPPHIRONS_WING_BUFFET, true);
+	}
+};
+
+class ChillTriggerAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(ChillTriggerAI);
+
+    ChillTriggerAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->CastSpellAoF(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), dbcSpell.LookupEntry(28547), true);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		_unit->GetAIInterface()->disable_melee = true;
+		_unit->GetAIInterface()->m_canMove = false;
+		_unit->m_noRespawn = true;
+		_unit->Despawn(15000, 0);
+    }
+
+    void OnCombatStop(Unit *mTarget)
+    {
+        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+    }
+};
+
+// SapphironAI
+// Missing spawning effect with building skeleton of Sappiron
+#define CN_SAPPHIRON	15989
+
+// Land phase spells
+#define LIFE_DRAIN					28542
+#define CHILL						28547
+#define FROST_AURA					28531
+
+// Air phase spells
+#define ICEBOLT						28522
+
+// Additional spells
+#define SAPPHIRON_DIES				29357
+#define BERSERK						26662	// 28498 - casts frostbolt (would be cool for Sapphiron), but every 2 sec for 5 min (~16k dmg per hit);
+											// 27680 - 10 mins instead 5 mins
+// Researches
+#define SAPPHIRON_BIRTH				181356
+#define FROSTWYRM_WATERFALL_DOOR	181225
+#define ICE_BLOCK_GO				181247
+
+// Move types
+#define WALK	0
+#define RUN		256
+#define FLY		768
+
+// Immunities
+#define IMMUNITY_DISEASE			6681
+#define IMMUNITY_SHADOW				7743
+#define IMMUNITY_FROST				7940
+#define IMMUNITY_NATURE				7941
+#define IMMUNITY_FIRE				7942
+#define IMMUNITY_HOLY				34182
+#define IMMUNITY_ARCANE				34184
+#define IMMUNITY_PHYSICAL			34310
+
+class SapphironAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(SapphironAI);
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
+
+    SapphironAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 3000, RUN));
+
+		nrspells = 2;
+		for(int i = 0; i < nrspells; i++)
+		{
+			m_spellcheck[i] = false;
+			spells[i].casttime = 0;
+		}
+		
+        spells[0].info = dbcSpell.LookupEntry(LIFE_DRAIN);
+		spells[0].targettype = TARGET_VARIOUS;
+		spells[0].instant = true;
+		spells[0].perctrigger = 8.0f;
+		spells[0].cooldown = 20;
+		spells[0].attackstoptimer = 2000;
+
+		spells[1].info = dbcSpell.LookupEntry(CHILL);
+		spells[1].targettype = TARGET_RANDOM_DESTINATION;
+		spells[1].instant = true;
+		spells[1].perctrigger = 10.0f;
+		spells[1].cooldown = 15;
+		spells[1].attackstoptimer = 1000;
+		spells[1].mindist2cast = 0.0f;
+		spells[1].maxdist2cast = 40.0f;
+		spells[1].minhp2cast = 0;
+		spells[1].maxhp2cast = 100;
+
+		spells[2].info = dbcSpell.LookupEntry(ICEBOLT);
+		spells[2].targettype = TARGET_RANDOM_SINGLE;
+		spells[2].instant = true;
+		spells[2].perctrigger = 0.0f;
+		spells[2].cooldown = 0;
+		spells[2].attackstoptimer = 1000;
+		spells[2].mindist2cast = 0.0f;
+		spells[2].maxdist2cast = 70.0f;
+		spells[2].minhp2cast = 0;
+		spells[2].maxhp2cast = 100;
+		
+		spells[3].info = dbcSpell.LookupEntry(BERSERK);
+		spells[3].targettype = TARGET_SELF;
+		spells[3].instant = true;
+		spells[3].perctrigger = 0.0f;
+		spells[3].cooldown = 900;
+		spells[3].attackstoptimer = 1000;
+
+		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+		_unit->GetAIInterface()->m_moveFly = false;
+		_unit->GetAIInterface()->m_canMove = true;
+		_unit->CastSpell(_unit, IMMUNITY_FROST, true);
+
+		WorldPacket data(SMSG_MOVE_UNSET_HOVER, 13);
+		data << _unit->GetNewGUID();
+		data << uint32(0);
+		_unit->SendMessageToSet(&data, false);
+
+		ChillCounter = NULL;
+		FlightActions = 0;
+		ChillCounter = 0;
+		PhaseTimer = 0;
+		m_phase = 1;
+    }
+    
+    void OnCombatStart(Unit* mTarget)
+    {
+		for(int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+
+		spells[3].casttime = (uint32)time(NULL) + spells[3].cooldown;
+
+		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+		_unit->GetAIInterface()->m_moveFly = false;
+		_unit->GetAIInterface()->m_canMove = true;
+
+		WorldPacket data(SMSG_MOVE_UNSET_HOVER, 13);
+		data << _unit->GetNewGUID();
+		data << uint32(0);
+		_unit->SendMessageToSet(&data, false);
+
+		GameObject *Waterfall = NULL;
+		Waterfall = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(3536.852783f, -5159.951172f, 143.636139f, FROSTWYRM_WATERFALL_DOOR);
+		if (Waterfall != NULL)
+		{
+			Waterfall->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		}
+
+		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+
+		PhaseTimer = (uint32)time(NULL) + 35;
+		ChillCounter = NULL;
+		FlightActions = 0;
+		ChillCounter = 0;
+		m_phase = 1;
+    }
+
+    void OnCombatStop(Unit *mTarget)
+    {
+		Creature *BreathTrigger = NULL;
+		BreathTrigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z, CN_FROST_BREATH_TRIGGER3);
+		if (BreathTrigger != NULL)
+			BreathTrigger->Despawn(0,0);
+
+		for (int i = 1; i < 21; i++)
+		{
+			GameObject *IceBlock = NULL;
+			IceBlock = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(IceBlocks[i].x, IceBlocks[i].y, IceBlocks[i].z, ICE_BLOCK_GO);
+			if (IceBlock != NULL)
+			{
+				delete IceBlock;
+			}
+		}
+
+		GameObject *Waterfall = NULL;
+		Waterfall = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(3536.852783f, -5159.951172f, 143.636139f, FROSTWYRM_WATERFALL_DOOR);
+		if (Waterfall != NULL)
+		{
+			Waterfall->SetUInt32Value(GAMEOBJECT_STATE, 0);
+		}
+
+		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+		_unit->GetAIInterface()->m_moveFly = false;
+		_unit->GetAIInterface()->m_canMove = true;
+
+		WorldPacket data(SMSG_MOVE_UNSET_HOVER, 13);
+		data << _unit->GetNewGUID();
+		data << uint32(0);
+		_unit->SendMessageToSet(&data, false);
+
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
+		RemoveAIUpdateEvent();
+    }
+
+	void OnTargetDied(Unit* mTarget)
+	{
+	}
+
+    void OnDied(Unit * mKiller)
+    {
+		_unit->CastSpell(_unit, SAPPHIRON_DIES, true);
+
+		RemoveAIUpdateEvent();
+    }
+
+    void AIUpdate()
+    {
+		uint32 t = (uint32)time(NULL);
+		if (t > spells[3].casttime && _unit->GetCurrentSpell() == NULL)
+		{
+			_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+
+			spells[3].casttime = t + spells[3].cooldown;
+		}
+
+		switch (m_phase)
+		{
+		case 1:
+			PhaseOne();
+			break;
+		case 2:
+			PhaseTwo();
+			break;
+		default:
+			{
+			}
+		}
+    }
+
+	void PhaseOne()
+	{
+		_unit->CastSpell(_unit, FROST_AURA, true);
+
+		if (_unit->GetAIInterface()->getMoveType() == MOVEMENTTYPE_WANTEDWP)
+			return;
+
+		if (_unit->GetHealthPct() > 10)
+		{
+			uint32 t = (uint32)time(NULL);
+			if (t > PhaseTimer)
+			{
+				if (_unit->GetCurrentSpell() != NULL)
+					_unit->GetCurrentSpell()->cancel();
+
+				_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+				_unit->GetAIInterface()->StopMovement(0);
+				_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+				_unit->GetAIInterface()->setWaypointToMove(1);
+
+				return;
+			}
+		}
+
+		if (ChillCounter > 0)
+		{
+			ChillCounter--;
+			if (ChillTarget != NULL)
+			{
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_CHILL_TRIGGER, ChillTarget->GetPositionX(), ChillTarget->GetPositionY(), ChillTarget->GetPositionZ(), ChillTarget->GetOrientation(), true, false, 0, 0);
+			}
+
+			if (ChillCounter == 0)
+			{
+				ChillTarget = NULL;
+			}
+		}
+
+		float val = (float)RandomFloat(100.0f);
+        SpellCast(val);
+	}
+
+	void PhaseTwo()
+	{
+		if (FlightActions == 0)
+		{
+			_unit->GetAIInterface()->m_canMove = false;
+			_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
+			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+			_unit->GetAIInterface()->setWaypointToMove(0);
+		}
+
+		if (FlightActions < 5)
+		{
+			if (_unit->GetCurrentSpell() == NULL)
+			{
+				if (_unit->GetAIInterface()->GetNextTarget() != NULL)
+				{
+					CastSpellOnRandomTarget(2, 0.0f, 40.0f, 0, 100);
+
+					FlightActions++;
+					if (FlightActions >= 5)
+					{
+						uint32 LastOne = 0;
+						for (int i = 0; i < 2; i++)
+						{
+							uint32 Block = 0;
+							while (LastOne == Block)
+							{
+								Block = RandomUInt(5) + 15;
+							}
+
+							LastOne = Block;
+
+							GameObject *IceBlock = NULL;
+							IceBlock = _unit->GetMapMgr()->GetInterface()->SpawnGameObject(ICE_BLOCK_GO, IceBlocks[Block].x, IceBlocks[Block].y, IceBlocks[Block].z, IceBlocks[Block].o, true, 0, 0);
+							if (IceBlock != NULL)
+							{
+								IceBlock->SetUInt32Value(GAMEOBJECT_FLAGS, 1);
+							}
+						}
+
+						RemoveAIUpdateEvent();
+						RegisterAIUpdateEvent(3000);
+
+						FlightActions = 5;
+					}
+
+					if (FlightActions == 2)
+					{
+						for (int i = 0; i < 2; i++)
+						{
+							uint32 Block = 0;
+							if (i == 0)
+								Block = RandomUInt(3) + 1;
+							else
+								Block = RandomUInt(3) + 10;
+
+							GameObject *IceBlock = NULL;
+							IceBlock = _unit->GetMapMgr()->GetInterface()->SpawnGameObject(ICE_BLOCK_GO, IceBlocks[Block].x, IceBlocks[Block].y, IceBlocks[Block].z, IceBlocks[Block].o, true, 0, 0);
+							if (IceBlock != NULL)
+							{
+								IceBlock->SetUInt32Value(GAMEOBJECT_FLAGS, 1);
+							}
+						}
+					}
+
+					if (FlightActions == 4)
+					{
+						for (int i = 0; i < 2; i++)
+						{
+							uint32 Block = 0;
+							if (i == 0)
+								Block = RandomUInt(3) + 7;
+							else
+								Block = RandomUInt(9) + 13;
+
+							GameObject *IceBlock = NULL;
+							IceBlock = _unit->GetMapMgr()->GetInterface()->SpawnGameObject(ICE_BLOCK_GO, IceBlocks[Block].x, IceBlocks[Block].y, IceBlocks[Block].z, IceBlocks[Block].o, true, 0, 0);
+							if (IceBlock != NULL)
+							{
+								IceBlock->SetUInt32Value(GAMEOBJECT_FLAGS, 1);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		else
+		{
+			if (FlightActions == 5)
+			{
+				Unit *FlyingFrostBreath = NULL;
+				FlyingFrostBreath =_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FROST_BREATH_TRIGGER, PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z + 18.0f, _unit->GetOrientation(), true, false, 0, 0);
+				if (FlyingFrostBreath != NULL)
+				{
+					FlyingFrostBreath->GetAIInterface()->MoveTo(PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z, PhaseTwoWP[1].o);
+				}
+
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FROST_BREATH_TRIGGER2, PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z, _unit->GetOrientation(), true, false, 0, 0);
+
+				RemoveAIUpdateEvent();
+				RegisterAIUpdateEvent(10000);
+
+				Creature *BreathTrigger = NULL;
+				BreathTrigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z, CN_FROST_BREATH_TRIGGER3);
+				if (BreathTrigger != NULL)
+					BreathTrigger->Despawn(0,0);
+			}
+
+			if (FlightActions == 6)
+			{
+				for (int i = 1; i < 21; i++)
+				{
+					GameObject *IceBlock = NULL;
+					IceBlock = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(IceBlocks[i].x, IceBlocks[i].y, IceBlocks[i].z, ICE_BLOCK_GO);
+					if (IceBlock != NULL)
+					{
+						delete IceBlock;
+					}
+				}
+
+				_unit->GetAIInterface()->m_moveFly = false;
+				_unit->Emote(EMOTE_ONESHOT_LAND);
+
+				WorldPacket data(SMSG_MOVE_UNSET_HOVER, 13);
+				data << _unit->GetNewGUID();
+				data << uint32(0);
+				_unit->SendMessageToSet(&data, false);
+
+				RemoveAIUpdateEvent();
+				RegisterAIUpdateEvent(3000);
+			}
+
+			if (FlightActions == 7)
+			{
+				_unit->GetAIInterface()->m_canMove = true;
+				_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+                _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+                _unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
+                _unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+                _unit->GetAIInterface()->setWaypointToMove(0);
+
+				RemoveAIUpdateEvent();
+				RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+
+				PhaseTimer = (uint32)time(NULL) + 67;
+				ChillTarget = NULL;
+				FlightActions = 0;
+				ChillCounter = 0;
+				m_phase = 1;
+			}
+
+			FlightActions++;
+		}
+	}
+
+	void SpellCast(float val)
+    {
+        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget() != NULL)
+        {
+			float comulativeperc = 0;
+		    Unit *target = NULL;
+			for (int i = 0; i < nrspells; i++)
+			{
+				if(!spells[i].perctrigger) continue;
+				
+				if(m_spellcheck[i])
+				{
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+						case TARGET_SELF:
+						case TARGET_VARIOUS:
+							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+						case TARGET_ATTACKING:
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+						case TARGET_DESTINATION:
+							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
+					}
+
+					if (spells[i].speech != "")
+					{
+						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
+						_unit->PlaySoundToSet(spells[i].soundid); 
+					}
+
+					m_spellcheck[i] = false;
+					return;
+				}
+
+				uint32 t = (uint32)time(NULL);
+				if((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) && t > spells[i].casttime)
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
+					m_spellcheck[i] = true;
+				}
+
+				comulativeperc += spells[i].perctrigger;
+			}
+        }
+    }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget() != NULL)
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (isHostile(_unit, (*itr)) && (*itr) != _unit && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && _unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (RTarget == NULL)
+				return;
+
+			if (i == 1)
+			{
+				ChillCounter = RandomUInt(3) + 3;
+				ChillTarget = RTarget;
+			}
+
+			else
+			{
+				switch (spells[i].targettype)
+				{
+				case TARGET_RANDOM_FRIEND:
+				case TARGET_RANDOM_SINGLE:
+					_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+				case TARGET_RANDOM_DESTINATION:
+					_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+				}
+			}
+
+			TargetTable.clear();
+		}
+	}
+
+	void OnReachWP(uint32 iWaypointId, bool bForwards)
+    {
+		if (iWaypointId == 1)
+		{
+			_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FROST_BREATH_TRIGGER3, PhaseTwoWP[1].x, PhaseTwoWP[1].y, PhaseTwoWP[1].z, _unit->GetOrientation(), true, false, 0, 0);
+			_unit->GetAIInterface()->m_moveFly = true;
+			_unit->Emote(EMOTE_ONESHOT_LIFTOFF);
+
+			WorldPacket data(SMSG_MOVE_SET_HOVER, 13);
+			data << _unit->GetNewGUID();
+			data << uint32(0);
+			_unit->SendMessageToSet(&data, false);
+
+			RemoveAIUpdateEvent();
+			RegisterAIUpdateEvent(3500);
+
+			ChillTarget = NULL;
+			FlightActions = 0;
+			ChillCounter = 0;
+			m_phase = 2;
+		}
+	}
+
+	inline WayPoint* CreateWaypoint(int id, uint32 waittime, uint32 flags)
+    {
+        WayPoint * wp = _unit->CreateWaypointStruct();
+        wp->id = id;
+        wp->x = PhaseTwoWP[id].x;
+        wp->y = PhaseTwoWP[id].y;
+        wp->z = PhaseTwoWP[id].z;
+        wp->o = PhaseTwoWP[id].o;
+        wp->waittime = waittime;
+        wp->flags = flags;
+        wp->forwardemoteoneshot = 0;
+        wp->forwardemoteid = 0;
+        wp->backwardemoteoneshot = 0;
+        wp->backwardemoteid = 0;
+        wp->forwardskinid = 0;
+        wp->backwardskinid = 0;
+        return wp;
+    }
+
+protected:
+
+	Unit *ChillTarget;	// I don't like it >_>
+
+	uint32 FlightActions;
+	uint32 ChillCounter;
+	uint32 PhaseTimer;
+	uint32 m_phase;
+	int nrspells;
+};
+
 // -- Kel'thuzad Encounter by M4ksiu -- //
 
 // NOTE: a lot of sounds/speeches were not used and keep in mind that those which are actually used can be
@@ -3537,14 +4330,6 @@ bool DespawnTrash[1000000];
 #define CN_UNSTOPPABLE_ABOMINATION 16428
 #define CN_SOUL_WEAVER 16429
 #define CN_GUARDIAN_OF_ICECROWN 16441
-
-struct Spawns
-{
-	float x;
-	float y;
-	float z;
-	float o;
-};
 
 /*
   _____
@@ -3709,25 +4494,8 @@ class SoldierOfTheFrozenWastesAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(SoldierOfTheFrozenWastesAI);
-	SP_AI_Spell spells[1];
-	bool m_spellcheck[1];
-
     SoldierOfTheFrozenWastesAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 1;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-			spells[i].casttime = 0;
-		}
-
-		spells[0].info = dbcSpell.LookupEntry(DARK_BLAST);	// not sure about way it should be casted
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
-		spells[0].cooldown = 0;
-		spells[0].perctrigger = 7.0f;
-		spells[0].attackstoptimer = 1000;
-
 		_unit->m_noRespawn = true;
 
 		OnStart = false;
@@ -3742,9 +4510,6 @@ public:
 		LastPosZ = _unit->GetPositionZ();
 
 		//RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-
-		for (int i = 0; i < nrspells; i++)
-			spells[i].casttime = 0;
     }
 
     void OnCombatStop(Unit *mTarget)
@@ -3798,47 +4563,12 @@ public:
 			OnStart = true;
 		}
 
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
-    }
-
-	void SpellCast(float val)
-    {
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-			float comulativeperc = 0;
-		    Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-				
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-						case TARGET_SELF:
-						case TARGET_VARIOUS:
-							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-						case TARGET_DESTINATION:
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				uint32 t = (uint32)time(NULL);
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					spells[i].casttime = t + spells[i].cooldown;
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-        }
+		if (_unit->GetAIInterface()->GetNextTarget() != NULL)
+		{
+			Unit *target = _unit->GetAIInterface()->GetNextTarget();
+			if (_unit->GetDistance2dSq(target) <= 49.0f)
+				_unit->CastSpell(_unit, DARK_BLAST, true);
+		}
     }
 
 protected:
@@ -3847,7 +4577,6 @@ protected:
 	float newposx;
 	float newposy;
 	bool OnStart;
-	int nrspells;
 };
 
 // Unstoppable Abomination AI
@@ -4396,9 +5125,9 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Minions, servants, soldiers of the cold dark, obey the call of Kel'Thuzad!");
 		_unit->PlaySoundToSet(8819);
 
-		Unit* TheLichKing = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(3767.58f, -5117.15f, 174.49f, CN_THE_LICH_KING);
-
-		if (TheLichKing)
+		Unit* TheLichKing = NULL;
+		TheLichKing = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(3767.58f, -5117.15f, 174.49f, CN_THE_LICH_KING);
+		if (TheLichKing != NULL)
 		{
 			_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, TheLichKing->GetGUID());
 			_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 29423);
@@ -4412,11 +5141,11 @@ public:
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_canMove = false;
-		//_unit->Root();
 		
         RegisterAIUpdateEvent(1000);
 		CastTime();
 
+		DespawnTrash[_unit->GetInstanceID()] = false;
 		EventStart = true;
 		SpawnCounter = 0;
 		PhaseTimer = 310;
@@ -4428,18 +5157,18 @@ public:
     void OnCombatStop(Unit *mTarget)
     {
 		GameObject* KelGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(3635.44f, -5090.33f, 143.205f, 181228);
-					
-		if (KelGate)
+		if (KelGate != NULL)
 			KelGate->SetUInt32Value(GAMEOBJECT_STATE, 0);
 
 		for (int i = 0; i < 4; i++)
 		{
-			GameObject* WindowGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(Guardians[i].x, Guardians[i].y, Guardians[i].z, 200002);
-						
-			if (WindowGate)
+			GameObject* WindowGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(Guardians[i].x, Guardians[i].y, Guardians[i].z, 200002);		
+			if (WindowGate != NULL)
 				WindowGate->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		}
 
+		_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+		_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		_unit->GetAIInterface()->disable_melee = false;
@@ -4447,6 +5176,7 @@ public:
 		_unit->GetAIInterface()->m_canMove = true;
         RemoveAIUpdateEvent();
 
+		DespawnTrash[_unit->GetInstanceID()] = true;
 		EventStart = false;
 		SpawnCounter = 0;
 		PhaseTimer = 310;
@@ -4483,14 +5213,14 @@ public:
     {
 		GameObject* KelGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(3635.44f, -5090.33f, 143.205f, 181228);
 					
-		if (KelGate)
+		if (KelGate != NULL)
 			KelGate->SetUInt32Value(GAMEOBJECT_STATE, 0);
 
 		for (int i = 0; i < 4; i++)
 		{
 			GameObject* WindowGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(Guardians[i].x, Guardians[i].y, Guardians[i].z, 200002);
 						
-			if (WindowGate)
+			if (WindowGate != NULL)
 				WindowGate->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		}
 
@@ -4692,9 +5422,9 @@ public:
 
 			if (HelpDialog == 4)
 			{
-				Unit* TheLichKing = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(3716.076904f, -5106.971191f, 141.289001f, CN_THE_LICH_KING);
-
-				if (TheLichKing)
+				Unit* TheLichKing = NULL;
+				TheLichKing = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(3767.58f, -5117.15f, 174.49f, CN_THE_LICH_KING);
+				if (TheLichKing != NULL)
 				{
 					TheLichKing->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Very well... warriors of the frozen wastes, rise up, I command you to fight, kill, and die for your master. Let none survive...");
 					TheLichKing->PlaySoundToSet(8824);
@@ -4720,10 +5450,13 @@ public:
 				Unit *Guardian = NULL;
 				uint32 i = RandomUInt(4);
 				Guardian =_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_GUARDIAN_OF_ICECROWN, Guardians[i].x, Guardians[i].y, Guardians[i].z, Guardians[i].o, false, false, 0, 0);
-				Guardian->GetAIInterface()->AttackReaction(Guardian->GetAIInterface()->GetNextTarget(), 1, 0);
+				if (Guardian  != NULL)
+				{
+					if (Guardian->GetAIInterface()->GetNextTarget() != NULL)
+					Guardian->GetAIInterface()->AttackReaction(Guardian->GetAIInterface()->GetNextTarget(), 1, 0);
+				}
 
 				GCounter++;
-
 				if (GCounter == 5)
 				{
 					GCounter = 0;
@@ -4887,8 +5620,7 @@ void SetupNaxxramas(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_MAEXXNA, &MaexxnaAI::Create);
 	mgr->register_creature_script(CN_WIDOW_FAERLINA, &WidowFaerlinaAI::Create);
 	mgr->register_creature_script(CN_ANUB, &AnubAI::Create);
-	
-	
+
 	// ---- Abomination Wing ----
 	mgr->register_creature_script(CN_BILE_RETCHER, &BileRetcherAI::Create);
 	mgr->register_creature_script(CN_PATCHWORK_GOLEM, &PatchworkGolemAI::Create);
@@ -4906,7 +5638,6 @@ void SetupNaxxramas(ScriptMgr * mgr)
 	mgr->register_creature_script(16446, &StonekinGargoyleAI::Create);
 	mgr->register_creature_script(CN_EYE_STALK, &EyeStalkAI::Create);
 	// BOSS'S
-	
 
 	// ---- Deathknight Wing ----
 	mgr->register_creature_script(CN_BONY_CONSTRUCT, &BonyConstructAI::Create);
@@ -4922,6 +5653,13 @@ void SetupNaxxramas(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_LADY_BLAUMEUX, &BlaumeuxAI::Create);
 	mgr->register_creature_script(CN_SIR_ZELIEK, &ZeliekAI::Create);
 
+	// ---- Frostwyrm Lair ---- > Sapphiron Encounter:
+	mgr->register_creature_script(CN_FROST_BREATH_TRIGGER, &FrostBreathTriggerAI::Create);
+	mgr->register_creature_script(CN_FROST_BREATH_TRIGGER2, &FrostBreathTrigger2AI::Create);
+	mgr->register_creature_script(CN_FROST_BREATH_TRIGGER3, &FrostBreathTrigger3AI::Create);
+	mgr->register_creature_script(CN_CHILL_TRIGGER, &ChillTriggerAI::Create);
+	mgr->register_creature_script(CN_SAPPHIRON, &SapphironAI::Create);
+
 	// ---- Frostwyrm Lair ---- > Kel'thuzad Encounter:
 	mgr->register_creature_script(CN_THE_LICH_KING ,&TheLichKingAI::Create);
 	mgr->register_creature_script(CN_SOLDIER_OF_THE_FROZEN_WASTES ,&SoldierOfTheFrozenWastesAI::Create);
@@ -4930,4 +5668,3 @@ void SetupNaxxramas(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_GUARDIAN_OF_ICECROWN ,&GuardianOfIcecrownAI::Create);
 	mgr->register_creature_script(CN_KELTHUZAD, &KelthuzadAI::Create);
 }
-

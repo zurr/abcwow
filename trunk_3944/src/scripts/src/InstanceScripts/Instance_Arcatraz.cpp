@@ -4864,69 +4864,88 @@ protected:
 /*****************************/
 
 // Zereketh the UnboundAI
-// TO DO: Void Zone
-#define CN_ZEREKETH_THE_UNBOUND 20870	
+#define CN_ZEREKETH			20870
+#define CN_VOIDZONEARC		21101
 
-#define SEED_OF_CORRUPTION 36123	//32865, 36123
-#define SHADOW_NOVA	36127 // 30533, 39005, 36127 (normal mode), 39005 (heroic mode?)
-#define VOID_ZONE 36119	// DBC: 36119; it's not fully functionl without additional core support (for dmg and random place targeting).
+#define SEED_OF_C			36123	//32865, 36123
+#define SHADOW_NOVA			36127 // 30533, 39005, 36127 (normal mode), 39005 (heroic mode?)
+#define SHADOW_NOVA_H		39005
+#define CONSUMPTION			30498
+#define CONSUMPTION_H		39004
+// #define VOID_ZONE 36119	// DBC: 36119; it's not fully functionl without additional core support (for dmg and random place targeting).
 
-class ZerekethTheUnboundAI : public CreatureAIScript
+class ZerekethAI : public CreatureAIScript
 {
 public:
-	ADD_CREATURE_FACTORY_FUNCTION(ZerekethTheUnboundAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	ADD_CREATURE_FACTORY_FUNCTION(ZerekethAI);
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
-    ZerekethTheUnboundAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    ZerekethAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
 
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
-
-		spells[0].info = dbcSpell.LookupEntry(SEED_OF_CORRUPTION);
-		spells[0].targettype = TARGET_ATTACKING;
+			
+		spells[0].info = dbcSpell.LookupEntry(SEED_OF_C);
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = false;
+		spells[0].cooldown = 20;
 		spells[0].perctrigger = 6.0f;
-		spells[0].attackstoptimer = 1000;
+		spells[0].attackstoptimer = 2000;
+		spells[0].mindist2cast = 0.0f;
+		spells[0].maxdist2cast = 100.0f;
 
-		spells[1].info = dbcSpell.LookupEntry(SHADOW_NOVA);
-		spells[1].targettype = TARGET_VARIOUS;
-		spells[1].instant = false;
-		spells[1].perctrigger = 15.0f;
-		spells[1].attackstoptimer = 1000;
+		if(_unit->GetMapMgr()->iInstanceMode != MODE_HEROIC)
+		{
 
-		spells[2].info = dbcSpell.LookupEntry(VOID_ZONE);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = false;
-		spells[2].perctrigger = 9.0f;
-		spells[2].attackstoptimer = 1000;
-
-    }
-    
+			spells[1].info = dbcSpell.LookupEntry(SHADOW_NOVA);
+			spells[1].targettype = TARGET_VARIOUS;
+			spells[1].instant = false;
+			spells[1].cooldown = 15;
+			spells[1].perctrigger = 15.0f;
+			spells[1].attackstoptimer = 1500;
+		}
+		else
+		{
+			spells[1].info = dbcSpell.LookupEntry(SHADOW_NOVA_H);
+			spells[1].targettype = TARGET_VARIOUS;
+			spells[1].instant = false;
+			spells[1].cooldown = 15;
+			spells[1].perctrigger = 15.0f;
+			spells[1].attackstoptimer = 1500;
+		}
+	}
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
+		for(int i=0;i<nrspells;i++)
+			spells[i].casttime = spells[i].cooldown;
+
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Life energy to... consume.");
 		_unit->PlaySoundToSet(11250);
-    }
 
-	void CastTime()
-	{
-		for(int i=0;i<nrspells;i++)
-			spells[i].casttime = spells[i].cooldown;
-	}
+		uint32 t = (uint32)time(NULL);
+		VoidTimer = t + RandomUInt(10)+30;
+		SpeechTimer = t + RandomUInt(10)+40;
+    }
 
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
+	}
+
+    void OnDied(Unit * mKiller)
+    {
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Void... beckons.");
+		_unit->PlaySoundToSet(11255);
+
+		RemoveAIUpdateEvent();
     }
 
 	void OnTargetDied(Unit* mTarget)
@@ -4949,47 +4968,100 @@ public:
 			}
 		}
     }
-
-    void OnDied(Unit * mKiller)
-    {
-		CastTime();
-		RemoveAIUpdateEvent();
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Void... beckons.");
-		_unit->PlaySoundToSet(11255);
-    }
-
-    void AIUpdate()
+	
+	void Speech()
 	{
-		int RandomSpeach;
-		RandomSpeach=rand()%100;	// 2% chance to say sth (no idea if this is right as names "TEMPEST_Zerek_ShadowHell01/02" tell me nothing =/
-		switch (RandomSpeach)
+		switch (RandomUInt(1))
 		{
 		case 0:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The shadow... will <missing_word> you.");	// missing word! =(
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The shadow... will engulf you.");
 			_unit->PlaySoundToSet(11253);
 			break;
 		case 1:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Darkness... consumes all.");	// verification needed
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Darkness... consumes all.");
 			_unit->PlaySoundToSet(11254);
 			break;
 		}
+		SpeechTimer = (uint32)time(NULL) + RandomUInt(10)+40;
+	}
+
+	void VoidZoneArc()
+	{
+		VoidTimer = (uint32)time(NULL) + RandomUInt(10)+30;
+		
+		CreatureInfo * ci = CreatureNameStorage.LookupEntry(CN_VOIDZONEARC);
+		CreatureProto * cp = CreatureProtoStorage.LookupEntry(CN_VOIDZONEARC);
+		if(!cp || !ci)
+			return;
+
+		std::vector<Player*> TargetTable;
+		std::set<Player*>::iterator Itr = _unit->GetInRangePlayerSetBegin();
+		for(; Itr != _unit->GetInRangePlayerSetEnd(); Itr++) 
+		{ 
+			Player* RandomTarget = NULL;
+			RandomTarget = static_cast< Player* >(*Itr);
+			if(RandomTarget && RandomTarget->isAlive() && isHostile(*Itr, _unit))
+				TargetTable.push_back(RandomTarget);
+			RandomTarget = NULL;
+		}
+
+		if (!TargetTable.size())
+			return;
+
+		size_t RandTarget = rand()%TargetTable.size();
+
+		Player * RTarget = TargetTable[RandTarget];
+
+		if (!RTarget)
+			return;
+
+		float vzX = RandomUInt(5) * cos(RandomFloat(6.28f))+RTarget->GetPositionX();
+		float vzY = RandomUInt(5) * cos(RandomFloat(6.28f))+RTarget->GetPositionY();
+		float vzZ = RTarget->GetPositionZ();
+		Creature *VoidZone = _unit->GetMapMgr()->CreateCreature();
+		VoidZone->Load(cp, vzX, vzY, vzZ);
+		VoidZone->SetInstanceID(_unit->GetInstanceID());
+		VoidZone->SetZoneId(_unit->GetZoneId());
+		VoidZone->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		VoidZone->m_noRespawn = true;
+		if(VoidZone->CanAddToWorld())
+		{
+			VoidZone->PushToWorld(_unit->GetMapMgr());
+		}
+		else
+		{
+			VoidZone->SafeDelete();
+			return;
+		}
+		RTarget = NULL;
+		sEventMgr.AddEvent(VoidZone, &Creature::SafeDelete, EVENT_CREATURE_SAFE_DELETE, 60000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	}
+
+    void AIUpdate()
+	{
+		uint32 t = (uint32)time(NULL);
+		if(t > SpeechTimer)
+			Speech();
+
+		if(t > VoidTimer)
+			VoidZoneArc();
+		
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
     }
 
 	void SpellCast(float val)
-	{
+    {
         if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
 			float comulativeperc = 0;
 		    Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
-				spells[i].casttime--;
+				if(!spells[i].perctrigger) continue;
 				
-				if (m_spellcheck[i])
-				{					
-					spells[i].casttime = spells[i].cooldown;
+				if(m_spellcheck[i])
+				{
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
@@ -5000,32 +5072,97 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
+			target = NULL;
+        }
+    }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Player *> TargetTable;
+			for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
+			{ 
+				Player* RandomTarget = NULL;
+				RandomTarget = (Player*)(*itr);
+
+				if (RandomTarget && RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast)
+					TargetTable.push_back(RandomTarget);
+				RandomTarget = NULL;
+			}
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+			RTarget = NULL;
+			TargetTable.clear();
 		}
+	}
+
+	void Destroy()
+	{
+		delete this;
 	}
 
 protected:
 
+	uint32 SpeechTimer;
+	uint32 VoidTimer;
 	int nrspells;
 };
+
+class VoidZoneARC : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(VoidZoneARC);
+	VoidZoneARC(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->Root();
+		_unit->DisableAI();
+		SpellEntry *Sp = NULL;
+		if(_unit->GetMapMgr()->iInstanceMode != MODE_HEROIC)
+			Sp = dbcSpell.LookupEntry(CONSUMPTION);
+		else
+			Sp = dbcSpell.LookupEntry(CONSUMPTION_H);
+
+		sEventMgr.AddEvent(((Unit*)_unit), &Unit::EventCastSpell, ((Unit*)_unit), Sp, EVENT_UNK, (uint32)1000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	}
+};
+
 
 // Dalliah the DoomsayerAI
 
@@ -5820,7 +5957,9 @@ void SetupArcatraz(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_WARDER_CORPSE, &WarderCorpseAI::Create);
 	mgr->register_creature_script(CN_SARGERON_ARCHER, &SargeronArcherAI::Create);
 
-	mgr->register_creature_script(CN_ZEREKETH_THE_UNBOUND, &ZerekethTheUnboundAI::Create);
+	mgr->register_creature_script(CN_ZEREKETH, &ZerekethAI::Create);
+	mgr->register_creature_script(CN_VOIDZONEARC, &VoidZoneARC::Create);
+
 	mgr->register_creature_script(CN_DALLIAH_THE_DOOMSAYER, &DalliahTheDoomsayerAI::Create);
 	mgr->register_creature_script(CN_WRATH_SCRYER_SOCCOTHRATES, &WrathScryerSoccothratesAI::Create);
 	mgr->register_creature_script(CN_HARBRINGER_SKYRISS, &HarbringerSkyrissAI::Create);

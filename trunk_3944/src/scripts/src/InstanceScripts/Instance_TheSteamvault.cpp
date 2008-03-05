@@ -11,7 +11,6 @@
 
 #define BOMB 22334 //40332 // AOE
 #define NET 6533 //38338 // Should stay for 5 or 8 sec?
-// DAZED?
 
 class COILFANGENGINEERAI : public CreatureAIScript
 {
@@ -140,8 +139,6 @@ protected:
 #define SONIC_BURST 8281 //39052 // Should make dmg? or maybe it shouldn't be added here?
 #define HEAL 31730 //39378 // Hmm... no idea if this is correct id (and how much should heal)
 // Also it should heal other naga like etc.
-// DAZED?
-
 class COILFANGORACLEAI : public CreatureAIScript
 {
 public:
@@ -274,8 +271,6 @@ protected:
 #define MORTAL_BLOW 35105
 #define BATTLE_SHOUT 31403 
 // Defensive Stance 7164 ?
-// DAZED?
-
 class COILFANGWARRIORAI : public CreatureAIScript
 {
 public:
@@ -409,7 +404,6 @@ protected:
 #define AOE_FEAR 29321 //30584 // Maybe should be: 33547 or 29321
 #define LIGHTNING_BOLT 15234 //36152 // 1 target
 #define ARCANE_FLARE 35106
-// DAZED?
 
 class COILFANGSIRENAI : public CreatureAIScript
 {
@@ -832,7 +826,6 @@ protected:
 #define HEAL_LEPER 11642
 #define SUNDER_ARMOR_LEPER 13444
 #define SHOOT 15547
-//DAZED
 
 class COILFANGLEPERAI : public CreatureAIScript
 {
@@ -1124,7 +1117,7 @@ protected:
 
 //#define FROSTBOLT_VOLLEY 36741
 #define WATER_BOLT_WOLLEY 34449
-// DAZED?
+
 class COILFANGWATERELEMENTALAI : public CreatureAIScript
 {
 public:
@@ -1513,7 +1506,6 @@ protected:
 #define CN_STEAMRIGGER_MECHANIC 17951
 
 #define REPAIR 31532
-// DAZED?
 
 class STEAMRIGGERMECHANICAI : public CreatureAIScript
 {
@@ -1630,7 +1622,6 @@ protected:
 #define CN_STEAM_SURGER 21696
 
 #define WATER_BOLT 37252
-// DAZED?
 
 class STEAMSURGERAI : public CreatureAIScript
 {
@@ -1748,250 +1739,6 @@ protected:
 /*                           */
 /*****************************/
 
-struct Coords
-{
-    float x;
-    float y;
-    float z;
-    float o;
-};
-
-//Mekgineer Steamrigger
-
-static Coords spawnCoords[] =
-{
-    { -300.037842f, -115.296227f, -7.865229f, 4.197916f },
-    { -330.083008f, -121.505997f, -7.985120f, 5.061450f },
-    { -346.530273f, -147.167892f, -6.703687f, 0.010135f }
-};
-
-#define CN_MEKGINEER_STEAMRIGGER 17796
-#define CN_STEAMRIGGER_MECHANIC 17951
-
-#define SUPER_SHRINK_RAY 31485
-#define SAW_BLADE 31486 // Or this: 35318
-#define ELECTRIFIED_NET 35107
-#define ENRAGE 41447  // No idea if these are good ids // still not sue
-
-// Must spawn 3 Steamrigger Mechanics when his health is on 75%, 50% and 25%
-class MEKGINEERSTEAMRIGGERAI : public CreatureAIScript
-{
-public:
-    ADD_CREATURE_FACTORY_FUNCTION(MEKGINEERSTEAMRIGGERAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
-
-    MEKGINEERSTEAMRIGGERAI(Creature* pCreature) : CreatureAIScript(pCreature)
-    {
-		nrspells = 4;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-		}
-        spells[0].info = dbcSpell.LookupEntry(SUPER_SHRINK_RAY);
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
-		spells[0].cooldown = 35;
-		spells[0].perctrigger = 0.0f;
-		spells[0].attackstoptimer = 1000;
-
-		spells[1].info = dbcSpell.LookupEntry(SAW_BLADE);
-		spells[1].targettype = TARGET_ATTACKING; // when killed with VARIOUS (because with that caster attacks also himself) server crashes
-		spells[1].instant = true;
-		spells[1].cooldown = 20;
-		spells[1].perctrigger = 0.0f;
-		spells[1].attackstoptimer = 1000;
-
-		spells[2].info = dbcSpell.LookupEntry(ELECTRIFIED_NET);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].cooldown = 25;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
-
-		spells[3].info = dbcSpell.LookupEntry(ENRAGE);
-		spells[3].targettype = TARGET_SELF;
-		spells[3].instant = true;
-		spells[3].cooldown = -1;
-		spells[3].perctrigger = 0.0f;
-		spells[3].attackstoptimer = 1000;
-		spells[3].soundid = 10374;
-		spells[3].speech = "Have fun dyin', cupcake!"; //cupcake?
-
-    }
-    
-    void OnCombatStart(Unit* mTarget)
-    {
-		CastTime();
-		Timer = 0;
-		int RandomSpeach;
-		RandomUInt(1000);
-		RandomSpeach=rand()%4;
-		switch (RandomSpeach)
-		{
-		case 0:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your in for a World-O-Hurt !");
-			_unit->PlaySoundToSet(10368);
-			break;
-		case 1:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Eat hot metal! Scumbag!");
-			_unit->PlaySoundToSet(10369);
-			break;
-		case 2:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I'll come over there!"); // really?
-			_unit->PlaySoundToSet(10370);
-			break;
-		case 3:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I'm bringin' the pain!"); // really2?
-			_unit->PlaySoundToSet(10371);
-			break;
-		}
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-    }
-
-	void CastTime()
-	{
-		for(int i=0;i<nrspells;i++)
-			spells[i].casttime = spells[i].cooldown;
-	}
-
-	void OnTargetDied(Unit* mTarget)
-    {
-		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
-		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
-			switch (RandomSpeach)
-			{
-			case 0:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You just got served, Punk!");
-				_unit->PlaySoundToSet(10372);
-				break;
-			case 1:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I own you!");
-				_unit->PlaySoundToSet(10373);
-				break;
-			case 2:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Have fun dying, capcake!"); // capcake?
-				_unit->PlaySoundToSet(10374);
-				break;
-			}
-		}
-    }
-
-    void OnCombatStop(Unit *mTarget)
-    {
-		Timer = 0;
-		CastTime();
-        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-        RemoveAIUpdateEvent();
-    }
-
-    void OnDied(Unit * mKiller)
-    {
-		Timer = 0;
-		CastTime();
-	   _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Mommy");
-       _unit->PlaySoundToSet(10375);
-       RemoveAIUpdateEvent();
-    }
-
-    void AIUpdate()
-    {
-		Timer++;
-
-		if (Timer == 100)
-		{
-			_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
-		}
-
-		if(_unit->GetHealthPct() == 25 || _unit->GetHealthPct() == 50 || _unit->GetHealthPct() == 75)
-        {
-            Creature *cre = NULL;
-            for(int i = 0; i < 3; i++)
-            {
-                cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_STEAMRIGGER_MECHANIC, 
-                    spawnCoords[i].x, spawnCoords[i].y,
-                    spawnCoords[i].z, spawnCoords[i].o,
-                    true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 50); //63
-                if(cre)
-                {
-                    //cre->GetAIInterface()->MoveTo(14.161, -177.874, -85.649, 0.23);
-                    cre->GetAIInterface()->setOutOfCombatRange(100000);
-                }
-                cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_STEAMRIGGER_MECHANIC, 
-                    spawnCoords[2-i].x, spawnCoords[2-i].y,
-                    spawnCoords[2-i].z, spawnCoords[2-i].o,
-                    true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 63);
-                if(cre)
-                {
-                    //cre->GetAIInterface()->MoveTo(27.133, -232.030, -84.188, 0.44);
-                    cre->GetAIInterface()->setOutOfCombatRange(100000);
-                }
-            }
-        }
-
-		else
-		{
-			float val = (float)RandomFloat(100.0f);
-			SpellCast(val);
-		}
-	}
-
-	void SpellCast(float val)
-	{
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-			float comulativeperc = 0;
-		    Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				spells[i].casttime--;
-				
-				if (m_spellcheck[i])
-				{					
-					spells[i].casttime = spells[i].cooldown;
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-						case TARGET_SELF:
-						case TARGET_VARIOUS:
-							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-						case TARGET_DESTINATION:
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-		}
-	}
-
-protected:
-
-	int Timer;
-	int nrspells;
-};
-
-
 // Hydromancer ThespiaAI
 
 #define CN_HYDROMANCER_THESPIA 17797
@@ -2000,50 +1747,56 @@ protected:
 #define LIGHTNING_CLOUD 25033
 #define LUNG_BURST 31481
 
-class HYDROMANCERTHESPIAAI : public CreatureAIScript
+class HydromancerThespiaAI : public CreatureAIScript
 {
 public:
-    ADD_CREATURE_FACTORY_FUNCTION(HYDROMANCERTHESPIAAI);
+    ADD_CREATURE_FACTORY_FUNCTION(HydromancerThespiaAI);
 	SP_AI_Spell spells[3];
 	bool m_spellcheck[3];
 
-    HYDROMANCERTHESPIAAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    HydromancerThespiaAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
 		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 
-		} 
+		}
+
         spells[0].info = dbcSpell.LookupEntry(ENVELOPING_WINDS);
-		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
-		spells[0].cooldown = 25;
-		spells[0].perctrigger = 0.0f;
+		spells[0].cooldown = 10;
+		spells[0].perctrigger = 9.0f;
 		spells[0].attackstoptimer = 1000;
+		spells[0].mindist2cast = 0.0f;
+		spells[0].maxdist2cast = 35.0f;
 
 		spells[1].info = dbcSpell.LookupEntry(LIGHTNING_CLOUD);
-		spells[1].targettype = TARGET_DESTINATION;
+		spells[1].targettype = TARGET_RANDOM_DESTINATION;
 		spells[1].instant = true;				
-		spells[1].cooldown = 35;
-		spells[1].perctrigger = 0.0f;
+		spells[1].cooldown = 25;
+		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
+		spells[1].mindist2cast = 0.0f;
+		spells[1].maxdist2cast = 30.0f;
 
 		spells[2].info = dbcSpell.LookupEntry(LUNG_BURST);
-		spells[2].targettype = TARGET_ATTACKING;
+		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = true;
-		spells[2].cooldown = 20;
-		spells[2].perctrigger = 0.0f;
+		spells[2].cooldown = 15;
+		spells[2].perctrigger = 9.0f;
 		spells[2].attackstoptimer = 1000;
-
+		spells[2].mindist2cast = 0.0f;
+		spells[2].maxdist2cast = 40.0f;
     }
     
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
-		int RandomSpeach;
-		RandomUInt(1000);
-		RandomSpeach=rand()%3;
+		for (int i = 0;i < nrspells; i++)
+			spells[i].casttime = 0;
+
+		int RandomSpeach = rand()%3;
 		switch (RandomSpeach)
 		{
 		case 0:
@@ -2059,22 +1812,15 @@ public:
 			_unit->PlaySoundToSet(10363);
 			break;
 		}
+
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
-
-	void CastTime()
-	{
-		for(int i=0;i<nrspells;i++)
-			spells[i].casttime = spells[i].cooldown;
-	}
 
 	void OnTargetDied(Unit* mTarget)
     {
 		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%2;
+			int RandomSpeach = rand()%2;
 			switch (RandomSpeach)
 			{
 			case 0: 
@@ -2091,18 +1837,18 @@ public:
 
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
         RemoveAIUpdateEvent();
     }
 
     void OnDied(Unit * mKiller)
     {
-		CastTime();
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Our matron will be ... The end of you");
         _unit->PlaySoundToSet(10366);
-       RemoveAIUpdateEvent();
+
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
@@ -2112,18 +1858,20 @@ public:
     }
 
 	void SpellCast(float val)
-	{
+    {
         if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
 			float comulativeperc = 0;
 		    Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
-				spells[i].casttime--;
+				if(!spells[i].perctrigger) continue;
 				
-				if (m_spellcheck[i])
-				{					
-					spells[i].casttime = spells[i].cooldown;
+				if(m_spellcheck[i])
+				{
+					if (!spells[i].instant)
+						_unit->GetAIInterface()->StopMovement(1);
+
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
@@ -2134,25 +1882,74 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
+        }
+    }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
 		}
 	}
 
@@ -2161,69 +1958,526 @@ protected:
 	int nrspells;
 };
 
+//---- Steamrigger encounter ----//
 
+struct Coords
+{
+    float x;
+    float y;
+    float z;
+    float o;
+};
+
+static Coords SpawnCoords[] =
+{
+    { -300.037842f, -115.296227f, -7.865229f, 4.197916f },
+    { -330.083008f, -121.505997f, -7.985120f, 5.061450f },
+    { -346.530273f, -147.167892f, -6.703687f, 0.010135f }
+};
+
+// Steamrigger MechanicAI
+// Should they really fight?
+#define CN_STEAMRIGGER_MECHANIC		17951
+
+#define REPAIR	31532
+
+class SteamriggerMechanicAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(SteamriggerMechanicAI);
+
+    SteamriggerMechanicAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->m_noRespawn = true;
+	}
+    
+    void OnCombatStart(Unit* mTarget)
+    {
+		_unit->GetAIInterface()->SetUnitToFollow(NULL);
+		_unit->GetAIInterface()->SetUnitToFollowAngle(0.0f);
+
+		if (_unit->GetCurrentSpell() != NULL)
+			_unit->GetCurrentSpell()->cancel();
+    }
+
+    void OnCombatStop(Unit *mTarget)
+    {
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+    }
+
+	void OnTargetDied(Unit *mTarget)
+	{
+		_unit->GetAIInterface()->RemoveThreatByPtr(mTarget);
+	}
+
+    void OnDied(Unit * mKiller)
+    {
+		_unit->GetAIInterface()->SetUnitToFollow(NULL);
+		_unit->GetAIInterface()->SetUnitToFollowAngle(0.0f);
+
+		RemoveAIUpdateEvent();
+    }
+
+	void OnDamageTaken(Unit* mAttacker, float fAmount)
+	{
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+	}
+};
+
+
+// Mekgineer Steamrigger
+
+#define CN_MEKGINEER_STEAMRIGGER	17796
+
+#define SUPER_SHRINK_RAY	31485
+#define SAW_BLADE			31486
+#define ELECTRIFIED_NET		35107
+#define ENRAGE				41447  // No idea if this is good id
+
+// Must spawn 3 Steamrigger Mechanics when his health is on 75%, 50% and 25%
+class MekgineerSteamriggerAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(MekgineerSteamriggerAI);
+	SP_AI_Spell spells[4];
+	bool m_spellcheck[4];
+	std::vector <Unit*> Gnomes;
+
+    MekgineerSteamriggerAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		nrspells = 3;
+		for(int i = 0; i < nrspells; i++)
+		{
+			m_spellcheck[i] = false;
+		}
+
+        spells[0].info = dbcSpell.LookupEntry(SUPER_SHRINK_RAY);
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
+		spells[0].instant = true;
+		spells[0].cooldown = 20;
+		spells[0].perctrigger = 9.0f;
+		spells[0].attackstoptimer = 1000;
+		spells[0].mindist2cast = 0.0f;
+		spells[0].maxdist2cast = 40.0f;
+
+		spells[1].info = dbcSpell.LookupEntry(SAW_BLADE);
+		spells[1].targettype = TARGET_RANDOM_SINGLE; // when killed with VARIOUS (because with that caster attacks also himself) server crashes
+		spells[1].instant = true;
+		spells[1].cooldown = 15;
+		spells[1].perctrigger = 10.0f;
+		spells[1].attackstoptimer = 1000;
+		spells[1].mindist2cast = 0.0f;
+		spells[1].maxdist2cast = 40.0f;
+
+		spells[2].info = dbcSpell.LookupEntry(ELECTRIFIED_NET);
+		spells[2].targettype = TARGET_RANDOM_SINGLE;
+		spells[2].instant = true;
+		spells[2].cooldown = 15;
+		spells[2].perctrigger = 8.0f;
+		spells[2].attackstoptimer = 1000;
+		spells[2].mindist2cast = 0.0f;
+		spells[2].maxdist2cast = 40.0f;
+
+		spells[3].info = dbcSpell.LookupEntry(ENRAGE);
+		spells[3].targettype = TARGET_SELF;
+		spells[3].instant = true;
+		spells[3].cooldown = 300;
+		spells[3].perctrigger = 0.0f;
+		spells[3].attackstoptimer = 1000;
+
+		GnomeCounter = 0;
+    }
+    
+    void OnCombatStart(Unit* mTarget)
+    {
+		for(int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+		spells[3].casttime = (uint32)time(NULL) + spells[3].cooldown;
+
+		GnomeCounter = 0;
+
+		Gnomes.clear();
+
+		int RandomSpeach = rand()%4;
+		switch (RandomSpeach)
+		{
+		case 0:
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your in for a World-O-Hurt!");
+			_unit->PlaySoundToSet(10368);
+			break;
+		case 1:
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Eat hot metal! Scumbag!");
+			_unit->PlaySoundToSet(10369);
+			break;
+		case 2:
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I'll come over there!");
+			_unit->PlaySoundToSet(10370);
+			break;
+		case 3:
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I'm bringin' the pain!");
+			_unit->PlaySoundToSet(10371);
+			break;
+		}
+
+		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+    }
+
+	void OnTargetDied(Unit* mTarget)
+    {
+		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+		{
+			int RandomSpeach = rand()%2;
+			switch (RandomSpeach)
+			{
+			case 0:
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You just got served, Punk!");
+				_unit->PlaySoundToSet(10372);
+				break;
+			case 1:
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I own you!");
+				_unit->PlaySoundToSet(10373);
+				break;
+			}
+		}
+    }
+
+    void OnCombatStop(Unit *mTarget)
+    {
+		for (size_t i = 0; i < Gnomes.size(); i++)
+		{
+			Creature *Gnome = NULL;
+			Gnome = (Creature*)Gnomes[i];
+			if (!Gnome)
+				continue;
+
+			if (!Gnome->IsInWorld() || !Gnome->isAlive())
+				continue;
+
+			Gnome->Despawn(0,0);
+		}
+
+		Gnomes.clear();
+
+        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
+        RemoveAIUpdateEvent();
+    }
+
+    void OnDied(Unit * mKiller)
+    {
+	   _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Mommy");
+       _unit->PlaySoundToSet(10375);
+
+       RemoveAIUpdateEvent();
+    }
+
+    void AIUpdate()
+    {
+		if (Gnomes.size())
+		{
+			Unit *Gnome = NULL;
+			for (std::vector<Unit*>::iterator itr = Gnomes.begin(); itr < Gnomes.end(); itr++)
+			{
+				Gnome = (Unit*)(*itr);
+				if (!Gnome->isAlive() || !Gnome->IsInWorld())
+				{
+					Gnomes.erase(itr);
+					continue;
+				}
+
+				if (Gnome->GetAIInterface()->GetNextTarget())
+					continue;
+
+				if (Gnome->GetAIInterface()->getUnitToFollow() == NULL)
+				{
+					Gnome->GetAIInterface()->SetUnitToFollow(_unit);
+					Gnome->GetAIInterface()->SetFollowDistance(15.0f);
+				}
+
+				if (_unit->GetDistance2dSq(Gnome) > 250.0f)
+				{
+					if (Gnome->GetCurrentSpell() != NULL)
+						Gnome->GetCurrentSpell()->cancel();
+
+					continue;
+				}
+
+				if (Gnome->GetCurrentSpell() == NULL)
+				{
+					Gnome->GetAIInterface()->StopMovement(1);
+					Gnome->CastSpell(_unit, REPAIR, false);	// core problem? casted on self (and effect is applied on caster instead of _unit)
+				}
+			}
+		}
+
+		uint32 t = (uint32)time(NULL);
+		if (t > spells[3].casttime)
+		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Have fun dyin', cupcake!");
+			_unit->PlaySoundToSet(10374);
+
+			_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+
+			spells[3].casttime = t + spells[3].cooldown;
+		}
+
+		if ((_unit->GetHealthPct() <= 75 && GnomeCounter == 0) || (_unit->GetHealthPct() <= 50 && GnomeCounter == 1) || (_unit->GetHealthPct() <= 25 && GnomeCounter == 2))
+        {
+            Unit *Gnome = NULL;
+            for(int i = 0; i < 3; i++)
+            {
+                Gnome = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_STEAMRIGGER_MECHANIC, SpawnCoords[i].x, SpawnCoords[i].y, SpawnCoords[i].z, SpawnCoords[i].o, true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 50);
+                if(Gnome)
+                {
+					Gnome->GetAIInterface()->SetUnitToFollow(_unit);
+					Gnome->GetAIInterface()->SetFollowDistance(15.0f);
+					Gnomes.push_back(Gnome);
+				}
+            }
+
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Tune 'em up good boys!");
+			_unit->PlaySoundToSet(10367);
+
+			GnomeCounter++;
+        }
+
+		else
+		{
+			float val = (float)RandomFloat(100.0f);
+			SpellCast(val);
+		}
+	}
+
+	void SpellCast(float val)
+    {
+        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			float comulativeperc = 0;
+		    Unit *target = NULL;
+			for(int i=0;i<nrspells;i++)
+			{
+				if(!spells[i].perctrigger) continue;
+				
+				if(m_spellcheck[i])
+				{
+					if (!spells[i].instant)
+						_unit->GetAIInterface()->StopMovement(1);
+
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+						case TARGET_SELF:
+						case TARGET_VARIOUS:
+							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+						case TARGET_ATTACKING:
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+						case TARGET_DESTINATION:
+							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
+					}
+
+					m_spellcheck[i] = false;
+					return;
+				}
+
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+        }
+    }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
+		}
+	}
+
+protected:
+
+	uint8 GnomeCounter;
+	int nrspells;
+};
+
+//---- Warlord Kalitresh Encounter ----//
+
+static Coords Distiller[]=
+{
+	{  },
+	{ -113.183952f, -488.599335f, 8.196310f, 6.134734f },
+	{  -76.880989f, -489.164673f, 8.236189f, 2.103285f },
+	{  -74.309753f, -520.418884f, 8.255078f, 4.612630f },
+	{ -116.220764f, -520.139771f, 8.198921f, 5.127069f }
+};
+
+static Coords DistillerMoveTo[]=
+{
+	{  },
+	{ -108.092949f, -491.747803f, 8.198845f,  0.621336f },
+	{  -81.165871f, -492.459869f, 8.255936f,  6.531955f },
+	{  -79.170982f, -518.544800f, 8.241381f, -2.281880f },
+	{ -112.033188f, -517.945190f, 8.205022f, -0.949258f }
+};
+
+// Naga DistillerAI
+
+#define CN_NAGA_DISTILLER	17954
+
+#define REPAIR	31532
+
+class NagaDistillerAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(NagaDistillerAI);
+
+    NagaDistillerAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->GetAIInterface()->disable_melee = true;
+		_unit->GetAIInterface()->m_canMove = false;
+	}
+
+    void OnDied(Unit * mKiller)
+    {
+		_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+		_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+    }
+};
 
 // Warlord Kalitresh AI
 
 #define CN_WARLORD_KALITRESH 17798
 
-#define IMPALE 34451 //24049 // 1 target Correct spell id? Maybe 34451 or ... correct
-#define HEAD_CRACK 16172
-#define WARLORDS_RAGE 36453 // DBC: 37081, 36453	// still he must be forced by Driller to cast it
-#define SPELL_REFLECTION 31534 //33961
+#define IMPALE				34451
+#define HEAD_CRACK			16172
+#define SPELL_REFLECTION	31534
+#define WARLORDS_RAGE		36453 // DBC: 37081, 36453	// still he must be forced by Driller to cast it
 
-class WARLORDKALITRESHAI : public CreatureAIScript
+class WarlordKalitreshAI : public CreatureAIScript
 {
 public:
-    ADD_CREATURE_FACTORY_FUNCTION(WARLORDKALITRESHAI);
+    ADD_CREATURE_FACTORY_FUNCTION(WarlordKalitreshAI);
 	SP_AI_Spell spells[4];
 	bool m_spellcheck[4];
 
-    WARLORDKALITRESHAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    WarlordKalitreshAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
-		for(int i=0;i<nrspells;i++)
+		nrspells = 3;
+		for(int i = 0; i < nrspells; i++)
 		{
 			m_spellcheck[i] = false;
 		}
+
         spells[0].info = dbcSpell.LookupEntry(IMPALE);
-		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
-		spells[0].cooldown = 15;
-		spells[0].perctrigger = 0.0f;
+		spells[0].cooldown = 10;
+		spells[0].perctrigger = 8.0f;
 		spells[0].attackstoptimer = 1000;
+		spells[0].mindist2cast = 0.0f;
+		spells[0].maxdist2cast = 40.0f;
 
 		spells[1].info = dbcSpell.LookupEntry(HEAD_CRACK);
-		spells[1].targettype = TARGET_ATTACKING;
+		spells[1].targettype = TARGET_RANDOM_SINGLE;
 		spells[1].instant = true;
-		spells[1].cooldown = 25;
-		spells[1].perctrigger = 0.0f;
+		spells[1].cooldown = 10;
+		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
+		spells[1].mindist2cast = 0.0f;
+		spells[1].maxdist2cast = 40.0f;
 
-		spells[2].info = dbcSpell.LookupEntry(WARLORDS_RAGE);
+		spells[2].info = dbcSpell.LookupEntry(SPELL_REFLECTION);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
-		spells[2].cooldown = 90;
-		spells[2].perctrigger = 0.0f;
+		spells[2].cooldown = 25;
+		spells[2].perctrigger = 8.0f;
 		spells[2].attackstoptimer = 1000;
-		spells[2].soundid = 10391;
-		spells[2].speech = "This is not nearly over!";
 
-		spells[3].info = dbcSpell.LookupEntry(SPELL_REFLECTION);
+		spells[3].info = dbcSpell.LookupEntry(WARLORDS_RAGE);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = true;
-		spells[3].cooldown = 20;
+		spells[3].cooldown = 90;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
-        
+		spells[3].soundid = 10391;
+		spells[3].speech = "This is not nearly over!";
+
+		DistillerNumber = 0;
+		RagePhaseTimer = 0;
+		EnrageTimer = 0;
+		RagePhase = 0;
 	} 
 
     void OnCombatStart(Unit* mTarget)
     {
-		CastTime();
-		int RandomSpeach;
-		RandomUInt(1000);
-		RandomSpeach=rand()%3;
+		for (int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+
+		RagePhaseTimer = (uint32)time(NULL) + RandomUInt(15) + 10;
+		DistillerNumber = 0;
+		EnrageTimer = 0;
+		RagePhase = 0;
+
+		GameObject *Gate = NULL;
+		Gate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-95.774361f, -439.608612f, 3.382976f, 183049);
+		if (Gate)
+			Gate->SetUInt32Value(GAMEOBJECT_STATE, 1);
+
+		int RandomSpeach = rand()%3;
 		switch (RandomSpeach)
 		{
 		case 0: 
@@ -2235,8 +2489,7 @@ public:
 			_unit->PlaySoundToSet(10393);
 			break;
 		case 2:
-			/* Maybe an emote for "strange words"? */
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "No freaking idea :P");
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ba'anthalso'dorei!");
 			_unit->PlaySoundToSet(10394);
 			break;
 		}
@@ -2244,27 +2497,19 @@ public:
         RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
-	void CastTime()
-	{
-		for(int i=0;i<nrspells;i++)
-			spells[i].casttime = spells[i].cooldown;
-	}
-
 	void OnTargetDied(Unit* mTarget)
     {
 		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%2;
+			int RandomSpeach = rand()%2;
 			switch (RandomSpeach)
 			{
 			case 0: 
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Squirm , Surface filth!");
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Scram, surface filth!");
 				_unit->PlaySoundToSet(10395);
 				break;
 			case 1:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Hahahahah");
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ah ha ha ha ha ha ha!");
 				_unit->PlaySoundToSet(10366);
 				break;
 			}
@@ -2273,39 +2518,151 @@ public:
 
     void OnCombatStop(Unit *mTarget)
     {
-		CastTime();
+		GameObject *Gate = NULL;
+		Gate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-95.774361f, -439.608612f, 3.382976f, 183049);
+		if (Gate)
+			Gate->SetUInt32Value(GAMEOBJECT_STATE, 0);
+
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+		_unit->GetAIInterface()->m_canMove = true;
+		_unit->GetAIInterface()->SetUnitToFollow(NULL);
+		_unit->GetAIInterface()->SetFollowDistance(0.0f);
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
+		if (_unit->FindAura(37076))
+			_unit->RemoveAura(37076);
+		if (_unit->FindAura(36453))
+			_unit->RemoveAura(36453);
+
+		Unit *pDistiller = NULL;
+		pDistiller = GetClosestDistiller();
+		if (pDistiller)
+		{
+			pDistiller->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
+			pDistiller->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+			pDistiller->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+			pDistiller->GetAIInterface()->WipeTargetList();
+			pDistiller->GetAIInterface()->WipeHateList();
+		}
+
         RemoveAIUpdateEvent();
     }
 
 	void OnDied(Unit * mKiller)
     {
-		CastTime();
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "For her exelency , For Vash...");
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "For her Excellency... for... Vashj!");
         _unit->PlaySoundToSet(10397);
-       RemoveAIUpdateEvent();
+
+		RemoveAIUpdateEvent();
     }
 
     void AIUpdate()
 	{
+		uint32 t = (uint32)time(NULL);
+		if (t > RagePhaseTimer)
+		{
+			if (EnrageTimer != 0)
+				EnrageTimer++;
+
+			Unit *pDistiller = NULL;
+			pDistiller = GetClosestDistiller();
+			if (!pDistiller || (pDistiller->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9) && RagePhase != 0))
+			{
+				_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+				_unit->GetAIInterface()->m_canMove = true;
+				_unit->GetAIInterface()->SetUnitToFollow(NULL);
+				_unit->GetAIInterface()->SetFollowDistance(0.0f);
+
+				RagePhaseTimer = t + RandomUInt(15) + 20;
+				EnrageTimer = 0;
+				RagePhase = 0;
+
+				if (_unit->FindAura(31543))
+					_unit->RemoveAura(31543);
+				if (_unit->FindAura(37076))
+					_unit->RemoveAura(37076);
+			}
+			
+			else
+			{
+				if (EnrageTimer == 0 && RagePhase == 0)
+				{
+					_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+					_unit->GetAIInterface()->SetUnitToFollow(pDistiller);
+					_unit->GetAIInterface()->SetFollowDistance(10.0f);
+
+					_unit->GetAIInterface()->StopMovement(0);
+					_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+					_unit->GetAIInterface()->MoveTo(DistillerMoveTo[DistillerNumber].x, DistillerMoveTo[DistillerNumber].y, DistillerMoveTo[DistillerNumber].z, DistillerMoveTo[DistillerNumber].o);
+
+					if (_unit->GetDistance2dSq(pDistiller) <= 100.0f)
+					{
+						pDistiller->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+						pDistiller->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, _unit->GetGUID());
+						pDistiller->SetUInt32Value(UNIT_CHANNEL_SPELL, 31543);
+
+						_unit->GetAIInterface()->StopMovement(0);
+						_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
+						_unit->GetAIInterface()->m_canMove = false;
+						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "This is not nearly over...");
+						_unit->PlaySoundToSet(10394);
+
+						if (!_unit->FindAura(36453))
+							_unit->CastSpell(_unit, 31543, true);
+
+						EnrageTimer = t + 3;
+						RagePhase = 1;
+					}
+				}
+
+				else if (t > EnrageTimer && RagePhase == 1)
+				{
+					EnrageTimer = t + 6;	// 9
+					RagePhase = 2;
+				}
+
+				else if (t > EnrageTimer && RagePhase == 2)
+				{
+					pDistiller->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
+					pDistiller->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+					pDistiller->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+					pDistiller->GetAIInterface()->WipeTargetList();
+					pDistiller->GetAIInterface()->WipeHateList();
+
+					_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+					_unit->GetAIInterface()->m_canMove = true;
+					_unit->GetAIInterface()->SetUnitToFollow(NULL);
+					_unit->GetAIInterface()->SetFollowDistance(0.0f);
+					_unit->CastSpell(_unit, 36453, true);
+
+					RagePhaseTimer = t + RandomUInt(15) + 20;
+					DistillerNumber = 0;
+					EnrageTimer = 0;
+					RagePhase = 0;
+				}
+			}
+		}
+
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
     }
 
 	void SpellCast(float val)
-	{
+    {
         if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
 			float comulativeperc = 0;
 		    Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
-				spells[i].casttime--;
+				if(!spells[i].perctrigger) continue;
 				
-				if (m_spellcheck[i])
-				{					
-					spells[i].casttime = spells[i].cooldown;
+				if(m_spellcheck[i])
+				{
+					if (!spells[i].instant)
+						_unit->GetAIInterface()->StopMovement(1);
+
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
@@ -2316,36 +2673,116 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
+        }
+    }
+
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
 		}
+	}
+
+	Unit *GetClosestDistiller()
+	{
+		float distance = 50.0f;
+		Unit *pDistiller = NULL;
+		Unit *Unit2Check = NULL;
+
+		for (int i = 1; i < 5; i++)
+		{
+			Unit2Check = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(Distiller[i].x, Distiller[i].y, Distiller[i].z, 17954);
+			if (!Unit2Check)
+				continue;
+
+			if (!Unit2Check->isAlive())
+				continue;
+			
+			float Dist2Unit = _unit->GetDistance2dSq(Unit2Check);
+			if (Dist2Unit > distance*distance)
+				continue;
+
+			pDistiller = Unit2Check;
+			distance = sqrt(Dist2Unit);
+			DistillerNumber = i;
+		}
+
+		return pDistiller;
 	}
 
 protected:
 
+	uint32 DistillerNumber;
+	uint32 RagePhaseTimer;
+	uint32 EnrageTimer;
+	uint32 RagePhase;
 	int nrspells;
 };
 
 void SetupTheSteamvault(ScriptMgr * mgr)
 {
-    mgr->register_creature_script(CN_COILFANG_ORACLE, &COILFANGORACLEAI::Create);
+    /*mgr->register_creature_script(CN_COILFANG_ORACLE, &COILFANGORACLEAI::Create);
     mgr->register_creature_script(CN_COILFANG_ENGINEER, &COILFANGENGINEERAI::Create);
     mgr->register_creature_script(CN_COILFANG_WARRIOR, &COILFANGWARRIORAI::Create);
 	mgr->register_creature_script(CN_COILFANG_SIREN, &COILFANGSIRENAI::Create);
@@ -2357,12 +2794,13 @@ void SetupTheSteamvault(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_BOG_OVERLORD, &BOGOVERLORDAI::Create);
 	mgr->register_creature_script(CN_TIDAL_SURGER, &TIDALSURGERAI::Create);
 	mgr->register_creature_script(CN_STEAM_SURGER, &STEAMSURGERAI::Create);
-	mgr->register_creature_script(CN_STEAMRIGGER_MECHANIC, &STEAMRIGGERMECHANICAI::Create);
-	mgr->register_creature_script(CN_HYDROMANCER_THESPIA, &HYDROMANCERTHESPIAAI::Create);
-	mgr->register_creature_script(CN_MEKGINEER_STEAMRIGGER, &MEKGINEERSTEAMRIGGERAI::Create);
-	mgr->register_creature_script(CN_WARLORD_KALITRESH, &WARLORDKALITRESHAI::Create);
+	mgr->register_creature_script(CN_STEAMRIGGER_MECHANIC, &STEAMRIGGERMECHANICAI::Create);*/
+	mgr->register_creature_script(CN_HYDROMANCER_THESPIA, &HydromancerThespiaAI::Create);
+	mgr->register_creature_script(CN_STEAMRIGGER_MECHANIC, &SteamriggerMechanicAI::Create);
+	mgr->register_creature_script(CN_MEKGINEER_STEAMRIGGER, &MekgineerSteamriggerAI::Create);
+	mgr->register_creature_script(CN_NAGA_DISTILLER, &NagaDistillerAI::Create);
+	mgr->register_creature_script(CN_WARLORD_KALITRESH, &WarlordKalitreshAI::Create);
 }
-
 
 /* TO DO: Check all spells/creatures and evenatually balance them (if needed!)
    also add spawns correctly (no core support for now and hacky Onyxia way does
