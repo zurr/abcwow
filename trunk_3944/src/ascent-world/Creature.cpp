@@ -1325,6 +1325,15 @@ void Creature::Despawn(uint32 delay, uint32 respawntime)
 	if(!IsInWorld())
 		return;
 
+	if(GetMapMgr() && GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
+	{
+		if(GetTypeId() == TYPEID_UNIT)
+		{
+			if(GetCreatureName() && GetCreatureName()->Rank == ELITE_WORLDBOSS)
+				GetMapMgr()->RemoveCombatInProgress(GetGUID());
+		}
+	}
+
 	if(respawntime)
 	{
 		/* get the cell with our SPAWN location. if we've moved cell this might break :P */
@@ -1346,14 +1355,7 @@ void Creature::Despawn(uint32 delay, uint32 respawntime)
 		SafeDelete();
 	}
 
-	if(GetMapMgr() && GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
-	{
-		if(GetTypeId() == TYPEID_UNIT)
-		{
-			if(GetCreatureName() && GetCreatureName()->Rank == ELITE_WORLDBOSS)
-				GetMapMgr()->RemoveCombatInProgress(GetGUID());
-		}
-	}
+	
 }
 
 void Creature::TriggerScriptEvent(string func)
