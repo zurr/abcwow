@@ -990,7 +990,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(CAVE_IN);
 		spells[0].targettype = TARGET_RANDOM_DESTINATION;
 		spells[0].instant = true;
-		spells[0].perctrigger = 5.0f;
+		spells[0].perctrigger = 8.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(HURTFUL_STRIKE);
@@ -1155,12 +1155,11 @@ public:
 		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
 			return;
 
-		Unit *temp;
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
 		TargetMap::iterator itr;
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			temp = itr->first;
+			Unit *temp = itr->first;
 			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
 				knockback(temp);
@@ -1171,9 +1170,9 @@ public:
 
 	void knockback(Unit *target)
 	{
-		float ori = (float)RandomFloat(6.0f);
+		float ori = (float)RandomFloat(6.283f);
 		float dx,dy;
-		float affect = 20;
+		float affect = 20 + RandomFloat(6.0f);
 
 		dx = sinf(ori);
 		dy = cosf(ori);
@@ -1194,12 +1193,11 @@ public:
 		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
 			return;
 
-		Unit *temp;
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
 		TargetMap::iterator itr;
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			temp = itr->first;
+			Unit *temp = itr->first;
 			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
 				temp->CastSpell(temp, STONED, true);
@@ -1212,18 +1210,31 @@ public:
 		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
 			return;
 
-		Unit *temp;
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
 		TargetMap::iterator itr;
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			temp = itr->first;
+			Unit *temp = itr->first;
 			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
+
+				for(set<Player*>::iterator itr = temp->GetInRangePlayerSetBegin(); itr != temp->GetInRangePlayerSetEnd(); ++itr) 
+				{
+					Player *currentTarget = (*itr);
+					Player *tempPlayer = (Player*)temp;
+
+					if (currentTarget != tempPlayer && currentTarget->isAlive() && tempPlayer->GetDistance2dSq(currentTarget) <= 400)
+					{
+						int damage = 9000 - 430 * (int)sqrt(temp->GetDistance2dSq(currentTarget));
+						SpellEntry *tempspell = dbcSpell.LookupEntry(SHATTER);
+						tempspell->EffectBasePoints[0] = damage;
+						tempPlayer->CastSpell(currentTarget, tempspell, true);
+					}
+				}
+
 				Aura *aur = temp->FindAura(STONED);
 				if (aur)
 					aur->Remove();
-				//todo: add damage :>
 			}
 		}
 	}
