@@ -548,7 +548,7 @@ public:
 
 		// spell buggy: should be VARIOUS but this targets the maiden?!
 		spells[0].info = dbcSpell.LookupEntry(HOLY_FIRE);
-		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
 		spells[0].perctrigger = 0.0f;
