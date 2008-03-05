@@ -5291,7 +5291,7 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 						WorldPacket data(5);
 						data.SetOpcode(SMSG_UPDATE_AURA_DURATION);
 						data << (uint8)(aura)->GetAuraSlot() << dur;
-						((Player*)u_caster)->GetSession()->SendPacket(&data);
+						p_caster->GetSession()->SendPacket(&data);
 					}
 				}
 				return;
