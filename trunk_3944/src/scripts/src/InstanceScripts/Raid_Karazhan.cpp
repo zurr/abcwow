@@ -658,6 +658,14 @@ public:
 						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 					case TARGET_DESTINATION:
 						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					case TARGET_RANDOM_SINGLE:
+						target = RandomTarget(true, true, spells[i].info->base_range_or_radius_sqr);
+						if (target)
+						{
+							_unit->GetAIInterface()->SetNextTarget(target);
+							_unit->CastSpell(target, spells[i].info, spells[i].instant);
+						}
+						break;
 					}
 
 					if (spells[i].speech != "")
@@ -678,6 +686,33 @@ public:
 				comulativeperc += spells[i].perctrigger;
 			}
 		}
+	}
+
+	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return NULL;
+
+		std::vector<Unit*> targetTable;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		TargetMap::iterator itr;
+		for (itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			Unit *temp = itr->first;
+			if (_unit->GetDistance2dSq(temp) <= dist)
+			{
+				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (!targetTable.size())
+			return NULL;
+
+		uint32 randt = RandomUInt(100)%targetTable.size();
+		Unit * randomtarget = targetTable[randt];
+		return randomtarget;
 	}
 
 	bool RepentanceTrigger()
