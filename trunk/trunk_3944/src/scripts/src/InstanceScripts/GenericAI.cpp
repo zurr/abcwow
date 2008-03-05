@@ -25,8 +25,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(17253);
 		     spells[0].reqlvl = 1;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -34,8 +34,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(17255);
 		     spells[1].reqlvl = 8;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -43,8 +43,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(17256);
 		     spells[2].reqlvl = 16;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -52,8 +52,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(17257);
 		     spells[3].reqlvl = 24;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -61,8 +61,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(17258);
 		     spells[4].reqlvl = 32;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -70,8 +70,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(17259);
 		     spells[5].reqlvl = 40;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -79,8 +79,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(17260);
 		     spells[6].reqlvl = 48;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -88,8 +88,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(17261);
 		     spells[7].reqlvl = 56;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -97,16 +97,16 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(27050);
 		     spells[8].reqlvl = 64;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
 		     spells[9].info = dbcSpell.LookupEntry(15471);
 		     spells[9].reqlvl = 1;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -202,24 +202,24 @@ public:
         spells[0].info = dbcSpell.LookupEntry(Frost_Nova);
 		spells[0].reqlvl = 25;
 		spells[0].targettype = TARGET_VARIOUS;
-		spells[0].instant = true;
-		spells[0].perctrigger = (float)RandomFloat(10.0f);
+		spells[0].instant = false;
+		spells[0].perctrigger = (float)RandomFloat(5.0f);
 		spells[0].attackstoptimer = 1000; // 1sec
 		m_spellcheck[0] = true;
 
 		spells[1].info = dbcSpell.LookupEntry(Shadow_Shock);
 		spells[1].reqlvl = 20;
 		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
-		spells[1].perctrigger = (float)RandomFloat(10.0f);
+		spells[1].instant = false;
+		spells[1].perctrigger = (float)RandomFloat(5.0f);
 		spells[1].attackstoptimer = 1000; // 1sec
 		m_spellcheck[1] = true;
 
 		spells[2].info = dbcSpell.LookupEntry(Consuming_Shadows);
 		spells[2].reqlvl = 20;
 		spells[2].targettype = TARGET_SELF;
-		spells[2].instant = true;
-		spells[2].perctrigger = (float)RandomFloat(10.0f);
+		spells[2].instant = false;
+		spells[2].perctrigger = (float)RandomFloat(5.0f);
 		spells[2].attackstoptimer = 1000; // 1sec
 		m_spellcheck[2] = true;
     }
@@ -313,8 +313,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(17253);
 		     spells[0].reqlvl = 1;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -322,8 +322,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(17255);
 		     spells[1].reqlvl = 8;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -331,8 +331,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(17256);
 		     spells[2].reqlvl = 16;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -340,8 +340,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(17257);
 		     spells[3].reqlvl = 24;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -349,8 +349,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(17258);
 		     spells[4].reqlvl = 32;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -358,8 +358,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(17259);
 		     spells[5].reqlvl = 40;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -367,8 +367,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(17260);
 		     spells[6].reqlvl = 48;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -376,8 +376,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(17261);
 		     spells[7].reqlvl = 56;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -385,15 +385,15 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(27050);
 		     spells[8].reqlvl = 64;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
 			 spells[9].info = dbcSpell.LookupEntry(27050);
 		     spells[9].reqlvl = 64;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
+		     spells[9].instant = false;
 		     spells[9].perctrigger = 0;
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
@@ -401,8 +401,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(16827);
 		     spells[10].reqlvl = 1;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -410,8 +410,8 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(16828);
 		     spells[11].reqlvl = 8;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -419,8 +419,8 @@ public:
 		     spells[12].info = dbcSpell.LookupEntry(16829);
 		     spells[12].reqlvl = 16;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -428,8 +428,8 @@ public:
 		     spells[13].info = dbcSpell.LookupEntry(16830);
 		     spells[13].reqlvl = 24;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -437,8 +437,8 @@ public:
 		     spells[14].info = dbcSpell.LookupEntry(16831);
 		     spells[14].reqlvl = 32;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -446,8 +446,8 @@ public:
 		     spells[15].info = dbcSpell.LookupEntry(16832);
 		     spells[15].reqlvl = 40;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -455,8 +455,8 @@ public:
 		     spells[16].info = dbcSpell.LookupEntry(3010);
 		     spells[16].reqlvl = 48;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -464,8 +464,8 @@ public:
 		     spells[17].info = dbcSpell.LookupEntry(3009);
 		     spells[17].reqlvl = 56;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -473,8 +473,8 @@ public:
 		     spells[18].info = dbcSpell.LookupEntry(27049);
 		     spells[18].reqlvl = 64;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -482,8 +482,8 @@ public:
 		     spells[19].info = dbcSpell.LookupEntry(23145);
 		     spells[19].reqlvl = 30;
 		     spells[19].targettype = TARGET_SELF;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -491,8 +491,8 @@ public:
 		     spells[20].info = dbcSpell.LookupEntry(23147);
 		     spells[20].reqlvl = 40;
 		     spells[20].targettype = TARGET_SELF;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -500,8 +500,8 @@ public:
 		     spells[21].info = dbcSpell.LookupEntry(23148);
 		     spells[21].reqlvl = 50;
 		     spells[21].targettype = TARGET_SELF;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -509,8 +509,8 @@ public:
 		     spells[22].info = dbcSpell.LookupEntry(24423);
 		     spells[22].reqlvl = 8;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -518,8 +518,8 @@ public:
 		     spells[23].info = dbcSpell.LookupEntry(24577);
 		     spells[23].reqlvl = 24;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -527,8 +527,8 @@ public:
 		     spells[24].info = dbcSpell.LookupEntry(24578);
 		     spells[24].reqlvl = 48;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -536,8 +536,8 @@ public:
 		     spells[25].info = dbcSpell.LookupEntry(24579);
 		     spells[25].reqlvl = 55;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -545,16 +545,16 @@ public:
 		     spells[26].info = dbcSpell.LookupEntry(24579);
 		     spells[26].reqlvl = 64;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
 		     spells[27].info = dbcSpell.LookupEntry(23147);
 		     spells[27].reqlvl = 1;
 		     spells[27].targettype = TARGET_ATTACKING;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -646,16 +646,16 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(27049);
 		     spells[0].reqlvl = 64;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
 		     spells[1].info = dbcSpell.LookupEntry(16827);
 		     spells[1].reqlvl = 1;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -663,8 +663,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(16828);
 		     spells[2].reqlvl = 8;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -672,8 +672,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(16829);
 		     spells[3].reqlvl = 16;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -681,8 +681,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(16830);
 		     spells[4].reqlvl = 24;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -690,8 +690,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(16831);
 		     spells[5].reqlvl = 32;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -699,8 +699,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(16832);
 		     spells[6].reqlvl = 40;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -708,8 +708,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(3010);
 		     spells[7].reqlvl = 48;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -717,16 +717,16 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(3009);
 		     spells[8].reqlvl = 56;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
 		     spells[9].info = dbcSpell.LookupEntry(3609);
 		     spells[9].reqlvl = 1;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -826,8 +826,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(17253);
 		     spells[0].reqlvl = 1;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -835,8 +835,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(17255);
 		     spells[1].reqlvl = 8;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -844,8 +844,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(17256);
 		     spells[2].reqlvl = 16;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -853,8 +853,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(17257);
 		     spells[3].reqlvl = 24;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -862,8 +862,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(17258);
 		     spells[4].reqlvl = 32;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -871,8 +871,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(17259);
 		     spells[5].reqlvl = 40;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -880,8 +880,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(17260);
 		     spells[6].reqlvl = 48;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -889,8 +889,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(17261);
 		     spells[7].reqlvl = 56;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -898,16 +898,16 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(27050);
 		     spells[8].reqlvl = 64;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
 		     spells[9].info = dbcSpell.LookupEntry(23099);
 		     spells[9].reqlvl = 30;
 		     spells[9].targettype = TARGET_SELF;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -915,8 +915,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(23109);
 		     spells[10].reqlvl = 40;
 		     spells[10].targettype = TARGET_SELF;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -924,8 +924,8 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(23110);
 		     spells[11].reqlvl = 50;
 		     spells[11].targettype = TARGET_SELF;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -933,8 +933,8 @@ public:
 		     spells[12].info = dbcSpell.LookupEntry(24604);
 		     spells[12].reqlvl = 10;
 		     spells[12].targettype = TARGET_SELF;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -942,8 +942,8 @@ public:
 		     spells[13].info = dbcSpell.LookupEntry(24605);
 		     spells[13].reqlvl = 24;
 		     spells[13].targettype = TARGET_SELF;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -951,8 +951,8 @@ public:
 		     spells[14].info = dbcSpell.LookupEntry(24603);
 		     spells[14].reqlvl = 40;
 		     spells[14].targettype = TARGET_SELF;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -960,8 +960,8 @@ public:
 		     spells[15].info = dbcSpell.LookupEntry(24597);
 		     spells[15].reqlvl = 56;
 		     spells[15].targettype = TARGET_SELF;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -969,8 +969,8 @@ public:
 		spells[2].info = dbcSpell.LookupEntry(Rabies);
 		spells[2].reqlvl = 0;
 		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].perctrigger = (float)RandomFloat(10.0f);
+		spells[2].instant = false;
+		spells[2].perctrigger = (float)RandomFloat(5.0f);
 		spells[2].attackstoptimer = 1000; // 1sec
 		m_spellcheck[2] = true;
 		*/
@@ -1068,8 +1068,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(17253);
 		     spells[0].reqlvl = 1;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -1077,8 +1077,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(17255);
 		     spells[1].reqlvl = 8;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -1086,8 +1086,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(17256);
 		     spells[2].reqlvl = 16;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -1095,8 +1095,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(17257);
 		     spells[3].reqlvl = 24;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -1104,8 +1104,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(17258);
 		     spells[4].reqlvl = 32;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -1113,8 +1113,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(17259);
 		     spells[5].reqlvl = 40;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -1122,8 +1122,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(17260);
 		     spells[6].reqlvl = 48;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -1131,8 +1131,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(17261);
 		     spells[7].reqlvl = 56;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -1140,16 +1140,16 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(27050);
 		     spells[8].reqlvl = 64;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
 		     spells[9].info = dbcSpell.LookupEntry(26090);
 		     spells[9].reqlvl = 30;
 		     spells[9].targettype = TARGET_DESTINATION;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -1157,8 +1157,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(26187);
 		     spells[10].reqlvl = 30;
 		     spells[10].targettype = TARGET_DESTINATION;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -1166,8 +1166,8 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(26188);
 		     spells[11].reqlvl = 30;
 		     spells[11].targettype = TARGET_DESTINATION;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -1175,8 +1175,8 @@ public:
 		     spells[12].info = dbcSpell.LookupEntry(27063);
 		     spells[12].reqlvl = 30;
 		     spells[12].targettype = TARGET_DESTINATION;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -1275,16 +1275,16 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(27049);
 		     spells[0].reqlvl = 64;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
 		     spells[1].info = dbcSpell.LookupEntry(16827);
 		     spells[1].reqlvl = 1;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -1292,8 +1292,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(16828);
 		     spells[2].reqlvl = 8;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -1301,8 +1301,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(16829);
 		     spells[3].reqlvl = 16;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -1310,8 +1310,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(16830);
 		     spells[4].reqlvl = 24;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -1319,8 +1319,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(16831);
 		     spells[5].reqlvl = 32;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -1328,8 +1328,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(16832);
 		     spells[6].reqlvl = 40;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -1337,8 +1337,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(3010);
 		     spells[7].reqlvl = 48;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -1346,8 +1346,8 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(3009);
 		     spells[8].reqlvl = 56;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
     }
@@ -1444,16 +1444,16 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(27049);
 		     spells[0].reqlvl = 64;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
 		     spells[1].info = dbcSpell.LookupEntry(16827);
 		     spells[1].reqlvl = 1;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -1461,8 +1461,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(16828);
 		     spells[2].reqlvl = 8;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -1470,8 +1470,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(16829);
 		     spells[3].reqlvl = 16;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -1479,8 +1479,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(16830);
 		     spells[4].reqlvl = 24;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -1488,8 +1488,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(16831);
 		     spells[5].reqlvl = 32;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -1497,8 +1497,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(16832);
 		     spells[6].reqlvl = 40;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -1506,8 +1506,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(3010);
 		     spells[7].reqlvl = 48;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -1515,16 +1515,16 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(3009);
 		     spells[8].reqlvl = 56;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
 		     spells[9].info = dbcSpell.LookupEntry(17253);
 		     spells[9].reqlvl = 1;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -1532,8 +1532,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(17255);
 		     spells[10].reqlvl = 8;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -1541,8 +1541,8 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(17256);
 		     spells[11].reqlvl = 16;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -1550,8 +1550,8 @@ public:
 		     spells[12].info = dbcSpell.LookupEntry(17257);
 		     spells[12].reqlvl = 24;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -1559,8 +1559,8 @@ public:
 		     spells[13].info = dbcSpell.LookupEntry(17258);
 		     spells[13].reqlvl = 32;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -1568,8 +1568,8 @@ public:
 		     spells[14].info = dbcSpell.LookupEntry(17259);
 		     spells[14].reqlvl = 40;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -1577,8 +1577,8 @@ public:
 		     spells[15].info = dbcSpell.LookupEntry(17260);
 		     spells[15].reqlvl = 48;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -1586,8 +1586,8 @@ public:
 		     spells[16].info = dbcSpell.LookupEntry(17261);
 		     spells[16].reqlvl = 56;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -1595,8 +1595,8 @@ public:
 		     spells[17].info = dbcSpell.LookupEntry(27050);
 		     spells[17].reqlvl = 64;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -1694,8 +1694,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(17253);
 		     spells[0].reqlvl = 1;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -1703,8 +1703,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(17255);
 		     spells[1].reqlvl = 8;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -1712,8 +1712,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(17256);
 		     spells[2].reqlvl = 16;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -1721,8 +1721,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(17257);
 		     spells[3].reqlvl = 24;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -1730,8 +1730,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(17258);
 		     spells[4].reqlvl = 32;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -1739,8 +1739,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(17259);
 		     spells[5].reqlvl = 40;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -1748,8 +1748,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(17260);
 		     spells[6].reqlvl = 48;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -1757,8 +1757,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(17261);
 		     spells[7].reqlvl = 56;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -1766,16 +1766,16 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(27050);
 		     spells[8].reqlvl = 64;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
  		     spells[9].info = dbcSpell.LookupEntry(23099);
 		     spells[9].reqlvl = 30;
 		     spells[9].targettype = TARGET_SELF;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -1783,8 +1783,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(23109);
 		     spells[10].reqlvl = 40;
 		     spells[10].targettype = TARGET_SELF;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -1792,16 +1792,16 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(23110);
 		     spells[11].reqlvl = 50;
 		     spells[11].targettype = TARGET_SELF;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
 		     spells[12].info = dbcSpell.LookupEntry(7371);
 		     spells[12].reqlvl = 1;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -1809,8 +1809,8 @@ public:
 		     spells[13].info = dbcSpell.LookupEntry(26177);
 		     spells[13].reqlvl = 12;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -1818,8 +1818,8 @@ public:
 		     spells[14].info = dbcSpell.LookupEntry(26178);
 		     spells[14].reqlvl = 24;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -1827,8 +1827,8 @@ public:
 		     spells[15].info = dbcSpell.LookupEntry(26179);
 		     spells[15].reqlvl = 36;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -1836,8 +1836,8 @@ public:
 		     spells[16].info = dbcSpell.LookupEntry(26201);
 		     spells[16].reqlvl = 48;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -1845,8 +1845,8 @@ public:
 		     spells[17].info = dbcSpell.LookupEntry(27685);
 		     spells[17].reqlvl = 60;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -1854,8 +1854,8 @@ public:
 		     spells[18].info = dbcSpell.LookupEntry(35290);
 		     spells[18].reqlvl = 1;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -1863,8 +1863,8 @@ public:
 		     spells[19].info = dbcSpell.LookupEntry(35291);
 		     spells[19].reqlvl = 8;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -1872,8 +1872,8 @@ public:
 		     spells[20].info = dbcSpell.LookupEntry(35292);
 		     spells[20].reqlvl = 16;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -1881,8 +1881,8 @@ public:
 		     spells[21].info = dbcSpell.LookupEntry(35293);
 		     spells[21].reqlvl = 24;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -1890,8 +1890,8 @@ public:
 		     spells[22].info = dbcSpell.LookupEntry(35294);
 		     spells[22].reqlvl = 32;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -1899,8 +1899,8 @@ public:
 		     spells[23].info = dbcSpell.LookupEntry(35295);
 		     spells[23].reqlvl = 40;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -1908,8 +1908,8 @@ public:
 		     spells[24].info = dbcSpell.LookupEntry(35296);
 		     spells[24].reqlvl = 48;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -1917,8 +1917,8 @@ public:
 		     spells[25].info = dbcSpell.LookupEntry(35297);
 		     spells[25].reqlvl = 56;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -1926,8 +1926,8 @@ public:
 		     spells[26].info = dbcSpell.LookupEntry(35298);
 		     spells[26].reqlvl = 63;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -2027,40 +2027,40 @@ public:
         spells[0].info = dbcSpell.LookupEntry(8873);
 		spells[0].reqlvl = 1;
 		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
-		spells[0].perctrigger = (float)RandomFloat(10.0f);
+		spells[0].instant = false;
+		spells[0].perctrigger = (float)RandomFloat(5.0f);
 		spells[0].attackstoptimer = 1000; // 1sec
 		m_spellcheck[0] = true;
 
 		spells[1].info = dbcSpell.LookupEntry(9573);
 		spells[1].reqlvl = 10;
 		spells[1].targettype = TARGET_SELF;
-		spells[1].instant = true;
-		spells[1].perctrigger = (float)RandomFloat(10.0f);
+		spells[1].instant = false;
+		spells[1].perctrigger = (float)RandomFloat(5.0f);
 		spells[1].attackstoptimer = 1000; // 1sec
 		m_spellcheck[1] = true;
 
 		spells[2].info = dbcSpell.LookupEntry(16390);
 		spells[1].reqlvl = 20;
 		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].perctrigger = (float)RandomFloat(10.0f);
+		spells[2].instant = false;
+		spells[2].perctrigger = (float)RandomFloat(5.0f);
 		spells[2].attackstoptimer = 1000; // 1sec
 		m_spellcheck[2] = true;
 
 		spells[3].info = dbcSpell.LookupEntry(16396);
 		spells[3].reqlvl = 20;
 		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
-		spells[3].perctrigger = (float)RandomFloat(10.0f);
+		spells[3].instant = false;
+		spells[3].perctrigger = (float)RandomFloat(5.0f);
 		spells[3].attackstoptimer = 1000; // 1sec
 		m_spellcheck[3] = true;
 
 		spells[4].info = dbcSpell.LookupEntry(20712);
 		spells[4].reqlvl = 60;
 		spells[4].targettype = TARGET_SELF;
-		spells[4].instant = true;
-		spells[4].perctrigger = (float)RandomFloat(10.0f);
+		spells[4].instant = false;
+		spells[4].perctrigger = (float)RandomFloat(5.0f);
 		spells[4].attackstoptimer = 1000; // 1sec
 		m_spellcheck[4] = true;
 
@@ -2159,56 +2159,56 @@ public:
         spells[0].info = dbcSpell.LookupEntry(9483);
 		spells[0].reqlvl = 20;
 		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
-		spells[0].perctrigger = (float)RandomFloat(10.0f);
+		spells[0].instant = false;
+		spells[0].perctrigger = (float)RandomFloat(5.0f);
 		spells[0].attackstoptimer = 1000; // 1sec
 		m_spellcheck[0] = true;
 
 		spells[1].info = dbcSpell.LookupEntry(91);
 		spells[1].reqlvl = 5;
 		spells[1].targettype = TARGET_SELF;
-		spells[1].instant = true;
-		spells[1].perctrigger = (float)RandomFloat(10.0f);
+		spells[1].instant = false;
+		spells[1].perctrigger = (float)RandomFloat(5.0f);
 		spells[1].attackstoptimer = 1000; // 1sec
 		m_spellcheck[1] = true;
 
 		spells[2].info = dbcSpell.LookupEntry(12021);
 		spells[2].reqlvl = 1;
 		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].perctrigger = (float)RandomFloat(10.0f);
+		spells[2].instant = false;
+		spells[2].perctrigger = (float)RandomFloat(5.0f);
 		spells[2].attackstoptimer = 1000; // 1sec
 		m_spellcheck[2] = true;
 
 		spells[3].info = dbcSpell.LookupEntry(11837);
 		spells[3].reqlvl = 1;
 		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
-		spells[3].perctrigger = (float)RandomFloat(10.0f);
+		spells[3].instant = false;
+		spells[3].perctrigger = (float)RandomFloat(5.0f);
 		spells[3].attackstoptimer = 1000; // 1sec
 		m_spellcheck[3] = true;
 
 		spells[4].info = dbcSpell.LookupEntry(8277);
 		spells[4].reqlvl = 5;
 		spells[4].targettype = TARGET_ATTACKING;
-		spells[4].instant = true;
-		spells[4].perctrigger = (float)RandomFloat(10.0f);
+		spells[4].instant = false;
+		spells[4].perctrigger = (float)RandomFloat(5.0f);
 		spells[4].attackstoptimer = 1000; // 1sec
 		m_spellcheck[4] = true;
 
 		spells[5].info = dbcSpell.LookupEntry(403);
 		spells[5].reqlvl = 1;
 		spells[5].targettype = TARGET_ATTACKING;
-		spells[5].instant = true;
-		spells[5].perctrigger = (float)RandomFloat(10.0f);
+		spells[5].instant = false;
+		spells[5].perctrigger = (float)RandomFloat(5.0f);
 		spells[5].attackstoptimer = 1000; // 1sec
 		m_spellcheck[5] = true;
 
 		spells[6].info = dbcSpell.LookupEntry(474);
 		spells[6].reqlvl = 8;
 		spells[6].targettype = TARGET_SELF;
-		spells[6].instant = true;
-		spells[6].perctrigger = (float)RandomFloat(10.0f);
+		spells[6].instant = false;
+		spells[6].perctrigger = (float)RandomFloat(5.0f);
 		spells[6].attackstoptimer = 1000; // 1sec
 		m_spellcheck[6] = true;
 
@@ -2307,7 +2307,7 @@ public:
         spells[0].info = dbcSpell.LookupEntry(9515);
 		spells[0].reqlvl = 30;
 		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
+		spells[0].instant = false;
 		spells[0].perctrigger = (float)RandomFloat(2.0f);
 		spells[0].attackstoptimer = 1000; // 1sec
 		m_spellcheck[0] = true;
@@ -2315,32 +2315,32 @@ public:
 		spells[1].info = dbcSpell.LookupEntry(11975);
 		spells[1].reqlvl = 20;
 		spells[1].targettype = TARGET_SELF;
-		spells[1].instant = true;
-		spells[1].perctrigger = (float)RandomFloat(10.0f);
+		spells[1].instant = false;
+		spells[1].perctrigger = (float)RandomFloat(5.0f);
 		spells[1].attackstoptimer = 1000; // 1sec
 		m_spellcheck[1] = true;
 
 		spells[2].info = dbcSpell.LookupEntry(12001);
 		spells[2].reqlvl = 17;
 		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].perctrigger = (float)RandomFloat(10.0f);
+		spells[2].instant = false;
+		spells[2].perctrigger = (float)RandomFloat(5.0f);
 		spells[2].attackstoptimer = 1000; // 1sec
 		m_spellcheck[2] = true;
 
 		spells[3].info = dbcSpell.LookupEntry(12038); // this shity spell doesnt exist?:PPP
 		spells[3].reqlvl = 0;
 		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
-		spells[3].perctrigger = (float)RandomFloat(10.0f);
+		spells[3].instant = false;
+		spells[3].perctrigger = (float)RandomFloat(5.0f);
 		spells[3].attackstoptimer = 1000; // 1sec
 		m_spellcheck[3] = true;
 
 		spells[4].info = dbcSpell.LookupEntry(17009); //VOODOOOOOO :)
 		spells[4].reqlvl = 0; // Feel the 1337 power
 		spells[4].targettype = TARGET_ATTACKING;
-		spells[4].instant = true;
-		spells[4].perctrigger = (float)RandomFloat(10.0f);
+		spells[4].instant = false;
+		spells[4].perctrigger = (float)RandomFloat(5.0f);
 		spells[4].attackstoptimer = 1000; // 1sec
 		m_spellcheck[4] = true;
 
@@ -2433,8 +2433,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(1978);
 		     spells[0].reqlvl = 4;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -2442,8 +2442,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(13549);
 		     spells[1].reqlvl = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -2451,8 +2451,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(13550);
 		     spells[2].reqlvl = 18;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -2460,8 +2460,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(3551);
 		     spells[3].reqlvl = 20;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -2469,8 +2469,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(13552);
 		     spells[4].reqlvl = 34;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -2478,8 +2478,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(13553);
 		     spells[5].reqlvl = 42;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -2487,8 +2487,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(13555);
 		     spells[6].reqlvl = 58;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -2496,8 +2496,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(3044);
 		     spells[7].reqlvl = 6;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -2505,8 +2505,8 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(14281);
 		     spells[8].reqlvl = 12;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -2514,8 +2514,8 @@ public:
 		     spells[9].info = dbcSpell.LookupEntry(14282);
 		     spells[9].reqlvl = 20;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -2523,8 +2523,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(14283);
 		     spells[10].reqlvl = 28;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -2532,8 +2532,8 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(14284);
 		     spells[11].reqlvl = 36;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -2541,8 +2541,8 @@ public:
 		     spells[12].info = dbcSpell.LookupEntry(13554);
 		     spells[12].reqlvl = 50;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -2550,8 +2550,8 @@ public:
 		     spells[13].info = dbcSpell.LookupEntry(14287);
 		     spells[13].reqlvl = 60;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -2559,8 +2559,8 @@ public:
 		     spells[14].info = dbcSpell.LookupEntry(20736);
 		     spells[14].reqlvl = 12;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -2568,8 +2568,8 @@ public:
 		     spells[15].info = dbcSpell.LookupEntry(14274);
 		     spells[15].reqlvl = 20;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -2577,8 +2577,8 @@ public:
 		     spells[16].info = dbcSpell.LookupEntry(15629);
 		     spells[16].reqlvl = 30;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -2586,8 +2586,8 @@ public:
 		     spells[17].info = dbcSpell.LookupEntry(15630);
 		     spells[17].reqlvl = 40;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -2595,8 +2595,8 @@ public:
 		     spells[18].info = dbcSpell.LookupEntry(14285);
 		     spells[18].reqlvl = 44;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -2604,8 +2604,8 @@ public:
 		     spells[19].info = dbcSpell.LookupEntry(15632);
 		     spells[19].reqlvl = 60;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -2613,8 +2613,8 @@ public:
 		     spells[20].info = dbcSpell.LookupEntry(5116);
 		     spells[20].reqlvl = 8;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -2622,8 +2622,8 @@ public:
 		     spells[21].info = dbcSpell.LookupEntry(14286);
 		     spells[21].reqlvl = 52;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -2631,8 +2631,8 @@ public:
 		     spells[22].info = dbcSpell.LookupEntry(19434);
 		     spells[22].reqlvl = 20;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -2640,8 +2640,8 @@ public:
 		     spells[23].info = dbcSpell.LookupEntry(20900);
 		     spells[23].reqlvl = 28;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -2649,8 +2649,8 @@ public:
 		     spells[24].info = dbcSpell.LookupEntry(20901);
 		     spells[24].reqlvl = 36;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -2658,8 +2658,8 @@ public:
 		     spells[25].info = dbcSpell.LookupEntry(15631);
 		     spells[25].reqlvl = 50;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -2667,8 +2667,8 @@ public:
 		     spells[26].info = dbcSpell.LookupEntry(20903);
 		     spells[26].reqlvl = 52;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -2676,8 +2676,8 @@ public:
 		     spells[27].info = dbcSpell.LookupEntry(2643);
 		     spells[27].reqlvl = 18;
 		     spells[27].targettype = TARGET_ATTACKING;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -2685,8 +2685,8 @@ public:
 		     spells[28].info = dbcSpell.LookupEntry(14288);
 		     spells[28].reqlvl = 30;
 		     spells[28].targettype = TARGET_ATTACKING;
-		     spells[28].instant = true;
-		     spells[28].perctrigger = (float)RandomFloat(10.0f);
+		     spells[28].instant = false;
+		     spells[28].perctrigger = (float)RandomFloat(5.0f);
 		     spells[28].attackstoptimer = 1000;
 		     m_spellcheck[28] = true;
 
@@ -2694,8 +2694,8 @@ public:
 		     spells[29].info = dbcSpell.LookupEntry(5116);
 		     spells[29].reqlvl = 8;
 		     spells[29].targettype = TARGET_ATTACKING;
-		     spells[29].instant = true;
-		     spells[29].perctrigger = (float)RandomFloat(10.0f);
+		     spells[29].instant = false;
+		     spells[29].perctrigger = (float)RandomFloat(5.0f);
 		     spells[29].attackstoptimer = 1000;
 		     m_spellcheck[29] = true;
 
@@ -2703,8 +2703,8 @@ public:
 		     spells[30].info = dbcSpell.LookupEntry(20904);
 		     spells[30].reqlvl = 60;
 		     spells[30].targettype = TARGET_ATTACKING;
-		     spells[30].instant = true;
-		     spells[30].perctrigger = (float)RandomFloat(10.0f);
+		     spells[30].instant = false;
+		     spells[30].perctrigger = (float)RandomFloat(5.0f);
 		     spells[30].attackstoptimer = 1000;
 		     m_spellcheck[30] = true;
 
@@ -2712,8 +2712,8 @@ public:
 		     spells[31].info = dbcSpell.LookupEntry(3043);
 		     spells[31].reqlvl = 22;
 		     spells[31].targettype = TARGET_ATTACKING;
-		     spells[31].instant = true;
-		     spells[31].perctrigger = (float)RandomFloat(10.0f);
+		     spells[31].instant = false;
+		     spells[31].perctrigger = (float)RandomFloat(5.0f);
 		     spells[31].attackstoptimer = 1000;
 		     m_spellcheck[31] = true;
 
@@ -2721,8 +2721,8 @@ public:
 		     spells[32].info = dbcSpell.LookupEntry(14275);
 		     spells[32].reqlvl = 32;
 		     spells[32].targettype = TARGET_ATTACKING;
-		     spells[32].instant = true;
-		     spells[32].perctrigger = (float)RandomFloat(10.0f);
+		     spells[32].instant = false;
+		     spells[32].perctrigger = (float)RandomFloat(5.0f);
 		     spells[32].attackstoptimer = 1000;
 		     m_spellcheck[32] = true;
 
@@ -2730,8 +2730,8 @@ public:
 		     spells[33].info = dbcSpell.LookupEntry(20902);
 		     spells[33].reqlvl = 44;
 		     spells[33].targettype = TARGET_ATTACKING;
-		     spells[33].instant = true;
-		     spells[33].perctrigger = (float)RandomFloat(10.0f);
+		     spells[33].instant = false;
+		     spells[33].perctrigger = (float)RandomFloat(5.0f);
 		     spells[33].attackstoptimer = 1000;
 		     m_spellcheck[33] = true;
 
@@ -2739,8 +2739,8 @@ public:
 		     spells[34].info = dbcSpell.LookupEntry(14290);
 		     spells[34].reqlvl = 54;
 		     spells[34].targettype = TARGET_ATTACKING;
-		     spells[34].instant = true;
-		     spells[34].perctrigger = (float)RandomFloat(10.0f);
+		     spells[34].instant = false;
+		     spells[34].perctrigger = (float)RandomFloat(5.0f);
 		     spells[34].attackstoptimer = 1000;
 		     m_spellcheck[34] = true;
 
@@ -2748,8 +2748,8 @@ public:
 		     spells[35].info = dbcSpell.LookupEntry(3034);
 		     spells[35].reqlvl = 36;
 		     spells[35].targettype = TARGET_ATTACKING;
-		     spells[35].instant = true;
-		     spells[35].perctrigger = (float)RandomFloat(10.0f);
+		     spells[35].instant = false;
+		     spells[35].perctrigger = (float)RandomFloat(5.0f);
 		     spells[35].attackstoptimer = 1000;
 		     m_spellcheck[35] = true;
 
@@ -2757,8 +2757,8 @@ public:
 		     spells[36].info = dbcSpell.LookupEntry(14289);
 		     spells[36].reqlvl = 42;
 		     spells[36].targettype = TARGET_ATTACKING;
-		     spells[36].instant = true;
-		     spells[36].perctrigger = (float)RandomFloat(10.0f);
+		     spells[36].instant = false;
+		     spells[36].perctrigger = (float)RandomFloat(5.0f);
 		     spells[36].attackstoptimer = 1000;
 		     m_spellcheck[36] = true;
 
@@ -2766,8 +2766,8 @@ public:
 		     spells[37].info = dbcSpell.LookupEntry(14277);
 		     spells[37].reqlvl = 52;
 		     spells[37].targettype = TARGET_ATTACKING;
-		     spells[37].instant = true;
-		     spells[37].perctrigger = (float)RandomFloat(10.0f);
+		     spells[37].instant = false;
+		     spells[37].perctrigger = (float)RandomFloat(5.0f);
 		     spells[37].attackstoptimer = 1000;
 		     m_spellcheck[37] = true;
 
@@ -2775,8 +2775,8 @@ public:
 		     spells[38].info = dbcSpell.LookupEntry(1510);
 		     spells[38].reqlvl = 40;
 		     spells[38].targettype = TARGET_ATTACKING;
-		     spells[38].instant = true;
-		     spells[38].perctrigger = (float)RandomFloat(10.0f);
+		     spells[38].instant = false;
+		     spells[38].perctrigger = (float)RandomFloat(5.0f);
 		     spells[38].attackstoptimer = 1000;
 		     m_spellcheck[38] = true;
 
@@ -2784,8 +2784,8 @@ public:
 		     spells[39].info = dbcSpell.LookupEntry(14276);
 		     spells[39].reqlvl = 42;
 		     spells[39].targettype = TARGET_ATTACKING;
-		     spells[39].instant = true;
-		     spells[39].perctrigger = (float)RandomFloat(10.0f);
+		     spells[39].instant = false;
+		     spells[39].perctrigger = (float)RandomFloat(5.0f);
 		     spells[39].attackstoptimer = 1000;
 		     m_spellcheck[39] = true;
 
@@ -2793,8 +2793,8 @@ public:
 		     spells[40].info = dbcSpell.LookupEntry(14280);
 		     spells[40].reqlvl = 56;
 		     spells[40].targettype = TARGET_ATTACKING;
-		     spells[40].instant = true;
-		     spells[40].perctrigger = (float)RandomFloat(10.0f);
+		     spells[40].instant = false;
+		     spells[40].perctrigger = (float)RandomFloat(5.0f);
 		     spells[40].attackstoptimer = 1000;
 		     m_spellcheck[40] = true;
 
@@ -2802,8 +2802,8 @@ public:
 		     spells[41].info = dbcSpell.LookupEntry(14279);
 		     spells[41].reqlvl = 46;
 		     spells[41].targettype = TARGET_ATTACKING;
-		     spells[41].instant = true;
-		     spells[41].perctrigger = (float)RandomFloat(10.0f);
+		     spells[41].instant = false;
+		     spells[41].perctrigger = (float)RandomFloat(5.0f);
 		     spells[41].attackstoptimer = 1000;
 		     m_spellcheck[41] = true;
 
@@ -2811,8 +2811,8 @@ public:
 		     spells[42].info = dbcSpell.LookupEntry(14295);
 		     spells[42].reqlvl = 58;
 		     spells[42].targettype = TARGET_ATTACKING;
-		     spells[42].instant = true;
-		     spells[42].perctrigger = (float)RandomFloat(10.0f);
+		     spells[42].instant = false;
+		     spells[42].perctrigger = (float)RandomFloat(5.0f);
 		     spells[42].attackstoptimer = 1000;
 		     m_spellcheck[42] = true;
 
@@ -2820,8 +2820,8 @@ public:
 		     spells[43].info = dbcSpell.LookupEntry(14294);
 		     spells[43].reqlvl = 50;
 		     spells[43].targettype = TARGET_ATTACKING;
-		     spells[43].instant = true;
-		     spells[43].perctrigger = (float)RandomFloat(10.0f);
+		     spells[43].instant = false;
+		     spells[43].perctrigger = (float)RandomFloat(5.0f);
 		     spells[43].attackstoptimer = 1000;
 		     m_spellcheck[43] = true;
 
@@ -2909,8 +2909,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(589);
 		     spells[0].reqlvl = 4;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -2918,8 +2918,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(594);
 		     spells[1].reqlvl = 10;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -2927,8 +2927,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(970);
 		     spells[2].reqlvl = 18;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -2936,8 +2936,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(992);
 		     spells[3].reqlvl = 26;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -2945,8 +2945,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(2767);
 		     spells[4].reqlvl = 34;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -2954,8 +2954,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(10892);
 		     spells[5].reqlvl = 42;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -2963,8 +2963,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(10893);
 		     spells[6].reqlvl = 50;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -2972,8 +2972,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(695);
 		     spells[7].reqlvl = 6;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -2981,8 +2981,8 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(705);
 		     spells[8].reqlvl = 12;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -2990,8 +2990,8 @@ public:
 		     spells[9].info = dbcSpell.LookupEntry(1106);
 		     spells[9].reqlvl = 28;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -2999,8 +2999,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(7641);
 		     spells[10].reqlvl = 36;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -3008,8 +3008,8 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(11659);
 		     spells[11].reqlvl = 44;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -3017,8 +3017,8 @@ public:
 		     spells[12].info = dbcSpell.LookupEntry(11660);
 		     spells[12].reqlvl = 52;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -3026,8 +3026,8 @@ public:
 		     spells[13].info = dbcSpell.LookupEntry(11661);
 		     spells[13].reqlvl = 60;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -3035,8 +3035,8 @@ public:
 		     spells[14].info = dbcSpell.LookupEntry(1978);
 		     spells[14].reqlvl = 4;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -3044,8 +3044,8 @@ public:
 		     spells[15].info = dbcSpell.LookupEntry(13549);
 		     spells[15].reqlvl = 10;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -3053,8 +3053,8 @@ public:
 		     spells[16].info = dbcSpell.LookupEntry(13550);
 		     spells[16].reqlvl = 18;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -3062,8 +3062,8 @@ public:
 		     spells[17].info = dbcSpell.LookupEntry(3551);
 		     spells[17].reqlvl = 20;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -3071,8 +3071,8 @@ public:
 		     spells[18].info = dbcSpell.LookupEntry(13552);
 		     spells[18].reqlvl = 34;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -3080,8 +3080,8 @@ public:
 		     spells[19].info = dbcSpell.LookupEntry(13554);
 		     spells[19].reqlvl = 50;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -3089,8 +3089,8 @@ public:
 		     spells[20].info = dbcSpell.LookupEntry(13555);
 		     spells[20].reqlvl = 58;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -3098,8 +3098,8 @@ public:
 		     spells[21].info = dbcSpell.LookupEntry(3043);
 		     spells[21].reqlvl = 22;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -3107,8 +3107,8 @@ public:
 		     spells[22].info = dbcSpell.LookupEntry(14275);
 		     spells[22].reqlvl = 32;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -3116,8 +3116,8 @@ public:
 		     spells[23].info = dbcSpell.LookupEntry(14276);
 		     spells[23].reqlvl = 42;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -3125,8 +3125,8 @@ public:
 		     spells[24].info = dbcSpell.LookupEntry(14277);
 		     spells[24].reqlvl = 52;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -3134,8 +3134,8 @@ public:
 		     spells[25].info = dbcSpell.LookupEntry(3034);
 		     spells[25].reqlvl = 36;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -3143,8 +3143,8 @@ public:
 		     spells[26].info = dbcSpell.LookupEntry(14279);
 		     spells[26].reqlvl = 46;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -3152,8 +3152,8 @@ public:
 		     spells[27].info = dbcSpell.LookupEntry(14280);
 		     spells[27].reqlvl = 56;
 		     spells[27].targettype = TARGET_ATTACKING;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -3240,8 +3240,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(133);
 		     spells[0].reqlvl = 1;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -3249,8 +3249,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(143);
 		     spells[1].reqlvl = 6;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -3258,8 +3258,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(3140);
 		     spells[2].reqlvl = 18;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -3267,8 +3267,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(8401);
 		     spells[3].reqlvl = 30;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -3276,8 +3276,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(10148);
 		     spells[4].reqlvl = 42;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -3285,8 +3285,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(10149);
 		     spells[5].reqlvl = 48;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -3294,8 +3294,8 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(10151);
 		     spells[6].reqlvl = 60;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -3303,8 +3303,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(116);
 		     spells[7].reqlvl = 4;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -3312,8 +3312,8 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(145);
 		     spells[8].reqlvl = 12;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -3321,8 +3321,8 @@ public:
 		     spells[9].info = dbcSpell.LookupEntry(8400);
 		     spells[9].reqlvl = 24;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -3330,8 +3330,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(7322);
 		     spells[10].reqlvl = 20;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -3339,8 +3339,8 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(8407);
 		     spells[11].reqlvl = 32;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -3348,8 +3348,8 @@ public:
 		     spells[12].info = dbcSpell.LookupEntry(10179);
 		     spells[12].reqlvl = 44;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -3357,8 +3357,8 @@ public:
 		     spells[13].info = dbcSpell.LookupEntry(10181);
 		     spells[13].reqlvl = 56;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -3366,8 +3366,8 @@ public:
 		     spells[14].info = dbcSpell.LookupEntry(2136);
 		     spells[14].reqlvl = 6;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -3375,8 +3375,8 @@ public:
 		     spells[15].info = dbcSpell.LookupEntry(2137);
 		     spells[15].reqlvl = 14;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -3384,8 +3384,8 @@ public:
 		     spells[16].info = dbcSpell.LookupEntry(8406);
 		     spells[16].reqlvl = 26;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -3393,8 +3393,8 @@ public:
 		     spells[17].info = dbcSpell.LookupEntry(8408);
 		     spells[17].reqlvl = 38;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -3402,8 +3402,8 @@ public:
 		     spells[18].info = dbcSpell.LookupEntry(10180);
 		     spells[18].reqlvl = 50;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -3411,8 +3411,8 @@ public:
 		     spells[19].info = dbcSpell.LookupEntry(10199);
 		     spells[19].reqlvl = 54;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -3420,8 +3420,8 @@ public:
 		     spells[20].info = dbcSpell.LookupEntry(205);
 		     spells[20].reqlvl = 8;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -3429,8 +3429,8 @@ public:
 		     spells[21].info = dbcSpell.LookupEntry(837);
 		     spells[21].reqlvl = 14;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -3438,8 +3438,8 @@ public:
 		     spells[22].info = dbcSpell.LookupEntry(2138);
 		     spells[22].reqlvl = 22;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -3447,8 +3447,8 @@ public:
 		     spells[23].info = dbcSpell.LookupEntry(8413);
 		     spells[23].reqlvl = 38;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -3456,8 +3456,8 @@ public:
 		     spells[24].info = dbcSpell.LookupEntry(10197);
 		     spells[24].reqlvl = 46;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -3465,8 +3465,8 @@ public:
 		     spells[25].info = dbcSpell.LookupEntry(10230);
 		     spells[25].reqlvl = 54;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -3474,8 +3474,8 @@ public:
 		     spells[26].info = dbcSpell.LookupEntry(122);
 		     spells[26].reqlvl = 10;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -3483,8 +3483,8 @@ public:
 		     spells[27].info = dbcSpell.LookupEntry(8412);
 		     spells[27].reqlvl = 30;
 		     spells[27].targettype = TARGET_ATTACKING;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -3492,8 +3492,8 @@ public:
 		     spells[28].info = dbcSpell.LookupEntry(6131);
 		     spells[28].reqlvl = 40;
 		     spells[28].targettype = TARGET_ATTACKING;
-		     spells[28].instant = true;
-		     spells[28].perctrigger = (float)RandomFloat(10.0f);
+		     spells[28].instant = false;
+		     spells[28].perctrigger = (float)RandomFloat(5.0f);
 		     spells[28].attackstoptimer = 1000;
 		     m_spellcheck[28] = true;
 
@@ -3502,8 +3502,8 @@ public:
 		     spells[29].info = dbcSpell.LookupEntry(10161);
 		     spells[29].reqlvl = 58;
 		     spells[29].targettype = TARGET_ATTACKING;
-		     spells[29].instant = true;
-		     spells[29].perctrigger = (float)RandomFloat(10.0f);
+		     spells[29].instant = false;
+		     spells[29].perctrigger = (float)RandomFloat(5.0f);
 		     spells[29].attackstoptimer = 1000;
 		     m_spellcheck[29] = true;
 
@@ -3511,8 +3511,8 @@ public:
 		     spells[30].info = dbcSpell.LookupEntry(10);
 		     spells[30].reqlvl = 20;
 		     spells[30].targettype = TARGET_ATTACKING;
-		     spells[30].instant = true;
-		     spells[30].perctrigger = (float)RandomFloat(10.0f);
+		     spells[30].instant = false;
+		     spells[30].perctrigger = (float)RandomFloat(5.0f);
 		     spells[30].attackstoptimer = 1000;
 		     m_spellcheck[30] = true;
 
@@ -3520,8 +3520,8 @@ public:
 		     spells[31].info = dbcSpell.LookupEntry(120);
 		     spells[31].reqlvl = 26;
 		     spells[31].targettype = TARGET_ATTACKING;
-		     spells[31].instant = true;
-		     spells[31].perctrigger = (float)RandomFloat(10.0f);
+		     spells[31].instant = false;
+		     spells[31].perctrigger = (float)RandomFloat(5.0f);
 		     spells[31].attackstoptimer = 1000;
 		     m_spellcheck[31] = true;
 
@@ -3529,8 +3529,8 @@ public:
 		     spells[32].info = dbcSpell.LookupEntry(865);
 		     spells[32].reqlvl = 26;
 		     spells[32].targettype = TARGET_ATTACKING;
-		     spells[32].instant = true;
-		     spells[32].perctrigger = (float)RandomFloat(10.0f);
+		     spells[32].instant = false;
+		     spells[32].perctrigger = (float)RandomFloat(5.0f);
 		     spells[32].attackstoptimer = 1000;
 		     m_spellcheck[32] = true;
 
@@ -3538,8 +3538,8 @@ public:
 		     spells[33].info = dbcSpell.LookupEntry(10159);
 		     spells[33].reqlvl = 42;
 		     spells[33].targettype = TARGET_ATTACKING;
-		     spells[33].instant = true;
-		     spells[33].perctrigger = (float)RandomFloat(10.0f);
+		     spells[33].instant = false;
+		     spells[33].perctrigger = (float)RandomFloat(5.0f);
 		     spells[33].attackstoptimer = 1000;
 		     m_spellcheck[33] = true;
 
@@ -3547,8 +3547,8 @@ public:
 		     spells[34].info = dbcSpell.LookupEntry(10160);
 		     spells[34].reqlvl = 50;
 		     spells[34].targettype = TARGET_ATTACKING;
-		     spells[34].instant = true;
-		     spells[34].perctrigger = (float)RandomFloat(10.0f);
+		     spells[34].instant = false;
+		     spells[34].perctrigger = (float)RandomFloat(5.0f);
 		     spells[34].attackstoptimer = 1000;
 		     m_spellcheck[34] = true;
 
@@ -3556,8 +3556,8 @@ public:
 		     spells[35].info = dbcSpell.LookupEntry(13020);
 		     spells[35].reqlvl = 52;
 		     spells[35].targettype = TARGET_ATTACKING;
-		     spells[35].instant = true;
-		     spells[35].perctrigger = (float)RandomFloat(10.0f);
+		     spells[35].instant = false;
+		     spells[35].perctrigger = (float)RandomFloat(5.0f);
 		     spells[35].attackstoptimer = 1000;
 		     m_spellcheck[35] = true;
 
@@ -3565,8 +3565,8 @@ public:
 		     spells[36].info = dbcSpell.LookupEntry(8437);
 		     spells[36].reqlvl = 22;
 		     spells[36].targettype = TARGET_ATTACKING;
-		     spells[36].instant = true;
-		     spells[36].perctrigger = (float)RandomFloat(10.0f);
+		     spells[36].instant = false;
+		     spells[36].perctrigger = (float)RandomFloat(5.0f);
 		     spells[36].attackstoptimer = 1000;
 		     m_spellcheck[36] = true;
 
@@ -3574,8 +3574,8 @@ public:
 		     spells[37].info = dbcSpell.LookupEntry(8427);
 		     spells[37].reqlvl = 36;
 		     spells[37].targettype = TARGET_ATTACKING;
-		     spells[37].instant = true;
-		     spells[37].perctrigger = (float)RandomFloat(10.0f);
+		     spells[37].instant = false;
+		     spells[37].perctrigger = (float)RandomFloat(5.0f);
 		     spells[37].attackstoptimer = 1000;
 		     m_spellcheck[37] = true;
 
@@ -3583,8 +3583,8 @@ public:
 		     spells[38].info = dbcSpell.LookupEntry(10185);
 		     spells[38].reqlvl = 44;
 		     spells[38].targettype = TARGET_ATTACKING;
-		     spells[38].instant = true;
-		     spells[38].perctrigger = (float)RandomFloat(10.0f);
+		     spells[38].instant = false;
+		     spells[38].perctrigger = (float)RandomFloat(5.0f);
 		     spells[38].attackstoptimer = 1000;
 		     m_spellcheck[38] = true;
 
@@ -3592,8 +3592,8 @@ public:
 		     spells[39].info = dbcSpell.LookupEntry(10186);
 		     spells[39].reqlvl = 52;
 		     spells[39].targettype = TARGET_ATTACKING;
-		     spells[39].instant = true;
-		     spells[39].perctrigger = (float)RandomFloat(10.0f);
+		     spells[39].instant = false;
+		     spells[39].perctrigger = (float)RandomFloat(5.0f);
 		     spells[39].attackstoptimer = 1000;
 		     m_spellcheck[39] = true;
 
@@ -3601,8 +3601,8 @@ public:
 		     spells[40].info = dbcSpell.LookupEntry(10202);
 		     spells[40].reqlvl = 54;
 		     spells[40].targettype = TARGET_ATTACKING;
-		     spells[40].instant = true;
-		     spells[40].perctrigger = (float)RandomFloat(10.0f);
+		     spells[40].instant = false;
+		     spells[40].perctrigger = (float)RandomFloat(5.0f);
 		     spells[40].attackstoptimer = 1000;
 		     m_spellcheck[40] = true;
 
@@ -3610,8 +3610,8 @@ public:
 		     spells[41].info = dbcSpell.LookupEntry(8438);
 		     spells[41].reqlvl = 30;
 		     spells[41].targettype = TARGET_ATTACKING;
-		     spells[41].instant = true;
-		     spells[41].perctrigger = (float)RandomFloat(10.0f);
+		     spells[41].instant = false;
+		     spells[41].perctrigger = (float)RandomFloat(5.0f);
 		     spells[41].attackstoptimer = 1000;
 		     m_spellcheck[41] = true;
 
@@ -3619,8 +3619,8 @@ public:
 		     spells[42].info = dbcSpell.LookupEntry(8439);
 		     spells[42].reqlvl = 38;
 		     spells[42].targettype = TARGET_ATTACKING;
-		     spells[42].instant = true;
-		     spells[42].perctrigger = (float)RandomFloat(10.0f);
+		     spells[42].instant = false;
+		     spells[42].perctrigger = (float)RandomFloat(5.0f);
 		     spells[42].attackstoptimer = 1000;
 		     m_spellcheck[42] = true;
 
@@ -3628,8 +3628,8 @@ public:
 		     spells[43].info = dbcSpell.LookupEntry(10201);
 		     spells[43].reqlvl = 46;
 		     spells[43].targettype = TARGET_ATTACKING;
-		     spells[43].instant = true;
-		     spells[43].perctrigger = (float)RandomFloat(10.0f);
+		     spells[43].instant = false;
+		     spells[43].perctrigger = (float)RandomFloat(5.0f);
 		     spells[43].attackstoptimer = 1000;
 		     m_spellcheck[43] = true;
 
@@ -3637,8 +3637,8 @@ public:
 		     spells[44].info = dbcSpell.LookupEntry(168);
 		     spells[44].reqlvl = 1;
 		     spells[44].targettype = TARGET_SELF;
-		     spells[44].instant = true;
-		     spells[44].perctrigger = (float)RandomFloat(10.0f);
+		     spells[44].instant = false;
+		     spells[44].perctrigger = (float)RandomFloat(5.0f);
 		     spells[44].attackstoptimer = 1000;
 		     m_spellcheck[44] = true;
 
@@ -3646,8 +3646,8 @@ public:
 		     spells[45].info = dbcSpell.LookupEntry(7300);
 		     spells[45].reqlvl = 10;
 		     spells[45].targettype = TARGET_SELF;
-		     spells[45].instant = true;
-		     spells[45].perctrigger = (float)RandomFloat(10.0f);
+		     spells[45].instant = false;
+		     spells[45].perctrigger = (float)RandomFloat(5.0f);
 		     spells[45].attackstoptimer = 1000;
 		     m_spellcheck[45] = true;
 
@@ -3655,8 +3655,8 @@ public:
 		     spells[46].info = dbcSpell.LookupEntry(7301);
 		     spells[46].reqlvl = 20;
 		     spells[46].targettype = TARGET_SELF;
-		     spells[46].instant = true;
-		     spells[46].perctrigger = (float)RandomFloat(10.0f);
+		     spells[46].instant = false;
+		     spells[46].perctrigger = (float)RandomFloat(5.0f);
 		     spells[46].attackstoptimer = 1000;
 		     m_spellcheck[46] = true;
 
@@ -3664,8 +3664,8 @@ public:
 		     spells[47].info = dbcSpell.LookupEntry(7302);
 		     spells[47].reqlvl = 30;
 		     spells[47].targettype = TARGET_SELF;
-		     spells[47].instant = true;
-		     spells[47].perctrigger = (float)RandomFloat(10.0f);
+		     spells[47].instant = false;
+		     spells[47].perctrigger = (float)RandomFloat(5.0f);
 		     spells[47].attackstoptimer = 1000;
 		     m_spellcheck[47] = true;
 
@@ -3673,8 +3673,8 @@ public:
 		     spells[48].info = dbcSpell.LookupEntry(7320);
 		     spells[48].reqlvl = 40;
 		     spells[48].targettype = TARGET_SELF;
-		     spells[48].instant = true;
-		     spells[48].perctrigger = (float)RandomFloat(10.0f);
+		     spells[48].instant = false;
+		     spells[48].perctrigger = (float)RandomFloat(5.0f);
 		     spells[48].attackstoptimer = 1000;
 		     m_spellcheck[48] = true;
 
@@ -3682,8 +3682,8 @@ public:
 		     spells[49].info = dbcSpell.LookupEntry(10219);
 		     spells[49].reqlvl = 50;
 		     spells[49].targettype = TARGET_SELF;
-		     spells[49].instant = true;
-		     spells[49].perctrigger = (float)RandomFloat(10.0f);
+		     spells[49].instant = false;
+		     spells[49].perctrigger = (float)RandomFloat(5.0f);
 		     spells[49].attackstoptimer = 1000;
 		     m_spellcheck[49] = true;
 
@@ -3691,8 +3691,8 @@ public:
 		     spells[50].info = dbcSpell.LookupEntry(10220);
 		     spells[50].reqlvl = 60;
 		     spells[50].targettype = TARGET_SELF;
-		     spells[50].instant = true;
-		     spells[50].perctrigger = (float)RandomFloat(10.0f);
+		     spells[50].instant = false;
+		     spells[50].perctrigger = (float)RandomFloat(5.0f);
 		     spells[50].attackstoptimer = 1000;
 		     m_spellcheck[50] = true;
 
@@ -3700,8 +3700,8 @@ public:
 		     spells[51].info = dbcSpell.LookupEntry(1463);
 		     spells[51].reqlvl = 20;
 		     spells[51].targettype = TARGET_SELF;
-		     spells[51].instant = true;
-		     spells[51].perctrigger = (float)RandomFloat(10.0f);
+		     spells[51].instant = false;
+		     spells[51].perctrigger = (float)RandomFloat(5.0f);
 		     spells[51].attackstoptimer = 1000;
 		     m_spellcheck[51] = true;
 
@@ -3709,8 +3709,8 @@ public:
 		     spells[52].info = dbcSpell.LookupEntry(8494);
 		     spells[52].reqlvl = 28;
 		     spells[52].targettype = TARGET_SELF;
-		     spells[52].instant = true;
-		     spells[52].perctrigger = (float)RandomFloat(10.0f);
+		     spells[52].instant = false;
+		     spells[52].perctrigger = (float)RandomFloat(5.0f);
 		     spells[52].attackstoptimer = 1000;
 		     m_spellcheck[52] = true;
 
@@ -3718,8 +3718,8 @@ public:
 		     spells[53].info = dbcSpell.LookupEntry(8495);
 		     spells[53].reqlvl = 36;
 		     spells[53].targettype = TARGET_SELF;
-		     spells[53].instant = true;
-		     spells[53].perctrigger = (float)RandomFloat(10.0f);
+		     spells[53].instant = false;
+		     spells[53].perctrigger = (float)RandomFloat(5.0f);
 		     spells[53].attackstoptimer = 1000;
 		     m_spellcheck[53] = true;
 
@@ -3727,8 +3727,8 @@ public:
 		     spells[54].info = dbcSpell.LookupEntry(10191);
 		     spells[54].reqlvl = 44;
 		     spells[54].targettype = TARGET_SELF;
-		     spells[54].instant = true;
-		     spells[54].perctrigger = (float)RandomFloat(10.0f);
+		     spells[54].instant = false;
+		     spells[54].perctrigger = (float)RandomFloat(5.0f);
 		     spells[54].attackstoptimer = 1000;
 		     m_spellcheck[54] = true;
 
@@ -3736,8 +3736,8 @@ public:
 		     spells[55].info = dbcSpell.LookupEntry(10192);
 		     spells[55].reqlvl = 52;
 		     spells[55].targettype = TARGET_SELF;
-		     spells[55].instant = true;
-		     spells[55].perctrigger = (float)RandomFloat(10.0f);
+		     spells[55].instant = false;
+		     spells[55].perctrigger = (float)RandomFloat(5.0f);
 		     spells[55].attackstoptimer = 1000;
 		     m_spellcheck[55] = true;
 
@@ -3745,8 +3745,8 @@ public:
 		     spells[56].info = dbcSpell.LookupEntry(10193);
 		     spells[56].reqlvl = 60;
 		     spells[56].targettype = TARGET_SELF;
-		     spells[56].instant = true;
-		     spells[56].perctrigger = (float)RandomFloat(10.0f);
+		     spells[56].instant = false;
+		     spells[56].perctrigger = (float)RandomFloat(5.0f);
 		     spells[56].attackstoptimer = 1000;
 		     m_spellcheck[56] = true;
 
@@ -3833,8 +3833,8 @@ public:
 		     spells[0].info = dbcSpell.LookupEntry(348);
 		     spells[0].reqlvl = 1;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -3842,8 +3842,8 @@ public:
 		     spells[1].info = dbcSpell.LookupEntry(172);
 		     spells[1].reqlvl = 4;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -3851,8 +3851,8 @@ public:
 		     spells[2].info = dbcSpell.LookupEntry(686);
 		     spells[2].reqlvl = 1;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -3860,8 +3860,8 @@ public:
 		     spells[3].info = dbcSpell.LookupEntry(695);
 		     spells[3].reqlvl = 6;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -3869,8 +3869,8 @@ public:
 		     spells[4].info = dbcSpell.LookupEntry(1454);
 		     spells[4].reqlvl = 6;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -3878,8 +3878,8 @@ public:
 		     spells[5].info = dbcSpell.LookupEntry(980);
 		     spells[5].reqlvl = 8;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -3887,7 +3887,7 @@ public:
 		     spells[6].info = dbcSpell.LookupEntry(5782);
 		     spells[6].reqlvl = 8;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
+		     spells[6].instant = false;
 		     spells[6].perctrigger = 0; //fear crash server
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
@@ -3896,8 +3896,8 @@ public:
 		     spells[7].info = dbcSpell.LookupEntry(707);
 		     spells[7].reqlvl = 10;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -3905,8 +3905,8 @@ public:
 		     spells[8].info = dbcSpell.LookupEntry(172);
 		     spells[8].reqlvl = 4;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -3914,8 +3914,8 @@ public:
 		     spells[9].info = dbcSpell.LookupEntry(705);
 		     spells[9].reqlvl = 12;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -3923,8 +3923,8 @@ public:
 		     spells[10].info = dbcSpell.LookupEntry(6222);
 		     spells[10].reqlvl = 14;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -3932,8 +3932,8 @@ public:
 		     spells[11].info = dbcSpell.LookupEntry(704);
 		     spells[11].reqlvl = 14;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -3941,8 +3941,8 @@ public:
 		     spells[12].info = dbcSpell.LookupEntry(689);
 		     spells[12].reqlvl = 14;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -3950,8 +3950,8 @@ public:
 		     spells[13].info = dbcSpell.LookupEntry(1455);
 		     spells[13].reqlvl = 16;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -3959,8 +3959,8 @@ public:
 		     spells[14].info = dbcSpell.LookupEntry(1014);
 		     spells[14].reqlvl = 18;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -3968,8 +3968,8 @@ public:
 		     spells[15].info = dbcSpell.LookupEntry(1094);
 		     spells[15].reqlvl = 20;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -3977,8 +3977,8 @@ public:
 		     spells[16].info = dbcSpell.LookupEntry(1088);
 		     spells[16].reqlvl = 20;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -3986,8 +3986,8 @@ public:
 		     spells[17].info = dbcSpell.LookupEntry(1106);
 		     spells[17].reqlvl = 28;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -3995,8 +3995,8 @@ public:
 		     spells[18].info = dbcSpell.LookupEntry(699);
 		     spells[18].reqlvl = 22;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -4004,8 +4004,8 @@ public:
 		     spells[19].info = dbcSpell.LookupEntry(6223);
 		     spells[19].reqlvl = 24;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -4013,8 +4013,8 @@ public:
 		     spells[20].info = dbcSpell.LookupEntry(5138);
 		     spells[20].reqlvl = 24;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -4022,8 +4022,8 @@ public:
 		     spells[21].info = dbcSpell.LookupEntry(1456);
 		     spells[21].reqlvl = 26;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -4031,8 +4031,8 @@ public:
 		     spells[22].info = dbcSpell.LookupEntry(6217);
 		     spells[22].reqlvl = 28;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -4040,8 +4040,8 @@ public:
 		     spells[23].info = dbcSpell.LookupEntry(7658);
 		     spells[23].reqlvl = 28;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -4049,8 +4049,8 @@ public:
 		     spells[24].info = dbcSpell.LookupEntry(7641);
 		     spells[24].reqlvl = 36;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -4058,8 +4058,8 @@ public:
 		     spells[25].info = dbcSpell.LookupEntry(18223);
 		     spells[25].reqlvl = 0;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -4067,8 +4067,8 @@ public:
 		     spells[26].info = dbcSpell.LookupEntry(709);
 		     spells[26].reqlvl = 30;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -4076,8 +4076,8 @@ public:
 		     spells[27].info = dbcSpell.LookupEntry(2941);
 		     spells[27].reqlvl = 30;
 		     spells[27].targettype = TARGET_ATTACKING;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -4085,7 +4085,7 @@ public:
 		     spells[28].info = dbcSpell.LookupEntry(6213);
 		     spells[28].reqlvl = 32;
 		     spells[28].targettype = TARGET_ATTACKING;
-		     spells[28].instant = true;
+		     spells[28].instant = false;
 		     spells[28].perctrigger = 0; //Fear crash server
 		     spells[28].attackstoptimer = 1000;
 		     m_spellcheck[28] = true;
@@ -4094,8 +4094,8 @@ public:
 		     spells[29].info = dbcSpell.LookupEntry(7648);
 		     spells[29].reqlvl = 34;
 		     spells[29].targettype = TARGET_ATTACKING;
-		     spells[29].instant = true;
-		     spells[29].perctrigger = (float)RandomFloat(10.0f);
+		     spells[29].instant = false;
+		     spells[29].perctrigger = (float)RandomFloat(5.0f);
 		     spells[29].attackstoptimer = 1000;
 		     m_spellcheck[29] = true;
 
@@ -4103,8 +4103,8 @@ public:
 		     spells[30].info = dbcSpell.LookupEntry(6226);
 		     spells[30].reqlvl = 34;
 		     spells[30].targettype = TARGET_ATTACKING;
-		     spells[30].instant = true;
-		     spells[30].perctrigger = (float)RandomFloat(10.0f);
+		     spells[30].instant = false;
+		     spells[30].perctrigger = (float)RandomFloat(5.0f);
 		     spells[30].attackstoptimer = 1000;
 		     m_spellcheck[30] = true;
 
@@ -4112,8 +4112,8 @@ public:
 		     spells[31].info = dbcSpell.LookupEntry(11687);
 		     spells[31].reqlvl = 36;
 		     spells[31].targettype = TARGET_ATTACKING;
-		     spells[31].instant = true;
-		     spells[31].perctrigger = (float)RandomFloat(10.0f);
+		     spells[31].instant = false;
+		     spells[31].perctrigger = (float)RandomFloat(5.0f);
 		     spells[31].attackstoptimer = 1000;
 		     m_spellcheck[31] = true;
 
@@ -4121,8 +4121,8 @@ public:
 		     spells[32].info = dbcSpell.LookupEntry(11711);
 		     spells[32].reqlvl = 38;
 		     spells[32].targettype = TARGET_ATTACKING;
-		     spells[32].instant = true;
-		     spells[32].perctrigger = (float)RandomFloat(10.0f);
+		     spells[32].instant = false;
+		     spells[32].perctrigger = (float)RandomFloat(5.0f);
 		     spells[32].attackstoptimer = 1000;
 		     m_spellcheck[32] = true;
 
@@ -4130,8 +4130,8 @@ public:
 		     spells[33].info = dbcSpell.LookupEntry(11659);
 		     spells[33].reqlvl = 44;
 		     spells[33].targettype = TARGET_ATTACKING;
-		     spells[33].instant = true;
-		     spells[33].perctrigger = (float)RandomFloat(10.0f);
+		     spells[33].instant = false;
+		     spells[33].perctrigger = (float)RandomFloat(5.0f);
 		     spells[33].attackstoptimer = 1000;
 		     m_spellcheck[33] = true;
 
@@ -4139,8 +4139,8 @@ public:
 		     spells[34].info = dbcSpell.LookupEntry(11665);
 		     spells[34].reqlvl = 40;
 		     spells[34].targettype = TARGET_ATTACKING;
-		     spells[34].instant = true;
-		     spells[34].perctrigger = (float)RandomFloat(10.0f);
+		     spells[34].instant = false;
+		     spells[34].perctrigger = (float)RandomFloat(5.0f);
 		     spells[34].attackstoptimer = 1000;
 		     m_spellcheck[34] = true;
 
@@ -4148,8 +4148,8 @@ public:
 		     spells[35].info = dbcSpell.LookupEntry(7651);
 		     spells[35].reqlvl = 38;
 		     spells[35].targettype = TARGET_ATTACKING;
-		     spells[35].instant = true;
-		     spells[35].perctrigger = (float)RandomFloat(10.0f);
+		     spells[35].instant = false;
+		     spells[35].perctrigger = (float)RandomFloat(5.0f);
 		     spells[35].attackstoptimer = 1000;
 		     m_spellcheck[35] = true;
 
@@ -4157,8 +4157,8 @@ public:
 		     spells[36].info = dbcSpell.LookupEntry(7659);
 		     spells[36].reqlvl = 42;
 		     spells[36].targettype = TARGET_ATTACKING;
-		     spells[36].instant = true;
-		     spells[36].perctrigger = (float)RandomFloat(10.0f);
+		     spells[36].instant = false;
+		     spells[36].perctrigger = (float)RandomFloat(5.0f);
 		     spells[36].attackstoptimer = 1000;
 		     m_spellcheck[36] = true;
 
@@ -4166,8 +4166,8 @@ public:
 		     spells[37].info = dbcSpell.LookupEntry(6789);
 		     spells[37].reqlvl = 42;
 		     spells[37].targettype = TARGET_ATTACKING;
-		     spells[37].instant = true;
-		     spells[37].perctrigger = (float)RandomFloat(10.0f);
+		     spells[37].instant = false;
+		     spells[37].perctrigger = (float)RandomFloat(5.0f);
 		     spells[37].attackstoptimer = 1000;
 		     m_spellcheck[37] = true;
 
@@ -4175,8 +4175,8 @@ public:
 		     spells[38].info = dbcSpell.LookupEntry(11671);
 		     spells[38].reqlvl = 44;
 		     spells[38].targettype = TARGET_ATTACKING;
-		     spells[38].instant = true;
-		     spells[38].perctrigger = (float)RandomFloat(10.0f);
+		     spells[38].instant = false;
+		     spells[38].perctrigger = (float)RandomFloat(5.0f);
 		     spells[38].attackstoptimer = 1000;
 		     m_spellcheck[38] = true;
 
@@ -4184,8 +4184,8 @@ public:
 		     spells[39].info = dbcSpell.LookupEntry(17862);
 		     spells[39].reqlvl = 44;
 		     spells[39].targettype = TARGET_ATTACKING;
-		     spells[39].instant = true;
-		     spells[39].perctrigger = (float)RandomFloat(10.0f);
+		     spells[39].instant = false;
+		     spells[39].perctrigger = (float)RandomFloat(5.0f);
 		     spells[39].attackstoptimer = 1000;
 		     m_spellcheck[39] = true;
 
@@ -4193,8 +4193,8 @@ public:
 		     spells[40].info = dbcSpell.LookupEntry(11699);
 		     spells[40].reqlvl = 46;
 		     spells[40].targettype = TARGET_ATTACKING;
-		     spells[40].instant = true;
-		     spells[40].perctrigger = (float)RandomFloat(10.0f);
+		     spells[40].instant = false;
+		     spells[40].perctrigger = (float)RandomFloat(5.0f);
 		     spells[40].attackstoptimer = 1000;
 		     m_spellcheck[40] = true;
 
@@ -4202,8 +4202,8 @@ public:
 		     spells[41].info = dbcSpell.LookupEntry(11688);
 		     spells[41].reqlvl = 46;
 		     spells[41].targettype = TARGET_ATTACKING;
-		     spells[41].instant = true;
-		     spells[41].perctrigger = (float)RandomFloat(10.0f);
+		     spells[41].instant = false;
+		     spells[41].perctrigger = (float)RandomFloat(5.0f);
 		     spells[41].attackstoptimer = 1000;
 		     m_spellcheck[41] = true;
 
@@ -4211,8 +4211,8 @@ public:
 		     spells[42].info = dbcSpell.LookupEntry(11712);
 		     spells[42].reqlvl = 48;
 		     spells[42].targettype = TARGET_ATTACKING;
-		     spells[42].instant = true;
-		     spells[42].perctrigger = (float)RandomFloat(10.0f);
+		     spells[42].instant = false;
+		     spells[42].perctrigger = (float)RandomFloat(5.0f);
 		     spells[42].attackstoptimer = 1000;
 		     m_spellcheck[42] = true;
 
@@ -4220,8 +4220,8 @@ public:
 		     spells[43].info = dbcSpell.LookupEntry(11660);
 		     spells[43].reqlvl = 52;
 		     spells[43].targettype = TARGET_ATTACKING;
-		     spells[43].instant = true;
-		     spells[43].perctrigger = (float)RandomFloat(10.0f);
+		     spells[43].instant = false;
+		     spells[43].perctrigger = (float)RandomFloat(5.0f);
 		     spells[43].attackstoptimer = 1000;
 		     m_spellcheck[43] = true;
 
@@ -4229,8 +4229,8 @@ public:
 		     spells[44].info = dbcSpell.LookupEntry(11661);
 		     spells[44].reqlvl = 60;
 		     spells[44].targettype = TARGET_ATTACKING;
-		     spells[44].instant = true;
-		     spells[44].perctrigger = (float)RandomFloat(10.0f);
+		     spells[44].instant = false;
+		     spells[44].perctrigger = (float)RandomFloat(5.0f);
 		     spells[44].attackstoptimer = 1000;
 		     m_spellcheck[44] = true;
 
@@ -4238,8 +4238,8 @@ public:
 		     spells[45].info = dbcSpell.LookupEntry(11661);
 		     spells[45].reqlvl = 60;
 		     spells[45].targettype = TARGET_ATTACKING;
-		     spells[45].instant = true;
-		     spells[45].perctrigger = (float)RandomFloat(10.0f);
+		     spells[45].instant = false;
+		     spells[45].perctrigger = (float)RandomFloat(5.0f);
 		     spells[45].attackstoptimer = 1000;
 		     m_spellcheck[45] = true;
 
@@ -4247,8 +4247,8 @@ public:
 		     spells[46].info = dbcSpell.LookupEntry(17926);
 		     spells[46].reqlvl = 58;
 		     spells[46].targettype = TARGET_ATTACKING;
-		     spells[46].instant = true;
-		     spells[46].perctrigger = (float)RandomFloat(10.0f);
+		     spells[46].instant = false;
+		     spells[46].perctrigger = (float)RandomFloat(5.0f);
 		     spells[46].attackstoptimer = 1000;
 		     m_spellcheck[46] = true;
 
@@ -4256,8 +4256,8 @@ public:
 		     spells[47].info = dbcSpell.LookupEntry(11713);
 		     spells[47].reqlvl = 58;
 		     spells[47].targettype = TARGET_ATTACKING;
-		     spells[47].instant = true;
-		     spells[47].perctrigger = (float)RandomFloat(10.0f);
+		     spells[47].instant = false;
+		     spells[47].perctrigger = (float)RandomFloat(5.0f);
 		     spells[47].attackstoptimer = 1000;
 		     m_spellcheck[47] = true;
 
@@ -4265,7 +4265,7 @@ public:
 		     spells[48].info = dbcSpell.LookupEntry(6215);
 		     spells[48].reqlvl = 56;
 		     spells[48].targettype = TARGET_ATTACKING;
-		     spells[48].instant = true;
+		     spells[48].instant = false;
 		     spells[48].perctrigger = 0; //fear crash server
 		     spells[48].attackstoptimer = 1000;
 		     m_spellcheck[48] = true;
@@ -4274,8 +4274,8 @@ public:
 		     spells[49].info = dbcSpell.LookupEntry(11689);
 		     spells[49].reqlvl = 56;
 		     spells[49].targettype = TARGET_ATTACKING;
-		     spells[49].instant = true;
-		     spells[49].perctrigger = (float)RandomFloat(10.0f);
+		     spells[49].instant = false;
+		     spells[49].perctrigger = (float)RandomFloat(5.0f);
 		     spells[49].attackstoptimer = 1000;
 		     m_spellcheck[49] = true;
 
@@ -4283,8 +4283,8 @@ public:
 		     spells[50].info = dbcSpell.LookupEntry(11717);
 		     spells[50].reqlvl = 56;
 		     spells[50].targettype = TARGET_ATTACKING;
-		     spells[50].instant = true;
-		     spells[50].perctrigger = (float)RandomFloat(10.0f);
+		     spells[50].instant = false;
+		     spells[50].perctrigger = (float)RandomFloat(5.0f);
 		     spells[50].attackstoptimer = 1000;
 		     m_spellcheck[50] = true;
 
@@ -4292,8 +4292,8 @@ public:
 		     spells[51].info = dbcSpell.LookupEntry(11704);
 		     spells[51].reqlvl = 54;
 		     spells[51].targettype = TARGET_ATTACKING;
-		     spells[51].instant = true;
-		     spells[51].perctrigger = (float)RandomFloat(10.0f);
+		     spells[51].instant = false;
+		     spells[51].perctrigger = (float)RandomFloat(5.0f);
 		     spells[51].attackstoptimer = 1000;
 		     m_spellcheck[51] = true;
 
@@ -4301,8 +4301,8 @@ public:
 		     spells[52].info = dbcSpell.LookupEntry(11700);
 		     spells[52].reqlvl = 54;
 		     spells[52].targettype = TARGET_ATTACKING;
-		     spells[52].instant = true;
-		     spells[52].perctrigger = (float)RandomFloat(10.0f);
+		     spells[52].instant = false;
+		     spells[52].perctrigger = (float)RandomFloat(5.0f);
 		     spells[52].attackstoptimer = 1000;
 		     m_spellcheck[52] = true;
 
@@ -4310,8 +4310,8 @@ public:
 		     spells[53].info = dbcSpell.LookupEntry(11672);
 		     spells[53].reqlvl = 54;
 		     spells[53].targettype = TARGET_ATTACKING;
-		     spells[53].instant = true;
-		     spells[53].perctrigger = (float)RandomFloat(10.0f);
+		     spells[53].instant = false;
+		     spells[53].perctrigger = (float)RandomFloat(5.0f);
 		     spells[53].attackstoptimer = 1000;
 		     m_spellcheck[53] = true;
 
@@ -4319,8 +4319,8 @@ public:
 		     spells[54].info = dbcSpell.LookupEntry(17925);
 		     spells[54].reqlvl = 50;
 		     spells[54].targettype = TARGET_ATTACKING;
-		     spells[54].instant = true;
-		     spells[54].perctrigger = (float)RandomFloat(10.0f);
+		     spells[54].instant = false;
+		     spells[54].perctrigger = (float)RandomFloat(5.0f);
 		     spells[54].attackstoptimer = 1000;
 		     m_spellcheck[54] = true;
 
@@ -4328,8 +4328,8 @@ public:
 		     spells[55].info = dbcSpell.LookupEntry(11667);
 		     spells[55].reqlvl = 50;
 		     spells[55].targettype = TARGET_ATTACKING;
-		     spells[55].instant = true;
-		     spells[55].perctrigger = (float)RandomFloat(10.0f);
+		     spells[55].instant = false;
+		     spells[55].perctrigger = (float)RandomFloat(5.0f);
 		     spells[55].attackstoptimer = 1000;
 		     m_spellcheck[55] = true;
 
@@ -4418,8 +4418,8 @@ public:
 		     spells[0].reqlvl = 4;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -4428,8 +4428,8 @@ public:
 		     spells[1].reqlvl = 1;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -4438,8 +4438,8 @@ public:
 		     spells[2].reqlvl = 10;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -4448,8 +4448,8 @@ public:
 		     spells[3].reqlvl = 6;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -4458,8 +4458,8 @@ public:
 		     spells[4].reqlvl = 10;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -4468,8 +4468,8 @@ public:
 		     spells[5].reqlvl = 18;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -4478,8 +4478,8 @@ public:
 		     spells[6].reqlvl = 14;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -4488,8 +4488,8 @@ public:
 		     spells[7].reqlvl = 16;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -4498,8 +4498,8 @@ public:
 		     spells[8].reqlvl = 14;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -4508,8 +4508,8 @@ public:
 		     spells[9].reqlvl = 26;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -4518,8 +4518,8 @@ public:
 		     spells[10].reqlvl = 22;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -4528,8 +4528,8 @@ public:
 		     spells[11].reqlvl = 22;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -4538,8 +4538,8 @@ public:
 		     spells[12].reqlvl = 28;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -4548,8 +4548,8 @@ public:
 		     spells[13].reqlvl = 14;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -4558,8 +4558,8 @@ public:
 		     spells[14].reqlvl = 34;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -4568,8 +4568,8 @@ public:
 		     spells[15].reqlvl = 30;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -4578,8 +4578,8 @@ public:
 		     spells[16].reqlvl = 34;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -4588,8 +4588,8 @@ public:
 		     spells[17].reqlvl = 14;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -4598,8 +4598,8 @@ public:
 		     spells[18].reqlvl = 42;
 		     spells[18].hpreqtocast = 85;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -4608,8 +4608,8 @@ public:
 		     spells[19].reqlvl = 38;
 		     spells[19].hpreqtocast = 85;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -4618,8 +4618,8 @@ public:
 		     spells[20].reqlvl = 46;
 		     spells[20].hpreqtocast = 85;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -4628,8 +4628,8 @@ public:
 		     spells[21].reqlvl = 40;
 		     spells[21].hpreqtocast = 85;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -4638,8 +4638,8 @@ public:
 		     spells[22].reqlvl = 46;
 		     spells[22].hpreqtocast = 85;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -4648,8 +4648,8 @@ public:
 		     spells[23].reqlvl = 14;
 		     spells[23].hpreqtocast = 85;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -4658,8 +4658,8 @@ public:
 		     spells[24].reqlvl = 50;
 		     spells[24].hpreqtocast = 85;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -4668,8 +4668,8 @@ public:
 		     spells[25].reqlvl = 58;
 		     spells[25].hpreqtocast = 85;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -4678,8 +4678,8 @@ public:
 		     spells[26].reqlvl = 54;
 		     spells[26].hpreqtocast = 85;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -4688,8 +4688,8 @@ public:
 		     spells[27].reqlvl = 52;
 		     spells[27].hpreqtocast = 85;
 		     spells[27].targettype = TARGET_ATTACKING;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -4698,8 +4698,8 @@ public:
 		     spells[28].reqlvl = 58;
 		     spells[28].hpreqtocast = 85;
 		     spells[28].targettype = TARGET_ATTACKING;
-		     spells[28].instant = true;
-		     spells[28].perctrigger = (float)RandomFloat(10.0f);
+		     spells[28].instant = false;
+		     spells[28].perctrigger = (float)RandomFloat(5.0f);
 		     spells[28].attackstoptimer = 1000;
 		     m_spellcheck[28] = true;
 
@@ -4708,8 +4708,8 @@ public:
 		     spells[29].reqlvl = 6;
 		     spells[29].hpreqtocast = 85;
 		     spells[29].targettype = TARGET_SELF;
-		     spells[29].instant = true;
-		     spells[29].perctrigger = (float)RandomFloat(10.0f);
+		     spells[29].instant = false;
+		     spells[29].perctrigger = (float)RandomFloat(5.0f);
 		     spells[29].attackstoptimer = 1000;
 		     m_spellcheck[29] = true;
 
@@ -4718,8 +4718,8 @@ public:
 		     spells[30].reqlvl = 12;
 		     spells[30].hpreqtocast = 85;
 		     spells[30].targettype = TARGET_SELF;
-		     spells[30].instant = true;
-		     spells[30].perctrigger = (float)RandomFloat(10.0f);
+		     spells[30].instant = false;
+		     spells[30].perctrigger = (float)RandomFloat(5.0f);
 		     spells[30].attackstoptimer = 1000;
 		     m_spellcheck[30] = true;
 
@@ -4728,8 +4728,8 @@ public:
 		     spells[31].reqlvl = 18;
 		     spells[31].hpreqtocast = 85;
 		     spells[31].targettype = TARGET_SELF;
-		     spells[31].instant = true;
-		     spells[31].perctrigger = (float)RandomFloat(10.0f);
+		     spells[31].instant = false;
+		     spells[31].perctrigger = (float)RandomFloat(5.0f);
 		     spells[31].attackstoptimer = 1000;
 		     m_spellcheck[31] = true;
 
@@ -4738,8 +4738,8 @@ public:
 		     spells[32].reqlvl = 24;
 		     spells[32].hpreqtocast = 85;
 		     spells[32].targettype = TARGET_SELF;
-		     spells[32].instant = true;
-		     spells[32].perctrigger = (float)RandomFloat(10.0f);
+		     spells[32].instant = false;
+		     spells[32].perctrigger = (float)RandomFloat(5.0f);
 		     spells[32].attackstoptimer = 1000;
 		     m_spellcheck[32] = true;
 
@@ -4748,8 +4748,8 @@ public:
 		     spells[33].reqlvl = 36;
 		     spells[33].hpreqtocast = 85;
 		     spells[33].targettype = TARGET_SELF;
-		     spells[33].instant = true;
-		     spells[33].perctrigger = (float)RandomFloat(10.0f);
+		     spells[33].instant = false;
+		     spells[33].perctrigger = (float)RandomFloat(5.0f);
 		     spells[33].attackstoptimer = 1000;
 		     m_spellcheck[33] = true;
 
@@ -4758,8 +4758,8 @@ public:
 		     spells[34].reqlvl = 48;
 		     spells[34].hpreqtocast = 85;
 		     spells[34].targettype = TARGET_SELF;
-		     spells[34].instant = true;
-		     spells[34].perctrigger = (float)RandomFloat(10.0f);
+		     spells[34].instant = false;
+		     spells[34].perctrigger = (float)RandomFloat(5.0f);
 		     spells[34].attackstoptimer = 1000;
 		     m_spellcheck[34] = true;
 
@@ -4768,8 +4768,8 @@ public:
 		     spells[35].reqlvl = 54;
 		     spells[35].hpreqtocast = 85;
 		     spells[35].targettype = TARGET_SELF;
-		     spells[35].instant = true;
-		     spells[35].perctrigger = (float)RandomFloat(10.0f);
+		     spells[35].instant = false;
+		     spells[35].perctrigger = (float)RandomFloat(5.0f);
 		     spells[35].attackstoptimer = 1000;
 		     m_spellcheck[35] = true;
 
@@ -4778,8 +4778,8 @@ public:
 		     spells[36].reqlvl = 4;
 		     spells[36].hpreqtocast = 50;
 		     spells[36].targettype = TARGET_SELF;
-		     spells[36].instant = true;
-		     spells[36].perctrigger = (float)RandomFloat(10.0f);
+		     spells[36].instant = false;
+		     spells[36].perctrigger = (float)RandomFloat(5.0f);
 		     spells[36].attackstoptimer = 1000;
 		     m_spellcheck[36] = true;
 
@@ -4788,8 +4788,8 @@ public:
 		     spells[37].reqlvl = 10;
 		     spells[37].hpreqtocast = 50;
 		     spells[37].targettype = TARGET_SELF;
-		     spells[37].instant = true;
-		     spells[37].perctrigger = (float)RandomFloat(10.0f);
+		     spells[37].instant = false;
+		     spells[37].perctrigger = (float)RandomFloat(5.0f);
 		     spells[37].attackstoptimer = 1000;
 		     m_spellcheck[37] = true;
 
@@ -4798,8 +4798,8 @@ public:
 		     spells[38].reqlvl = 26;
 		     spells[38].hpreqtocast = 50;
 		     spells[38].targettype = TARGET_SELF;
-		     spells[38].instant = true;
-		     spells[38].perctrigger = (float)RandomFloat(10.0f);
+		     spells[38].instant = false;
+		     spells[38].perctrigger = (float)RandomFloat(5.0f);
 		     spells[38].attackstoptimer = 1000;
 		     m_spellcheck[38] = true;
 
@@ -4808,8 +4808,8 @@ public:
 		     spells[39].reqlvl = 38;
 		     spells[39].hpreqtocast = 50;
 		     spells[39].targettype = TARGET_SELF;
-		     spells[39].instant = true;
-		     spells[39].perctrigger = (float)RandomFloat(10.0f);
+		     spells[39].instant = false;
+		     spells[39].perctrigger = (float)RandomFloat(5.0f);
 		     spells[39].attackstoptimer = 1000;
 		     m_spellcheck[39] = true;
 
@@ -4818,8 +4818,8 @@ public:
 		     spells[40].reqlvl = 44;
 		     spells[40].hpreqtocast = 50;
 		     spells[40].targettype = TARGET_SELF;
-		     spells[40].instant = true;
-		     spells[40].perctrigger = (float)RandomFloat(10.0f);
+		     spells[40].instant = false;
+		     spells[40].perctrigger = (float)RandomFloat(5.0f);
 		     spells[40].attackstoptimer = 1000;
 		     m_spellcheck[40] = true;
 
@@ -4828,8 +4828,8 @@ public:
 		     spells[41].reqlvl = 50;
 		     spells[41].hpreqtocast = 50;
 		     spells[41].targettype = TARGET_SELF;
-		     spells[41].instant = true;
-		     spells[41].perctrigger = (float)RandomFloat(10.0f);
+		     spells[41].instant = false;
+		     spells[41].perctrigger = (float)RandomFloat(5.0f);
 		     spells[41].attackstoptimer = 1000;
 		     m_spellcheck[41] = true;
 
@@ -4838,8 +4838,8 @@ public:
 		     spells[42].reqlvl = 56;
 		     spells[42].hpreqtocast = 50;
 		     spells[42].targettype = TARGET_SELF;
-		     spells[42].instant = true;
-		     spells[42].perctrigger = (float)RandomFloat(10.0f);
+		     spells[42].instant = false;
+		     spells[42].perctrigger = (float)RandomFloat(5.0f);
 		     spells[42].attackstoptimer = 1000;
 		     m_spellcheck[42] = true;
 
@@ -4848,8 +4848,8 @@ public:
 		     spells[43].reqlvl = 8;
 		     spells[43].hpreqtocast = 50;
 		     spells[43].targettype = TARGET_SELF;
-		     spells[43].instant = true;
-		     spells[43].perctrigger = (float)RandomFloat(10.0f);
+		     spells[43].instant = false;
+		     spells[43].perctrigger = (float)RandomFloat(5.0f);
 		     spells[43].attackstoptimer = 1000;
 		     m_spellcheck[43] = true;
 
@@ -4858,8 +4858,8 @@ public:
 		     spells[44].reqlvl = 14;
 		     spells[44].hpreqtocast = 50;
 		     spells[44].targettype = TARGET_SELF;
-		     spells[44].instant = true;
-		     spells[44].perctrigger = (float)RandomFloat(10.0f);
+		     spells[44].instant = false;
+		     spells[44].perctrigger = (float)RandomFloat(5.0f);
 		     spells[44].attackstoptimer = 1000;
 		     m_spellcheck[44] = true;
 
@@ -4868,8 +4868,8 @@ public:
 		     spells[45].reqlvl = 20;
 		     spells[45].hpreqtocast = 50;
 		     spells[45].targettype = TARGET_SELF;
-		     spells[45].instant = true;
-		     spells[45].perctrigger = (float)RandomFloat(10.0f);
+		     spells[45].instant = false;
+		     spells[45].perctrigger = (float)RandomFloat(5.0f);
 		     spells[45].attackstoptimer = 1000;
 		     m_spellcheck[45] = true;
 
@@ -4878,8 +4878,8 @@ public:
 		     spells[46].reqlvl = 38;
 		     spells[46].hpreqtocast = 50;
 		     spells[46].targettype = TARGET_SELF;
-		     spells[46].instant = true;
-		     spells[46].perctrigger = (float)RandomFloat(10.0f);
+		     spells[46].instant = false;
+		     spells[46].perctrigger = (float)RandomFloat(5.0f);
 		     spells[46].attackstoptimer = 1000;
 		     m_spellcheck[46] = true;
 
@@ -4888,8 +4888,8 @@ public:
 		     spells[47].reqlvl = 44;
 		     spells[47].hpreqtocast = 50;
 		     spells[47].targettype = TARGET_SELF;
-		     spells[47].instant = true;
-		     spells[47].perctrigger = (float)RandomFloat(10.0f);
+		     spells[47].instant = false;
+		     spells[47].perctrigger = (float)RandomFloat(5.0f);
 		     spells[47].attackstoptimer = 1000;
 		     m_spellcheck[47] = true;
 
@@ -4898,8 +4898,8 @@ public:
 		     spells[48].reqlvl = 56;
 		     spells[48].hpreqtocast = 50;
 		     spells[48].targettype = TARGET_SELF;
-		     spells[48].instant = true;
-		     spells[48].perctrigger = (float)RandomFloat(10.0f);
+		     spells[48].instant = false;
+		     spells[48].perctrigger = (float)RandomFloat(5.0f);
 		     spells[48].attackstoptimer = 1000;
 		     m_spellcheck[48] = true;
 
@@ -4990,8 +4990,8 @@ public:
 		     spells[0].reqlvl = 4;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -5000,8 +5000,8 @@ public:
 		     spells[1].reqlvl = 30;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -5010,8 +5010,8 @@ public:
 		     spells[2].reqlvl = 4;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -5020,8 +5020,8 @@ public:
 		     spells[3].reqlvl = 10;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -5030,8 +5030,8 @@ public:
 		     spells[4].reqlvl = 10;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -5040,8 +5040,8 @@ public:
 		     spells[5].reqlvl = 30;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -5050,8 +5050,8 @@ public:
 		     spells[6].reqlvl = 8;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -5060,8 +5060,8 @@ public:
 		     spells[7].reqlvl = 4;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -5070,8 +5070,8 @@ public:
 		     spells[8].reqlvl = 18;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -5080,8 +5080,8 @@ public:
 		     spells[9].reqlvl = 16;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -5090,8 +5090,8 @@ public:
 		     spells[10].reqlvl = 14;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -5100,8 +5100,8 @@ public:
 		     spells[11].reqlvl = 26;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -5110,8 +5110,8 @@ public:
 		     spells[12].reqlvl = 28;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -5120,8 +5120,8 @@ public:
 		     spells[13].reqlvl = 24;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -5130,8 +5130,8 @@ public:
 		     spells[14].reqlvl = 34;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -5140,8 +5140,8 @@ public:
 		     spells[15].reqlvl = 34;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -5150,8 +5150,8 @@ public:
 		     spells[16].reqlvl = 36;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -5160,8 +5160,8 @@ public:
 		     spells[17].reqlvl = 42;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -5170,8 +5170,8 @@ public:
 		     spells[18].reqlvl = 46;
 		     spells[18].hpreqtocast = 85;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -5180,8 +5180,8 @@ public:
 		     spells[19].reqlvl = 48;
 		     spells[19].hpreqtocast = 85;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -5190,8 +5190,8 @@ public:
 		     spells[20].reqlvl = 58;
 		     spells[20].hpreqtocast = 85;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -5200,8 +5200,8 @@ public:
 		     spells[21].reqlvl = 58;
 		     spells[21].hpreqtocast = 85;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -5210,8 +5210,8 @@ public:
 		     spells[22].reqlvl = 60;
 		     spells[22].hpreqtocast = 85;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -5220,8 +5220,8 @@ public:
 		     spells[23].reqlvl = 1;
 		     spells[23].hpreqtocast = 50;
 		     spells[23].targettype = TARGET_SELF;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -5230,8 +5230,8 @@ public:
 		     spells[24].reqlvl = 6;
 		     spells[24].hpreqtocast = 50;
 		     spells[24].targettype = TARGET_SELF;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -5240,8 +5240,8 @@ public:
 		     spells[25].reqlvl = 20;
 		     spells[25].hpreqtocast = 50;
 		     spells[25].targettype = TARGET_SELF;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -5250,8 +5250,8 @@ public:
 		     spells[26].reqlvl = 28;
 		     spells[26].hpreqtocast = 50;
 		     spells[26].targettype = TARGET_SELF;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -5260,8 +5260,8 @@ public:
 		     spells[27].reqlvl = 36;
 		     spells[27].hpreqtocast = 50;
 		     spells[27].targettype = TARGET_SELF;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -5270,8 +5270,8 @@ public:
 		     spells[28].reqlvl = 44;
 		     spells[28].hpreqtocast = 50;
 		     spells[28].targettype = TARGET_SELF;
-		     spells[28].instant = true;
-		     spells[28].perctrigger = (float)RandomFloat(10.0f);
+		     spells[28].instant = false;
+		     spells[28].perctrigger = (float)RandomFloat(5.0f);
 		     spells[28].attackstoptimer = 1000;
 		     m_spellcheck[28] = true;
 
@@ -5280,8 +5280,8 @@ public:
 		     spells[29].reqlvl = 60;
 		     spells[29].hpreqtocast = 50;
 		     spells[29].targettype = TARGET_SELF;
-		     spells[29].instant = true;
-		     spells[29].perctrigger = (float)RandomFloat(10.0f);
+		     spells[29].instant = false;
+		     spells[29].perctrigger = (float)RandomFloat(5.0f);
 		     spells[29].attackstoptimer = 1000;
 		     m_spellcheck[29] = true;
 
@@ -5374,8 +5374,8 @@ public:
 		     spells[0].reqlvl = 4;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -5384,8 +5384,8 @@ public:
 		     spells[1].reqlvl = 20;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -5394,8 +5394,8 @@ public:
 		     spells[2].reqlvl = 10;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -5404,8 +5404,8 @@ public:
 		     spells[3].reqlvl = 10;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -5414,8 +5414,8 @@ public:
 		     spells[4].reqlvl = 28;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -5424,8 +5424,8 @@ public:
 		     spells[5].reqlvl = 18;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -5434,8 +5434,8 @@ public:
 		     spells[6].reqlvl = 16;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -5444,8 +5444,8 @@ public:
 		     spells[7].reqlvl = 14;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -5454,8 +5454,8 @@ public:
 		     spells[8].reqlvl = 0;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -5464,8 +5464,8 @@ public:
 		     spells[9].reqlvl = 36;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -5474,8 +5474,8 @@ public:
 		     spells[10].reqlvl = 26;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -5484,8 +5484,8 @@ public:
 		     spells[11].reqlvl = 22;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -5494,8 +5494,8 @@ public:
 		     spells[12].reqlvl = 22;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -5504,8 +5504,8 @@ public:
 		     spells[13].reqlvl = 28;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -5514,8 +5514,8 @@ public:
 		     spells[14].reqlvl = 14;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -5524,8 +5524,8 @@ public:
 		     spells[15].reqlvl = 44;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -5534,8 +5534,8 @@ public:
 		     spells[16].reqlvl = 34;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -5544,8 +5544,8 @@ public:
 		     spells[17].reqlvl = 34;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -5554,8 +5554,8 @@ public:
 		     spells[18].reqlvl = 52;
 		     spells[18].hpreqtocast = 85;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -5564,8 +5564,8 @@ public:
 		     spells[19].reqlvl = 42;
 		     spells[19].hpreqtocast = 85;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -5574,8 +5574,8 @@ public:
 		     spells[20].reqlvl = 40;
 		     spells[20].hpreqtocast = 85;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -5584,8 +5584,8 @@ public:
 		     spells[21].reqlvl = 46;
 		     spells[21].hpreqtocast = 85;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -5594,8 +5594,8 @@ public:
 		     spells[22].reqlvl = 60;
 		     spells[22].hpreqtocast = 85;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -5604,8 +5604,8 @@ public:
 		     spells[23].reqlvl = 50;
 		     spells[23].hpreqtocast = 85;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -5614,8 +5614,8 @@ public:
 		     spells[24].reqlvl = 58;
 		     spells[24].hpreqtocast = 85;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -5624,8 +5624,8 @@ public:
 		     spells[25].reqlvl = 52;
 		     spells[25].hpreqtocast = 85;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -5634,8 +5634,8 @@ public:
 		     spells[26].reqlvl = 58;
 		     spells[26].hpreqtocast = 85;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -5727,8 +5727,8 @@ public:
 		     spells[0].reqlvl = 1;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -5737,8 +5737,8 @@ public:
 		     spells[1].reqlvl = 6;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -5747,8 +5747,8 @@ public:
 		     spells[2].reqlvl = 14;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -5757,8 +5757,8 @@ public:
 		     spells[3].reqlvl = 20;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -5767,8 +5767,8 @@ public:
 		     spells[4].reqlvl = 24;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -5777,8 +5777,8 @@ public:
 		     spells[5].reqlvl = 22;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -5787,8 +5787,8 @@ public:
 		     spells[6].reqlvl = 28;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -5797,8 +5797,8 @@ public:
 		     spells[7].reqlvl = 36;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -5807,8 +5807,8 @@ public:
 		     spells[8].reqlvl = 30;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -5817,8 +5817,8 @@ public:
 		     spells[9].reqlvl = 36;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -5827,8 +5827,8 @@ public:
 		     spells[10].reqlvl = 48;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -5837,8 +5837,8 @@ public:
 		     spells[11].reqlvl = 46;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -5847,8 +5847,8 @@ public:
 		     spells[12].reqlvl = 36;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -5857,8 +5857,8 @@ public:
 		     spells[13].reqlvl = 54;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -5867,8 +5867,8 @@ public:
 		     spells[14].reqlvl = 54;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -5877,8 +5877,8 @@ public:
 		     spells[15].reqlvl = 36;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -5887,8 +5887,8 @@ public:
 		     spells[16].reqlvl = 60;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -5897,8 +5897,8 @@ public:
 		     spells[17].reqlvl = 6;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_SELF;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -5907,8 +5907,8 @@ public:
 		     spells[18].reqlvl = 12;
 		     spells[18].hpreqtocast = 85;
 		     spells[18].targettype = TARGET_SELF;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -5917,8 +5917,8 @@ public:
 		     spells[19].reqlvl = 18;
 		     spells[19].hpreqtocast = 85;
 		     spells[19].targettype = TARGET_SELF;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -5927,8 +5927,8 @@ public:
 		     spells[20].reqlvl = 24;
 		     spells[20].hpreqtocast = 85;
 		     spells[20].targettype = TARGET_SELF;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -5937,8 +5937,8 @@ public:
 		     spells[21].reqlvl = 36;
 		     spells[21].hpreqtocast = 85;
 		     spells[21].targettype = TARGET_SELF;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -5947,8 +5947,8 @@ public:
 		     spells[22].reqlvl = 48;
 		     spells[22].hpreqtocast = 85;
 		     spells[22].targettype = TARGET_SELF;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -5957,8 +5957,8 @@ public:
 		     spells[23].reqlvl = 54;
 		     spells[23].hpreqtocast = 85;
 		     spells[23].targettype = TARGET_SELF;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -5967,8 +5967,8 @@ public:
 		     spells[24].reqlvl = 4;
 		     spells[24].hpreqtocast = 50;
 		     spells[24].targettype = TARGET_SELF;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -5977,8 +5977,8 @@ public:
 		     spells[25].reqlvl = 10;
 		     spells[25].hpreqtocast = 50;
 		     spells[25].targettype = TARGET_SELF;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -5987,8 +5987,8 @@ public:
 		     spells[26].reqlvl = 26;
 		     spells[26].hpreqtocast = 50;
 		     spells[26].targettype = TARGET_SELF;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -5997,8 +5997,8 @@ public:
 		     spells[27].reqlvl = 38;
 		     spells[27].hpreqtocast = 50;
 		     spells[27].targettype = TARGET_SELF;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -6007,8 +6007,8 @@ public:
 		     spells[28].reqlvl = 44;
 		     spells[28].hpreqtocast = 50;
 		     spells[28].targettype = TARGET_SELF;
-		     spells[28].instant = true;
-		     spells[28].perctrigger = (float)RandomFloat(10.0f);
+		     spells[28].instant = false;
+		     spells[28].perctrigger = (float)RandomFloat(5.0f);
 		     spells[28].attackstoptimer = 1000;
 		     m_spellcheck[28] = true;
 
@@ -6017,8 +6017,8 @@ public:
 		     spells[29].reqlvl = 50;
 		     spells[29].hpreqtocast = 50;
 		     spells[29].targettype = TARGET_SELF;
-		     spells[29].instant = true;
-		     spells[29].perctrigger = (float)RandomFloat(10.0f);
+		     spells[29].instant = false;
+		     spells[29].perctrigger = (float)RandomFloat(5.0f);
 		     spells[29].attackstoptimer = 1000;
 		     m_spellcheck[29] = true;
 
@@ -6027,8 +6027,8 @@ public:
 		     spells[30].reqlvl = 56;
 		     spells[30].hpreqtocast = 50;
 		     spells[30].targettype = TARGET_SELF;
-		     spells[30].instant = true;
-		     spells[30].perctrigger = (float)RandomFloat(10.0f);
+		     spells[30].instant = false;
+		     spells[30].perctrigger = (float)RandomFloat(5.0f);
 		     spells[30].attackstoptimer = 1000;
 		     m_spellcheck[30] = true;
 
@@ -6037,8 +6037,8 @@ public:
 		     spells[31].reqlvl = 8;
 		     spells[31].hpreqtocast = 50;
 		     spells[31].targettype = TARGET_SELF;
-		     spells[31].instant = true;
-		     spells[31].perctrigger = (float)RandomFloat(10.0f);
+		     spells[31].instant = false;
+		     spells[31].perctrigger = (float)RandomFloat(5.0f);
 		     spells[31].attackstoptimer = 1000;
 		     m_spellcheck[31] = true;
 
@@ -6047,8 +6047,8 @@ public:
 		     spells[32].reqlvl = 14;
 		     spells[32].hpreqtocast = 50;
 		     spells[32].targettype = TARGET_SELF;
-		     spells[32].instant = true;
-		     spells[32].perctrigger = (float)RandomFloat(10.0f);
+		     spells[32].instant = false;
+		     spells[32].perctrigger = (float)RandomFloat(5.0f);
 		     spells[32].attackstoptimer = 1000;
 		     m_spellcheck[32] = true;
 
@@ -6057,8 +6057,8 @@ public:
 		     spells[33].reqlvl = 20;
 		     spells[33].hpreqtocast = 50;
 		     spells[33].targettype = TARGET_SELF;
-		     spells[33].instant = true;
-		     spells[33].perctrigger = (float)RandomFloat(10.0f);
+		     spells[33].instant = false;
+		     spells[33].perctrigger = (float)RandomFloat(5.0f);
 		     spells[33].attackstoptimer = 1000;
 		     m_spellcheck[33] = true;
 
@@ -6067,8 +6067,8 @@ public:
 		     spells[34].reqlvl = 38;
 		     spells[34].hpreqtocast = 50;
 		     spells[34].targettype = TARGET_SELF;
-		     spells[34].instant = true;
-		     spells[34].perctrigger = (float)RandomFloat(10.0f);
+		     spells[34].instant = false;
+		     spells[34].perctrigger = (float)RandomFloat(5.0f);
 		     spells[34].attackstoptimer = 1000;
 		     m_spellcheck[34] = true;
 
@@ -6077,8 +6077,8 @@ public:
 		     spells[35].reqlvl = 44;
 		     spells[35].hpreqtocast = 50;
 		     spells[35].targettype = TARGET_SELF;
-		     spells[35].instant = true;
-		     spells[35].perctrigger = (float)RandomFloat(10.0f);
+		     spells[35].instant = false;
+		     spells[35].perctrigger = (float)RandomFloat(5.0f);
 		     spells[35].attackstoptimer = 1000;
 		     m_spellcheck[35] = true;
 
@@ -6087,8 +6087,8 @@ public:
 		     spells[36].reqlvl = 56;
 		     spells[36].hpreqtocast = 50;
 		     spells[36].targettype = TARGET_SELF;
-		     spells[36].instant = true;
-		     spells[36].perctrigger = (float)RandomFloat(10.0f);
+		     spells[36].instant = false;
+		     spells[36].perctrigger = (float)RandomFloat(5.0f);
 		     spells[36].attackstoptimer = 1000;
 		     m_spellcheck[36] = true;
 
@@ -6180,8 +6180,8 @@ public:
 		     spells[0].reqlvl = 1;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -6190,8 +6190,8 @@ public:
 		     spells[1].reqlvl = 4;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -6200,8 +6200,8 @@ public:
 		     spells[2].reqlvl = 6;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -6210,8 +6210,8 @@ public:
 		     spells[3].reqlvl = 10;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -6220,8 +6220,8 @@ public:
 		     spells[4].reqlvl = 14;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -6230,8 +6230,8 @@ public:
 		     spells[5].reqlvl = 16;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -6240,8 +6240,8 @@ public:
 		     spells[6].reqlvl = 18;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -6250,8 +6250,8 @@ public:
 		     spells[7].reqlvl = 20;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -6260,8 +6260,8 @@ public:
 		     spells[8].reqlvl = 20;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -6270,8 +6270,8 @@ public:
 		     spells[9].reqlvl = 22;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -6280,8 +6280,8 @@ public:
 		     spells[10].reqlvl = 22;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -6290,8 +6290,8 @@ public:
 		     spells[11].reqlvl = 30;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -6300,8 +6300,8 @@ public:
 		     spells[12].reqlvl = 30;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -6310,8 +6310,8 @@ public:
 		     spells[13].reqlvl = 26;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -6320,8 +6320,8 @@ public:
 		     spells[14].reqlvl = 30;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -6330,8 +6330,8 @@ public:
 		     spells[15].reqlvl = 28;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -6340,8 +6340,8 @@ public:
 		     spells[16].reqlvl = 42;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -6350,8 +6350,8 @@ public:
 		     spells[17].reqlvl = 40;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -6360,8 +6360,8 @@ public:
 		     spells[18].reqlvl = 34;
 		     spells[18].hpreqtocast = 85;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -6370,8 +6370,8 @@ public:
 		     spells[19].reqlvl = 40;
 		     spells[19].hpreqtocast = 85;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -6380,8 +6380,8 @@ public:
 		     spells[20].reqlvl = 38;
 		     spells[20].hpreqtocast = 85;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -6390,8 +6390,8 @@ public:
 		     spells[21].reqlvl = 46;
 		     spells[21].hpreqtocast = 85;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -6400,8 +6400,8 @@ public:
 		     spells[22].reqlvl = 34;
 		     spells[22].hpreqtocast = 85;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -6410,8 +6410,8 @@ public:
 		     spells[23].reqlvl = 40;
 		     spells[23].hpreqtocast = 85;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -6420,8 +6420,8 @@ public:
 		     spells[24].reqlvl = 54;
 		     spells[24].hpreqtocast = 85;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -6430,8 +6430,8 @@ public:
 		     spells[25].reqlvl = 50;
 		     spells[25].hpreqtocast = 85;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -6440,8 +6440,8 @@ public:
 		     spells[26].reqlvl = 42;
 		     spells[26].hpreqtocast = 85;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -6450,8 +6450,8 @@ public:
 		     spells[27].reqlvl = 50;
 		     spells[27].hpreqtocast = 85;
 		     spells[27].targettype = TARGET_ATTACKING;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -6460,8 +6460,8 @@ public:
 		     spells[28].reqlvl = 54;
 		     spells[28].hpreqtocast = 85;
 		     spells[28].targettype = TARGET_ATTACKING;
-		     spells[28].instant = true;
-		     spells[28].perctrigger = (float)RandomFloat(10.0f);
+		     spells[28].instant = false;
+		     spells[28].perctrigger = (float)RandomFloat(5.0f);
 		     spells[28].attackstoptimer = 1000;
 		     m_spellcheck[28] = true;
 
@@ -6470,8 +6470,8 @@ public:
 		     spells[29].reqlvl = 46;
 		     spells[29].hpreqtocast = 85;
 		     spells[29].targettype = TARGET_ATTACKING;
-		     spells[29].instant = true;
-		     spells[29].perctrigger = (float)RandomFloat(10.0f);
+		     spells[29].instant = false;
+		     spells[29].perctrigger = (float)RandomFloat(5.0f);
 		     spells[29].attackstoptimer = 1000;
 		     m_spellcheck[29] = true;
 
@@ -6480,8 +6480,8 @@ public:
 		     spells[30].reqlvl = 52;
 		     spells[30].hpreqtocast = 85;
 		     spells[30].targettype = TARGET_ATTACKING;
-		     spells[30].instant = true;
-		     spells[30].perctrigger = (float)RandomFloat(10.0f);
+		     spells[30].instant = false;
+		     spells[30].perctrigger = (float)RandomFloat(5.0f);
 		     spells[30].attackstoptimer = 1000;
 		     m_spellcheck[30] = true;
 
@@ -6490,8 +6490,8 @@ public:
 		     spells[31].reqlvl = 54;
 		     spells[31].hpreqtocast = 85;
 		     spells[31].targettype = TARGET_ATTACKING;
-		     spells[31].instant = true;
-		     spells[31].perctrigger = (float)RandomFloat(10.0f);
+		     spells[31].instant = false;
+		     spells[31].perctrigger = (float)RandomFloat(5.0f);
 		     spells[31].attackstoptimer = 1000;
 		     m_spellcheck[31] = true;
 
@@ -6500,8 +6500,8 @@ public:
 		     spells[32].reqlvl = 60;
 		     spells[32].hpreqtocast = 85;
 		     spells[32].targettype = TARGET_ATTACKING;
-		     spells[32].instant = true;
-		     spells[32].perctrigger = (float)RandomFloat(10.0f);
+		     spells[32].instant = false;
+		     spells[32].perctrigger = (float)RandomFloat(5.0f);
 		     spells[32].attackstoptimer = 1000;
 		     m_spellcheck[32] = true;
 
@@ -6510,8 +6510,8 @@ public:
 		     spells[33].reqlvl = 50;
 		     spells[33].hpreqtocast = 85;
 		     spells[33].targettype = TARGET_ATTACKING;
-		     spells[33].instant = true;
-		     spells[33].perctrigger = (float)RandomFloat(10.0f);
+		     spells[33].instant = false;
+		     spells[33].perctrigger = (float)RandomFloat(5.0f);
 		     spells[33].attackstoptimer = 1000;
 		     m_spellcheck[33] = true;
 
@@ -6520,8 +6520,8 @@ public:
 		     spells[34].reqlvl = 58;
 		     spells[34].hpreqtocast = 85;
 		     spells[34].targettype = TARGET_ATTACKING;
-		     spells[34].instant = true;
-		     spells[34].perctrigger = (float)RandomFloat(10.0f);
+		     spells[34].instant = false;
+		     spells[34].perctrigger = (float)RandomFloat(5.0f);
 		     spells[34].attackstoptimer = 1000;
 		     m_spellcheck[34] = true;
 
@@ -6530,8 +6530,8 @@ public:
 		     spells[35].reqlvl = 60;
 		     spells[35].hpreqtocast = 85;
 		     spells[35].targettype = TARGET_ATTACKING;
-		     spells[35].instant = true;
-		     spells[35].perctrigger = (float)RandomFloat(10.0f);
+		     spells[35].instant = false;
+		     spells[35].perctrigger = (float)RandomFloat(5.0f);
 		     spells[35].attackstoptimer = 1000;
 		     m_spellcheck[35] = true;
 
@@ -6540,8 +6540,8 @@ public:
 		     spells[36].reqlvl = 6;
 		     spells[36].hpreqtocast = 85;
 		     spells[36].targettype = TARGET_SELF;
-		     spells[36].instant = true;
-		     spells[36].perctrigger = (float)RandomFloat(10.0f);
+		     spells[36].instant = false;
+		     spells[36].perctrigger = (float)RandomFloat(5.0f);
 		     spells[36].attackstoptimer = 1000;
 		     m_spellcheck[36] = true;
 
@@ -6550,8 +6550,8 @@ public:
 		     spells[37].reqlvl = 14;
 		     spells[37].hpreqtocast = 85;
 		     spells[37].targettype = TARGET_SELF;
-		     spells[37].instant = true;
-		     spells[37].perctrigger = (float)RandomFloat(10.0f);
+		     spells[37].instant = false;
+		     spells[37].perctrigger = (float)RandomFloat(5.0f);
 		     spells[37].attackstoptimer = 1000;
 		     m_spellcheck[37] = true;
 
@@ -6560,8 +6560,8 @@ public:
 		     spells[38].reqlvl = 24;
 		     spells[38].hpreqtocast = 85;
 		     spells[38].targettype = TARGET_SELF;
-		     spells[38].instant = true;
-		     spells[38].perctrigger = (float)RandomFloat(10.0f);
+		     spells[38].instant = false;
+		     spells[38].perctrigger = (float)RandomFloat(5.0f);
 		     spells[38].attackstoptimer = 1000;
 		     m_spellcheck[38] = true;
 
@@ -6570,8 +6570,8 @@ public:
 		     spells[39].reqlvl = 34;
 		     spells[39].hpreqtocast = 85;
 		     spells[39].targettype = TARGET_SELF;
-		     spells[39].instant = true;
-		     spells[39].perctrigger = (float)RandomFloat(10.0f);
+		     spells[39].instant = false;
+		     spells[39].perctrigger = (float)RandomFloat(5.0f);
 		     spells[39].attackstoptimer = 1000;
 		     m_spellcheck[39] = true;
 
@@ -6580,8 +6580,8 @@ public:
 		     spells[40].reqlvl = 44;
 		     spells[40].hpreqtocast = 85;
 		     spells[40].targettype = TARGET_SELF;
-		     spells[40].instant = true;
-		     spells[40].perctrigger = (float)RandomFloat(10.0f);
+		     spells[40].instant = false;
+		     spells[40].perctrigger = (float)RandomFloat(5.0f);
 		     spells[40].attackstoptimer = 1000;
 		     m_spellcheck[40] = true;
 
@@ -6590,8 +6590,8 @@ public:
 		     spells[41].reqlvl = 54;
 		     spells[41].hpreqtocast = 85;
 		     spells[41].targettype = TARGET_SELF;
-		     spells[41].instant = true;
-		     spells[41].perctrigger = (float)RandomFloat(10.0f);
+		     spells[41].instant = false;
+		     spells[41].perctrigger = (float)RandomFloat(5.0f);
 		     spells[41].attackstoptimer = 1000;
 		     m_spellcheck[41] = true;
 
@@ -6600,8 +6600,8 @@ public:
 		     spells[42].reqlvl = 10;
 		     spells[42].hpreqtocast = 50;
 		     spells[42].targettype = TARGET_SELF;
-		     spells[42].instant = true;
-		     spells[42].perctrigger = (float)RandomFloat(10.0f);
+		     spells[42].instant = false;
+		     spells[42].perctrigger = (float)RandomFloat(5.0f);
 		     spells[42].attackstoptimer = 1000;
 		     m_spellcheck[42] = true;
 
@@ -6610,8 +6610,8 @@ public:
 		     spells[43].reqlvl = 18;
 		     spells[43].hpreqtocast = 50;
 		     spells[43].targettype = TARGET_SELF;
-		     spells[43].instant = true;
-		     spells[43].perctrigger = (float)RandomFloat(10.0f);
+		     spells[43].instant = false;
+		     spells[43].perctrigger = (float)RandomFloat(5.0f);
 		     spells[43].attackstoptimer = 1000;
 		     m_spellcheck[43] = true;
 
@@ -6620,8 +6620,8 @@ public:
 		     spells[44].reqlvl = 28;
 		     spells[44].hpreqtocast = 50;
 		     spells[44].targettype = TARGET_SELF;
-		     spells[44].instant = true;
-		     spells[44].perctrigger = (float)RandomFloat(10.0f);
+		     spells[44].instant = false;
+		     spells[44].perctrigger = (float)RandomFloat(5.0f);
 		     spells[44].attackstoptimer = 1000;
 		     m_spellcheck[44] = true;
 
@@ -6630,8 +6630,8 @@ public:
 		     spells[45].reqlvl = 38;
 		     spells[45].hpreqtocast = 50;
 		     spells[45].targettype = TARGET_SELF;
-		     spells[45].instant = true;
-		     spells[45].perctrigger = (float)RandomFloat(10.0f);
+		     spells[45].instant = false;
+		     spells[45].perctrigger = (float)RandomFloat(5.0f);
 		     spells[45].attackstoptimer = 1000;
 		     m_spellcheck[45] = true;
 
@@ -6640,8 +6640,8 @@ public:
 		     spells[46].reqlvl = 48;
 		     spells[46].hpreqtocast = 50;
 		     spells[46].targettype = TARGET_SELF;
-		     spells[46].instant = true;
-		     spells[46].perctrigger = (float)RandomFloat(10.0f);
+		     spells[46].instant = false;
+		     spells[46].perctrigger = (float)RandomFloat(5.0f);
 		     spells[46].attackstoptimer = 1000;
 		     m_spellcheck[46] = true;
 
@@ -6650,8 +6650,8 @@ public:
 		     spells[47].reqlvl = 58;
 		     spells[47].hpreqtocast = 50;
 		     spells[47].targettype = TARGET_SELF;
-		     spells[47].instant = true;
-		     spells[47].perctrigger = (float)RandomFloat(10.0f);
+		     spells[47].instant = false;
+		     spells[47].perctrigger = (float)RandomFloat(5.0f);
 		     spells[47].attackstoptimer = 1000;
 		     m_spellcheck[47] = true;
 
@@ -6660,8 +6660,8 @@ public:
 		     spells[48].reqlvl = 4;
 		     spells[48].hpreqtocast = 50;
 		     spells[48].targettype = TARGET_SELF;
-		     spells[48].instant = true;
-		     spells[48].perctrigger = (float)RandomFloat(10.0f);
+		     spells[48].instant = false;
+		     spells[48].perctrigger = (float)RandomFloat(5.0f);
 		     spells[48].attackstoptimer = 1000;
 		     m_spellcheck[48] = true;
 
@@ -6670,8 +6670,8 @@ public:
 		     spells[49].reqlvl = 10;
 		     spells[49].hpreqtocast = 50;
 		     spells[49].targettype = TARGET_SELF;
-		     spells[49].instant = true;
-		     spells[49].perctrigger = (float)RandomFloat(10.0f);
+		     spells[49].instant = false;
+		     spells[49].perctrigger = (float)RandomFloat(5.0f);
 		     spells[49].attackstoptimer = 1000;
 		     m_spellcheck[49] = true;
 
@@ -6680,8 +6680,8 @@ public:
 		     spells[50].reqlvl = 16;
 		     spells[50].hpreqtocast = 50;
 		     spells[50].targettype = TARGET_SELF;
-		     spells[50].instant = true;
-		     spells[50].perctrigger = (float)RandomFloat(10.0f);
+		     spells[50].instant = false;
+		     spells[50].perctrigger = (float)RandomFloat(5.0f);
 		     spells[50].attackstoptimer = 1000;
 		     m_spellcheck[50] = true;
 
@@ -6690,8 +6690,8 @@ public:
 		     spells[51].reqlvl = 22;
 		     spells[51].hpreqtocast = 50;
 		     spells[51].targettype = TARGET_SELF;
-		     spells[51].instant = true;
-		     spells[51].perctrigger = (float)RandomFloat(10.0f);
+		     spells[51].instant = false;
+		     spells[51].perctrigger = (float)RandomFloat(5.0f);
 		     spells[51].attackstoptimer = 1000;
 		     m_spellcheck[51] = true;
 
@@ -6700,8 +6700,8 @@ public:
 		     spells[52].reqlvl = 28;
 		     spells[52].hpreqtocast = 50;
 		     spells[52].targettype = TARGET_SELF;
-		     spells[52].instant = true;
-		     spells[52].perctrigger = (float)RandomFloat(10.0f);
+		     spells[52].instant = false;
+		     spells[52].perctrigger = (float)RandomFloat(5.0f);
 		     spells[52].attackstoptimer = 1000;
 		     m_spellcheck[52] = true;
 
@@ -6710,8 +6710,8 @@ public:
 		     spells[53].reqlvl = 34;
 		     spells[53].hpreqtocast = 50;
 		     spells[53].targettype = TARGET_SELF;
-		     spells[53].instant = true;
-		     spells[53].perctrigger = (float)RandomFloat(10.0f);
+		     spells[53].instant = false;
+		     spells[53].perctrigger = (float)RandomFloat(5.0f);
 		     spells[53].attackstoptimer = 1000;
 		     m_spellcheck[53] = true;
 
@@ -6720,8 +6720,8 @@ public:
 		     spells[54].reqlvl = 40;
 		     spells[54].hpreqtocast = 50;
 		     spells[54].targettype = TARGET_SELF;
-		     spells[54].instant = true;
-		     spells[54].perctrigger = (float)RandomFloat(10.0f);
+		     spells[54].instant = false;
+		     spells[54].perctrigger = (float)RandomFloat(5.0f);
 		     spells[54].attackstoptimer = 1000;
 		     m_spellcheck[54] = true;
 
@@ -6730,8 +6730,8 @@ public:
 		     spells[55].reqlvl = 1;
 		     spells[55].hpreqtocast = 50;
 		     spells[55].targettype = TARGET_SELF;
-		     spells[55].instant = true;
-		     spells[55].perctrigger = (float)RandomFloat(10.0f);
+		     spells[55].instant = false;
+		     spells[55].perctrigger = (float)RandomFloat(5.0f);
 		     spells[55].attackstoptimer = 1000;
 		     m_spellcheck[55] = true;
 
@@ -6740,8 +6740,8 @@ public:
 		     spells[56].reqlvl = 8;
 		     spells[56].hpreqtocast = 50;
 		     spells[56].targettype = TARGET_SELF;
-		     spells[56].instant = true;
-		     spells[56].perctrigger = (float)RandomFloat(10.0f);
+		     spells[56].instant = false;
+		     spells[56].perctrigger = (float)RandomFloat(5.0f);
 		     spells[56].attackstoptimer = 1000;
 		     m_spellcheck[56] = true;
 
@@ -6750,8 +6750,8 @@ public:
 		     spells[57].reqlvl = 14;
 		     spells[57].hpreqtocast = 50;
 		     spells[57].targettype = TARGET_SELF;
-		     spells[57].instant = true;
-		     spells[57].perctrigger = (float)RandomFloat(10.0f);
+		     spells[57].instant = false;
+		     spells[57].perctrigger = (float)RandomFloat(5.0f);
 		     spells[57].attackstoptimer = 1000;
 		     m_spellcheck[57] = true;
 
@@ -6760,8 +6760,8 @@ public:
 		     spells[58].reqlvl = 20;
 		     spells[58].hpreqtocast = 50;
 		     spells[58].targettype = TARGET_SELF;
-		     spells[58].instant = true;
-		     spells[58].perctrigger = (float)RandomFloat(10.0f);
+		     spells[58].instant = false;
+		     spells[58].perctrigger = (float)RandomFloat(5.0f);
 		     spells[58].attackstoptimer = 1000;
 		     m_spellcheck[58] = true;
 
@@ -6770,8 +6770,8 @@ public:
 		     spells[59].reqlvl = 26;
 		     spells[59].hpreqtocast = 50;
 		     spells[59].targettype = TARGET_SELF;
-		     spells[59].instant = true;
-		     spells[59].perctrigger = (float)RandomFloat(10.0f);
+		     spells[59].instant = false;
+		     spells[59].perctrigger = (float)RandomFloat(5.0f);
 		     spells[59].attackstoptimer = 1000;
 		     m_spellcheck[59] = true;
 
@@ -6780,8 +6780,8 @@ public:
 		     spells[60].reqlvl = 32;
 		     spells[60].hpreqtocast = 50;
 		     spells[60].targettype = TARGET_SELF;
-		     spells[60].instant = true;
-		     spells[60].perctrigger = (float)RandomFloat(10.0f);
+		     spells[60].instant = false;
+		     spells[60].perctrigger = (float)RandomFloat(5.0f);
 		     spells[60].attackstoptimer = 1000;
 		     m_spellcheck[60] = true;
 
@@ -6790,8 +6790,8 @@ public:
 		     spells[61].reqlvl = 38;
 		     spells[61].hpreqtocast = 50;
 		     spells[61].targettype = TARGET_SELF;
-		     spells[61].instant = true;
-		     spells[61].perctrigger = (float)RandomFloat(10.0f);
+		     spells[61].instant = false;
+		     spells[61].perctrigger = (float)RandomFloat(5.0f);
 		     spells[61].attackstoptimer = 1000;
 		     m_spellcheck[61] = true;
 
@@ -6800,8 +6800,8 @@ public:
 		     spells[62].reqlvl = 8;
 		     spells[62].hpreqtocast = 20;
 		     spells[62].targettype = TARGET_ATTACKING;
-		     spells[62].instant = true;
-		     spells[62].perctrigger = (float)RandomFloat(10.0f);
+		     spells[62].instant = false;
+		     spells[62].perctrigger = (float)RandomFloat(5.0f);
 		     spells[62].attackstoptimer = 1000;
 		     m_spellcheck[62] = true;
 
@@ -6810,8 +6810,8 @@ public:
 		     spells[63].reqlvl = 18;
 		     spells[63].hpreqtocast = 20;
 		     spells[63].targettype = TARGET_ATTACKING;
-		     spells[63].instant = true;
-		     spells[63].perctrigger = (float)RandomFloat(10.0f);
+		     spells[63].instant = false;
+		     spells[63].perctrigger = (float)RandomFloat(5.0f);
 		     spells[63].attackstoptimer = 1000;
 		     m_spellcheck[63] = true;
 
@@ -6820,8 +6820,8 @@ public:
 		     spells[64].reqlvl = 28;
 		     spells[64].hpreqtocast = 20;
 		     spells[64].targettype = TARGET_ATTACKING;
-		     spells[64].instant = true;
-		     spells[64].perctrigger = (float)RandomFloat(10.0f);
+		     spells[64].instant = false;
+		     spells[64].perctrigger = (float)RandomFloat(5.0f);
 		     spells[64].attackstoptimer = 1000;
 		     m_spellcheck[64] = true;
 
@@ -6830,8 +6830,8 @@ public:
 		     spells[65].reqlvl = 38;
 		     spells[65].hpreqtocast = 20;
 		     spells[65].targettype = TARGET_ATTACKING;
-		     spells[65].instant = true;
-		     spells[65].perctrigger = (float)RandomFloat(10.0f);
+		     spells[65].instant = false;
+		     spells[65].perctrigger = (float)RandomFloat(5.0f);
 		     spells[65].attackstoptimer = 1000;
 		     m_spellcheck[65] = true;
 
@@ -6840,8 +6840,8 @@ public:
 		     spells[66].reqlvl = 48;
 		     spells[66].hpreqtocast = 20;
 		     spells[66].targettype = TARGET_ATTACKING;
-		     spells[66].instant = true;
-		     spells[66].perctrigger = (float)RandomFloat(10.0f);
+		     spells[66].instant = false;
+		     spells[66].perctrigger = (float)RandomFloat(5.0f);
 		     spells[66].attackstoptimer = 1000;
 		     m_spellcheck[66] = true;
 
@@ -6850,8 +6850,8 @@ public:
 		     spells[67].reqlvl = 58;
 		     spells[67].hpreqtocast = 20;
 		     spells[67].targettype = TARGET_ATTACKING;
-		     spells[67].instant = true;
-		     spells[67].perctrigger = (float)RandomFloat(10.0f);
+		     spells[67].instant = false;
+		     spells[67].perctrigger = (float)RandomFloat(5.0f);
 		     spells[67].attackstoptimer = 1000;
 		     m_spellcheck[67] = true;
 
@@ -6943,8 +6943,8 @@ public:
 		     spells[0].reqlvl = 10;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -6953,8 +6953,8 @@ public:
 		     spells[1].reqlvl = 20;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -6963,8 +6963,8 @@ public:
 		     spells[2].reqlvl = 10;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -6973,8 +6973,8 @@ public:
 		     spells[3].reqlvl = 20;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -6983,8 +6983,8 @@ public:
 		     spells[4].reqlvl = 18;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -6993,8 +6993,8 @@ public:
 		     spells[5].reqlvl = 20;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -7003,8 +7003,8 @@ public:
 		     spells[6].reqlvl = 20;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -7013,8 +7013,8 @@ public:
 		     spells[7].reqlvl = 4;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -7023,8 +7023,8 @@ public:
 		     spells[8].reqlvl = 25;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -7033,8 +7033,8 @@ public:
 		     spells[9].reqlvl = 20;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -7043,8 +7043,8 @@ public:
 		     spells[10].reqlvl = 18;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -7053,8 +7053,8 @@ public:
 		     spells[11].reqlvl = 20;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -7063,8 +7063,8 @@ public:
 		     spells[12].reqlvl = 20;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -7073,8 +7073,8 @@ public:
 		     spells[13].reqlvl = 4;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -7083,8 +7083,8 @@ public:
 		     spells[14].reqlvl = 20;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -7093,8 +7093,8 @@ public:
 		     spells[15].reqlvl = 20;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -7103,8 +7103,8 @@ public:
 		     spells[16].reqlvl = 4;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -7113,8 +7113,8 @@ public:
 		     spells[17].reqlvl = 35;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -7123,8 +7123,8 @@ public:
 		     spells[18].reqlvl = 20;
 		     spells[18].hpreqtocast = 85;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -7133,8 +7133,8 @@ public:
 		     spells[19].reqlvl = 4;
 		     spells[19].hpreqtocast = 85;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -7143,8 +7143,8 @@ public:
 		     spells[20].reqlvl = 20;
 		     spells[20].hpreqtocast = 85;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -7236,8 +7236,8 @@ public:
 		     spells[0].reqlvl = 20;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -7246,8 +7246,8 @@ public:
 		     spells[1].reqlvl = 30;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -7256,8 +7256,8 @@ public:
 		     spells[2].reqlvl = 1;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -7266,8 +7266,8 @@ public:
 		     spells[3].reqlvl = 10;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -7276,8 +7276,8 @@ public:
 		     spells[4].reqlvl = 20;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -7286,8 +7286,8 @@ public:
 		     spells[5].reqlvl = 1;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -7296,8 +7296,8 @@ public:
 		     spells[6].reqlvl = 10;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -7306,8 +7306,8 @@ public:
 		     spells[7].reqlvl = 20;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -7316,8 +7316,8 @@ public:
 		     spells[8].reqlvl = 20;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -7326,8 +7326,8 @@ public:
 		     spells[9].reqlvl = 1;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -7336,8 +7336,8 @@ public:
 		     spells[10].reqlvl = 20;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -7346,8 +7346,8 @@ public:
 		     spells[11].reqlvl = 20;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -7356,8 +7356,8 @@ public:
 		     spells[12].reqlvl = 20;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -7366,8 +7366,8 @@ public:
 		     spells[13].reqlvl = 10;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -7376,8 +7376,8 @@ public:
 		     spells[14].reqlvl = 35;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -7386,8 +7386,8 @@ public:
 		     spells[15].reqlvl = 10;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -7396,8 +7396,8 @@ public:
 		     spells[16].reqlvl = 45;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -7406,8 +7406,8 @@ public:
 		     spells[17].reqlvl = 10;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -7416,8 +7416,8 @@ public:
 		     spells[18].reqlvl = 0;
 		     spells[18].hpreqtocast = 85;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -7426,8 +7426,8 @@ public:
 		     spells[19].reqlvl = 60;
 		     spells[19].hpreqtocast = 85;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -7519,8 +7519,8 @@ public:
 		     spells[0].reqlvl = 20;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -7529,8 +7529,8 @@ public:
 		     spells[1].reqlvl = 30;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -7539,8 +7539,8 @@ public:
 		     spells[2].reqlvl = 1;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -7549,8 +7549,8 @@ public:
 		     spells[3].reqlvl = 20;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -7559,8 +7559,8 @@ public:
 		     spells[4].reqlvl = 1;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -7569,8 +7569,8 @@ public:
 		     spells[5].reqlvl = 0;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -7579,8 +7579,8 @@ public:
 		     spells[6].reqlvl = 20;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -7589,8 +7589,8 @@ public:
 		     spells[7].reqlvl = 1;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -7599,8 +7599,8 @@ public:
 		     spells[8].reqlvl = 10;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -7609,8 +7609,8 @@ public:
 		     spells[9].reqlvl = 0;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -7619,8 +7619,8 @@ public:
 		     spells[10].reqlvl = 20;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -7629,8 +7629,8 @@ public:
 		     spells[11].reqlvl = 1;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -7639,8 +7639,8 @@ public:
 		     spells[12].reqlvl = 10;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -7649,8 +7649,8 @@ public:
 		     spells[13].reqlvl = 35;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -7659,8 +7659,8 @@ public:
 		     spells[14].reqlvl = 10;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -7669,8 +7669,8 @@ public:
 		     spells[15].reqlvl = 45;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -7679,8 +7679,8 @@ public:
 		     spells[16].reqlvl = 10;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -7689,8 +7689,8 @@ public:
 		     spells[17].reqlvl = 60;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -7782,8 +7782,8 @@ public:
 		     spells[0].reqlvl = 20;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -7792,8 +7792,8 @@ public:
 		     spells[1].reqlvl = 20;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -7802,8 +7802,8 @@ public:
 		     spells[2].reqlvl = 20;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -7812,8 +7812,8 @@ public:
 		     spells[3].reqlvl = 20;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -7822,8 +7822,8 @@ public:
 		     spells[4].reqlvl = 20;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -7832,8 +7832,8 @@ public:
 		     spells[5].reqlvl = 40;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -7842,8 +7842,8 @@ public:
 		     spells[6].reqlvl = 20;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -7852,8 +7852,8 @@ public:
 		     spells[7].reqlvl = 20;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -7862,8 +7862,8 @@ public:
 		     spells[8].reqlvl = 40;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -7872,8 +7872,8 @@ public:
 		     spells[9].reqlvl = 20;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -7882,8 +7882,8 @@ public:
 		     spells[10].reqlvl = 20;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -7892,8 +7892,8 @@ public:
 		     spells[11].reqlvl = 0;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -7902,8 +7902,8 @@ public:
 		     spells[12].reqlvl = 1;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -7995,8 +7995,8 @@ public:
 		     spells[0].reqlvl = 1;
 		     spells[0].hpreqtocast = 85;
 		     spells[0].targettype = TARGET_ATTACKING;
-		     spells[0].instant = true;
-		     spells[0].perctrigger = (float)RandomFloat(10.0f);
+		     spells[0].instant = false;
+		     spells[0].perctrigger = (float)RandomFloat(5.0f);
 		     spells[0].attackstoptimer = 1000;
 		     m_spellcheck[0] = true;
 
@@ -8005,8 +8005,8 @@ public:
 		     spells[1].reqlvl = 4;
 		     spells[1].hpreqtocast = 85;
 		     spells[1].targettype = TARGET_ATTACKING;
-		     spells[1].instant = true;
-		     spells[1].perctrigger = (float)RandomFloat(10.0f);
+		     spells[1].instant = false;
+		     spells[1].perctrigger = (float)RandomFloat(5.0f);
 		     spells[1].attackstoptimer = 1000;
 		     m_spellcheck[1] = true;
 
@@ -8015,8 +8015,8 @@ public:
 		     spells[2].reqlvl = 8;
 		     spells[2].hpreqtocast = 85;
 		     spells[2].targettype = TARGET_ATTACKING;
-		     spells[2].instant = true;
-		     spells[2].perctrigger = (float)RandomFloat(10.0f);
+		     spells[2].instant = false;
+		     spells[2].perctrigger = (float)RandomFloat(5.0f);
 		     spells[2].attackstoptimer = 1000;
 		     m_spellcheck[2] = true;
 
@@ -8025,8 +8025,8 @@ public:
 		     spells[3].reqlvl = 8;
 		     spells[3].hpreqtocast = 85;
 		     spells[3].targettype = TARGET_ATTACKING;
-		     spells[3].instant = true;
-		     spells[3].perctrigger = (float)RandomFloat(10.0f);
+		     spells[3].instant = false;
+		     spells[3].perctrigger = (float)RandomFloat(5.0f);
 		     spells[3].attackstoptimer = 1000;
 		     m_spellcheck[3] = true;
 
@@ -8035,8 +8035,8 @@ public:
 		     spells[4].reqlvl = 10;
 		     spells[4].hpreqtocast = 85;
 		     spells[4].targettype = TARGET_ATTACKING;
-		     spells[4].instant = true;
-		     spells[4].perctrigger = (float)RandomFloat(10.0f);
+		     spells[4].instant = false;
+		     spells[4].perctrigger = (float)RandomFloat(5.0f);
 		     spells[4].attackstoptimer = 1000;
 		     m_spellcheck[4] = true;
 
@@ -8045,8 +8045,8 @@ public:
 		     spells[5].reqlvl = 14;
 		     spells[5].hpreqtocast = 85;
 		     spells[5].targettype = TARGET_ATTACKING;
-		     spells[5].instant = true;
-		     spells[5].perctrigger = (float)RandomFloat(10.0f);
+		     spells[5].instant = false;
+		     spells[5].perctrigger = (float)RandomFloat(5.0f);
 		     spells[5].attackstoptimer = 1000;
 		     m_spellcheck[5] = true;
 
@@ -8055,8 +8055,8 @@ public:
 		     spells[6].reqlvl = 14;
 		     spells[6].hpreqtocast = 85;
 		     spells[6].targettype = TARGET_ATTACKING;
-		     spells[6].instant = true;
-		     spells[6].perctrigger = (float)RandomFloat(10.0f);
+		     spells[6].instant = false;
+		     spells[6].perctrigger = (float)RandomFloat(5.0f);
 		     spells[6].attackstoptimer = 1000;
 		     m_spellcheck[6] = true;
 
@@ -8065,8 +8065,8 @@ public:
 		     spells[7].reqlvl = 18;
 		     spells[7].hpreqtocast = 85;
 		     spells[7].targettype = TARGET_ATTACKING;
-		     spells[7].instant = true;
-		     spells[7].perctrigger = (float)RandomFloat(10.0f);
+		     spells[7].instant = false;
+		     spells[7].perctrigger = (float)RandomFloat(5.0f);
 		     spells[7].attackstoptimer = 1000;
 		     m_spellcheck[7] = true;
 
@@ -8075,8 +8075,8 @@ public:
 		     spells[8].reqlvl = 20;
 		     spells[8].hpreqtocast = 85;
 		     spells[8].targettype = TARGET_ATTACKING;
-		     spells[8].instant = true;
-		     spells[8].perctrigger = (float)RandomFloat(10.0f);
+		     spells[8].instant = false;
+		     spells[8].perctrigger = (float)RandomFloat(5.0f);
 		     spells[8].attackstoptimer = 1000;
 		     m_spellcheck[8] = true;
 
@@ -8085,8 +8085,8 @@ public:
 		     spells[9].reqlvl = 26;
 		     spells[9].hpreqtocast = 85;
 		     spells[9].targettype = TARGET_ATTACKING;
-		     spells[9].instant = true;
-		     spells[9].perctrigger = (float)RandomFloat(10.0f);
+		     spells[9].instant = false;
+		     spells[9].perctrigger = (float)RandomFloat(5.0f);
 		     spells[9].attackstoptimer = 1000;
 		     m_spellcheck[9] = true;
 
@@ -8095,8 +8095,8 @@ public:
 		     spells[10].reqlvl = 24;
 		     spells[10].hpreqtocast = 85;
 		     spells[10].targettype = TARGET_ATTACKING;
-		     spells[10].instant = true;
-		     spells[10].perctrigger = (float)RandomFloat(10.0f);
+		     spells[10].instant = false;
+		     spells[10].perctrigger = (float)RandomFloat(5.0f);
 		     spells[10].attackstoptimer = 1000;
 		     m_spellcheck[10] = true;
 
@@ -8105,8 +8105,8 @@ public:
 		     spells[11].reqlvl = 28;
 		     spells[11].hpreqtocast = 85;
 		     spells[11].targettype = TARGET_ATTACKING;
-		     spells[11].instant = true;
-		     spells[11].perctrigger = (float)RandomFloat(10.0f);
+		     spells[11].instant = false;
+		     spells[11].perctrigger = (float)RandomFloat(5.0f);
 		     spells[11].attackstoptimer = 1000;
 		     m_spellcheck[11] = true;
 
@@ -8115,8 +8115,8 @@ public:
 		     spells[12].reqlvl = 20;
 		     spells[12].hpreqtocast = 85;
 		     spells[12].targettype = TARGET_ATTACKING;
-		     spells[12].instant = true;
-		     spells[12].perctrigger = (float)RandomFloat(10.0f);
+		     spells[12].instant = false;
+		     spells[12].perctrigger = (float)RandomFloat(5.0f);
 		     spells[12].attackstoptimer = 1000;
 		     m_spellcheck[12] = true;
 
@@ -8125,8 +8125,8 @@ public:
 		     spells[13].reqlvl = 32;
 		     spells[13].hpreqtocast = 85;
 		     spells[13].targettype = TARGET_ATTACKING;
-		     spells[13].instant = true;
-		     spells[13].perctrigger = (float)RandomFloat(10.0f);
+		     spells[13].instant = false;
+		     spells[13].perctrigger = (float)RandomFloat(5.0f);
 		     spells[13].attackstoptimer = 1000;
 		     m_spellcheck[13] = true;
 
@@ -8135,8 +8135,8 @@ public:
 		     spells[14].reqlvl = 38;
 		     spells[14].hpreqtocast = 85;
 		     spells[14].targettype = TARGET_ATTACKING;
-		     spells[14].instant = true;
-		     spells[14].perctrigger = (float)RandomFloat(10.0f);
+		     spells[14].instant = false;
+		     spells[14].perctrigger = (float)RandomFloat(5.0f);
 		     spells[14].attackstoptimer = 1000;
 		     m_spellcheck[14] = true;
 
@@ -8145,8 +8145,8 @@ public:
 		     spells[15].reqlvl = 32;
 		     spells[15].hpreqtocast = 85;
 		     spells[15].targettype = TARGET_ATTACKING;
-		     spells[15].instant = true;
-		     spells[15].perctrigger = (float)RandomFloat(10.0f);
+		     spells[15].instant = false;
+		     spells[15].perctrigger = (float)RandomFloat(5.0f);
 		     spells[15].attackstoptimer = 1000;
 		     m_spellcheck[15] = true;
 
@@ -8155,8 +8155,8 @@ public:
 		     spells[16].reqlvl = 36;
 		     spells[16].hpreqtocast = 85;
 		     spells[16].targettype = TARGET_ATTACKING;
-		     spells[16].instant = true;
-		     spells[16].perctrigger = (float)RandomFloat(10.0f);
+		     spells[16].instant = false;
+		     spells[16].perctrigger = (float)RandomFloat(5.0f);
 		     spells[16].attackstoptimer = 1000;
 		     m_spellcheck[16] = true;
 
@@ -8165,8 +8165,8 @@ public:
 		     spells[17].reqlvl = 20;
 		     spells[17].hpreqtocast = 85;
 		     spells[17].targettype = TARGET_ATTACKING;
-		     spells[17].instant = true;
-		     spells[17].perctrigger = (float)RandomFloat(10.0f);
+		     spells[17].instant = false;
+		     spells[17].perctrigger = (float)RandomFloat(5.0f);
 		     spells[17].attackstoptimer = 1000;
 		     m_spellcheck[17] = true;
 
@@ -8175,8 +8175,8 @@ public:
 		     spells[18].reqlvl = 48;
 		     spells[18].hpreqtocast = 85;
 		     spells[18].targettype = TARGET_ATTACKING;
-		     spells[18].instant = true;
-		     spells[18].perctrigger = (float)RandomFloat(10.0f);
+		     spells[18].instant = false;
+		     spells[18].perctrigger = (float)RandomFloat(5.0f);
 		     spells[18].attackstoptimer = 1000;
 		     m_spellcheck[18] = true;
 
@@ -8185,8 +8185,8 @@ public:
 		     spells[19].reqlvl = 40;
 		     spells[19].hpreqtocast = 85;
 		     spells[19].targettype = TARGET_ATTACKING;
-		     spells[19].instant = true;
-		     spells[19].perctrigger = (float)RandomFloat(10.0f);
+		     spells[19].instant = false;
+		     spells[19].perctrigger = (float)RandomFloat(5.0f);
 		     spells[19].attackstoptimer = 1000;
 		     m_spellcheck[19] = true;
 
@@ -8195,8 +8195,8 @@ public:
 		     spells[20].reqlvl = 48;
 		     spells[20].hpreqtocast = 85;
 		     spells[20].targettype = TARGET_ATTACKING;
-		     spells[20].instant = true;
-		     spells[20].perctrigger = (float)RandomFloat(10.0f);
+		     spells[20].instant = false;
+		     spells[20].perctrigger = (float)RandomFloat(5.0f);
 		     spells[20].attackstoptimer = 1000;
 		     m_spellcheck[20] = true;
 
@@ -8205,8 +8205,8 @@ public:
 		     spells[21].reqlvl = 40;
 		     spells[21].hpreqtocast = 85;
 		     spells[21].targettype = TARGET_ATTACKING;
-		     spells[21].instant = true;
-		     spells[21].perctrigger = (float)RandomFloat(10.0f);
+		     spells[21].instant = false;
+		     spells[21].perctrigger = (float)RandomFloat(5.0f);
 		     spells[21].attackstoptimer = 1000;
 		     m_spellcheck[21] = true;
 
@@ -8215,8 +8215,8 @@ public:
 		     spells[22].reqlvl = 44;
 		     spells[22].hpreqtocast = 85;
 		     spells[22].targettype = TARGET_ATTACKING;
-		     spells[22].instant = true;
-		     spells[22].perctrigger = (float)RandomFloat(10.0f);
+		     spells[22].instant = false;
+		     spells[22].perctrigger = (float)RandomFloat(5.0f);
 		     spells[22].attackstoptimer = 1000;
 		     m_spellcheck[22] = true;
 
@@ -8225,8 +8225,8 @@ public:
 		     spells[23].reqlvl = 46;
 		     spells[23].hpreqtocast = 85;
 		     spells[23].targettype = TARGET_ATTACKING;
-		     spells[23].instant = true;
-		     spells[23].perctrigger = (float)RandomFloat(10.0f);
+		     spells[23].instant = false;
+		     spells[23].perctrigger = (float)RandomFloat(5.0f);
 		     spells[23].attackstoptimer = 1000;
 		     m_spellcheck[23] = true;
 
@@ -8235,8 +8235,8 @@ public:
 		     spells[24].reqlvl = 60;
 		     spells[24].hpreqtocast = 85;
 		     spells[24].targettype = TARGET_ATTACKING;
-		     spells[24].instant = true;
-		     spells[24].perctrigger = (float)RandomFloat(10.0f);
+		     spells[24].instant = false;
+		     spells[24].perctrigger = (float)RandomFloat(5.0f);
 		     spells[24].attackstoptimer = 1000;
 		     m_spellcheck[24] = true;
 
@@ -8245,8 +8245,8 @@ public:
 		     spells[25].reqlvl = 58;
 		     spells[25].hpreqtocast = 85;
 		     spells[25].targettype = TARGET_ATTACKING;
-		     spells[25].instant = true;
-		     spells[25].perctrigger = (float)RandomFloat(10.0f);
+		     spells[25].instant = false;
+		     spells[25].perctrigger = (float)RandomFloat(5.0f);
 		     spells[25].attackstoptimer = 1000;
 		     m_spellcheck[25] = true;
 
@@ -8255,8 +8255,8 @@ public:
 		     spells[26].reqlvl = 50;
 		     spells[26].hpreqtocast = 85;
 		     spells[26].targettype = TARGET_ATTACKING;
-		     spells[26].instant = true;
-		     spells[26].perctrigger = (float)RandomFloat(10.0f);
+		     spells[26].instant = false;
+		     spells[26].perctrigger = (float)RandomFloat(5.0f);
 		     spells[26].attackstoptimer = 1000;
 		     m_spellcheck[26] = true;
 
@@ -8265,8 +8265,8 @@ public:
 		     spells[27].reqlvl = 52;
 		     spells[27].hpreqtocast = 85;
 		     spells[27].targettype = TARGET_ATTACKING;
-		     spells[27].instant = true;
-		     spells[27].perctrigger = (float)RandomFloat(10.0f);
+		     spells[27].instant = false;
+		     spells[27].perctrigger = (float)RandomFloat(5.0f);
 		     spells[27].attackstoptimer = 1000;
 		     m_spellcheck[27] = true;
 
@@ -8275,8 +8275,8 @@ public:
 		     spells[28].reqlvl = 56;
 		     spells[28].hpreqtocast = 85;
 		     spells[28].targettype = TARGET_ATTACKING;
-		     spells[28].instant = true;
-		     spells[28].perctrigger = (float)RandomFloat(10.0f);
+		     spells[28].instant = false;
+		     spells[28].perctrigger = (float)RandomFloat(5.0f);
 		     spells[28].attackstoptimer = 1000;
 		     m_spellcheck[28] = true;
 
@@ -8285,8 +8285,8 @@ public:
 		     spells[29].reqlvl = 56;
 		     spells[29].hpreqtocast = 85;
 		     spells[29].targettype = TARGET_ATTACKING;
-		     spells[29].instant = true;
-		     spells[29].perctrigger = (float)RandomFloat(10.0f);
+		     spells[29].instant = false;
+		     spells[29].perctrigger = (float)RandomFloat(5.0f);
 		     spells[29].attackstoptimer = 1000;
 		     m_spellcheck[29] = true;
 
@@ -8295,8 +8295,8 @@ public:
 		     spells[30].reqlvl = 8;
 		     spells[30].hpreqtocast = 85;
 		     spells[30].targettype = TARGET_SELF;
-		     spells[30].instant = true;
-		     spells[30].perctrigger = (float)RandomFloat(10.0f);
+		     spells[30].instant = false;
+		     spells[30].perctrigger = (float)RandomFloat(5.0f);
 		     spells[30].attackstoptimer = 1000;
 		     m_spellcheck[30] = true;
 
@@ -8305,8 +8305,8 @@ public:
 		     spells[31].reqlvl = 16;
 		     spells[31].hpreqtocast = 85;
 		     spells[31].targettype = TARGET_SELF;
-		     spells[31].instant = true;
-		     spells[31].perctrigger = (float)RandomFloat(10.0f);
+		     spells[31].instant = false;
+		     spells[31].perctrigger = (float)RandomFloat(5.0f);
 		     spells[31].attackstoptimer = 1000;
 		     m_spellcheck[31] = true;
 
@@ -8315,8 +8315,8 @@ public:
 		     spells[32].reqlvl = 24;
 		     spells[32].hpreqtocast = 85;
 		     spells[32].targettype = TARGET_SELF;
-		     spells[32].instant = true;
-		     spells[32].perctrigger = (float)RandomFloat(10.0f);
+		     spells[32].instant = false;
+		     spells[32].perctrigger = (float)RandomFloat(5.0f);
 		     spells[32].attackstoptimer = 1000;
 		     m_spellcheck[32] = true;
 
@@ -8325,8 +8325,8 @@ public:
 		     spells[33].reqlvl = 40;
 		     spells[33].hpreqtocast = 85;
 		     spells[33].targettype = TARGET_SELF;
-		     spells[33].instant = true;
-		     spells[33].perctrigger = (float)RandomFloat(10.0f);
+		     spells[33].instant = false;
+		     spells[33].perctrigger = (float)RandomFloat(5.0f);
 		     spells[33].attackstoptimer = 1000;
 		     m_spellcheck[33] = true;
 
@@ -8335,8 +8335,8 @@ public:
 		     spells[34].reqlvl = 48;
 		     spells[34].hpreqtocast = 85;
 		     spells[34].targettype = TARGET_SELF;
-		     spells[34].instant = true;
-		     spells[34].perctrigger = (float)RandomFloat(10.0f);
+		     spells[34].instant = false;
+		     spells[34].perctrigger = (float)RandomFloat(5.0f);
 		     spells[34].attackstoptimer = 1000;
 		     m_spellcheck[34] = true;
 
@@ -8345,8 +8345,8 @@ public:
 		     spells[35].reqlvl = 56;
 		     spells[35].hpreqtocast = 85;
 		     spells[35].targettype = TARGET_SELF;
-		     spells[35].instant = true;
-		     spells[35].perctrigger = (float)RandomFloat(10.0f);
+		     spells[35].instant = false;
+		     spells[35].perctrigger = (float)RandomFloat(5.0f);
 		     spells[35].attackstoptimer = 1000;
 		     m_spellcheck[35] = true;
 
@@ -8355,8 +8355,8 @@ public:
 		     spells[36].reqlvl = 1;
 		     spells[36].hpreqtocast = 50;
 		     spells[36].targettype = TARGET_SELF;
-		     spells[36].instant = true;
-		     spells[36].perctrigger = (float)RandomFloat(10.0f);
+		     spells[36].instant = false;
+		     spells[36].perctrigger = (float)RandomFloat(5.0f);
 		     spells[36].attackstoptimer = 1000;
 		     m_spellcheck[36] = true;
 
@@ -8365,8 +8365,8 @@ public:
 		     spells[37].reqlvl = 6;
 		     spells[37].hpreqtocast = 50;
 		     spells[37].targettype = TARGET_SELF;
-		     spells[37].instant = true;
-		     spells[37].perctrigger = (float)RandomFloat(10.0f);
+		     spells[37].instant = false;
+		     spells[37].perctrigger = (float)RandomFloat(5.0f);
 		     spells[37].attackstoptimer = 1000;
 		     m_spellcheck[37] = true;
 
@@ -8375,8 +8375,8 @@ public:
 		     spells[38].reqlvl = 20;
 		     spells[38].hpreqtocast = 50;
 		     spells[38].targettype = TARGET_SELF;
-		     spells[38].instant = true;
-		     spells[38].perctrigger = (float)RandomFloat(10.0f);
+		     spells[38].instant = false;
+		     spells[38].perctrigger = (float)RandomFloat(5.0f);
 		     spells[38].attackstoptimer = 1000;
 		     m_spellcheck[38] = true;
 
@@ -8385,8 +8385,8 @@ public:
 		     spells[39].reqlvl = 28;
 		     spells[39].hpreqtocast = 50;
 		     spells[39].targettype = TARGET_SELF;
-		     spells[39].instant = true;
-		     spells[39].perctrigger = (float)RandomFloat(10.0f);
+		     spells[39].instant = false;
+		     spells[39].perctrigger = (float)RandomFloat(5.0f);
 		     spells[39].attackstoptimer = 1000;
 		     m_spellcheck[39] = true;
 
@@ -8395,8 +8395,8 @@ public:
 		     spells[40].reqlvl = 36;
 		     spells[40].hpreqtocast = 50;
 		     spells[40].targettype = TARGET_SELF;
-		     spells[40].instant = true;
-		     spells[40].perctrigger = (float)RandomFloat(10.0f);
+		     spells[40].instant = false;
+		     spells[40].perctrigger = (float)RandomFloat(5.0f);
 		     spells[40].attackstoptimer = 1000;
 		     m_spellcheck[40] = true;
 
@@ -8405,8 +8405,8 @@ public:
 		     spells[41].reqlvl = 44;
 		     spells[41].hpreqtocast = 50;
 		     spells[41].targettype = TARGET_SELF;
-		     spells[41].instant = true;
-		     spells[41].perctrigger = (float)RandomFloat(10.0f);
+		     spells[41].instant = false;
+		     spells[41].perctrigger = (float)RandomFloat(5.0f);
 		     spells[41].attackstoptimer = 1000;
 		     m_spellcheck[41] = true;
 
@@ -8415,8 +8415,8 @@ public:
 		     spells[42].reqlvl = 60;
 		     spells[42].hpreqtocast = 50;
 		     spells[42].targettype = TARGET_SELF;
-		     spells[42].instant = true;
-		     spells[42].perctrigger = (float)RandomFloat(10.0f);
+		     spells[42].instant = false;
+		     spells[42].perctrigger = (float)RandomFloat(5.0f);
 		     spells[42].attackstoptimer = 1000;
 		     m_spellcheck[42] = true;
 
@@ -8493,6 +8493,7 @@ int nrspells;
 void SetupGenericAI(ScriptMgr * mgr)
 {
 // Family based AI's
+/*
 mgr->register_creature_script(16350, &SpiderFamily::Create); 
 mgr->register_creature_script(18466, &SpiderFamily::Create);
 mgr->register_creature_script(11370, &SpiderFamily::Create);
@@ -11288,5 +11289,5 @@ mgr->register_creature_script(15440, &HumanoidWarrior::Create);
 mgr->register_creature_script(15528, &HumanoidPriest::Create); 
 mgr->register_creature_script(15532, &HumanoidWarrior::Create); 
 mgr->register_creature_script(15533, &HumanoidWarrior::Create); 
-
+*/
 }

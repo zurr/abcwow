@@ -1,27 +1,6 @@
-/*
- * Moon++ Scripts for Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
- * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #include "StdAfx.h"
 #include "Setup.h"
 
-#ifdef WIN32
-#pragma warning(disable:4305)		// warning C4305: 'argument' : truncation from 'double' to 'float'
-#endif
 /************************************************************************/
 /* Instance_BlackTemple.cpp Script		                                */
 /************************************************************************/
@@ -138,9 +117,9 @@ public:
 	}
 
 	void AIUpdate()
-	{
+	{	// Disabled till I find way to make it dispellable like on blizz
 		uint32 t = (uint32)time(NULL);
-		if (t > spells[2].casttime)
+		/*if (t > spells[2].casttime)
 		{
 			_unit->setAttackTimer(spells[2].attackstoptimer, false);
 
@@ -150,7 +129,7 @@ public:
 			spells[1].casttime = t + 55;
 			spells[3].casttime = t + 65;
 			return;
-		}
+		}*/
 
 		if (t > spells[3].casttime)
 		{
@@ -197,8 +176,8 @@ public:
 						case TARGET_VARIOUS:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							_unit->GetMapMgr()->GetInterface()->SpawnGameObject(NAJENTUS_SPINE_GO , _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.207343, true, 0, 0); break;
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+							//_unit->GetMapMgr()->GetInterface()->SpawnGameObject(NAJENTUS_SPINE_GO , target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.207343, true, 0, 0); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 						case TARGET_RANDOM_FRIEND:
@@ -626,8 +605,11 @@ public:
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I'll rip the meat from your bones!");
-		_unit->PlaySoundToSet(11437);
+		if (_unit->isAlive())
+		{
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I'll rip the meat from your bones!");
+			_unit->PlaySoundToSet(11437);
+		}
 
 		RemoveAIUpdateEvent();
 
@@ -793,8 +775,15 @@ public:
 				_unit->CastSpell(_unit, spells[8].info, spells[8].instant);
 
 				LastThreat = _unit->GetAIInterface()->getThreatByPtr(RTarget);
-				Unit *Target = _unit->GetAIInterface()->GetNextTarget();
-				RTarget->GetAIInterface()->AttackReaction(RTarget, _unit->GetAIInterface()->getThreatByPtr(Target) + 100000, 0);
+
+				Unit *Target = _unit->GetAIInterface()->GetMostHated();
+				uint32 MostHatedThreat = 0;
+				if (Target)	// unneeded, but still safe check :P
+				{
+					MostHatedThreat = _unit->GetAIInterface()->getThreatByPtr(Target);
+				}
+
+				_unit->GetAIInterface()->AttackReaction(RTarget, MostHatedThreat + 100000, 0);
 
 				TargetTable.clear();
 
@@ -843,7 +832,6 @@ public:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							_unit->GetMapMgr()->GetInterface()->SpawnGameObject(NAJENTUS_SPINE_GO , _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.207343, true, 0, 0); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 						case TARGET_RANDOM_FRIEND:
@@ -1180,8 +1168,7 @@ public:
 						case TARGET_VARIOUS:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							break;
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
@@ -1311,8 +1298,7 @@ public:
 						case TARGET_VARIOUS:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							break;
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
@@ -1583,8 +1569,7 @@ public:
 						case TARGET_VARIOUS:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							_unit->GetMapMgr()->GetInterface()->SpawnGameObject(NAJENTUS_SPINE_GO , _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.207343, true, 0, 0); break;
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 						case TARGET_RANDOM_FRIEND:
@@ -1665,94 +1650,440 @@ protected:
 	int nrspells;
 };
 
+//----------------------------------------------------------------------//
+//-----------------------The Illidari Council---------------------------//
+//-------------------Originally scripted by Plexor----------------------//
+//---------------------Fully rewritten by M4ksiu------------------------//
+//----------------------------------------------------------------------//
+
 //------------------------------------
-//    -= Lady Malande =-
+//    -=Veras Darkshadow  =-
 //------------------------------------
-#define CN_LADY_MALANDE 22951
+#define CN_VERAS_DARKSHADOW 22952
 
-#define EMPOWERED_SMITE 41471
-#define DIVINE_WRATH 41472
-#define REFLECTIVE_SHIELD 41475
-#define CIRCLE_OF_HEALING 41455
+#define DEADLY_POISON	41485
+#define ENVENOM			41487
+#define VANISH			41476
 
-
-class MalandeAI : public CreatureAIScript
+class VerasAI : public CreatureAIScript
 {
 public:
-    ADD_CREATURE_FACTORY_FUNCTION(MalandeAI);
-	SP_AI_Spell spells[4];
-	bool m_spellcheck[4];
+    ADD_CREATURE_FACTORY_FUNCTION(VerasAI);
+	SP_AI_Spell spells[3];
+	bool m_spellcheck[3];
 
-    MalandeAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    VerasAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		// -- Number of spells to add --
-		nrspells = 4;
+		nrspells = 1;
 
-		// --- Initialization ---
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
-		// ----------------------
-		
-		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 
-		spells[0].info = dbcSpell.LookupEntry(EMPOWERED_SMITE);
-		spells[0].targettype = TARGET_VARIOUS;
-		spells[0].instant = false;
-		spells[0].perctrigger = 10.0f;
-		spells[0].attackstoptimer = 1000; // 1sec
+		spells[0].info = dbcSpell.LookupEntry(DEADLY_POISON);
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
+		spells[0].instant = true;
+		spells[0].perctrigger = 12.0f;
+		spells[0].attackstoptimer = 1000;
+		spells[0].cooldown = 10;
+		spells[0].mindist2cast = 0.0f;
+		spells[0].maxdist2cast = 60.0f;
 
-		spells[1].info = dbcSpell.LookupEntry(DIVINE_WRATH);
-		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = false;
-		spells[1].perctrigger = 10.0f;
-		spells[1].attackstoptimer = 2000; // 2sec
+		spells[1].info = dbcSpell.LookupEntry(ENVENOM);
+		spells[1].targettype = TARGET_RANDOM_SINGLE;
+		spells[1].instant = true;
+		spells[1].perctrigger = 0.0f;
+		spells[1].attackstoptimer = 2000;
+		spells[1].cooldown = 10;
 
-		spells[2].info = dbcSpell.LookupEntry(REFLECTIVE_SHIELD);
+		spells[2].info = dbcSpell.LookupEntry(VANISH);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
-		spells[2].perctrigger = 5.0f;
-		spells[2].attackstoptimer = 2000; // 2sec
+		spells[2].perctrigger = 0.0f;
+		spells[2].attackstoptimer = 32000;
+		spells[2].cooldown = 85;
 
-		spells[3].info = dbcSpell.LookupEntry(CIRCLE_OF_HEALING);
-		spells[3].targettype = TARGET_SELF;
-		spells[3].instant = false;
-		spells[3].perctrigger = 10.0f;
-		spells[3].attackstoptimer = 2000; // 2sec
+		Poisoned = false;
+		Vanish = 0;
     }
 
     void OnCombatStart(Unit* mTarget)
     {
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You wish to test me?");
+		_unit->PlaySoundToSet(11524);
+
+		for (int i = 0; i < 2; i++)
+			spells[i].casttime = 0;
+
+		uint32 t = (uint32)time(NULL);
+		spells[2].casttime = t + 55;
+
+		Poisoned = false;
+		Vanish = 0;
+
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Flee or die!");
-		_unit->PlaySoundToSet(11482);
+    }
+
+	void OnCombatStop(Unit *mTarget)
+    {
+		_unit->GetAIInterface()->disable_melee = false;
+
+        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
+		RemoveAIUpdateEvent();
+    }
+
+    void OnDied(Unit * mKiller)
+    {
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You got lucky!");
+		_unit->PlaySoundToSet(11527);
+
+		RemoveAIUpdateEvent();
+    }
+
+	void OnTargetDied(Unit* mTarget)
+    {
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Valiant Effort.");
+		_unit->PlaySoundToSet(11525);
+	}
+
+	void AIUpdate()
+	{
+		uint32 t = (uint32)time(NULL);
+		if (t > Vanish)
+		{
+			_unit->GetAIInterface()->ClearHateList();
+		}
+
+		if (_unit->GetAIInterface()->GetNextTarget() && _unit->GetCurrentSpell() == NULL && !_unit->FindAura(VANISH))
+		{
+			uint32 t = (uint32)time(NULL);
+			if (t > spells[2].casttime)
+			{
+				std::vector <Unit*> TargetTable;
+				for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+				{ 
+					if (isHostile(_unit, (*itr)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
+					{
+						Unit* Target = NULL;
+						Target = (Unit*)(*itr);
+
+						if (Target->isAlive() && _unit->GetDistance2dSq(Target) <= 30.0f && _unit->GetAIInterface()->getThreatByPtr(Target) > 0)
+							TargetTable.push_back(Target);
+					} 
+				}
+
+				if (TargetTable.size())
+				{
+					_unit->GetAIInterface()->ClearHateList();
+
+					Unit *UnitToFollow = NULL;
+					size_t Rand = rand()%TargetTable.size();
+					UnitToFollow = TargetTable[Rand];
+
+					if (UnitToFollow)
+					{
+						_unit->GetAIInterface()->AttackReaction(UnitToFollow, 10000, 0);
+					}
+
+					Vanish = t + 31;	// 31, coz there is 1-2 sec till he fights again after vanish aura is removed
+				}
+
+				_unit->setAttackTimer(spells[2].attackstoptimer, false);
+				_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+
+				spells[2].casttime = t + spells[2].cooldown;
+				return;
+			}
+
+			if (_unit->GetAIInterface()->GetNextTarget() && t > spells[1].casttime && Poisoned && RandomUInt(3) != 1)
+			{
+				Unit *TargetToAttack = NULL;
+				for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+				{ 
+					if (isHostile(_unit, (*itr)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
+					{
+						Unit* PoisonedTarget = NULL;
+						PoisonedTarget = (Unit*)(*itr);
+
+						if (PoisonedTarget->isAlive() && _unit->GetAIInterface()->getThreatByPtr(PoisonedTarget) > 0 && PoisonedTarget->FindAura(DEADLY_POISON))
+						{
+							TargetToAttack = PoisonedTarget;
+							break;
+						} 
+					} 
+				}
+
+				if (TargetToAttack)
+				{
+					_unit->CastSpell(TargetToAttack, spells[1].info, spells[1].instant);
+				}
+
+				spells[1].casttime = t + spells[1].cooldown;
+				Poisoned = false;
+				return;
+			}
+		}
+
+		float val = (float)RandomFloat(100.0f);
+        SpellCast(val);
+	}
+
+	void SpellCast(float val)
+    {
+        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget() && !_unit->FindAura(VANISH))
+        {
+			float comulativeperc = 0;
+		    Unit *target = NULL;
+			for(int i=0;i<nrspells;i++)
+			{
+				if(!spells[i].perctrigger) continue;
+				
+				if(m_spellcheck[i])
+				{
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+						case TARGET_SELF:
+						case TARGET_VARIOUS:
+							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+						case TARGET_ATTACKING:
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+						case TARGET_DESTINATION:
+							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
+					}
+
+					m_spellcheck[i] = false;
+					return;
+				}
+
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+        }
+    }
+
+    void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
+
+			if (i == 0)
+				Poisoned = true;
+		}
+	}
+
+protected:
+
+	uint32 Vanish;
+	bool Poisoned;
+	int nrspells;
+};
+
+//------------------------------------
+//    -= High Nethermancer Zerevor  =-
+//------------------------------------
+#define CN_HIGH_NETHERMANCER_ZEREVOR 22950
+
+#define ARCANE_BOLT			41483
+#define BLIZZARD			41482
+#define FLAMESTRIKE			41481
+#define ARCANE_EXPLOSION	29973
+#define DAMPEN_MAGIC		41478
+
+class ZerevorAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(ZerevorAI);
+	SP_AI_Spell spells[5];
+	bool m_spellcheck[5];
+
+    ZerevorAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		nrspells = 3;
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+		}
+
+		spells[0].info = dbcSpell.LookupEntry(ARCANE_BOLT);
+		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].instant = false;
+		spells[0].perctrigger = 65.0f;
+		spells[0].attackstoptimer = 2000;
+		spells[0].cooldown = 0;
+
+		spells[1].info = dbcSpell.LookupEntry(BLIZZARD);
+		spells[1].targettype = TARGET_RANDOM_DESTINATION;
+		spells[1].instant = true;
+		spells[1].perctrigger = 10.0f;
+		spells[1].attackstoptimer = 2000;
+		spells[1].cooldown = 15;
+		spells[1].mindist2cast = 0.0f;
+		spells[1].maxdist2cast = 60.0f;
+
+		spells[2].info = dbcSpell.LookupEntry(FLAMESTRIKE);
+		spells[2].targettype = TARGET_RANDOM_DESTINATION;
+		spells[2].instant = false;
+		spells[2].perctrigger = 10.0f;
+		spells[2].attackstoptimer = 2000;
+		spells[2].cooldown = 15;
+		spells[2].mindist2cast = 0.0f;
+		spells[2].maxdist2cast = 60.0f;
+
+		spells[3].info = dbcSpell.LookupEntry(DAMPEN_MAGIC);
+		spells[3].targettype = TARGET_SELF;
+		spells[3].instant = true;
+		spells[3].perctrigger = 0.0f;
+		spells[3].attackstoptimer = 2000;
+		spells[3].cooldown = 60;	// not sure at all
+
+		spells[4].info = dbcSpell.LookupEntry(ARCANE_EXPLOSION);
+		spells[4].targettype = TARGET_VARIOUS;
+		spells[4].instant = false;
+		spells[4].perctrigger = 0.0f;
+		spells[4].attackstoptimer = 11000;
+		spells[4].cooldown = 0;
+
+		ArcaneCheck = 0;
+    }
+
+    void OnCombatStart(Unit* mTarget)
+    {
+		for (int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+		spells[3].casttime = (uint32)time(NULL) + spells[3].cooldown;
+
+		if (_unit->GetDistance2dSq(mTarget) <= 1600.0f)
+		{
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+			_unit->GetAIInterface()->StopMovement(1);
+		}
+
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Common... such a crude language. Bandal!");
+		_unit->PlaySoundToSet(11440);
+
+		_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+
+		ArcaneCheck = 5;
+
+		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
 	void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-       RemoveAIUpdateEvent();
+
+		RemoveAIUpdateEvent();
     }
 
     void OnDied(Unit * mKiller)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Destiny... awaits!");
-		_unit->PlaySoundToSet(11485);
+		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "BossDied");
+		_unit->PlaySoundToSet(11443);
+
 		RemoveAIUpdateEvent();
     }
 
 	void OnTargetDied(Unit* mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "My work is done.");
-		_unit->PlaySoundToSet(11483);
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Shorel'aran.");
+		_unit->PlaySoundToSet(11441);
 	}
 
 	void AIUpdate()
 	{
-		float val = (float)RandomFloat(100.0f);
-        SpellCast(val);
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+
+		ArcaneCheck--;
+		if (_unit->GetAIInterface()->GetNextTarget() && _unit->GetCurrentSpell() == NULL)
+		{
+			if (ArcaneCheck <= 0)
+			{
+				ArcaneCheck = 5;
+				Unit *Target = NULL;
+				Target = FindTargetForSpell();
+
+				if (Target)
+				{
+					_unit->CastSpell(_unit, spells[4].info, spells[4].instant);
+					return;
+				}
+			}
+
+			uint32 t = (uint32)time(NULL);
+			if (t > spells[3].casttime)
+			{
+				_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+
+				spells[3].casttime = t + spells[3].cooldown;
+				return;
+			}
+
+			if (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) >= 0.0f && _unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) <= 900.0f)
+			{
+				_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+				_unit->GetAIInterface()->StopMovement(1);
+				
+				float val = RandomFloat(100.0f);
+				SpellCast(val);
+			}
+		}
 	}
 
     void SpellCast(float val)
@@ -1774,18 +2105,23 @@ public:
 						case TARGET_VARIOUS:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							break;
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
@@ -1793,7 +2129,95 @@ public:
         }
     }
 
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
+		}
+	}
+
+	// A bit rewritten FindTarget function
+	Unit* FindTargetForSpell()
+	{
+		Unit* target = NULL;
+		float distance = 5.0f;
+
+		Unit *pUnit;
+		float dist;
+
+		for (std::set<Object*>::iterator itr = _unit->GetInRangeOppFactsSetBegin(); itr != _unit->GetInRangeOppFactsSetEnd(); itr++)
+		{
+			if((*itr)->GetTypeId() != TYPEID_UNIT && (*itr)->GetTypeId() != TYPEID_PLAYER)
+				continue;
+
+			pUnit = static_cast<Unit*>((*itr));
+
+			if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
+				continue;
+
+			if(pUnit->m_invisible)
+				continue;
+			
+			if(!pUnit->isAlive() || _unit == pUnit)
+				continue;
+
+			dist = _unit->GetDistance2dSq(pUnit);
+
+			if(dist > distance*distance)
+				continue;
+
+			target = pUnit;
+			break;
+		}
+
+		return target;
+	}
+
 protected:
+
+	int ArcaneCheck;
 	int nrspells;
 };
 
@@ -1802,14 +2226,14 @@ protected:
 //------------------------------------
 #define CN_GATHIOS_THE_SHATTERER 22949
 
-#define HAMMER_OF_JUSTICE 41468
-#define SEAL_OF_COMMAND 41469
-#define SEAL_OF_BLOOD 32221 // Doesn't work
-#define CONSECRATION 41541
-#define BLESSING_OF_SPELL_WARDING 41451
-#define BLESSING_OF_PROTECTION 41450
-#define CHROMATIC_RESISTANCE_AURA 41453
-#define DEVOTION_AURA 41452
+#define HAMMER_OF_JUSTICE			41468
+#define SEAL_OF_COMMAND				41469
+#define SEAL_OF_BLOOD				41459
+#define CONSECRATION				41541
+#define BLESSING_OF_SPELL_WARDING	41451
+#define BLESSING_OF_PROTECTION		41450
+#define CHROMATIC_RESISTANCE_AURA	41453
+#define DEVOTION_AURA				41452
 
 class GathiosAI : public CreatureAIScript
 {
@@ -1820,86 +2244,103 @@ public:
 
     GathiosAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		// -- Number of spells to add --
-		nrspells = 8;
+		nrspells = 3;
 
-		// --- Initialization ---
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
-		// ----------------------
-		
-		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 
 		spells[0].info = dbcSpell.LookupEntry(HAMMER_OF_JUSTICE);
-		spells[0].targettype = TARGET_VARIOUS;
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
 		spells[0].perctrigger = 10.0f;
-		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
+		spells[0].attackstoptimer = 1000;
+		spells[0].cooldown = 10;
+		spells[0].mindist2cast = 10.0f;
+		spells[0].maxdist2cast = 40.0f;
 
+		// Next 2 spells share cooldowns (but couldn't have found infos about them)
 		spells[1].info = dbcSpell.LookupEntry(SEAL_OF_COMMAND);
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = true;
-		spells[1].perctrigger = 10.0f;
-		spells[1].attackstoptimer = 2000; // 2sec
+		spells[1].perctrigger = 8.0f;
+		spells[1].attackstoptimer = 2000;
+		spells[1].cooldown = 30;
 
 		spells[2].info = dbcSpell.LookupEntry(SEAL_OF_BLOOD);
 		spells[2].targettype = TARGET_SELF;
 		spells[2].instant = true;
-		spells[2].perctrigger = 5.0f;
-		spells[2].attackstoptimer = 2000; // 2sec
+		spells[2].perctrigger = 8.0f;
+		spells[2].attackstoptimer = 2000;
+		spells[2].cooldown = 30;
 
 		spells[3].info = dbcSpell.LookupEntry(CONSECRATION); 
-		spells[3].targettype = TARGET_ATTACKING;
+		spells[3].targettype = TARGET_VARIOUS;
 		spells[3].instant = true;
-		spells[3].perctrigger = 10.0f;
-		spells[3].attackstoptimer = 2000; // 2sec
-		
+		spells[3].perctrigger = 0.0f;
+		spells[3].attackstoptimer = 2000;
+		spells[3].cooldown = 30;
+
+		// Next 2 spells share cooldowns
 		spells[4].info = dbcSpell.LookupEntry(BLESSING_OF_SPELL_WARDING);  
-		spells[4].targettype = TARGET_SELF;
+		spells[4].targettype = TARGET_RANDOM_FRIEND;
 		spells[4].instant = true;
-		spells[4].perctrigger = 10.0f;
-		spells[4].attackstoptimer = 2000; // 2sec
+		spells[4].perctrigger = 0.0f;
+		spells[4].attackstoptimer = 2000;
+		spells[4].cooldown = 15;
 		
 		spells[5].info = dbcSpell.LookupEntry(BLESSING_OF_PROTECTION); 
-		spells[5].targettype = TARGET_SELF;
+		spells[5].targettype = TARGET_RANDOM_FRIEND;
 		spells[5].instant = true;
-		spells[5].perctrigger = 10.0f;
-		spells[5].attackstoptimer = 2000; // 2sec
-		
+		spells[5].perctrigger = 0.0f;
+		spells[5].attackstoptimer = 2000;
+		spells[5].cooldown = 15;
+
+		// Next 2 spells share cooldowns
 		spells[6].info = dbcSpell.LookupEntry(CHROMATIC_RESISTANCE_AURA);
-		spells[6].targettype = TARGET_SELF;
+		spells[6].targettype = TARGET_RANDOM_FRIEND;
 		spells[6].instant = true;
-		spells[6].perctrigger = 10.0f;
-		spells[6].attackstoptimer = 2000; // 2sec
+		spells[6].perctrigger = 0.0f;
+		spells[6].attackstoptimer = 2000;
+		spells[6].cooldown = 60;
 		
 		spells[7].info = dbcSpell.LookupEntry(DEVOTION_AURA); 
-		spells[7].targettype = TARGET_SELF;
+		spells[7].targettype = TARGET_RANDOM_FRIEND;
 		spells[7].instant = true;
-		spells[7].perctrigger = 10.0f;
-		spells[7].attackstoptimer = 2000; // 2sec
+		spells[7].perctrigger = 0.0f;
+		spells[7].attackstoptimer = 2000;
+		spells[7].cooldown = 60;
     }
 
     void OnCombatStart(Unit* mTarget)
     {
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		for (int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+
+		uint32 t = (uint32)time(NULL);
+		for (int i = 3; i < 8; i++)
+			spells[i].casttime = t + spells[i].cooldown;
+
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I have better things to do!");
 		_unit->PlaySoundToSet(11422);
+
+		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
 	void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-       RemoveAIUpdateEvent();
+
+		RemoveAIUpdateEvent();
     }
 
     void OnDied(Unit * mKiller)
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Lord Illidan... I...");
 		_unit->PlaySoundToSet(11425);
+
 		RemoveAIUpdateEvent();
     }
 
@@ -1911,6 +2352,99 @@ public:
 
 	void AIUpdate()
 	{
+		if (_unit->GetAIInterface()->GetNextTarget() && _unit->GetCurrentSpell() == NULL)
+		{
+			uint32 t = (uint32)time(NULL);
+			if (t > spells[3].casttime)
+			{
+				_unit->setAttackTimer(spells[3].attackstoptimer, false);
+
+				_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+
+				spells[3].casttime = t + spells[3].cooldown;
+				return;
+			}
+
+			if (t > spells[4].casttime)
+			{
+				Unit *TargetToBuff = NULL;
+				Unit *Malande = NULL;
+				Unit *Zerevor = NULL;
+				Unit *Veras = NULL;
+
+				Malande = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 22951);
+				if (Malande && Malande->isAlive())
+				{
+					TargetToBuff = Malande;
+					if (RandomUInt(10) == 1)
+					{
+						std::vector<Unit*> BuffTable;
+						Zerevor = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 22950);
+						Veras = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 22952);
+
+						if (Zerevor && Zerevor->isAlive())
+							BuffTable.push_back(Zerevor);
+						if (Veras && Veras->isAlive())
+							BuffTable.push_back(Veras);
+
+						if (BuffTable.size())
+						{
+							size_t Target = rand()%BuffTable.size();
+							TargetToBuff = BuffTable[Target];
+						}
+					}
+				}
+
+				else
+				{
+					std::vector<Unit*> BuffTable;
+					Zerevor = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 22950);
+					Veras = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 22952);
+
+					if (Zerevor && Zerevor->isAlive())
+						BuffTable.push_back(Zerevor);
+					if (Veras && Veras->isAlive())
+						BuffTable.push_back(Veras);
+
+					if (BuffTable.size())
+					{
+						size_t Target = rand()%BuffTable.size();
+						TargetToBuff = BuffTable[Target];
+					}
+				}
+
+				if (TargetToBuff)
+				{
+					uint32 SpellId = BLESSING_OF_SPELL_WARDING;
+					if (RandomUInt(2) == 1)
+						SpellId = BLESSING_OF_PROTECTION;
+
+					_unit->setAttackTimer(spells[4].attackstoptimer, false);
+
+					_unit->CastSpell(TargetToBuff, SpellId, spells[4].instant);
+
+					spells[4].casttime = t + spells[4].cooldown;
+					return;
+				}
+
+				spells[4].casttime = t + spells[4].cooldown;
+			}
+
+			if (t > spells[6].casttime)
+			{
+				uint32 SpellId = CHROMATIC_RESISTANCE_AURA;
+				if (RandomUInt(2) == 1)
+					SpellId = DEVOTION_AURA;
+
+				_unit->setAttackTimer(spells[6].attackstoptimer, false);
+
+				_unit->CastSpell(_unit, SpellId, spells[6].instant);
+
+				spells[6].casttime = t + spells[6].cooldown;
+				return;
+			}
+		}
+
 		float val = (float)RandomFloat(100.0f);
         SpellCast(val);
 	}
@@ -1934,241 +2468,206 @@ public:
 						case TARGET_VARIOUS:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							break;
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
+
+					if (i == 1 || i == 2)
+					{
+						spells[1].casttime = t + spells[1].cooldown;
+						spells[2].casttime = t + spells[2].cooldown;
+					}
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
         }
     }
 
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
+		}
+	}
+
 protected:
+
 	int nrspells;
 };
 
 //------------------------------------
-//    -= High Nethermancer Zerevor  =-
+//    -= Lady Malande =-
 //------------------------------------
-#define CN_HIGH_NETHERMANCER_ZEREVOR 22950
+#define CN_LADY_MALANDE 22951
 
-#define ARCANE_BOLT 41483
-#define BLIZZARD 20680
-#define FLAMESTRIKE 41379
-#define DAMPEN_MAGIC 41378
+#define DIVINE_WRATH		41472
+#define REFLECTIVE_SHIELD	41475
+#define EMPOWERED_SMITE		41471
+#define CIRCLE_OF_HEALING	41455
 
-class ZerevorAI : public CreatureAIScript
+class MalandeAI : public CreatureAIScript
 {
 public:
-    ADD_CREATURE_FACTORY_FUNCTION(ZerevorAI);
+    ADD_CREATURE_FACTORY_FUNCTION(MalandeAI);
 	SP_AI_Spell spells[4];
 	bool m_spellcheck[4];
 
-    ZerevorAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    MalandeAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		// -- Number of spells to add --
-		nrspells = 4;
-
-		// --- Initialization ---
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
-		// ----------------------
-		
-		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 
-		spells[0].info = dbcSpell.LookupEntry(ARCANE_BOLT);
-		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].info = dbcSpell.LookupEntry(DIVINE_WRATH);
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = false;
-		spells[0].perctrigger = 10.0f;
-		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
+		spells[0].perctrigger = 9.0f;
+		spells[0].attackstoptimer = 2000;
+		spells[0].cooldown = 15;
+		spells[0].mindist2cast = 0.0f;
+		spells[0].maxdist2cast = 60.0f;
 
-		spells[1].info = dbcSpell.LookupEntry(BLIZZARD);
-		spells[1].targettype = TARGET_VARIOUS;
+		spells[1].info = dbcSpell.LookupEntry(REFLECTIVE_SHIELD);
+		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = true;
-		spells[1].perctrigger = 10.0f;
-		spells[1].attackstoptimer = 2000; // 2sec
+		spells[1].perctrigger = 6.0f;
+		spells[1].attackstoptimer = 2000;
+		spells[1].cooldown = 30;
 
-		spells[2].info = dbcSpell.LookupEntry(FLAMESTRIKE);
-		spells[2].targettype = TARGET_VARIOUS;
-		spells[2].instant = true;
-		spells[2].perctrigger = 5.0f;
-		spells[2].attackstoptimer = 2000; // 2sec
+		spells[2].info = dbcSpell.LookupEntry(EMPOWERED_SMITE);
+		spells[2].targettype = TARGET_ATTACKING;
+		spells[2].instant = false;
+		spells[2].perctrigger = 0.0f;
+		spells[2].attackstoptimer = 1000;
+		spells[2].cooldown = 30;
 
-		spells[3].info = dbcSpell.LookupEntry(DAMPEN_MAGIC);
-		spells[3].targettype = TARGET_SELF;
-		spells[3].instant = true;
-		spells[3].perctrigger = 10.0f;
-		spells[3].attackstoptimer = 2000; // 2sec
+		spells[3].info = dbcSpell.LookupEntry(CIRCLE_OF_HEALING);
+		spells[3].targettype = TARGET_VARIOUS;
+		spells[3].instant = false;
+		spells[3].perctrigger = 0.0f;
+		spells[3].attackstoptimer = 4000;
+		spells[3].cooldown = 20;
     }
 
     void OnCombatStart(Unit* mTarget)
     {
+		for (int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+
+		uint32 t = (uint32)time(NULL);
+		for (int i = 2; i < 4; i++)
+			spells[i].casttime = t + spells[i].cooldown;
+
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Flee or die!");
+		_unit->PlaySoundToSet(11482);
+
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "CombatStart");
-		_unit->PlaySoundToSet(11440);
     }
 
 	void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+
        RemoveAIUpdateEvent();
     }
 
     void OnDied(Unit * mKiller)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "BossDied");
-		_unit->PlaySoundToSet(11443);
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Destiny... awaits!");
+		_unit->PlaySoundToSet(11485);
+
 		RemoveAIUpdateEvent();
     }
 
 	void OnTargetDied(Unit* mTarget)
     {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "KilledPlayer");
-		_unit->PlaySoundToSet(11441);
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "My work is done.");
+		_unit->PlaySoundToSet(11483);
 	}
 
 	void AIUpdate()
 	{
-		float val = (float)RandomFloat(100.0f);
-        SpellCast(val);
-	}
-
-    void SpellCast(float val)
-    {
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-			float comulativeperc = 0;
-		    Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-				
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-						case TARGET_SELF:
-						case TARGET_VARIOUS:
-							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							break;
-						case TARGET_DESTINATION:
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-        }
-    }
-
-protected:
-	int nrspells;
-};
-
-//------------------------------------
-//    -=Veras Darkshadow  =-
-//------------------------------------
-#define CN_VERAS_DARKSHADOW 22952
-
-#define DEADLY_POISON 41485
-#define ENVENOM 41487 //Doesn't work
-#define VANISH 41476 //Doesn't work
-
-class VerasAI : public CreatureAIScript
-{
-public:
-    ADD_CREATURE_FACTORY_FUNCTION(VerasAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
-
-    VerasAI(Creature* pCreature) : CreatureAIScript(pCreature)
-    {
-		// -- Number of spells to add --
-		nrspells = 3;
-
-		// --- Initialization ---
-		for(int i=0;i<nrspells;i++)
+		if (_unit->GetAIInterface()->GetNextTarget() && _unit->GetCurrentSpell() == NULL)
 		{
-			m_spellcheck[i] = false;
+			uint32 t = (uint32)time(NULL);
+			if (t > spells[2].casttime)
+			{
+				Unit *target = _unit->GetAIInterface()->GetNextTarget();
+				_unit->CastSpell(target, spells[2].info, spells[2].instant);
+
+				spells[2].casttime = t + spells[2].cooldown;
+				return;
+			}
+
+			if (t > spells[3].casttime)
+			{
+				_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+
+				spells[3].casttime = t + spells[3].cooldown;
+				return;
+			}
 		}
-		// ----------------------
-		
-		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
 
-		spells[0].info = dbcSpell.LookupEntry(DEADLY_POISON);
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
-		spells[0].perctrigger = 10.0f;
-		spells[0].attackstoptimer = 1000; // 1sec
-		m_spellcheck[0] = true;
-
-		spells[1].info = dbcSpell.LookupEntry(ENVENOM);
-		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
-		spells[1].perctrigger = 10.0f;
-		spells[1].attackstoptimer = 2000; // 2sec
-
-		spells[2].info = dbcSpell.LookupEntry(VANISH);
-		spells[2].targettype = TARGET_SELF;
-		spells[2].instant = true;
-		spells[2].perctrigger = 2.0f;
-		spells[2].attackstoptimer = 2000; // 2sec
-
-    }
-
-    void OnCombatStart(Unit* mTarget)
-    {
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You wish to test me?");
-		_unit->PlaySoundToSet(11524);
-    }
-
-	void OnCombatStop(Unit *mTarget)
-    {
-        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-       RemoveAIUpdateEvent();
-    }
-
-    void OnDied(Unit * mKiller)
-    {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You got lucky!");
-		_unit->PlaySoundToSet(11527);
-		RemoveAIUpdateEvent();
-    }
-
-	void OnTargetDied(Unit* mTarget)
-    {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "A glorious kill!");
-		_unit->PlaySoundToSet(11526);
-	}
-
-	void AIUpdate()
-	{
 		float val = (float)RandomFloat(100.0f);
         SpellCast(val);
 	}
@@ -2192,18 +2691,23 @@ public:
 						case TARGET_VARIOUS:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							break;
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_FRIEND:
+						case TARGET_RANDOM_SINGLE:
+						case TARGET_RANDOM_DESTINATION:
+							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
@@ -2211,7 +2715,57 @@ public:
         }
     }
 
+	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
+	{
+		if (!maxdist2cast) maxdist2cast = 100.0f;
+		if (!maxhp2cast) maxhp2cast = 100;
+
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
+			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+												/* If anyone wants to use this function, then leave this note!										 */
+			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+			{ 
+				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
+				{
+					Unit* RandomTarget = NULL;
+					RandomTarget = (Unit*)(*itr);
+
+					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
+					{
+						TargetTable.push_back(RandomTarget);
+					} 
+				} 
+			}
+
+			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
+				TargetTable.push_back(_unit);
+
+			if (!TargetTable.size())
+				return;
+
+			size_t RandTarget = rand()%TargetTable.size();
+
+			Unit * RTarget = TargetTable[RandTarget];
+
+			if (!RTarget)
+				return;
+
+			switch (spells[i].targettype)
+			{
+			case TARGET_RANDOM_FRIEND:
+			case TARGET_RANDOM_SINGLE:
+				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
+			case TARGET_RANDOM_DESTINATION:
+				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
+			}
+
+			TargetTable.clear();
+		}
+	}
+
 protected:
+
 	int nrspells;
 };
 
@@ -2371,8 +2925,7 @@ public:
 						case TARGET_VARIOUS:
 							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
 						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							_unit->GetMapMgr()->GetInterface()->SpawnGameObject(NAJENTUS_SPINE_GO , _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.207343, true, 0, 0); break;
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 						case TARGET_RANDOM_FRIEND:
@@ -3267,25 +3820,40 @@ protected:
 
 // Additional stuff
 uint32 m_phase[1000000];	// dunno if it's enough (uint32 InstanceID -> 4,294,967,295)
-uint32 FoADeaths[1000000];
-uint32 MaievDialog[1000000];
 
 // Events
-uint32 BladesEvent[1000000];
 uint32 DeathEvent[1000000];
 
 #define WALK 0
 #define RUN 256
 #define FLY 768
 
-// Global definitions - comment to disable
+// Global settings - comment to disable
 #define USE_SHADOW_PRISON	// aggroes a lot of mobs/NPCs if they are not friendly to Illidan
+
+// Structs
+struct Coords
+{
+    float x;
+    float y;
+    float z;
+    float o;
+};
+
+struct Coords SearchPos[]=
+{
+	{ 744.743896f, 270.928619f, 352.996185f, 2.605572f },
+	{ 742.240051f, 330.404205f, 352.996185f, 3.249600f },
+	{ 686.947632f, 305.891022f, 353.192383f, 3.096451f },
+	{ 676.432495f, 266.354828f, 353.264984f, 4.317750f },
+	{ 674.560974f, 353.792755f, 352.996094f, 1.918359f }
+};
 
 /* Effect and Trigger AIs */
 
 /* Door Event Trigger AI - Creature AI Class */
 
-#define CN_DOOR_EVENT_TRIGGER 30001
+#define CN_DOOR_EVENT_TRIGGER	30001
 
 class DoorEventTriggerAI : public CreatureAIScript
 {
@@ -3301,9 +3869,9 @@ public:
 
 /* Demon Fire AI - Creature AI Class */
 
-#define CN_DEMON_FIRE 23069
+#define CN_DEMON_FIRE	23069
 
-#define DEMON_FIRE 40029
+#define DEMON_FIRE		40029
 
 class DemonFireAI : public CreatureAIScript
 {
@@ -3312,47 +3880,26 @@ public:
 
     DemonFireAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 		_unit->CastSpell(_unit, dbcSpell.LookupEntry(DEMON_FIRE), true);
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_canMove = false;
 		_unit->m_noRespawn = true;
-
-		RegisterAIUpdateEvent(60000);
-    }
-    
-    void OnCombatStart(Unit* mTarget)
-    {
-		RegisterAIUpdateEvent(60000);
+		_unit->Despawn(60000, 0);
     }
 
     void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-
-		RemoveAIUpdateEvent();
     }
-
-    void OnDied(Unit * mKiller)
-    {
-       RemoveAIUpdateEvent();
-    }
-
-    void AIUpdate()
-    {
-		_unit->Despawn(0,0);
-    }
-
-protected:
-
-	int nrspells;
 };
 
 /* Eye Beam Trigger AI - Creature AI Class */
 
-#define CN_EYE_BEAM_TRIGGER 30000
+#define CN_EYE_BEAM_TRIGGER	30000
 
-#define EYE_BLAST 40017	//spawning doesn't work so we will use little hack
+#define EYE_BLAST			40017
 
 class EyeBeamTriggerAI : public CreatureAIScript
 {
@@ -3361,28 +3908,21 @@ public:
 
     EyeBeamTriggerAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);		// temp. fix
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_moveRun = true;
 		_unit->m_noRespawn = true;
+		_unit->Despawn(12000, 0);
 
 		RegisterAIUpdateEvent(1000);
-
 		WallCreating = false;
-		DespawnTimer = 12;
-    }
-    
-    void OnCombatStart(Unit* mTarget)
-    {
-		RegisterAIUpdateEvent(1000);
     }
 
     void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-
-		RemoveAIUpdateEvent();
     }
 
     void OnDied(Unit * mKiller)
@@ -3415,24 +3955,18 @@ public:
 		}
 
 		_unit->CastSpell(_unit, dbcSpell.LookupEntry(EYE_BLAST), true);
-
-		DespawnTimer--;
-		if (!DespawnTimer)
-			_unit->Despawn(0,0);
     }
 
 protected:
 
 	bool WallCreating;
-	uint32 DespawnTimer;
-	int nrspells;
 };
 
 /* Flame Crash Effect AI - Creature AI Class */
 
-#define CN_FLAME_CRASH 23336
+#define CN_FLAME_CRASH	23336
 
-#define FLAME_CRASH_EFFECT 40836
+#define FLAME_CRASH_EFFECT	40836
 
 class FlameCrashAI : public CreatureAIScript
 {
@@ -3441,47 +3975,26 @@ public:
 
     FlameCrashAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 		_unit->CastSpell(_unit, dbcSpell.LookupEntry(FLAME_CRASH_EFFECT), true);
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_canMove = false;
 		_unit->m_noRespawn = true;
-
-		RegisterAIUpdateEvent(60000);
-    }
-    
-    void OnCombatStart(Unit* mTarget)
-    {
-		RegisterAIUpdateEvent(60000);
+		_unit->Despawn(120000, 0);
     }
 
     void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-
-		RemoveAIUpdateEvent();
     }
-
-    void OnDied(Unit * mKiller)
-    {
-       RemoveAIUpdateEvent();
-    }
-
-    void AIUpdate()
-    {
-		_unit->Despawn(0,0);
-    }
-
-protected:
-
-	int nrspells;
 };
 
 /* Blaze Effect AI - Creature AI Class */
 
-#define CN_BLAZE 23259
+#define CN_BLAZE	23259
 
-#define BLAZE_EFFECT 40610
+#define BLAZE_EFFECT	40610
 
 class BlazeAI : public CreatureAIScript
 {
@@ -3490,52 +4003,31 @@ public:
 
     BlazeAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 		_unit->CastSpell(_unit, dbcSpell.LookupEntry(BLAZE_EFFECT), true);
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_canMove = false;
 		_unit->m_noRespawn = true;
-
-		RegisterAIUpdateEvent(60000);
-    }
-    
-    void OnCombatStart(Unit* mTarget)
-    {
-		RegisterAIUpdateEvent(60000);
+		_unit->Despawn(60000, 0);
     }
 
-    void OnCombatStop(Unit *mTarget)
+	void OnCombatStop(Unit *mTarget)
     {
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-
-		RemoveAIUpdateEvent();
     }
-
-    void OnDied(Unit * mKiller)
-    {
-       RemoveAIUpdateEvent();
-    }
-
-    void AIUpdate()
-    {
-		_unit->Despawn(0,0);
-    }
-
-protected:
-
-	int nrspells;
 };
 
 /* Misc Creature AIs */
 
 /* Flame of Azzinoth AI - Creature AI Class */
 
-#define CN_FLAME_OF_AZZINOTH 22997	
+#define CN_FLAME_OF_AZZINOTH	22997	
 
-#define BLAZE 40637		// this one just summons mob that will trigger that fire cloud - doesn't spawn mob
-#define FLAME_BLAST	40631
-#define FOA_ENRAGE 40683	// 40683 or 40743
-#define CHAOS_CHARGE 40497 // CHAOS_CHARGE 40497 CHARGE 40602
+#define BLAZE			40637		// this one just summons mob that will trigger that fire cloud - doesn't spawn mob
+#define FLAME_BLAST		40631
+#define FOA_ENRAGE		40683	// 40683 or 40743
+#define CHAOS_CHARGE	40497 // CHAOS_CHARGE 40497 CHARGE 40602
 
 class FlameOfAzzinothAI : public CreatureAIScript
 {
@@ -3547,7 +4039,7 @@ public:
     FlameOfAzzinothAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
 		nrspells = 2;
-		for(int i=0;i<nrspells;i++)
+		for (int i = 0; i < nrspells; i++)
 		{
 			m_spellcheck[i] = false;
 			spells[i].casttime = 0;
@@ -3582,6 +4074,9 @@ public:
     
     void OnCombatStart(Unit* mTarget)
     {
+		for (int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
+
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
 
@@ -3590,15 +4085,11 @@ public:
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
         RemoveAIUpdateEvent();
-
-		for (int i = 0; i < nrspells; i++)
-			spells[i].casttime = 0;
     }
 
     void OnDied(Unit * mKiller)
     {
        RemoveAIUpdateEvent();
-	   FoADeaths[_unit->GetInstanceID()]--;
     }
 
     void AIUpdate()
@@ -3606,11 +4097,12 @@ public:
 		if (Enrage == true)
 		{
 			_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+
 			Enrage = false;
 			return;
 		}
 
-		if (_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		if (_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget() != NULL)
 		{
 			Unit *target = NULL;
 			target = _unit->GetAIInterface()->GetNextTarget();
@@ -3618,6 +4110,7 @@ public:
 			if (_unit->GetDistance2dSq(target) >= 225.0f && _unit->GetDistance2dSq(target) <= 1225 && rand()%5 == 0)	// I must test this value (15-35yards for now)
 			{
 				_unit->CastSpell(target, spells[2].info, spells[2].instant);
+
 				Enrage = true;
 				return;
 			}
@@ -3669,8 +4162,8 @@ public:
 
 protected:
 
-	bool Enrage;
 	int nrspells;
+	bool Enrage;
 };
 
 /* Akama AI - Creature Gossip Class */
@@ -3712,29 +4205,25 @@ public:
 
 		switch (IntId)
 		{
-			case 0:
-				GossipHello(pObject, plr, true);
-				break;
- 
-			case 1:
-			{
-				Akama->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+		case 0:
+			GossipHello(pObject, plr, true);
+			break;
+		case 1:
+			Akama->SetUInt32Value(UNIT_NPC_FLAGS, 0);
 
-				Akama->GetAIInterface()->StopMovement(0);
-				Akama->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-				Akama->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-				Akama->GetAIInterface()->setWaypointToMove(1);
-			}break;
+			Akama->GetAIInterface()->StopMovement(0);
+			Akama->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+			Akama->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+			Akama->GetAIInterface()->setWaypointToMove(1);
+			break;
+		case 2:
+			Akama->SetUInt32Value(UNIT_NPC_FLAGS, 0);
 
-			case 2:
-			{
-				Akama->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-
-				Akama->GetAIInterface()->StopMovement(0);
-				Akama->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-				Akama->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-				Akama->GetAIInterface()->setWaypointToMove(17);
-			}break;
+			Akama->GetAIInterface()->StopMovement(0);
+			Akama->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+			Akama->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+			Akama->GetAIInterface()->setWaypointToMove(17);
+			break;
 		}
 	}
  
@@ -3746,25 +4235,17 @@ public:
 
 /* Akama AI - Creature AI Class */
 
-#define CN_AKAMA 22990
+#define CN_AKAMA	22990
 
-#define HEALING_POTION 40535
-#define BLESSING_OF_KINGS 20217
-#define AKAMA_DESPAWN 41242
+#define HEALING_POTION			40535
+#define BLESSING_OF_KINGS		20217
+#define AKAMA_DESPAWN			41242
 
 // Door Event Spells
-#define AKAMA_DOOR_FAIL 41271
-#define AKAMA_DOOR_OPEN 41268
-#define DEATHSWORN_DOOR_OPEN 41269
-#define GATE_FAILURE 10390
-
-struct Coords
-{
-    float x;
-    float y;
-    float z;
-    float o;
-};
+#define AKAMA_DOOR_FAIL			41271
+#define AKAMA_DOOR_OPEN			41268
+#define DEATHSWORN_DOOR_OPEN	41269
+#define GATE_FAILURE			10390
 
 static Coords ToIllidan[] = 
 {
@@ -3807,7 +4288,7 @@ public:
 		}
 
 		nrspells = 1;
-		for(int i=0;i<nrspells;i++)
+		for (int i = 0; i < nrspells; i++)
 		{
 			m_spellcheck[i] = false;
 			spells[i].casttime = 0;
@@ -3834,34 +4315,38 @@ public:
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		_unit->GetAIInterface()->m_moveRun = true;
-		RegisterAIUpdateEvent(1000);
+
+		m_phase[_unit->GetInstanceID()] = 0;
+		EventChapter = 0;
+		SoundLimiter = 0;
+		EventTimer = 0;
+
+		Udalo = Olum = NULL;
 
 		if (!DeathEvent[_unit->GetInstanceID()])
 			_unit->SetUInt32Value(UNIT_NPC_FLAGS, 1);
-		else _unit->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+		else
+		{
+			_unit->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+			RegisterAIUpdateEvent(1000);
 
-		MaievDialog[_unit->GetInstanceID()] = 0;
-		m_phase[_unit->GetInstanceID()] = 0;
-		AkamaDialog = 0;
-		DoorEvent = 0;
-		CourtSay = 0;
-		AkamaRun = 0;
+			EventChapter = 2;
+		}
 	}
     
     void OnCombatStart(Unit* mTarget)
     {
-		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+		for (int i = 0; i < nrspells; i++)
+			spells[i].casttime = 0;
 
 		SoundLimiter = 0;
 
-		for (int i = 0; i < nrspells; i++)
-			spells[i].casttime = 0;
+		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+
+		RegisterAIUpdateEvent(1000);
     }
 
     void OnCombatStop(Unit *mTarget)
@@ -3874,19 +4359,13 @@ public:
 		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
 
 		//RemoveAIUpdateEvent();
-
-		AkamaDialog = 0;
-		//AkamaRun = 0;
-		CourtSay = 0;
     }
 
 	void OnTargetDied(Unit* mTarget)
     {
 		if (_unit->GetHealthPct() > 0)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%2;
+			int RandomSpeach = rand()%2;
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -3901,28 +4380,338 @@ public:
 		}
     }
 
-    void OnDied(Unit * mKiller)
+	void OnDied(Unit * mKiller)
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Fight on friends! Kill him and end the curse on my people!");	// not sure
 		_unit->PlaySoundToSet(11391);
 
 		RemoveAIUpdateEvent();
 
-		AkamaDialog = 0;
-		AkamaRun = 0;
-		CourtSay = 0;
+		EventTimer = 0;
     }
 
-    void AIUpdate()
-    {
-		SoundLimiter++;
-
-		if (_unit->GetHealthPct() <= 15 && _unit->GetAIInterface()->GetNextTarget())
+	void AIUpdate()
+	{
+		switch (EventChapter)
 		{
-			int RandomSpeach = rand()%2;
+		case 0:
+			WayToIllidan();
+			break;
+		case 1:
+			FightWithIllidan();
+			break;
+		case 2:
+			EncounterEnd();
+			break;
+		}
+	}
 
+	void WayToIllidan()
+	{
+		if (_unit->GetAIInterface()->getCurrentWaypoint() == 6 && EventTimer > 0)
+		{
+			GameObject* Gate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(774.7f, 304.6f, 314.85f, 185905);
+			Unit* DoorTrigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(771.5f, 304.7f, 319.0f, CN_DOOR_EVENT_TRIGGER);
+			if (Gate == NULL)
+			{
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "It's strange that Illidan doesn't protect himself against intruders." );
+				_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+				_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+
+				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+				_unit->GetAIInterface()->setWaypointToMove(7);
+
+				if (Udalo != NULL)
+				{
+					Udalo->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+					Udalo->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+
+					Udalo = NULL;
+				}
+				if (Olum != NULL)
+				{
+					Olum->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+					Olum->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+
+					Olum = NULL;
+				}
+
+				RemoveAIUpdateEvent();
+
+				EventTimer = 0;
+				return;
+			}
+
+			switch (EventTimer)
+			{
+			case 2:
+				_unit->SetFacing(6.248631f);
+				break;
+			case 6:
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "The door is all that stands between us and the Betrayer. Stand aside, friends." );
+				_unit->Emote(EMOTE_ONESHOT_TALK);
+				break;
+			case 10:		// here will be first try to break door (Akama himself only)
+				if (DoorTrigger != NULL)
+				{
+					_unit->CastSpell(DoorTrigger, dbcSpell.LookupEntry(AKAMA_DOOR_FAIL), false);
+					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, DoorTrigger->GetGUID());
+					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, AKAMA_DOOR_FAIL);
+				}
+				break;
+			case 19:		// here we will stop casting spell on door
+				_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+				_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+				break;
+			case 20:
+				_unit->Emote(EMOTE_ONESHOT_NO);
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "I cannot do this alone..." );
+				break;
+			case 26:		// summoning two spirits to help Akama with breaking doors
+				Udalo = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23410, 751.884705f, 311.270050f, 312.121185f, 0.047113f, true, false, 0, 0);
+				Olum  = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23411, 751.687744f, 297.408600f, 312.124817f, 0.054958f, true, false, 0, 0);
+				if (Udalo != NULL)
+				{
+					Udalo->GetAIInterface()->SetAllowedToEnterCombat(false);
+					Udalo->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
+
+					Udalo->m_noRespawn = true;
+					Udalo->Despawn(45000, 0);
+				}
+				if (Olum != NULL)
+				{
+					Olum->GetAIInterface()->SetAllowedToEnterCombat(false);
+					Olum->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
+
+					Olum->m_noRespawn = true;
+					Olum->Despawn(45000, 0);
+				}
+				break;
+			case 27:
+				if (Udalo != NULL)
+					Udalo->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You are not alone, Akama." );
+				break;
+			case 33:
+				if (Olum != NULL)
+					Olum->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Your people will always be with you." );
+				break;
+			case 38:			// Akama starts casting his spell again with both spirits
+				if (DoorTrigger != NULL)
+				{
+					_unit->CastSpell(DoorTrigger, dbcSpell.LookupEntry(AKAMA_DOOR_OPEN), false);
+					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, DoorTrigger->GetGUID());
+					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, AKAMA_DOOR_OPEN);
+				}
+				break;
+			case 39:
+				if (DoorTrigger != NULL)
+				{
+					if (Udalo != NULL)
+					{
+						Udalo->CastSpell(DoorTrigger, dbcSpell.LookupEntry(DEATHSWORN_DOOR_OPEN), false);
+						Udalo->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, DoorTrigger->GetGUID());
+						Udalo->SetUInt32Value(UNIT_CHANNEL_SPELL, DEATHSWORN_DOOR_OPEN);
+					}
+					if (Olum != NULL)
+					{
+						Olum->CastSpell(DoorTrigger, dbcSpell.LookupEntry(DEATHSWORN_DOOR_OPEN), false);
+						Olum->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, DoorTrigger->GetGUID());
+						Olum->SetUInt32Value(UNIT_CHANNEL_SPELL, DEATHSWORN_DOOR_OPEN);
+					}
+				}
+				break;
+			case 48:			// Door has been broken and channel stopped
+				Gate->SetUInt32Value(GAMEOBJECT_STATE, 0);
+				if (DoorTrigger != NULL)
+				{
+					DoorTrigger->CastSpell(_unit, dbcSpell.LookupEntry(GATE_FAILURE), true);
+				}
+				break;
+			case 49:
+				_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+				_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+
+				if (Udalo != NULL)
+				{
+					Udalo->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+					Udalo->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+				}
+				if (Olum != NULL)
+				{
+					Olum->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+					Olum->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+				}
+				break;
+			case 52:
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "I thank you for your aid, my brothers. Our people will be redeemed!" );
+				_unit->Emote(EMOTE_ONESHOT_SALUTE);
+				break;
+			case 55:
+				if (Udalo != NULL)
+					Udalo->Emote(EMOTE_ONESHOT_SALUTE);
+				if (Olum != NULL)
+					Olum->Emote(EMOTE_ONESHOT_SALUTE);
+
+				Udalo = NULL;
+				Olum = NULL;
+				break;
+			case 58:
+				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+				_unit->GetAIInterface()->setWaypointToMove(7);
+				RemoveAIUpdateEvent();
+				break;
+			}
+
+			EventTimer++;
+			if (EventTimer > 58)
+				EventTimer = 0;
+		}
+
+		if (EventTimer > 0 && _unit->GetAIInterface()->getCurrentWaypoint() == 16)
+		{
+			EventTimer++;
+			switch (EventTimer)
+			{
+			case 2:
+				_unit->PlaySoundToSet(11388);
+				_unit->SetFacing(2.113512f);
+				break;
+			case 17:
+				_unit->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+				RemoveAIUpdateEvent();
+
+				EventTimer = 0;
+				break;
+			}
+		}
+
+		if (EventTimer > 0 && _unit->GetAIInterface()->getCurrentWaypoint() == 17 && m_phase[_unit->GetInstanceID()] == 0)
+		{
+			Illidan = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(704.539001f, 305.282013f, 353.919006f, 22917);
+			if (Illidan == NULL || !Illidan->isAlive())
+			{
+				RemoveAIUpdateEvent();
+
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Not this time my friends." );
+				_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+				_unit->Despawn(0,0);
+
+				EventTimer = 0;
+				return;
+			}
+
+			switch(EventTimer)
+			{
+			case 1:
+				_unit->SetFacing(3.126680f);
+				break;
+			case 2:
+				Illidan->RemoveAura(39656);
+				break;
+			case 3:
+		        Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Akama... your duplicity is hardly surprising. I should have slaughtered you and your malformed brethren long ago.");
+				Illidan->PlaySoundToSet(11463);
+				break;
+			case 7:
+				Illidan->Emote(EMOTE_ONESHOT_QUESTION);
+				break;
+			case 12:
+				Illidan->Emote(EMOTE_ONESHOT_QUESTION);
+				break;
+			case 15:
+		        _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "We've come to end your reign, Illidan. My people and all of Outland shall be free!");
+				_unit->PlaySoundToSet(11389);
+
+				_unit->Emote(EMOTE_ONESHOT_POINT);
+			    break;
+			case 18:
+				_unit->Emote(EMOTE_ONESHOT_TALK);
+				break;
+			case 22:
+				_unit->Emote(EMOTE_ONESHOT_SALUTE);
+				break;
+			case 25:
+		        Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Boldly said. But I remain unconvinced.");
+				Illidan->PlaySoundToSet(11464);
+
+				Illidan->Emote(EMOTE_ONESHOT_QUESTION);
+			    break;
+			case 28:
+				Illidan->Emote(EMOTE_ONESHOT_QUESTION);
+				break;
+			case 32:
+		        _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The time has come! The moment is at hand!");
+				_unit->PlaySoundToSet(11380);
+
+				_unit->Emote(EMOTE_ONESHOT_SHOUT);
+				break;
+			case 34:
+				_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+				_unit->Emote(EMOTE_ONESHOT_ROAR);
+				break;
+			case 36:
+				Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You are not prepared!");
+				Illidan->PlaySoundToSet(11466);
+
+				_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+
+				Illidan->Emote(EMOTE_ONESHOT_CUSTOMSPELL05);
+				break;
+			case 38:
+				Illidan->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+				break;
+			case 40:
+				GameObject* RightGate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(745.07f, 241.802f, 354.292f, 200000);
+				GameObject* LeftGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(744.829f, 369.276f, 354.324f, 200001);
+				if (RightGate != NULL)
+					RightGate->SetUInt32Value(GAMEOBJECT_STATE, 1);
+				if (LeftGate != NULL)
+					LeftGate->SetUInt32Value(GAMEOBJECT_STATE, 1);
+				
+				_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+				_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+				_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+				_unit->GetAIInterface()->m_canMove = true;
+
+				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+				_unit->GetAIInterface()->setWaypointToMove(0);
+
+				Illidan->GetAIInterface()->SetAllowedToEnterCombat(true);
+				Illidan->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+				Illidan->GetAIInterface()->m_canMove = true;
+
+				RemoveAIUpdateEvent();
+
+				_unit->GetAIInterface()->AttackReaction(Illidan, 1, 0);
+
+				Unit *IllidanTarget = NULL;
+				IllidanTarget = FindTarget();
+				if (IllidanTarget == NULL)
+				{
+					IllidanTarget = _unit;
+				}
+
+				Illidan->GetAIInterface()->AttackReaction(IllidanTarget, 500, 0);
+
+				EventChapter = 1;
+				break;
+			}
+
+			EventTimer++;
+			if (EventTimer > 40)
+				EventTimer = 0;
+		}
+	}
+
+	void FightWithIllidan()
+	{
+		SoundLimiter++;
+		if (_unit->GetHealthPct() <= 15 && _unit->GetAIInterface()->GetNextTarget() != NULL)
+		{
 			if (SoundLimiter >= 15)
 			{
+				int RandomSpeach = rand()%2;
 				switch (RandomSpeach)
 				{
 				case 0:
@@ -3942,348 +4731,116 @@ public:
 			{
 				Creature *Target = NULL;
 				Target = (Creature*)_unit->GetAIInterface()->GetNextTarget();
-				if (Target && Target->GetEntry() == 22917)
+				if (Target != NULL && Target->GetEntry() == 22917)
 					_unit->CastSpell(_unit, spells[1].info, spells[1].instant);
 			}
 		}
 
-		if (_unit->GetAIInterface()->getCurrentWaypoint() == 6 && DoorEvent)
+		if ((_unit->GetAIInterface()->GetNextTarget() != NULL || EventTimer > 7) && _unit->GetAIInterface()->getCurrentWaypoint() < 18 && m_phase[_unit->GetInstanceID()] != 0)
 		{
-			GameObject* Gate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(774.7f, 304.6f, 314.85f, 185905);
-
-			Unit* DoorTrigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(771.5f, 304.7f, 319.0f, CN_DOOR_EVENT_TRIGGER);
-
-			if (!Gate)
+			if (_unit->GetAIInterface()->GetAllowedToEnterCombat() == true && EventTimer < 7)	// && Illidan && Illidan->GetHealthPct() > 85)
 			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "It's strange that Illidan doesn't protect himself against intruders." );
-				_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-				_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+				_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
 
-				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-				_unit->GetAIInterface()->setWaypointToMove(7);
-				_unit->SetFacing(6.248631f);
-
-				DoorEvent = 0;
-
-				if (Udalo)
-				{
-					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-				}
-
-				if (Olum)
-				{
-					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-				}
-
-				return;
+				float val = (float)RandomFloat(100.0f);
+				SpellCast(val);
 			}
 
-			switch (DoorEvent)
+			if ((Illidan == NULL || !Illidan->isAlive()) && EventTimer <= 7)
 			{
-				case 2:
-				{
-					_unit->SetFacing(6.248631f);
-				}break;
-
-				case 6:
-				{
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "The door is all that stands between us and the Betrayer. Stand aside, friends." );
-					_unit->Emote(EMOTE_ONESHOT_TALK);
-				}break;
-
-				case 10:		// here will be first try to break door (Akama himself only)
-				{
-					if (DoorTrigger)
-					{
-						_unit->CastSpell(DoorTrigger, dbcSpell.LookupEntry(AKAMA_DOOR_FAIL), false);
-						_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, DoorTrigger->GetGUID());
-						_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, AKAMA_DOOR_FAIL);
-					}
-				}break;
-
-				case 19:		// here we will stop casting spell on door
-				{
-					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-				}break;
-
-				case 20:
-				{
-					_unit->Emote(EMOTE_ONESHOT_NO);
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "I cannot do this alone..." );
-				}break;
-
-				case 26:		// summoning two spirits to help Akama with breaking doors
-				{
-					Udalo = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23410, 751.884705f, 311.270050f, 312.121185f, 0.047113f, true, false, 0, 0);
-					Olum  = _unit->GetMapMgr()->GetInterface()->SpawnCreature(23411, 751.687744f, 297.408600f, 312.124817f, 0.054958f, true, false, 0, 0);
-
-					if (Udalo)
-					{
-						Udalo->GetAIInterface()->SetAllowedToEnterCombat(false);
-						Udalo->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
-					}
-					
-					if (Olum)
-					{
-						Olum->GetAIInterface()->SetAllowedToEnterCombat(false);
-						Olum->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
-					}
-				}break;
-
-				case 27:
-				{
-					if (Udalo)
-						Udalo->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You are not alone, Akama." );
-				}break;
-
-				case 33:
-				{
-					if (Olum)
-						Olum->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Your people will always be with you." );
-				}break;
-
-				case 38:			// Akama starts casting his spell again with both spirits
-				{
-					if (DoorTrigger)
-					{
-						_unit->CastSpell(DoorTrigger, dbcSpell.LookupEntry(AKAMA_DOOR_OPEN), false);
-						_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, DoorTrigger->GetGUID());
-						_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, AKAMA_DOOR_OPEN);
-					}
-				}break;
-
-				case 39:
-				{
-					if (DoorTrigger)
-					{
-						if (Udalo)
-						{
-							Udalo->CastSpell(DoorTrigger, dbcSpell.LookupEntry(DEATHSWORN_DOOR_OPEN), false);
-							Udalo->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, DoorTrigger->GetGUID());
-							Udalo->SetUInt32Value(UNIT_CHANNEL_SPELL, DEATHSWORN_DOOR_OPEN);
-						}
-	
-						if (Olum)
-						{
-							Olum->CastSpell(DoorTrigger, dbcSpell.LookupEntry(DEATHSWORN_DOOR_OPEN), false);
-							Olum->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, DoorTrigger->GetGUID());
-							Olum->SetUInt32Value(UNIT_CHANNEL_SPELL, DEATHSWORN_DOOR_OPEN);
-						}
-					}
-				}break;
-
-				case 48:			// Door has been broken and channel stoped
-				{
-					Gate->SetUInt32Value(GAMEOBJECT_STATE, 0);
-
-					if (DoorTrigger)
-					{
-						DoorTrigger->CastSpell(_unit, dbcSpell.LookupEntry(GATE_FAILURE), true);
-					}
-				}break;
-
-				case 49:
-				{
-					_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-					_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-
-					if (Udalo)
-					{
-						Udalo->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-						Udalo->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-					}
-
-					if (Olum)
-					{
-						Olum->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-						Olum->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-					}
-				}break;
-
-				case 52:
-				{
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "I thank you for your aid, my brothers. Our people will be redeemed!" );
-					_unit->Emote(EMOTE_ONESHOT_SALUTE);
-				}break;
-
-				case 55:
-				{
-					if (Udalo)
-						Udalo->Emote(EMOTE_ONESHOT_SALUTE);
-					if (Olum)
-						Olum->Emote(EMOTE_ONESHOT_SALUTE);
-				}break;
-
-				case 58:
-				{
-					_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-					_unit->GetAIInterface()->setWaypointToMove(7);
-				}break;
-			}
-
-			DoorEvent++;
-
-			if (DoorEvent > 58)
-				DoorEvent = 0;
-		}
-
-		if (CourtSay)
-		{
-			CourtSay++;
-
-			switch (CourtSay)
-			{
-			case 2:
-				{
-					_unit->PlaySoundToSet(11388);
-					_unit->SetFacing(2.113512f);
-				}break;
-			case 17:
-				{
-					_unit->SetUInt32Value(UNIT_NPC_FLAGS, 1);
-
-					CourtSay = 0;
-				}break;
-			}
-		}
-
-		if (AkamaDialog)
-		{
-			Illidan = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(704.539001f, 305.282013f, 353.919006f, 22917);
-
-			if (!Illidan || !Illidan->isAlive())
-			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Not this time my friends." );
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Not this time my friends.");
 				_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
 				_unit->Despawn(0,0);
-
-				AkamaDialog = 0;
-				return;
 			}
 
-			switch(AkamaDialog)
+			if ((Illidan != NULL && Illidan->isAlive() && Illidan->GetHealthPct() <= 85 && EventTimer <= 7) || EventTimer > 7)
 			{
-			case 1:
+				switch (EventTimer)
 				{
-					_unit->GetAIInterface()->SetNextTarget(Illidan);
-					_unit->SetFacing(3.126680f);
-				}break;
-			case 2:
-				{
-					Illidan->RemoveAura(39656);
-				}break;
-			case 3:
-			    {
-			        Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Akama... your duplicity is hardly surprising. I should have slaughtered you and your malformed brethren long ago.");
-					Illidan->PlaySoundToSet(11463);
-			    }break;
-			case 7:
-				{
-					Illidan->Emote(EMOTE_ONESHOT_QUESTION);
-				}break;
-			case 12:
-				{
-					Illidan->Emote(EMOTE_ONESHOT_QUESTION);
-				}break;
-			case 15:
-			    {
-			        _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "We've come to end your reign, Illidan. My people and all of Outland shall be free!");
-					_unit->PlaySoundToSet(11389);
-
-					_unit->Emote(EMOTE_ONESHOT_POINT);
-			    }break;
-			case 18:
-				{
-					_unit->Emote(EMOTE_ONESHOT_TALK);
-				}break;
-			case 22:
-				{
-					_unit->Emote(EMOTE_ONESHOT_SALUTE);
-				}break;
-			case 25:
-			    {
-			        Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Boldly said. But I remain unconvinced.");
-					Illidan->PlaySoundToSet(11464);
-
-					Illidan->Emote(EMOTE_ONESHOT_QUESTION);
-			    }break;
-			case 28:
-				{
-					Illidan->Emote(EMOTE_ONESHOT_QUESTION);
-				}break;
-			case 32:
-			    {
-			        _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The time has come! The moment is at hand!");
-					_unit->PlaySoundToSet(11380);
-
-					_unit->Emote(EMOTE_ONESHOT_SHOUT);
-			    }break;
-			case 34:
-				{
-					_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
-					_unit->Emote(EMOTE_ONESHOT_ROAR);
-				}break;
-			case 36:
-				{
-					Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You are not prepared!");
-					Illidan->PlaySoundToSet(11466);
-
-					_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-
-					Illidan->Emote(EMOTE_ONESHOT_CUSTOMSPELL05);
-				}break;
-			case 38:
-				{
-					Illidan->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
-				}break;
-			case 40:
-				{
-					GameObject* RightGate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(745.07f, 241.802f, 354.292f, 200000);
-					GameObject* LeftGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(744.829f, 369.276f, 354.324f, 200001);
-					
-					if (RightGate)
-						RightGate->SetUInt32Value(GAMEOBJECT_STATE, 1);
-
-					if (LeftGate)
-						LeftGate->SetUInt32Value(GAMEOBJECT_STATE, 1);
-					
-					_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
-					_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+				case 0:
+					Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come, my minions. Deal with this traitor as he deserves!");
+					Illidan->PlaySoundToSet(11465);
+					break;
+				case 7:
+					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 					_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+					_unit->GetAIInterface()->SetNextTarget(NULL);
+					_unit->GetAIInterface()->WipeTargetList();
+					_unit->GetAIInterface()->WipeHateList();
+
+					_unit->GetAIInterface()->disable_melee = true;
+					_unit->GetAIInterface()->m_canMove = false;
+
+					Illidan->GetAIInterface()->RemoveThreatByPtr(_unit);	// Akama will stuck in place anyway if alone in combat with Illidan
+					break;
+				case 8:
+					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I will deal with these mongrels! Strike now, friends! Strike at the Betrayer!");
+					_unit->PlaySoundToSet(11390);
+
+					_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+					break;
+				case 9:
+					_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+					break;
+				case 10:
+					_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+					break;
+				case 11:
+					_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
+					_unit->Emote(EMOTE_ONESHOT_EXCLAMATION);
+					break;
+				case 13:
+					_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+					_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+					break;
+				case 15:
+					_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 					_unit->GetAIInterface()->m_canMove = true;
 
-					Illidan->GetAIInterface()->SetAllowedToEnterCombat(true);
-					Illidan->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-					Illidan->GetAIInterface()->m_canMove = true;
+					_unit->GetAIInterface()->StopMovement(0);
+					_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+					_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+					_unit->GetAIInterface()->setWaypointToMove(18);
 
-					_unit->GetAIInterface()->AttackReaction(Illidan, 1, 0);
+					RemoveAIUpdateEvent();
 
-					CastTriggering = 2;
-					AkamaRun = 0;
-				}break;
+					//_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+					break;
+				}
+				
+				EventTimer++;
+				if (EventTimer > 15)
+					EventTimer = 0;
 			}
-
-			AkamaDialog++;
-
-			if (AkamaDialog > 40)
-				AkamaDialog = 0;
 		}
+	}
 
-		if (m_phase[_unit->GetInstanceID()] == 0 && DeathEvent[_unit->GetInstanceID()] >= 41)
+	void EncounterEnd()
+	{
+		if (m_phase[_unit->GetInstanceID()] == 0 && DeathEvent[_unit->GetInstanceID()] >= 40)
 		{	
-			if (DeathEvent[_unit->GetInstanceID()] == 41)
+			if (DeathEvent[_unit->GetInstanceID()] <= 41)
 			{
-				Maiev = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(700.009216f, 305.660065f, 354.405609f, 23197);
-				if (Maiev && Maiev->isAlive())
+				Unit *Maiev = NULL;
+				for (int i = 0; i < 5; i++)
 				{
-					MposX = Maiev->GetPositionX();
-					MposY = Maiev->GetPositionY();
-					MposZ = Maiev->GetPositionZ();
-					MposO = Maiev->GetOrientation();
+					Maiev = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(SearchPos[i].x, SearchPos[i].y, SearchPos[i].z, 23197);
+					if (Maiev != NULL && Maiev->isAlive())
+					{
+						MposX = Maiev->GetPositionX();
+						MposY = Maiev->GetPositionY();
+						MposZ = Maiev->GetPositionZ();
+						MposO = Maiev->GetOrientation();
+
+						break;
+					}
+				}
+				// Akama is despawned if he can't find Maiev anywhere (better than going to position x = 0.0f y = 0.0f and z = 0.0f (cells too small)
+				if (Maiev == NULL)
+				{
+					_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Not this time my friends.");
+					_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+					_unit->Despawn(0,0);
 				}
 			}
 
@@ -4292,9 +4849,9 @@ public:
 
 			if (DeathEvent[_unit->GetInstanceID()] == 42)
 			{
+				_unit->GetAIInterface()->m_moveRun = true;
 				_unit->GetAIInterface()->MoveTo(MposX, MposY, MposZ, MposO);
 				_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
-				_unit->GetAIInterface()->m_moveRun = true;
 
 				RemoveAIUpdateEvent();
 				RegisterAIUpdateEvent(1000);
@@ -4310,136 +4867,32 @@ public:
 				switch (DeathEvent[_unit->GetInstanceID()])
 				{
 				case 45:
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Light will fill these dismal halls once again. I swear it.");
-						_unit->PlaySoundToSet(11387);
+					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Light will fill these dismal halls once again. I swear it.");
+					_unit->PlaySoundToSet(11387);
 
-						if (Illidan)
-							_unit->GetAIInterface()->SetNextTarget(Illidan);
+					Illidan = NULL;
+					Illidan = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 22917);
+					if (Illidan != NULL)
+						_unit->GetAIInterface()->SetNextTarget(Illidan);
 
-						_unit->Emote(EMOTE_ONESHOT_TALK);
-					}break;
+					_unit->Emote(EMOTE_ONESHOT_TALK);
+					break;
 				case 49:
-					{
-						_unit->Emote(EMOTE_ONESHOT_SALUTE);
-					}break;
+					_unit->Emote(EMOTE_ONESHOT_SALUTE);
+					break;
 				case 53:
-					{
-						DeathEvent[_unit->GetInstanceID()] = 0;
+					DeathEvent[_unit->GetInstanceID()] = 0;
 
-						_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
-						_unit->Despawn(0,0);
-					}break;
+					_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+					_unit->Despawn(0,0);
+					break;
 				}
 			}
 
 			if (DeathEvent[_unit->GetInstanceID()] >= 44)
 				DeathEvent[_unit->GetInstanceID()]++;
 		}
-
-		if ((_unit->GetAIInterface()->GetNextTarget() || AkamaRun >= 7) && _unit->GetAIInterface()->getCurrentWaypoint() < 18)
-		{
-			CastTriggering--;
-			if (!CastTriggering && AkamaRun < 7)	// && Illidan && Illidan->GetHealthPct() > 85)
-			{
-				_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-				float val = (float)RandomFloat(100.0f);
-				SpellCast(val);
-
-				CastTriggering = 2;
-			}
-
-			if (((!Illidan || !Illidan->isAlive()) && AkamaRun <= 7) || (!DeathEvent[_unit->GetInstanceID()] && !Illidan->isAlive()))	// added check for Illidan life state, coz some stupid GMs can kill Illidan by command before real part of event starts
-			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Not this time my friends." );
-				_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
-
-				AkamaRun = 0;
-
-				_unit->Despawn(0,0);
-				return;
-			}
-
-			if (Illidan && Illidan->isAlive() && Illidan->GetHealthPct() <= 85 && AkamaRun <= 7 || AkamaRun > 7)	// we don't need to check Illidan if AkamaRun > 7 coz we don't use him in that time (only _unit)
-			{
-				switch (AkamaRun)
-				{
-					case 0:
-					{
-						Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come, my minions. Deal with this traitor as he deserves!");
-						Illidan->PlaySoundToSet(11465);
-					}break;
-
-					case 7:
-					{	
-						_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
-						_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-						_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-						_unit->GetAIInterface()->SetNextTarget(NULL);
-						/*_unit->GetAIInterface()->WipeTargetList();	// it's strange that if Akama goes out of combat he affects Illidan so he won't cast or update ai correctly
-						_unit->GetAIInterface()->WipeHateList();*/
-
-						_unit->GetAIInterface()->disable_melee = true;
-						_unit->GetAIInterface()->m_canMove = false;
-
-						Illidan->GetAIInterface()->RemoveThreatByPtr(_unit);	// Akama will stuck in place anyway if alone in combat with Illidan
-
-						//_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-					}break;
-
-					case 8:
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I will deal with these mongrels! Strike now, friends! Strike at the Betrayer!");
-						_unit->PlaySoundToSet(11390);
-
-						_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-					}break;
-
-					case 9:
-					{
-						_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-					}break;
-
-					case 10:
-					{
-						_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-					}break;
-
-					case 11:
-					{
-						_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
-						_unit->Emote(EMOTE_ONESHOT_EXCLAMATION);
-					}break;
-		
-					case 13:
-					{
-						_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-						_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
-					}break;
-
-					case 15:
-					{
-						if (_unit->GetAIInterface()->getMoveType() != MOVEMENTTYPE_WANTEDWP) 
-						{
-							// maybe something to stop Illidan from fight Akama, or switch target to PC something!
-							_unit->GetAIInterface()->m_canMove = true;
-
-							_unit->GetAIInterface()->StopMovement(0);
-							_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-							_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-							_unit->GetAIInterface()->setWaypointToMove(18);
-
-							//_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-						}
-					}break;
-				}
-				
-				AkamaRun++;
-				if (AkamaRun > 15)
-					AkamaRun = 0;
-			}
-		}
-    }
+	}
 
 	void SpellCast(float val)
     {
@@ -4485,25 +4938,17 @@ public:
 		switch (iWaypointId)
 		{
 		case 6:
-			{
-				DoorEvent = 1;
-			}break;
 		case 16:
-			{
-				CourtSay = 1;
-			}break;
 		case 17:
-			{
-				AkamaDialog = 1;
-			}break;
+			RegisterAIUpdateEvent(1000);
+			EventTimer = 1;
+			break;
 		case 19:
-			{
-				//_unit->Despawn(0, 0);	// do not let Illidan's AI being updated
-			}break;
+			_unit->Despawn(0, 0);
+			break;
 		case 20:
-			{
-				DeathEvent[_unit->GetInstanceID()] = 49;
-			}break;
+			DeathEvent[_unit->GetInstanceID()] = 49;
+			break;
 		default:
 			{
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
@@ -4531,64 +4976,55 @@ public:
         return wp;
     }
 
+	// A bit rewritten FindTarget function
+	Unit* FindTarget()
+	{
+		Unit* target = NULL;
+		float distance = 70.0f;
+		float z_diff;
+
+		Unit *pUnit;
+		float dist;
+
+		for (std::set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); itr++)
+		{
+			pUnit = static_cast<Unit*>((*itr));
+
+			if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
+				continue;
+
+			z_diff = fabs(_unit->GetPositionZ() - pUnit->GetPositionZ());
+			if(z_diff > 5.0f)
+				continue;
+
+			if(pUnit->m_invisible)
+				continue;
+
+			if(!pUnit->isAlive())
+				continue;
+
+			dist = Illidan->GetDistance2dSq(pUnit);
+
+			if(dist > distance*distance)
+				continue;
+
+			distance = dist;
+			target = pUnit;
+		}
+
+		return target;
+	}
+
 protected:
 
 	float MposX, MposY, MposZ, MposO;
-	uint32 CastTriggering;
 	uint32 SoundLimiter;
-	uint32 m_currentWP;
-	uint32 AkamaDialog;
-	uint32 DoorEvent;
-	uint32 AkamaRun;
-	uint32 CourtSay;
-	Unit* Illidan;
+	uint32 EventChapter;
+	uint32 EventTimer;
+	Creature *Udalo;
+	Creature *Olum;
+	Unit *Illidan;
 	int nrspells;
-	Unit* Maiev;
-	Unit* Udalo;
-	Unit* Olum;
-};
-
-/* Blade of Azzinoth AI - Creature AI Class */
-
-#define CN_BLADE_OF_AZZINOTH 22996
-
-class BladeOfAzzinothAI : public CreatureAIScript
-{
-public:
-    ADD_CREATURE_FACTORY_FUNCTION(BladeOfAzzinothAI);
-
-    BladeOfAzzinothAI(Creature* pCreature) : CreatureAIScript(pCreature)
-    {
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-		_unit->m_noRespawn = true;
-		
-		RegisterAIUpdateEvent(500);
-    }
-
-    void OnCombatStop(Unit *mTarget)
-    {
-        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-
-        //RemoveAIUpdateEvent();
-    }
-
-    void OnDied(Unit * mKiller)
-    {
-       //RemoveAIUpdateEvent();
-    }
-
-    void AIUpdate()
-    {
-		switch (BladesEvent[_unit->GetInstanceID()])
-		{
-			case 29:	// Despawn of Blades -> Return to Illidan's hands
-			{
-				_unit->Despawn(0,0);
-			}break;
-		}
-    }
 };
 
 /* Maiev AI - Creature AI Class */
@@ -4603,16 +5039,9 @@ class MaievAI : public CreatureAIScript
 public:
     ADD_CREATURE_FACTORY_FUNCTION(MaievAI);
 	SP_AI_Spell spells[1];
-	bool m_spellcheck[1];
 
     MaievAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 1;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-		}
-
 		spells[0].info = dbcSpell.LookupEntry(TELEPORT);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
@@ -4620,18 +5049,13 @@ public:
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 0;
 
-		Illidan = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(704.539001f, 305.282013f, 353.919006f, 22917);
-
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-	
+
+		SoundTimer = 0;
+
 		RegisterAIUpdateEvent(250);
-
-		CastTriggering = 0;
-		SoundTimer = 50;
-
-		//_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -4652,7 +5076,8 @@ public:
     void OnDied(Unit * mKiller)
     {
        RemoveAIUpdateEvent();
-	   SoundTimer = 50;
+
+	   SoundTimer = 0;
     }
 
 	void OnDamageTaken(Unit *mAttacker, float fAmount)
@@ -4664,174 +5089,125 @@ public:
     {
 		_unit->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
+		Unit *Illidan = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 22917);
 
-		if (MaievDialog[_unit->GetInstanceID()] >= 29 && !DeathEvent[_unit->GetInstanceID()])
-			SoundTimer++;
-
-		float SayNaisha = (float)RandomFloat(100.0f);
-		if (!DeathEvent[_unit->GetInstanceID()] && ((SayNaisha < 2.5f && SoundTimer >= 100 && SoundTimer < 1330) || SoundTimer == 1361 || SoundTimer > 1400))
+		if (DeathEvent[_unit->GetInstanceID()] == 0)
 		{
-			if (SoundTimer != 1361)
-				RandText = rand()%3;
-				//RandText = sRand.rand(3);
-			if (SoundTimer == 1361)
-				RandText = rand()%2;
-				//RandText = sRand.rand(2);
-			switch (RandText)	// Not sure if those both should be here, but couldn't find any relation when those are said on blizz
+			if (_unit->GetAIInterface()->GetNextTarget() != NULL && _unit->GetAIInterface()->m_canMove == true)
+				SoundTimer++;
+
+			float SayNaisha = (float)RandomFloat(100.0f);
+			if ((SayNaisha < 2.5f && SoundTimer >= 100 && SoundTimer < 1330) || SoundTimer == 1361 || SoundTimer > 1400)
 			{
-				case 0:
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Bleed as I have bled!");	// not sure
-					_unit->PlaySoundToSet(11494);
+				uint32 RandText;
+				if (SoundTimer != 1361)
+					RandText = rand()%3;
+				if (SoundTimer == 1361)
+					RandText = rand()%2;
+				switch (RandText)	// Not sure if those both should be here, but couldn't find any relation when those are said on blizz
+				{
+					case 0:
+						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Bleed as I have bled!");	// not sure
+						_unit->PlaySoundToSet(11494);
 
-					SoundTimer = 0;
-					break;
-				case 1:
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "That is for Naisha!");
-					_unit->PlaySoundToSet(11493);
+						SoundTimer = 0;
+						break;
+					case 1:
+						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "That is for Naisha!");
+						_unit->PlaySoundToSet(11493);
 
-					SoundTimer = 0;
-					break;
-				case 2:
-					if (Illidan)
-					{
-						Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Feel the hatred of ten thousand years!");
-						Illidan->PlaySoundToSet(11470);
+						SoundTimer = 0;
+						break;
+					case 2:
+						if (Illidan != NULL)
+						{
+							Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Feel the hatred of ten thousand years!");
+							Illidan->PlaySoundToSet(11470);
 
-						SoundTimer = 1337;
-				}break;
+							SoundTimer = 1337;
+					}break;
+				}
 			}
 		}
 
-		if (DeathEvent[_unit->GetInstanceID()] && Illidan)
+		if (DeathEvent[_unit->GetInstanceID()] > 0)
 		{
-			switch (DeathEvent[_unit->GetInstanceID()])
+			if ((DeathEvent[_unit->GetInstanceID()] <= 25 && Illidan != NULL) || (DeathEvent[_unit->GetInstanceID()] > 25))
 			{
-			case 1:
+				switch (DeathEvent[_unit->GetInstanceID()])
 				{
+				case 1:
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ah, it is finished. You are beaten.");	// not sure
 					_unit->PlaySoundToSet(11496);
 
-					//_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-					//_unit->WipeTargetList();
-					//_unit->WipeHateList();
-
-					Illidan->GetAIInterface()->SetNextTarget(NULL);
 					Illidan->Emote(EMOTE_ONESHOT_CUSTOMSPELL06);
 					if(Illidan->GetCurrentSpell() != NULL)
 						Illidan->GetCurrentSpell()->cancel();
 
 					RemoveAIUpdateEvent();
 					RegisterAIUpdateEvent(1000);
-				}break;
-			case 2:
-				{
+					break;
+				case 2:
 					Illidan->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CUSTOMSPELL07);
+
 					_unit->GetAIInterface()->SetNextTarget(Illidan);
-				}break;
-			case 5:
-				{
+					break;
+				case 5:
 					Illidan->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You have won... Maiev. But the huntress... is nothing without the hunt. You... are nothing... without me.");
 					Illidan->PlaySoundToSet(11478);
 
 					_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
 					_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
 					//MaievWeaponOff();
-				}break;
-			case 25:
-				{
+					break;
+				case 25:{
 					GameObject* RightGate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(745.07f, 241.802f, 354.292f, 200000);
 					GameObject* LeftGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(744.829f, 369.276f, 354.324f, 200001);
-					
-					if (RightGate)
+					if (RightGate != NULL)
 						RightGate->SetUInt32Value(GAMEOBJECT_STATE, 0);
-
-					if (LeftGate)
+					if (LeftGate != NULL)
 						LeftGate->SetUInt32Value(GAMEOBJECT_STATE, 0);
 
 					Illidan->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
 					Illidan->SetUInt32Value(UNIT_FIELD_HEALTH,0);
 					Illidan->setDeathState(JUST_DIED);
-				}break;
-			case 30:
-				{
+					}break;
+				case 30:
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "He's right. I feel nothing. I am nothing.");
 					_unit->PlaySoundToSet(11497);
-				}break;
-			case 39:
-				{
-					//_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_AKAMA, 739.545410f, 323.023743f, 352.996094f, 4.578086f, true, false, 0, 0);	// we have one Akama already spawned so we don't need another one =/ (still it's freakin' workaround -.-')
+					break;
+				case 39:
+					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_AKAMA, ToIllidan[19].x, ToIllidan[19].y, ToIllidan[19].z, ToIllidan[19].o, true, false, 0, 0);	// we have one Akama already spawned so we don't need another one =/ (still it's freakin' workaround -.-')
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Farewell, champions.");
 					_unit->PlaySoundToSet(11498);
-				}break;
-			case 40:
-				{
+					break;
+				case 40:
 					_unit->CastSpell(_unit, dbcSpell.LookupEntry(TELEPORT), true);
-				}break;
-			case 41:
-				{
+					break;
+				case 41:
 					RemoveAIUpdateEvent();
 
 					_unit->Despawn(0,0);
-				}break;
+					break;
+				}
+
+				if (DeathEvent[_unit->GetInstanceID()] <= 41)
+					DeathEvent[_unit->GetInstanceID()]++;
 			}
 
-			if (DeathEvent[_unit->GetInstanceID()] <= 41)
-				DeathEvent[_unit->GetInstanceID()]++;
+			else
+			{
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Farewell, champions.");
+				_unit->PlaySoundToSet(11498);
+				_unit->Despawn(0,0);
+			}
 		}
     }
 
-	void SpellCast(float val)
-    {
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-			float comulativeperc = 0;
-		    Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-				
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-						case TARGET_SELF:
-						case TARGET_VARIOUS:
-							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-						case TARGET_DESTINATION:
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				uint32 t = (uint32)time(NULL);
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					spells[i].casttime = t + spells[i].cooldown;
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-        }
-    }
-
-
 protected:
 
-	uint32 CastTriggering;
 	uint32 SoundTimer;
-	uint32 RandText;
-	Unit* Illidan;
-	int nrspells;
-	Unit* Maiev;
 };
-
 
 /* Illidan Stormrage AI - Creature AI Class */
 
@@ -4860,16 +5236,16 @@ protected:
 #define THROW_GLAIVE2						39849
 
 // Phase 2 Spells
+#define DEMON_FORM							40506
 #define AURA_OF_DREAD						41142
 #define FIREBALL							40598  // +
 #define DARK_BARRAGE						40585  // ? Haven't Tried
 #define SUMMON_TEAR_OF_AZZINOTH				39855  // +
 
-#define EYE_BLAST1 39908
-#define EYE_BLAST2 40017
-#define EYE_BLAST3 40017
+#define EYE_BLAST1							39908
+#define EYE_BLAST2							40017
 
-#define TEAR_OF_AZZINOTH_CHANNEL 39857
+#define TEAR_OF_AZZINOTH_CHANNEL			39857
 
 // Phase 3 Spells
 #define AGONIZING_FLAMES					40932  // ? Haven't Tried (Before Demon Form!)
@@ -4886,11 +5262,22 @@ protected:
 #define PARASITIC_SHADOWFIEND1				41914  // ? Haven't Tried
 #define PARASITIC_SHADOWFIEND2				41913  // ? Haven't Tried
 
+// Other macros
+#define CN_BLADE_OF_AZZINOTH				22996
+
 static Coords ForIllidan[] = 
 {
 	{  },
-	{ 709.783203f, 305.073883f, 362.988770f, 1.546307f },
-	{ 680.798157f, 305.648743f, 353.192200f, 3.196716f }
+	{ 709.783203f, 305.073883f, 362.988770f, 1.546307f },	// Middle pos
+	{ 678.703735f, 337.249664f, 362.988770f, 4.741172f },	// Eastern pos
+	{ 679.968384f, 284.618011f, 362.988770f, 1.603503f },	// Western pos
+	{ 680.798157f, 305.648743f, 353.192200f, 3.196716f }	// Land
+};
+
+static Coords UnitPos[]=
+{
+	{ 676.717346f, 322.445251f, 354.153320f, 5.732623f },	// Blade 1
+	{ 677.368286f, 285.374725f, 354.242157f, 5.645614f }	// Blade 2
 };
 
 class IllidanStormrageAI : public CreatureAIScript
@@ -4904,10 +5291,11 @@ public:
     {
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 0, FLY));
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(2, 0, FLY));
-		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(3, 0, RUN));
+		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(3, 0, FLY));
+		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(4, 0, FLY));
 
 		nrspells = 5;
-		for(int i=0;i<nrspells;i++)
+		for (int i = 0 ; i < nrspells; i++)
 		{
 			m_spellcheck[i] = false;
 			spells[i].casttime = 0;
@@ -4942,7 +5330,7 @@ public:
 		spells[3].attackstoptimer = 1000;
 
 		spells[4].info = dbcSpell.LookupEntry(AGONIZING_FLAMES);
-		spells[4].targettype = TARGET_RANDOM_SINGLE;
+		spells[4].targettype = TARGET_RANDOM_DESTINATION;
 		spells[4].instant = true;
 		spells[4].cooldown = 25;
 		spells[4].perctrigger = 7.0f;
@@ -5011,6 +5399,7 @@ public:
 		spells[13].instant = false;
 		spells[13].cooldown = 0;
 		spells[13].perctrigger = 0.0f;
+		spells[13].cooldown = 44;
 
 		spells[14].info = dbcSpell.LookupEntry(EYE_BLAST1);
 		spells[14].instant = false;
@@ -5018,22 +5407,23 @@ public:
 		spells[14].perctrigger = 0.0f;
 
 		/* Setup Illidan */
-
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->CastSpell(_unit, dbcSpell.LookupEntry(SKULL_INTRO), true);
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
 		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
 		_unit->GetAIInterface()->m_canMove = false;
 
 		/* Initialize variables and stuff, I Guess */
-		FoA1 = FoA2 = Maiev = Blade1 = Blade2 = NULL;
-		BladesEvent[_unit->GetInstanceID()] = 0;
+		FoA1 = FoA2 = Maiev = NULL;
 		DeathEvent[_unit->GetInstanceID()] = 0;
 		m_phase[_unit->GetInstanceID()] = 0;	// must be 0 to use it with some other stuff.
 		DemonSoundRand = false;
-		DemonPhaseTimer = 5;
-		DemonPhase = 0;		
+		DemonPhaseTimer = 0;
+		BladesEvent = 0;
+		MaievDialog = 0;
+		DemonPhase = 0;
     }
 
     void OnCombatStart(Unit* mTarget)
@@ -5043,21 +5433,21 @@ public:
 		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
 		_unit->GetAIInterface()->m_canMove = true;
 
+		DeathEvent[_unit->GetInstanceID()] = 0;
 		m_phase[_unit->GetInstanceID()] = 1;
-		DemonPhaseTimer = 5;
+		DemonPhaseTimer = 0;
 		DemonPhase = 0;
 
 		for (int i = 0; i < nrspells; i++)
 			spells[i].casttime = 0;
+		spells[13].casttime = 0;
     }
 
 	void OnTargetDied(Unit* mTarget)
     {
 		if (_unit->GetHealthPct() > 0)
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%2;
+			int RandomSpeach = rand()%2;
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -5101,38 +5491,32 @@ public:
 
 		DespawnTable.clear();
 
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 		_unit->GetAIInterface()->disable_melee = false;
 		_unit->GetAIInterface()->m_moveFly = false;
 		_unit->GetAIInterface()->m_canMove = true;
-
-		_unit->WipeTargetList();
-		_unit->WipeHateList();
 
 		RemoveAIUpdateEvent();
 
 		_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
 		_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+		_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+		_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+		if (_unit->FindAura(DEMON_FORM))
+			_unit->RemoveAura(DEMON_FORM);
+		_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 1.3f);
 
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
-		
-		_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-		
-		BladesEvent[_unit->GetInstanceID()] = 0;
-		DeathEvent[_unit->GetInstanceID()] = 0;
-		m_phase[_unit->GetInstanceID()] = 0;
+
 		DemonSoundRand = false;
-		DemonPhaseTimer = 5;
-		m_currentWP = 0;
+		DemonPhaseTimer = 0;
+		BladesEvent = 0;
 		DemonPhase = 0;
 
 		if (m_phase[_unit->GetInstanceID()] == 2)
 		{
-			_unit->WipeTargetList();
-			_unit->WipeHateList();
-
 			_unit->Emote(EMOTE_ONESHOT_LAND);
 
 			WorldPacket data(SMSG_MOVE_UNSET_HOVER, 13);
@@ -5148,123 +5532,89 @@ public:
 			_unit->GetAIInterface()->MoveTo(x, y, z, o);
 		}
 
-		if (m_phase[_unit->GetInstanceID()] == 4)
-		{
-			RegisterAIUpdateEvent(250);
+		if (_unit->isAlive())
+			m_phase[_unit->GetInstanceID()] = 1;
+		else
+			m_phase[_unit->GetInstanceID()] = 0;
 
-			DemonSoundRand = false;
-			DemonPhase = 76;
-		}
-
-		FoA1 = NULL;
-		FoA2 = NULL;
-		Blade1 = NULL;
-		Blade2 = NULL;
-
-		/*if (FoA1) delete FoA1;
-		if (FoA2) delete FoA2;
-		if (Blade1) delete Blade1;
-		if (Blade2) delete Blade2;*/
-
-		if (_unit->isAlive()) delete Maiev;
+		FoA1 = FoA2 = NULL;
     }
 
     void OnDied(Unit * mKiller)
     {
-		if (m_phase[_unit->GetInstanceID()] == 2)
-		{
-			_unit->GetAIInterface()->m_moveFly = false;
-			_unit->Emote(EMOTE_ONESHOT_LAND);
-		}
-
-		m_phase[_unit->GetInstanceID()] = 0;
-		DemonSoundRand = false;
-		DemonPhaseTimer = 30;
-		DemonPhase = 0;
-		
 		RemoveAIUpdateEvent();
 
-		if (!DeathEvent[_unit->GetInstanceID()] && MaievDialog[_unit->GetInstanceID()] >= 28 && Maiev && Maiev->isAlive())	// it's workaround (added pointer check, coz if he dies when Maiev is not on battlefield then it will crash server)
+		if (MaievDialog >= 28 && Maiev != NULL && Maiev->isAlive())	// it's workaround (added pointer check, coz if he dies when Maiev is not on battlefield then it will crash server)
 		{
-			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-			_unit->GetAIInterface()->disable_melee = true;
-			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-			_unit->GetAIInterface()->SetNextTarget(NULL);
-			_unit->GetAIInterface()->m_canMove = false;
 			_unit->SetUInt32Value(UNIT_FIELD_HEALTH, 1);
-			_unit->GetAIInterface()->StopMovement(0);	// needed?
 			if(_unit->GetCurrentSpell() != NULL)
 			    _unit->GetCurrentSpell()->cancel();
 
-			Maiev->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+			Maiev->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			Maiev->GetAIInterface()->SetAIState(STATE_IDLE);
 			Maiev->WipeTargetList();
 			Maiev->WipeHateList();
 
 			DeathEvent[_unit->GetInstanceID()] = 1;
-			m_phase[_unit->GetInstanceID()] = 0;
+			Maiev = NULL;
+		}
+		else
+		{
+			GameObject* RightGate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(745.07f, 241.802f, 354.292f, 200000);
+			GameObject* LeftGate  = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(744.829f, 369.276f, 354.324f, 200001);
+			if (RightGate != NULL)
+				RightGate->SetUInt32Value(GAMEOBJECT_STATE, 0);
+			if (LeftGate != NULL)
+				LeftGate->SetUInt32Value(GAMEOBJECT_STATE, 0);
 		}
     }
 
 	void AIUpdate()
 	{
-		if (_unit->CombatStatus.IsInCombat())
+		if (DemonPhase > 0 && DemonPhase < 75)	// 0;9
 		{
-			if (DemonPhase > 0 && DemonPhase < 75)	// 0;9
+			DemonTrans();
+		}
+		else if (DemonPhase > 75 && DemonPhase < 134)	// 9;17
+		{
+			TransRevert();
+		}
+		else
+		{
+			if (m_phase[_unit->GetInstanceID()] == 1)	// First Phase (without demon form)
 			{
-				DemonTrans();
+				PhaseOne();
 			}
-	
-			if (DemonPhase > 75 && DemonPhase < 134)	// 9;17
+			if (m_phase[_unit->GetInstanceID()] == 2)	// Second Phase (Fly phase)
 			{
-				TransRevert();
+				PhaseTwo();
 			}
-	
-			else
+			if (m_phase[_unit->GetInstanceID()] == 3)	// Third Phase normal form with ability to change into Demon
 			{
-				if (m_phase[_unit->GetInstanceID()] == 1)	// First Phase (without demon form)
-				{
-					PhaseOne();
-				}
-			
-				if (m_phase[_unit->GetInstanceID()] == 2)	// Second Phase (Fly phase)
-				{
-					PhaseTwo();
-				}
-		
-				if (m_phase[_unit->GetInstanceID()] == 3)	// Third Phase normal form with ability to change into Demon
-				{
-					PhaseThree();
-				}
-		
-				if (m_phase[_unit->GetInstanceID()] == 4)	// Fourth Phase Demon Form
-				{
-					PhaseFour();
-				}
-	
-				if (m_phase[_unit->GetInstanceID()] == 5)	// Fifth Phase with ability to change into Demon and Enrage
-				{
-					PhaseFive();
-				}
+				PhaseThree();
+			}
+			if (m_phase[_unit->GetInstanceID()] == 4)	// Fourth Phase Demon Form
+			{
+				PhaseFour();
+			}
+			if (m_phase[_unit->GetInstanceID()] == 5)	// Fifth Phase with ability to change into Demon and Enrage
+			{
+				PhaseFive();
 			}
 		}
 	}
 
 	void PhaseOne()
 	{
-		if (_unit->GetHealthPct() <= 65 && _unit->GetCurrentSpell() == NULL)	// <-
+		if (_unit->GetHealthPct() <= 65 && _unit->GetCurrentSpell() == NULL)
 		{
-			if (_unit->GetCurrentSpell() != NULL)	// safe check after adding		^-- this
-				_unit->GetCurrentSpell()->cancel();
-
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I will not be touched by a rebels such as you!");	// not sure
 			_unit->PlaySoundToSet(11479);
 
 			_unit->GetAIInterface()->MoveTo(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ() + 10.0f, _unit->GetOrientation());
-			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
 			_unit->GetAIInterface()->disable_melee = true;
@@ -5279,15 +5629,13 @@ public:
 			RemoveAIUpdateEvent();
 			RegisterAIUpdateEvent(500);
 
-			BladesEvent[_unit->GetInstanceID()] = 1;
-			FoADeaths[_unit->GetInstanceID()] = 2;
 			m_phase[_unit->GetInstanceID()] = 2;
+			CastCount = 5 + RandomUInt(2);
 			TriggerSpawned = false;
 			FireWallTimer = 0;
 			LastFireWall = 0;
-			m_currentWP = 0;
+			BladesEvent = 1;
 		}
-
 		else
 		{
 			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);	// in OnCombatStart or in Dialog part it doesn't work (in places I wanted to add it)
@@ -5300,272 +5648,316 @@ public:
 	{					// we can eventually add them as pointers and trigger some events from here (like Blade's channeling)
 		FoA1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FLAME_OF_AZZINOTH, 672.039246f, 326.748322f, 354.206390f, 0.207343f, true, false, 0, 0);
 		FoA2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FLAME_OF_AZZINOTH, 673.008667f, 283.813660f, 354.267548f, 6.203853f, true, false, 0, 0);
-	
-		if (Blade1 && FoA1)
+		if (FoA1 != NULL)
 		{
-			Blade1->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, FoA1->GetGUID());
-			Blade1->SetUInt32Value(UNIT_CHANNEL_SPELL, TEAR_OF_AZZINOTH_CHANNEL);
+			Unit *Blade = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(UnitPos[0].x, UnitPos[0].y, UnitPos[0].z, CN_BLADE_OF_AZZINOTH);
+			if (Blade != NULL)
+			{
+				Blade->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, FoA1->GetGUID());
+				Blade->SetUInt32Value(UNIT_CHANNEL_SPELL, TEAR_OF_AZZINOTH_CHANNEL);
+			}
 		}
-
-		if (Blade2 && FoA2)
+		if (FoA2 != NULL)
 		{
-			Blade2->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, FoA2->GetGUID());
-			Blade2->SetUInt32Value(UNIT_CHANNEL_SPELL, TEAR_OF_AZZINOTH_CHANNEL);
+			Unit *Blade = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(UnitPos[1].x, UnitPos[1].y, UnitPos[1].z, CN_BLADE_OF_AZZINOTH);
+			if (Blade != NULL)
+			{
+				Blade->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, FoA2->GetGUID());
+				Blade->SetUInt32Value(UNIT_CHANNEL_SPELL, TEAR_OF_AZZINOTH_CHANNEL);
+			}
 		}
 	}
 
-
 	void PhaseTwo()
 	{
-		if ((BladesEvent[_unit->GetInstanceID()] && BladesEvent[_unit->GetInstanceID()] < 20) || (BladesEvent[_unit->GetInstanceID()] > 24 && BladesEvent[_unit->GetInstanceID()] < 45))
+		if ((BladesEvent && BladesEvent < 20) || (BladesEvent > 24 && BladesEvent < 45))
 		{
-			switch (BladesEvent[_unit->GetInstanceID()])
+			switch (BladesEvent)
 			{
 			case 2:
-				{
-					_unit->GetAIInterface()->StopMovement(0);
-					_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-					_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-					_unit->GetAIInterface()->setWaypointToMove(1);
-				}break;
-			case 10:	// Blade1 fly
-				{
-					_unit->CastSpell(_unit, dbcSpell.LookupEntry(THROW_GLAIVE2), false);
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Behold the flames of Azzinoth!");
-					_unit->PlaySoundToSet(11480);
-				}break;
-			case 12:
-				{
-					_unit->CastSpellAoF(676.717346f, 322.445251f, 354.153320f, dbcSpell.LookupEntry(THROW_GLAIVE1), false);
-					_unit->CastSpellAoF(677.368286f, 285.374725f, 354.242157f, dbcSpell.LookupEntry(THROW_GLAIVE1), false);
-					_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
-				}break;
-			case 14:		// Blades spawn
-				{
-					Blade1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_BLADE_OF_AZZINOTH, 676.717346f, 322.445251f, 354.153320f, 5.732623f, false, false, 0, 0);
-					Blade2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_BLADE_OF_AZZINOTH, 677.368286f, 285.374725f, 354.242157f, 5.645614f, false, false, 0, 0);
-					
-					if (Blade1)
-					{
-						Blade1->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-						Blade1->GetAIInterface()->SetAllowedToEnterCombat(false);
-					}
-					
-					if (Blade2)
-					{
-						Blade2->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-						Blade2->GetAIInterface()->SetAllowedToEnterCombat(false);
-					}
-				}break;
-			case 18:		// Flames of Azzinoth Spawn + channeling
-				{
-					FoASummon();
-					RemoveAIUpdateEvent();
-					RegisterAIUpdateEvent(1000);
-
-					TriggerSpawned = false;
-					FireWallTimer = 0;
-
-					//_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);	//<-- flag blocks dmg of Fireball spell
-					//_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
-				}break;
-			case 30:		// Blades return
-				{
-					_unit->CastSpell(_unit, dbcSpell.LookupEntry(GLAIVE_RETURNS), false);
-					_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);	// he should also make something like jump emote when weapons are in his hands, but I can't find right one o_O
-				}break;
-			case 34:
-				{
-					_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);	
-					_unit->GetAIInterface()->m_moveFly = false;
-					_unit->Emote(EMOTE_ONESHOT_LAND);
-
-					WorldPacket data(SMSG_MOVE_UNSET_HOVER, 13);
-					data << _unit->GetNewGUID();
-					data << uint32(0);
-					_unit->SendMessageToSet(&data, false);
-				}break;
-			case 40:	//36
-				{
-					_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
-					_unit->GetAIInterface()->disable_melee = false;
-					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-					_unit->GetAIInterface()->m_canMove = true;
-
-					RemoveAIUpdateEvent();
-					RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-
-					MaievDialog[_unit->GetInstanceID()] = 0;
-					m_phase[_unit->GetInstanceID()] = 3;
-					TriggerSpawned = false;
-					DemonPhaseTimer = 30;
-					FireWallTimer = 0;
-					m_currentWP = 0;
-				}break;
-			}
-			if (BladesEvent[_unit->GetInstanceID()] != 3)
-				BladesEvent[_unit->GetInstanceID()]++;
-		}
-
-		else
-		{
-			if (BladesEvent[_unit->GetInstanceID()] > 18 && BladesEvent[_unit->GetInstanceID()] < 25)
-			{
-				if (Blade1 && FoA1 && !FoA1->isAlive())
-				{
-					Blade1->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-					Blade1->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-				}
-
-				if (Blade2 && FoA2 && !FoA2->isAlive())
-				{
-					Blade2->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-					Blade2->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-				}
-			}
-
-			if (!FoADeaths[_unit->GetInstanceID()] && FireWallTimer < 30 && _unit->GetCurrentSpell() != NULL)
-			{
-				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
-				_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-				_unit->GetAIInterface()->m_canMove = true;
-				if(_unit->GetCurrentSpell() != NULL)
-					_unit->GetCurrentSpell()->cancel();
-
 				_unit->GetAIInterface()->StopMovement(0);
 				_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-				_unit->GetAIInterface()->setWaypointToMove(2);
-				
-				FoADeaths[_unit->GetInstanceID()] = 2;
-			}
-
-			if (m_currentWP != 2 && _unit->GetAIInterface()->getMoveType() != MOVEMENTTYPE_WANTEDWP && BladesEvent[_unit->GetInstanceID()] == 20)
-			{
-				FireWallTimer++;
-
-				if (FireWallTimer >= 30)
+				_unit->GetAIInterface()->setWaypointToMove(1);
+				break;
+			case 10:	// Blade1 fly
+				_unit->CastSpell(_unit, dbcSpell.LookupEntry(THROW_GLAIVE2), false);
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Behold the flames of Azzinoth!");
+				_unit->PlaySoundToSet(11480);
+				break;
+			case 12:
+				for (int i = 0; i < 2; i++)
 				{
-					if (TriggerSpawned == false)
+					_unit->CastSpellAoF(UnitPos[i].x, UnitPos[i].y, UnitPos[i].z, dbcSpell.LookupEntry(THROW_GLAIVE1), false);
+				}
+				_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
+				break;
+			case 14:		// Blades spawn
+				for (int i = 0; i < 2; i++)
+				{
+					Creature *Blade = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_BLADE_OF_AZZINOTH, UnitPos[i].x, UnitPos[i].y, UnitPos[i].z, UnitPos[i].o, false, false, 0, 0);
+					if (Blade != NULL)
 					{
-						float posX;
-						float posY;
-						float posZ;
-
-						uint32 RandomWall = rand()%8+1;
-
-						while ((RandomWall == LastFireWall) || (RandomWall == LastFireWall - 4) || (RandomWall == LastFireWall + 4))
-						{
-							RandomWall = rand()%8+1;
-						}
-
-						switch (RandomWall)
-						{
-						case 1:
-							posX = 642.240601f;
-							posY = 297.297180f;
-							posZ = 353.423401f;
-							break;
-						case 2:
-							posX = 641.197449f;
-							posY = 314.330963f;
-							posZ = 353.300262f;
-							break;
-						case 3:
-							posX = 657.239807f;
-							posY = 256.925568f;
-							posZ = 352.996094f;
-							break;
-						case 4:
-							posX = 657.913330f;
-							posY = 353.562775f;
-							posZ = 352.996185f;
-							break;
-						case 5:
-							posX = 707.019043f;
-							posY = 270.441772f;
-							posZ = 352.996063f;
-							break;
-						case 6:
-							posX = 706.592407f;
-							posY = 343.425568f;
-							posZ = 352.996124f;
-							break;
-						case 7:
-							posX = 706.593262f;
-							posY = 310.011475f;
-							posZ = 353.693848f;
-							break;
-						case 8:
-							posX = 706.751343f;
-							posY = 298.312683f;
-							posZ = 353.653809f;
-							break;
-						}
-
-						Trigger = NULL;
-						Trigger = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_EYE_BEAM_TRIGGER, posX, posY, posZ, 0.0f, false, false, 0, 0);
-						
-						if (Trigger && Trigger->isAlive() && Trigger->IsInWorld())
-						{
-							if(_unit->GetCurrentSpell() != NULL)
-								_unit->GetCurrentSpell()->cancel();
-
-							_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, Trigger->GetGUID());
-							_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, EYE_BLAST1);
-							_unit->CastSpell(Trigger, spells[14].info, true);
-						}
-						
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Stare into the eyes of the Betrayer!");	// must check this
-						_unit->PlaySoundToSet(11481);
-
-						LastFireWall = RandomWall;
-						TriggerSpawned = true;
-						FireWallTimer = 30;
-					}
-
-					if (TriggerSpawned == true && FireWallTimer == 43)
-					{
-						_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-						_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-						_unit->RemoveAura(EYE_BLAST1);
-
-						TriggerSpawned = false;
-						FireWallTimer = 0;
+						Blade->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+						Blade->GetAIInterface()->SetAllowedToEnterCombat(false);
+						Blade->m_noRespawn = true;
 					}
 				}
-				
-				else if (_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-				{
-					Unit* target = NULL;
-					target = _unit->GetAIInterface()->GetNextTarget();
+				break;
+			case 18:		// Flames of Azzinoth Spawn + channeling
+				FoASummon();
+				RemoveAIUpdateEvent();
+				RegisterAIUpdateEvent(1000);
+				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 
-					int Spell = rand()%100;
-		
-					if (Spell >= 0 && Spell <= 25) // dunno why it doesn't make dmg, but looks correctly (it does damage when target can get into combat mode)
+				CastCount = 5 + RandomUInt(2);
+				TriggerSpawned = false;
+				FireWallTimer = 0;
+				break;
+			case 29:
+				for (int i = 0 ; i < 2; i++)
+				{
+					Creature *Blade = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(UnitPos[i].x, UnitPos[i].y, UnitPos[i].z, CN_BLADE_OF_AZZINOTH);
+					if (Blade != NULL)
 					{
-						CastSpellOnRandomTarget(12, 0.0f, 60.0f, 0, 100);
-					} 
-					if (Spell > 25 && Spell <= 35) 
-					{
-						CastSpellOnRandomTarget(13, 0.0f, 60.0f, 0, 100);
+						Blade->Despawn(0,0);
 					}
-				} 
+				}
+				break;
+			case 30:		// Blades return
+				_unit->CastSpell(_unit, dbcSpell.LookupEntry(GLAIVE_RETURNS), false);
+				_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);	// he should also make something like jump emote when weapons are in his hands, but I can't find right one o_O
+				break;
+			case 34:{
+				_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);	
+				_unit->GetAIInterface()->m_moveFly = false;
+				_unit->Emote(EMOTE_ONESHOT_LAND);
+
+				WorldPacket data(SMSG_MOVE_UNSET_HOVER, 13);
+				data << _unit->GetNewGUID();
+				data << uint32(0);
+				_unit->SendMessageToSet(&data, false);
+				}break;
+			case 40:	//36
+				_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+				_unit->GetAIInterface()->disable_melee = false;
+				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+				_unit->GetAIInterface()->m_canMove = true;
+				_unit->GetAIInterface()->ClearHateList();
+
+				RemoveAIUpdateEvent();
+				RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+
+				DemonPhaseTimer = (uint32)time(NULL) + 60;
+				m_phase[_unit->GetInstanceID()] = 3;
+				TriggerSpawned = false;
+				FireWallTimer = 0;
+				MaievDialog = 0;
+				break;
+			}
+
+			if (BladesEvent != 3)
+				BladesEvent++;
+		}
+		else
+		{
+			uint32 FoADeaths = 2;
+			if ((FoA1 != NULL && !FoA1->isAlive()) || FoA1 == NULL)
+			{
+				Unit *Blade = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(UnitPos[0].x, UnitPos[0].y, UnitPos[0].z, CN_BLADE_OF_AZZINOTH);
+				if (Blade != NULL)
+				{
+					Blade->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+					Blade->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+				}
+				FoADeaths--;
+				FoA1 = NULL;
+			}
+			if ((FoA2 != NULL && !FoA2->isAlive()) || FoA2 == NULL)
+			{
+				Unit *Blade = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(UnitPos[1].x, UnitPos[1].y, UnitPos[1].z, CN_BLADE_OF_AZZINOTH);
+				if (Blade != NULL)
+				{
+					Blade->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+					Blade->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+				}
+				FoADeaths--;
+				FoA2 = NULL;
+			}
+
+			FireWallTimer++;
+			if (_unit->GetAIInterface()->getMoveType() != MOVEMENTTYPE_WANTEDWP && _unit->GetCurrentSpell() == NULL)
+			{
+				if (_unit->GetUInt32Value(UNIT_CHANNEL_SPELL) == 0)
+				{
+					if (FoADeaths == 0)
+					{
+						_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
+						_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+						_unit->GetAIInterface()->m_canMove = true;
+						if(_unit->GetCurrentSpell() != NULL)
+							_unit->GetCurrentSpell()->cancel();
+
+						_unit->GetAIInterface()->StopMovement(0);
+						_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+						_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+						_unit->GetAIInterface()->setWaypointToMove(4);
+
+						return;
+					}
+					if (CastCount <= 0)
+					{
+						if (RandomUInt(2) == 1)	// Move right
+						{
+							CurrentWP++;
+							if (CurrentWP > 3)
+								CurrentWP = 1;
+						}
+						else					// Move left
+						{
+							CurrentWP--;
+							if (CurrentWP < 1)
+								CurrentWP = 3;
+						}
+
+						_unit->GetAIInterface()->StopMovement(0);
+						_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+						_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+						_unit->GetAIInterface()->setWaypointToMove(CurrentWP);
+
+						return;
+					}
+				}
+				if (_unit->GetAIInterface()->getCurrentWaypoint() != 4)
+				{
+					if (FireWallTimer >= 30)
+					{
+						if (TriggerSpawned == false)
+						{
+							float posX;
+							float posY;
+							float posZ;
+
+							uint32 RandomWall = rand()%8+1;
+							while ((RandomWall == LastFireWall) || (RandomWall == LastFireWall - 4) || (RandomWall == LastFireWall + 4))
+							{
+								RandomWall = rand()%8+1;
+							}
+
+							switch (RandomWall)
+							{
+							case 1:
+								posX = 642.240601f;
+								posY = 297.297180f;
+								posZ = 353.423401f;
+								break;
+							case 2:
+								posX = 641.197449f;
+								posY = 314.330963f;
+								posZ = 353.300262f;
+								break;
+							case 3:
+								posX = 657.239807f;
+								posY = 256.925568f;
+								posZ = 352.996094f;
+								break;
+							case 4:
+								posX = 657.913330f;
+								posY = 353.562775f;
+								posZ = 352.996185f;
+								break;
+							case 5:
+								posX = 707.019043f;
+								posY = 270.441772f;
+								posZ = 352.996063f;
+								break;
+							case 6:
+								posX = 706.592407f;
+								posY = 343.425568f;
+								posZ = 352.996124f;
+								break;
+							case 7:
+								posX = 706.593262f;
+								posY = 310.011475f;
+								posZ = 353.693848f;
+								break;
+							case 8:
+								posX = 706.751343f;
+								posY = 298.312683f;
+								posZ = 353.653809f;
+								break;
+							}
+
+							Unit *Trigger = NULL;
+							Trigger = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_EYE_BEAM_TRIGGER, posX, posY, posZ, 0.0f, false, false, 0, 0);
+							if (Trigger != NULL)
+							{
+								if (_unit->GetCurrentSpell() != NULL)
+									_unit->GetCurrentSpell()->cancel();
+
+								_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, Trigger->GetGUID());
+								_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, EYE_BLAST1);
+								_unit->CastSpell(Trigger, spells[14].info, true);
+
+								_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Stare into the eyes of the Betrayer!");	// must check this
+								_unit->PlaySoundToSet(11481);
+
+								LastFireWall = RandomWall;
+								TriggerSpawned = true;
+								FireWallTimer = 30;
+							}
+							else
+							{
+								FireWallTimer = 0;
+								LastFireWall = 0;
+							}
+						}
+						if (TriggerSpawned == true && FireWallTimer >= 42)
+						{
+							_unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+							_unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+							_unit->RemoveAura(EYE_BLAST1);
+
+							TriggerSpawned = false;
+							FireWallTimer = 0;
+						}
+					}
+					else if (_unit->GetAIInterface()->GetNextTarget())
+					{
+						Unit* target = NULL;
+						target = _unit->GetAIInterface()->GetNextTarget();
+
+						uint32 t = (uint32)time(NULL);
+						uint32 Spell = RandomUInt(100);
+						if (Spell >= 0 && Spell <= 25)
+						{
+							CastSpellOnRandomTarget(12, 0.0f, 60.0f, 0, 100);
+							CastCount--;
+						}
+						if (Spell > 25 && Spell <= 35 && t > spells[13].casttime)
+						{
+							CastSpellOnRandomTarget(13, 0.0f, 60.0f, 0, 100);
+
+							spells[13].casttime = t + spells[13].cooldown;
+							CastCount--;
+						}
+					}
+				}
 			}
 		}
 	 }
 
 	void PhaseThree()
 	{
-		if (_unit->GetHealthPct() <= 30 && !MaievDialog[_unit->GetInstanceID()] && (DemonPhase <= 0 || DemonPhase >= 135 && !_unit->GetCurrentSpell()))	// add more stuff with maiev in future!
+		if (_unit->GetHealthPct() <= 30 && MaievDialog == 0 && (DemonPhase <= 0 || DemonPhase >= 135 && _unit->GetCurrentSpell() == NULL))
 		{
 			#ifdef USE_SHADOW_PRISON
+				_unit->GetAIInterface()->StopMovement(1);
 				_unit->CastSpell(_unit, spells[8].info, spells[8].instant);
 			#endif
 
-			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 			_unit->GetAIInterface()->disable_melee = true;
 			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
@@ -5576,75 +5968,64 @@ public:
 			RemoveAIUpdateEvent();
 			RegisterAIUpdateEvent(1000);
 
-			MaievDialog[_unit->GetInstanceID()] = 1;
+			MaievDialog = 1;
 		}
-
-		if (MaievDialog[_unit->GetInstanceID()] && MaievDialog[_unit->GetInstanceID()] < 32 && (DemonPhase <= 0 || DemonPhase >= 135))
-		{	// add her weapon switching (from belt to hand, emote cases etc.)
-			switch (MaievDialog[_unit->GetInstanceID()])
+		if (MaievDialog > 0 && MaievDialog < 32 && (DemonPhase <= 0 || DemonPhase >= 135))
+		{
+			switch (MaievDialog)
 			{
 			case 3:		// 3
-				{
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Is this it, mortals? Is this all the fury you can muster?");
-					_unit->PlaySoundToSet(11476);
-				}break;
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Is this it, mortals? Is this all the fury you can muster?");
+				_unit->PlaySoundToSet(11476);
+				break;
 			case 6:		// 6
-				{
-					_unit->Emote(EMOTE_ONESHOT_QUESTION);
-				}break;
+				_unit->Emote(EMOTE_ONESHOT_QUESTION);
+				break;
+			case 9:
+				SpawnMaiev();
+				break;
+			case 10:
+				Maiev->CastSpell(_unit, dbcSpell.LookupEntry(TELEPORT), true);
+
+				_unit->GetAIInterface()->SetNextTarget(Maiev);
+				break;
 			case 11:	// 12
-				{
-					SpawnMaiev();
-					Maiev->GetAIInterface()->SetNextTarget(_unit);
-
-					Maiev->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Their fury pales before mine, Illidan. We have some unsettled business between us.");
-					Maiev->PlaySoundToSet(11491);
-
-					_unit->GetAIInterface()->SetNextTarget(Maiev);
-					//_unit->SetFacing(5.287312f);					// I must think about good formula for both units
-					//_unit->GetAIInterface()->setInFront(Maiev);	// dunno why it doesn't work -.-'
-				}break;
+				Maiev->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Their fury pales before mine, Illidan. We have some unsettled business between us.");
+				Maiev->PlaySoundToSet(11491);
+				break;
 			case 12:	// 13
-				{
-					Maiev->CastSpell(_unit, dbcSpell.LookupEntry(TELEPORT), true);
-
-					MaievWeaponOff();
-				}break;
+				MaievWeaponOff();
+				break;
 			case 13:	// 14
-				{
-					Maiev->Emote(EMOTE_ONESHOT_EXCLAMATION);
-				}break;
+				Maiev->Emote(EMOTE_ONESHOT_EXCLAMATION);
+				break;
 			case 18:	// 20
-				{
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Maiev... How is it even possible?");
-					_unit->PlaySoundToSet(11477);
-				}break;
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Maiev... How is it even possible?");
+				_unit->PlaySoundToSet(11477);
+				break;
 			case 21:	// 23
-				{
 					//_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-				}break;
+				break;
 			case 24:	// 27
-				{
-					Maiev->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ah, my long hunt is finally over. Today, Justice will be done!");
-					Maiev->PlaySoundToSet(11492);
+				Maiev->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ah, my long hunt is finally over. Today, Justice will be done!");
+				Maiev->PlaySoundToSet(11492);
 
-					Maiev->Emote(EMOTE_ONESHOT_EXCLAMATION);
-				}break;
+				Maiev->Emote(EMOTE_ONESHOT_EXCLAMATION);
+				break;
 			case 27:	// 30
-				{
-					Maiev->Emote(EMOTE_ONESHOT_YES);
-				}break;
+				Maiev->Emote(EMOTE_ONESHOT_YES);
+				break;
 			case 28:	// 31
-				{
-					Maiev->Emote(EMOTE_ONESHOT_ROAR);
-				}break;
+				Maiev->Emote(EMOTE_ONESHOT_ROAR);
+				break;
 			case 31:	//34
-				{
-					_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
-					_unit->GetAIInterface()->disable_melee = false;
-					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-					_unit->GetAIInterface()->m_canMove = true;
+				_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+				_unit->GetAIInterface()->disable_melee = false;
+				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+				_unit->GetAIInterface()->m_canMove = true;
 
+				if (Maiev != NULL && Maiev->isAlive())
+				{
 					Maiev->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
 					Maiev->GetAIInterface()->SetAllowedToEnterCombat(true);
 					Maiev->GetAIInterface()->setCurrentAgent(AGENT_NULL);
@@ -5654,27 +6035,26 @@ public:
 					Maiev->GetAIInterface()->AttackReaction(_unit, 1, 0);
 
 					MaievWeaponOn();
+				}
 					
-					RemoveAIUpdateEvent();
-					RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-					
-					m_phase[_unit->GetInstanceID()] = 5;
-					DemonPhaseTimer = 30;
-					EnrageTimer = 10;
-				}break;
+				RemoveAIUpdateEvent();
+				RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+
+				DemonPhaseTimer = (uint32)time(NULL) + 60;	
+				m_phase[_unit->GetInstanceID()] = 5;
+				EnrageTimer = 10;
+				break;
 			}
 
-			MaievDialog[_unit->GetInstanceID()]++;
+			MaievDialog++;
 		}
-		
 		else
 		{
-			DemonPhaseTimer--;
-
-			if (!DemonPhaseTimer)
+			uint32 t = (uint32)time(NULL);
+			if (t > DemonPhaseTimer)
 			{
+				_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
 				_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-				_unit->GetAIInterface()->disable_melee = true;
 				if(_unit->GetCurrentSpell() != NULL)
 					_unit->GetCurrentSpell()->cancel();
 				
@@ -5683,7 +6063,6 @@ public:
 
 				DemonPhase = 1;
 			}
-	
 			else
 			{
 				if (DemonPhase < 1 || DemonPhase > 134)
@@ -5699,59 +6078,47 @@ public:
 	void DemonTrans()	// check and change how long spell 9 is in use on official
 	{
 		if(_unit->GetCurrentSpell() != NULL)
-                _unit->GetCurrentSpell()->cancel();
+			_unit->GetCurrentSpell()->cancel();
 
 		switch (DemonPhase)
 		{	// let's give it 4 free triggers to not use melee attacks and spells
 		case 5:
-			{
-				_unit->CastSpell(_unit, spells[9].info, spells[9].instant);
-				_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
-
-				//_unit->GetAIInterface()->disable_melee = true;
-			}break;
-
+			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 403);
+			_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
+			break;
 		case 13:
-			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Behold the power... of the demon within!");
-				_unit->PlaySoundToSet(11475);
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Behold the power... of the demon within!");
+			_unit->PlaySoundToSet(11475);
 
-				_unit->CastSpell(_unit, spells[10].info, spells[10].instant);
-			}break;
-
+			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 404);
+			break;
 		case 33:
-			{
-				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , 21322);
-				_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 5.0f);
-			}break;
-
+			_unit->CastSpell(_unit, DEMON_FORM, true);
+			_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 5.0f);
+			break;
 		case 43:
-			{
-				_unit->CastSpell(_unit, spells[11].info, spells[11].instant);
+			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 405);
+			break;
+		case 53:{
+			_unit->GetAIInterface()->ClearHateList();
 
-				//_unit->Emote(EMOTE_ONESHOT_CUSTOMSPELL04);
-				//_unit->RemoveAura(40398);	
-			}break;
-
-		case 59:
-			{
-				_unit->CastSpell(_unit, spells[11].info, spells[11].instant);
-
-				//_unit->RemoveAura(40510);
-			}break;
-
+			Unit *NewTarget = NULL;
+			NewTarget = FindTarget();
+			if (NewTarget != NULL)
+				_unit->GetAIInterface()->modThreatByPtr(NewTarget, 200);
+		}break;
 		case 61:	//63	//65	// he should also drop aggro and take new target (warlock should take it by dots casted before final change)
-			{
-				_unit->RemoveAura(40510);
+			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
 
-				RemoveAIUpdateEvent();
-				RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+			RemoveAIUpdateEvent();
+			RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+			PhaseFour();
 
-				DemonSoundRand = false;
-				DemonPhaseTimer = 0;
-				DemonPhase = 74;
-				m_phase[_unit->GetInstanceID()] = 4;
-			}break;
+			DemonPhaseTimer = (uint32)time(NULL) + 30;
+			m_phase[_unit->GetInstanceID()] = 4;
+			DemonSoundRand = false;
+			DemonPhase = 74;
+			break;
 		}
 
 		DemonPhase++;
@@ -5760,68 +6127,47 @@ public:
 	void TransRevert()	// same here to spell 9 (but not that much I think); also I am thinking about changing spells on emotes
 	{
 		if(_unit->GetCurrentSpell() != NULL)
-                _unit->GetCurrentSpell()->cancel();
+			_unit->GetCurrentSpell()->cancel();
 
 		switch (DemonPhase)
 		{
 		case 81:	// 1 diff is too long?
-			{
-				_unit->CastSpell(_unit, spells[9].info, spells[9].instant);
-				_unit->GetAIInterface()->m_canMove = false;
-
-				//_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 403);
-				//_unit->Emote(EMOTE_ONESHOT_CUSTOMSPELL02);
-			}break;
-
+			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 403);
+			break;
 		case 84:	//85
-			{
-				_unit->CastSpell(_unit, spells[10].info, spells[10].instant);
-
-				//_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 404);
-			}break;
-
+			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 404);
+			break;
 		case 108:	//108	//109
-			{
-				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , 21137);
-				_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 1.5f);
-			}break;
+			if (_unit->FindAura(DEMON_FORM))
+				_unit->RemoveAura(DEMON_FORM);
+			_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 1.3f);
 
+			_unit->GetAIInterface()->ClearHateList();
+			break;
 		case 114:	//116	//117
+			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 405);
+			break;
+		case 118:
+			_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+			break;
+		case 126:
+			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+
+			if (MaievDialog == 0)
+				m_phase[_unit->GetInstanceID()] = 3;
+			else
 			{
-				_unit->CastSpell(_unit, spells[11].info, spells[11].instant);
+				EnrageTimer = rand()%10+11;
+				m_phase[_unit->GetInstanceID()] = 5;
+			}
 
-				//_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 405);
-				//_unit->Emote(EMOTE_ONESHOT_CUSTOMSPELL04);
-			}break;
+			RemoveAIUpdateEvent();
+			RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 
-		case 125:	//122	//125	//123 - hand show	//125 - on rage showing lol	//126
-			{
-				_unit->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
-			}break;
-
-		case 129:	//133	//129	//130
-			{
-				_unit->GetAIInterface()->disable_melee = false;
-				_unit->GetAIInterface()->m_canMove = true;
-				_unit->RemoveAura(40510);
-
-				if (!MaievDialog[_unit->GetInstanceID()])
-					m_phase[_unit->GetInstanceID()] = 3;
-				else
-				{
-					EnrageTimer = rand()%10+11;
-					m_phase[_unit->GetInstanceID()] = 5;
-				}
-				
-				RemoveAIUpdateEvent();
-				RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-
-				DemonPhaseTimer = 30;
-				DemonPhase = 135;
-
-				//_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-				//_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-			}break;
+			DemonPhaseTimer = (uint32)time(NULL) + 60;
+			DemonPhase = 135;
+			break;
 		}
 
 		DemonPhase++;
@@ -5829,61 +6175,47 @@ public:
 
 	void PhaseFour()
 	{
-		DemonPhaseTimer++;
-
-		if (DemonPhaseTimer == 15)
+		uint32 t = (uint32)time(NULL);
+		if (t > DemonPhaseTimer || (_unit->GetHealthPct() <= 30 && MaievDialog == 0))
 		{
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+
 			RemoveAIUpdateEvent();
 			RegisterAIUpdateEvent(250);
 
 			DemonSoundRand = false;
 			DemonPhase = 76;
 		}
-
-		if (DemonPhaseTimer < 2 && MaievDialog[_unit->GetInstanceID()] && !DemonSoundRand)
+		if (t <= DemonPhaseTimer - 26 && MaievDialog > 0 && !DemonSoundRand)
 		{
 			int Sound = rand()%3;	// 66% chance to say something, should work fine
-
 			switch (Sound)
 			{
 			case 0:
-				{
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You know nothing of power!");
-					_unit->PlaySoundToSet(11469);
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You know nothing of power!");
+				_unit->PlaySoundToSet(11469);
 
-					DemonSoundRand = true;
-				}break;
+				DemonSoundRand = true;
+				break;
 			case 1:
-				{
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Such arrogance!");
-					_unit->PlaySoundToSet(11471);
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Such arrogance!");
+				_unit->PlaySoundToSet(11471);
 
-					DemonSoundRand = true;
-				}break;
+				DemonSoundRand = true;
+				break;
 			}
 		}
-
-		if (_unit->GetHealthPct() <= 30 && !MaievDialog[_unit->GetInstanceID()])
-		{
-			RemoveAIUpdateEvent();
-			RegisterAIUpdateEvent(250);
-
-			DemonSoundRand = false;
-			DemonPhase = 76;
-		}
-
 		else
 		{
-			if (_unit->GetAIInterface()->GetNextTarget() && DemonPhase == 75)
+			if (_unit->GetAIInterface()->GetNextTarget() != NULL && DemonPhase == 75 && _unit->GetCurrentSpell() == NULL)
 			{
 				Unit *target = NULL;
 				target = _unit->GetAIInterface()->GetNextTarget();
 
-				if (_unit->GetDistance2dSq(target) >= 0.0f && _unit->GetDistance2dSq(target) <= 10000.0f)
+				if (_unit->GetDistance2dSq(target) >= 0.0f && _unit->GetDistance2dSq(target) <= 4900.0f)
 				{
-					_unit->GetAIInterface()->m_canMove = false;
-
-					if (_unit->GetCurrentSpell()) return;
+					_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+					_unit->GetAIInterface()->StopMovement(1);
 
 					int Spell = rand()%100;
 					if (Spell >= 0 && Spell <= 80)
@@ -5893,22 +6225,22 @@ public:
 					if (Spell > 90 && Spell <= 100)
 						_unit->CastSpell(_unit, spells[1].info, spells[1].instant);	// this one needs to be scripted
 				}
-
 				else
-					_unit->GetAIInterface()->m_canMove = true;
+				{
+					_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+				}
 			}
 		}
 	}
 
 	void PhaseFive()
 	{
-		DemonPhaseTimer--;
 		EnrageTimer--;
-
-		if (!DemonPhaseTimer)
+		uint32 t = (uint32)time(NULL);
+		if (t > DemonPhaseTimer)
 		{
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
 			_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-			_unit->GetAIInterface()->disable_melee = true;
 			if(_unit->GetCurrentSpell() != NULL)
 				_unit->GetCurrentSpell()->cancel();
 
@@ -5917,15 +6249,15 @@ public:
 			
 			DemonPhase = 1;
 		}
-
 		if (!EnrageTimer)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You've wasted too much time mortals, now you shall fall!");
 			_unit->PlaySoundToSet(11474);
 
 			_unit->CastSpell(_unit, spells[5].info, spells[5].instant);
-		}
 
+			return;
+		}
 		else
 		{
 			if (DemonPhase < 1 || DemonPhase > 134)
@@ -6049,6 +6381,17 @@ public:
 		float newposy = _unit->GetPositionY() + ychange;
 
 		Maiev = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MAIEV, newposx, newposy, _unit->GetPositionZ() + 0.5f, 2.177125f, true, false, 0, 0);
+		if (Maiev == NULL)
+		{
+			RemoveAIUpdateEvent();
+			RegisterAIUpdateEvent(20000);
+
+			MaievDialog = 30;
+		}
+		else
+		{
+			Maiev->GetAIInterface()->SetNextTarget(_unit);
+		}
 	}
 
 	void MaievWeaponOff()
@@ -6089,37 +6432,81 @@ public:
 
 	void OnReachWP(uint32 iWaypointId, bool bForwards)
     {
+		CurrentWP = iWaypointId;
 		switch(iWaypointId)
 		{
 		case 1:
-			{
-				_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-				_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
-				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-				_unit->GetAIInterface()->setWaypointToMove(0);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
+			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+			_unit->GetAIInterface()->setWaypointToMove(0);
 
-				BladesEvent[_unit->GetInstanceID()] = 4;
+			if (BladesEvent < 4)
+			{
+				_unit->GetAIInterface()->ClearHateList();
 
 				RemoveAIUpdateEvent();
 				RegisterAIUpdateEvent(500);
-			}break;
+				BladesEvent = 4;
+			}
+
+			CastCount = 5 + RandomUInt(2);
+			break;
 		case 2:
-			{
-				_unit->GetAIInterface()->m_canMove = false;
+		case 3:
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
+			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+			_unit->GetAIInterface()->setWaypointToMove(0);
 
-				_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-				_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
-				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-				_unit->GetAIInterface()->setWaypointToMove(0);
+			CastCount = 5 + RandomUInt(2);
+			break;
+		case 4:
+			_unit->GetAIInterface()->m_canMove = false;
 
-				RemoveAIUpdateEvent();
-				RegisterAIUpdateEvent(500);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
+			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+			_unit->GetAIInterface()->setWaypointToMove(0);
 
-				BladesEvent[_unit->GetInstanceID()] = 25;
-				m_currentWP = 2;
-			}break;
+			RemoveAIUpdateEvent();
+			RegisterAIUpdateEvent(500);
+
+			BladesEvent = 25;
+			break;
 		}
     }
+
+	Unit *FindTarget()
+	{
+		std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
+											/* If anyone wants to use this function, then leave this note!										 */
+		for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+		{ 
+			if (isHostile(_unit, (*itr)) && (*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->GetInstanceID() == _unit->GetInstanceID())
+			{
+				Unit* RandomTarget = NULL;
+				RandomTarget = (Unit*)(*itr);
+				if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) <= 10000.0f && _unit->GetDistance2dSq(RandomTarget) >= 0.0f && _unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0)
+				{
+					TargetTable.push_back(RandomTarget);
+				} 
+			} 
+		}
+
+		if (!TargetTable.size())
+			return NULL;
+
+		size_t RandTarget = rand()%TargetTable.size();
+		Unit * RTarget = TargetTable[RandTarget];
+
+		if (!RTarget)
+			return NULL;
+
+		TargetTable.clear();
+
+		return RTarget;
+	}
 
     inline WayPoint* CreateWaypoint(int id, uint32 waittime, uint32 flags)
     {
@@ -6142,18 +6529,18 @@ public:
 
 protected:
 
+	uint32 DemonPhaseTimer;
 	uint32 FireWallTimer;
 	bool DemonSoundRand;
 	uint32 LastFireWall;
 	bool TriggerSpawned;
-	int DemonPhaseTimer;
-	uint32 m_currentWP;
+	uint32 BladesEvent;
+	uint32 MaievDialog;
+	uint32 CurrentWP;
 	int EnrageTimer;
 	int DemonPhase;
-	Unit* Trigger;
+	int CastCount;
 	int nrspells;
-	Unit* Blade1;
-	Unit* Blade2;
 	Unit* Maiev;
 	Unit* FoA1;
 	Unit* FoA2;
@@ -6162,12 +6549,12 @@ protected:
 void SetupBlackTemple(ScriptMgr * mgr)
 {
 	//Bosses
-	mgr->register_creature_script(CN_SUPREMUS, &SupremusAI::Create);
+	//mgr->register_creature_script(CN_SUPREMUS, &SupremusAI::Create);
 	mgr->register_creature_script(CN_NAJENTUS, &NajentusAI::Create);
 	mgr->register_creature_script(CN_GURTOGG_BLOODBOIL, &GurtoggAI::Create);
-	mgr->register_creature_script(CN_ESSENCEOFSUFFERING, &EssenceOfSufferingAI::Create);
+	/*mgr->register_creature_script(CN_ESSENCEOFSUFFERING, &EssenceOfSufferingAI::Create);
 	mgr->register_creature_script(CN_ESSENCEOFDESIRE, &EssenceOfDesireAI::Create);
-	mgr->register_creature_script(CN_ESSENCEOFANGER, &EssenceOfAngerAI::Create);
+	mgr->register_creature_script(CN_ESSENCEOFANGER, &EssenceOfAngerAI::Create);*/
 	mgr->register_creature_script(CN_MOTHER_SHAHRAZ, &ShahrazAI::Create);
 	mgr->register_creature_script(CN_LADY_MALANDE, &MalandeAI::Create);
 	mgr->register_creature_script(CN_GATHIOS_THE_SHATTERER, &GathiosAI::Create);
@@ -6183,7 +6570,7 @@ void SetupBlackTemple(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_ASHTONGUE_SPIRITBINDER, &AshtonguespiritbinderAI::Create);
 
 	//Illidan Stormrage related
-	/*GossipScript * AG = (GossipScript*) new AkamaGossip();
+	GossipScript * AG = (GossipScript*) new AkamaGossip();
 	mgr->register_gossip_script(CN_AKAMA, AG);
 
 	mgr->register_creature_script(CN_DOOR_EVENT_TRIGGER, &DoorEventTriggerAI::Create);
@@ -6194,6 +6581,5 @@ void SetupBlackTemple(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_FLAME_OF_AZZINOTH, &FlameOfAzzinothAI::Create);
 	mgr->register_creature_script(CN_AKAMA, &AkamaAI::Create);
 	mgr->register_creature_script(CN_MAIEV, &MaievAI::Create);
-	mgr->register_creature_script(CN_BLADE_OF_AZZINOTH, &BladeOfAzzinothAI::Create);
-	mgr->register_creature_script(CN_ILLIDAN_STORMRAGE, &IllidanStormrageAI::Create);*/
+	mgr->register_creature_script(CN_ILLIDAN_STORMRAGE, &IllidanStormrageAI::Create);
 }

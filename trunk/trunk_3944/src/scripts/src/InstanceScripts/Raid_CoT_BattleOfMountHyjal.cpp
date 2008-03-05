@@ -970,6 +970,136 @@ public:
 	}
 };
 
+// DoomfireAI
+
+#define CN_DOOMFIRE 18095
+
+class DoomfireAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(DoomfireAI);
+
+    DoomfireAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		_unit->m_noRespawn = true;
+
+		RegisterAIUpdateEvent(1000);
+
+		DespawnTimer = 0;
+		DirChange = 0;
+	}
+
+	void AIUpdate()
+	{
+		DespawnTimer++;
+		if (DespawnTimer >= 27)
+		{
+			_unit->Despawn(0,0);
+			DespawnTimer = 0;
+		}
+		// After 4 sec of last direction change, doomfire has 33% chance to change direction
+		DirChange++;
+		if ((DirChange == 4 && RandomUInt(3) == 1) || DirChange >= 5)
+		{
+			if (_unit->GetAIInterface()->getUnitToFollow())
+			{
+				if (RandomUInt(3) == 1 || _unit->GetDistance2dSq(_unit->GetAIInterface()->getUnitToFollow()) <= 2.0f)
+				{
+					_unit->GetAIInterface()->SetUnitToFollow(NULL);
+					_unit->GetAIInterface()->SetUnitToFollowAngle(0.0f);
+				}
+			}
+
+			if (!_unit->GetAIInterface()->getUnitToFollow())
+			{
+				if (RandomUInt(3) == 1)
+				{
+					Unit *NewTarget = NULL;
+					NewTarget = FindTarget();
+					if (NewTarget)
+					{
+						_unit->GetAIInterface()->SetUnitToFollow(NewTarget);
+						_unit->GetAIInterface()->SetUnitToFollowAngle(2.0f);
+					}
+				}
+
+				if (!_unit->GetAIInterface()->getUnitToFollow())
+				{
+					float movedist = 10.0f;
+					float x = 0.0f;
+					float y = 0.0f;
+
+					float xchange = (float)RandomFloat(movedist);
+					float ychange = sqrt(movedist*movedist - xchange*xchange);
+
+					if (RandomUInt(2) == 1)
+						xchange *= -1;
+					if (RandomUInt(2) == 1)
+						ychange *= -1;
+
+					x = _unit->GetPositionX() + xchange;
+					y = _unit->GetPositionY() + ychange;
+
+					_unit->GetAIInterface()->MoveTo(x, y, _unit->GetPositionZ(), _unit->GetOrientation());
+				}
+			}
+
+			DirChange = 0;
+		}
+	}
+	// A bit rewritten FindTarget function
+	Unit* FindTarget()
+	{
+		Unit* target = NULL;
+		float distance = 15.0f;
+		float z_diff;
+
+		Unit *pUnit;
+		float dist;
+
+		for (std::set<Object*>::iterator itr = _unit->GetInRangeOppFactsSetBegin(); itr != _unit->GetInRangeOppFactsSetEnd(); itr++)
+		{
+			if((*itr)->GetTypeId() != TYPEID_UNIT && (*itr)->GetTypeId() != TYPEID_PLAYER)
+				continue;
+
+			pUnit = static_cast<Unit*>((*itr));
+
+			if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
+				continue;
+
+			z_diff = fabs(_unit->GetPositionZ() - pUnit->GetPositionZ());
+			if(z_diff > 2.5f)
+				continue;
+
+			if(pUnit->m_invisible)
+				continue;
+			
+			if(!pUnit->isAlive() || _unit == pUnit)
+				continue;
+
+			dist = _unit->GetDistance2dSq(pUnit);
+
+			if(dist > distance*distance)
+				continue;
+
+			if (dist < 3.0f)
+				continue;
+
+			distance = dist;
+			target = pUnit;
+		}
+
+		return target;
+	}
+
+protected:
+
+	uint32 DespawnTimer;
+	uint32 DirChange;
+};
+
 /* * Doomfire - Leaves a trail of fire on the ground, which does 2400 fire 
 		damage per second (occasionally feared people run into these and die) */
 
@@ -991,8 +1121,8 @@ class ArchimondeAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(ArchimondeAI);
-	SP_AI_Spell spells[6];
-	bool m_spellcheck[6];
+	SP_AI_Spell spells[7];
+	bool m_spellcheck[7];
 
     ArchimondeAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
@@ -1046,6 +1176,9 @@ public:
 		spells[5].attackstoptimer = 1000;
 		spells[5].cooldown = 600;
 
+		spells[6].instant = false;
+		spells[6].cooldown = 10;
+
 		Trigger = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ARCHIMONDE_CHANNEL_TRIGGER, 5501.476563f, -3524.868408f, 1604.188965f, 0.393633f, false, false, 0, 0);
 
 		if (Trigger && Trigger->IsInWorld())
@@ -1080,8 +1213,9 @@ public:
 			spells[i].casttime = 0;
 
 		uint32 t = (uint32)time(NULL);
-		spells[3].casttime =  t + spells[3].cooldown;
-		spells[5].casttime =  t + spells[5].cooldown;
+		spells[3].casttime = t + spells[3].cooldown;
+		spells[5].casttime = t + spells[5].cooldown;
+		spells[6].casttime = 0;
 
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
     }
@@ -1107,7 +1241,8 @@ public:
 				break;
 			}
 
-			if(mTarget->GetTypeId() == TYPEID_PLAYER)
+			uint32 t = (uint32)time(NULL);
+			if(mTarget->GetTypeId() == TYPEID_PLAYER && _unit->isAlive() && !_unit->GetCurrentSpell() && t > spells[6].casttime)
 			{
 				uint32 SpellID = 0;
 				if (mTarget->getClass() == WARRIOR || mTarget->getClass() == ROGUE || mTarget->getClass() == MAGE)
@@ -1117,7 +1252,9 @@ public:
 				else
 					SpellID = SOUL_CHARGEG;
 				
-				_unit->CastSpell(_unit, dbcSpell.LookupEntry(SpellID), false);
+				_unit->CastSpell(_unit, dbcSpell.LookupEntry(SpellID), spells[6].instant);
+
+				spells[6].casttime = t + spells[6].cooldown;
 			}
 		}
     }
@@ -1212,6 +1349,7 @@ public:
 						case TARGET_RANDOM_DESTINATION:
 							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
 					}
+
 					m_spellcheck[i] = false;
 					return;
 				}
@@ -1312,5 +1450,6 @@ void SetupBattleOfMountHyjal(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_KAZROGAL, &KazrogalAI::Create);
 	mgr->register_creature_script(CN_AZGALOR, &AzgalorAI::Create);
 	mgr->register_creature_script(CN_ARCHIMONDE_CHANNEL_TRIGGER, &ArchimondeTriggerAI::Create);
+	mgr->register_creature_script(CN_DOOMFIRE, &DoomfireAI::Create);
     mgr->register_creature_script(CN_ARCHIMONDE, &ArchimondeAI::Create);
 }
