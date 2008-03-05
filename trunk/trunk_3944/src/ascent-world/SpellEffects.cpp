@@ -4622,7 +4622,7 @@ void Spell::SpellEffectCharge(uint32 i)
 
 	x = d*cosf(alpha)+m_caster->GetPositionX();
 	y = d*sinf(alpha)+m_caster->GetPositionY();
-	z = unitTarget->GetPositionZ();
+	z = unitTarget->GetPositionZ() + 0.2f;
 
 	uint32 time = uint32( (m_caster->CalcDistance(unitTarget) / ((m_caster->m_runSpeed * 3.5) * 0.001f)) + 0.5);
 
