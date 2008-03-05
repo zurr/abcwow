@@ -5280,7 +5280,7 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 				if (dur > 120000)
 					dur = 120000;
  				u_caster->CastSpell(u_caster, aur->GetSpellProto(), true);
- 				unitTarget->RemoveAura(aur);		
+ 				unitTarget->RemoveAllAuras(aur->GetSpellProto()->Id,aur->GetCasterGUID());
 				Aura *aura = u_caster->FindAura(aur->GetSpellId());
 				if (aura)
 				{
