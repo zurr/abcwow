@@ -1009,6 +1009,7 @@ public:
 
 	void OnCombatStart(Unit* mTarget)
 	{
+		void CastTime();
 		GrowthCooldown = 30;
 		groundSlamcd = 45;
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come and die.");
@@ -1100,6 +1101,12 @@ public:
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
+	}
+
+	void CastTime()
+	{
+		for(int i=0;i<nrspells;i++)
+			spells[i].casttime = spells[i].cooldown;
 	}
 
 	void SpellCast(float val)
@@ -1218,9 +1225,9 @@ public:
 			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
 
-				for(set<Player*>::iterator itr = temp->GetInRangePlayerSetBegin(); itr != temp->GetInRangePlayerSetEnd(); ++itr) 
+				for(set<Player*>::iterator itr2 = temp->GetInRangePlayerSetBegin(); itr2 != temp->GetInRangePlayerSetEnd(); ++itr2) 
 				{
-					Player *currentTarget = (*itr);
+					Player *currentTarget = (*itr2);
 					Player *tempPlayer = (Player*)temp;
 
 					if (currentTarget != tempPlayer && currentTarget->isAlive() && tempPlayer->GetDistance2dSq(currentTarget) <= 400)
