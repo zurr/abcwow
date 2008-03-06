@@ -11,11 +11,13 @@ extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
 	return SCRIPT_TYPE_MISC;
 }
 
-extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)	// Comment any script to disable it
+extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 {
 	//Instances
 	SetupArcatraz(mgr);
 	SetupAuchenaiCrypts(mgr);
+	//SetupBlackMorass(mgr);
+	//SetupBlackrockSpire(mgr);
 	SetupBlackrockDepths(mgr);
 	SetupBloodFurnace(mgr);
 	SetupBotanica(mgr);
@@ -24,6 +26,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)	// Comment any 
 	SetupHellfireRamparts(mgr);
 	SetupManaTombs(mgr);
 	SetupMaraudon(mgr);
+	//SetupOldHillsbradFoothills(mgr);
 	SetupRagefireChasm(mgr);
 	SetupRazorfenDowns(mgr);
 	SetupScarletMonastery(mgr);
@@ -37,6 +40,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)	// Comment any 
 	SetupTheSteamvault(mgr);
 	SetupTheUnderbog(mgr);
 	SetupUldaman(mgr);
+	//SetupTheStockade(mgr);
 	SetupZulFarrak(mgr);
 	//Raids
 	SetupBlackTemple(mgr);
@@ -51,6 +55,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)	// Comment any 
 	SetupZulGurub(mgr);
 	SetupSerpentshrineCavern(mgr);
 	SetupMagtheridonsLair(mgr);
+	SetupWorldBosses(mgr); 
 	SetupZulAman(mgr);
 	//Events
 	SetupEventDarkPortal(mgr);
