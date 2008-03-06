@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="InstanceScripts"
 	ProjectGUID="{EE39B48B-C598-4AAF-9EF0-199402933EE5}"
 	RootNamespace="InstanceScripts"
@@ -394,7 +394,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\InstanceScripts\Instance_BlackMorass.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\InstanceScripts\Instance_BlackrockDepths.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_BlackrockSpire.cpp"
 				>
 			</File>
 			<File
@@ -423,6 +431,10 @@
 			</File>
 			<File
 				RelativePath="..\src\InstanceScripts\Instance_Mauradon.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_OldHillsbradFoothills.cpp"
 				>
 			</File>
 			<File
@@ -467,6 +479,10 @@
 			</File>
 			<File
 				RelativePath="..\src\InstanceScripts\Instance_TheSteamvault.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_TheStockade.cpp"
 				>
 			</File>
 			<File
@@ -523,6 +539,10 @@
 			</File>
 			<File
 				RelativePath="..\src\InstanceScripts\Raid_TheEye.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_WorldBosses.cpp"
 				>
 			</File>
 			<File
