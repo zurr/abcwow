@@ -359,3 +359,10 @@ INSERT INTO `spell_data_extra` (`spellid`,`dmg_bonus`) VALUES
  (18937,96),
  (18938,96),
  (27265,96);
+ 
+ 
+ -- Paladin
+ 
+ --Seal of Vengeance
+ INSERT INTO `spell_data_extra` (`spellid`,`dmg_bonus`) VALUES
+ (31803,80);

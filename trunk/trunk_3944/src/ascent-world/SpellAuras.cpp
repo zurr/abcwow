@@ -2853,27 +2853,10 @@ void Aura::SpellAuraModStealth(bool apply)
 		m_target->RemoveFlag(UNIT_FIELD_BYTES_1,0x02000000);
 		if( m_target->IsPlayer() )
 		{
-			Player* p_caster = static_cast< Player* >( m_target );
-
 			WorldPacket data(12);
 			data.SetOpcode(SMSG_COOLDOWN_EVENT);
 			data << (uint32)GetSpellProto()->Id << m_target->GetGUID();
-			p_caster->GetSession()->SendPacket (&data);
-
-			/*
-			//wipe aggro and remove all cast target victim
-			for(std::set<Object*>::iterator itr = p_caster->GetInRangeSetBegin(); itr != p_caster->GetInRangeSetEnd(); itr++ )
-			{
-				if( (*itr) && (*itr)->IsUnit() && static_cast< Unit* >( *itr )->isAlive() )
-				{
-					if( (*itr)->GetTypeId() == TYPEID_UNIT )
-						static_cast< Unit* >( *itr )->GetAIInterface()->RemoveThreatByPtr( p_caster );
-
-					if( ( (*itr) )->IsPlayer() && static_cast< Player* >( *itr )->isCasting() )
-						static_cast< Player* >( *itr )->CancelSpell( NULL );
-				}
-			}
-			*/
+			static_cast< Player* >( m_target )->GetSession()->SendPacket (&data);
 		}
 
 		// hack fix for vanish stuff
