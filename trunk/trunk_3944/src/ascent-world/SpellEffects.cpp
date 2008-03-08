@@ -3595,7 +3595,7 @@ void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
 		return;
 
 	Creature *target = static_cast<Creature*>( unitTarget );
-	if(target->IsPickPocketed() || (target->GetCreatureName() && lootmgr.IsPickpocketable(target->GetCreatureName()->Id)))
+	if(target->IsPickPocketed() || !lootmgr.IsPickpocketable( target->GetEntry() ) )
 	{
 		SendCastResult(SPELL_FAILED_TARGET_NO_POCKETS);
 		return;
