@@ -257,10 +257,10 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
         &Aura::SpellAuraNULL,//234 Apply Aura: Reduces Silence or Interrupt effects, Item spell magic http://www.thottbot.com/s42184
 		&Aura::SpellAuraNULL,//235 33206 Instantly reduces a friendly target's threat by $44416s1%, reduces all damage taken by $s1% and increases resistance to Dispel mechanics by $s2% for $d.
 		&Aura::SpellAuraNULL,//236
-		&Aura::SpellAuraNULL,//237
-		&Aura::SpellAuraNULL,//238
+		&Aura::SpellAuraHealingByAttackPowerPct,//237 Mental Quickness http://www.wowhead.com/?spell=30813 increases your spell damage by an amount equal to XX% of your attack power.
+		&Aura::SpellAuraDamageByAttackPowerPct,//238 Mental Quickness http://www.wowhead.com/?spell=30813 increases your healing by an amount equal to XX% of your attack power.
 		&Aura::SpellAuraNULL,//239
-		&Aura::SpellAuraAxeSkillModifier,//240 Increase Axe Skill http://www.wowhead.com/?spell=20574
+		&Aura::SpellAuraModExpertise,//240 Increase Expertise
 };
 /*
 ASCENT_INLINE void ApplyFloatSM(float ** m,float v,uint32 mask, float def)
@@ -6943,7 +6943,7 @@ void Aura::SpellAuraIncreasePartySpeed(bool apply)
 void Aura::SpellAuraIncreaseSpellDamageByAttribute(bool apply)
 {
 	Unit * pCaster = GetUnitCaster();
-	if(!pCaster)
+	if( pCaster == NULL || !m_target->IsPlayer() )
 		return;
 
 	int32 val;
@@ -6973,25 +6973,22 @@ void Aura::SpellAuraIncreaseSpellDamageByAttribute(bool apply)
 		}
 	}
 
-	if( m_target->IsPlayer() )
-	{	
-		for(uint32 x=0;x<7;x++)
+	for(uint32 x=0;x<7;x++)
+	{
+		if (mod->m_miscValue & (((uint32)1)<<x) )
 		{
-			if (mod->m_miscValue & (((uint32)1)<<x) )
-			{
-				m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) + float2int32(((float)val/100)*m_target->GetUInt32Value(UNIT_FIELD_STAT0 + stat)));
-				static_cast< Player* >( m_target )->SpellDmgDoneByAttribute[stat][x] += ((float)(val))/100;
-			}
+			m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) + float2int32(((float)val/100)*m_target->GetUInt32Value(UNIT_FIELD_STAT0 + stat)));
+			static_cast< Player* >( m_target )->SpellDmgDoneByAttribute[stat][x] += ((float)(val))/100;
 		}
-		if( m_target->IsPlayer() )
-			static_cast< Player* >( m_target )->UpdateChanceFields();
 	}
+
+	static_cast< Player* >( m_target )->UpdateChanceFields();
 }
 
 void Aura::SpellAuraIncreaseHealingByAttribute(bool apply)
 {
 	Unit * pCaster = GetUnitCaster();
-	if(!pCaster)
+	if( pCaster == NULL || !m_target->IsPlayer() )
 		return;
 
 	int32 val;
@@ -7020,18 +7017,11 @@ void Aura::SpellAuraIncreaseHealingByAttribute(bool apply)
 		return;
 	}
 
-	if( m_target->IsPlayer() )
-	{	
-		for(uint32 x=1;x<7;x++)
-		{
-			static_cast< Player* >( m_target )->SpellHealDoneByAttribute[stat][x] += ((float)(val))/100;
-		}
-		if( m_target->IsPlayer() )
-		{
-			static_cast< Player* >( m_target )->UpdateChanceFields();
-			m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) + float2int32(((float)val/100)*m_target->GetUInt32Value(UNIT_FIELD_STAT0 + stat)));
-		}
-	}
+	for(uint32 x=1;x<7;x++)
+		static_cast< Player* >( m_target )->SpellHealDoneByAttribute[stat][x] += ((float)(val))/100;
+
+	m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) + float2int32(((float)val/100)*m_target->GetUInt32Value(UNIT_FIELD_STAT0 + stat)));
+	static_cast< Player* >( m_target )->UpdateChanceFields();
 }
 
 void Aura::SpellAuraAddFlatModifier(bool apply)
@@ -7885,20 +7875,60 @@ void Aura::SMTMod_On_target(bool apply,bool is_pct,uint32 namehash, int value)
 	}
 }
 
-void Aura::SpellAuraAxeSkillModifier(bool apply)
+void Aura::SpellAuraHealingByAttackPowerPct(bool apply)
+{
+	Unit * pCaster = GetUnitCaster();
+	if( pCaster == NULL || !m_target->IsPlayer() )
+		return;
+
+	int32 val = mod->m_amount;
+
+	if( apply )
+		SetPositive();
+	else
+		val =- val;
+
+	m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, 
+		m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) 
+			+ float2int32(((float)val/100)*(m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER)+ m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER_MODS))));
+
+}
+
+void Aura::SpellAuraDamageByAttackPowerPct(bool apply)
+{
+	Unit * pCaster = GetUnitCaster();
+	if( pCaster == NULL || !m_target->IsPlayer() )
+		return;
+
+	int32 val = mod->m_amount;
+
+	if( apply )
+		SetPositive();
+	else
+		val =- val;
+
+	for(uint32 x=0;x<7;x++)
+		m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x,
+			m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) 
+				+ float2int32(((float)val/100)*(m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER)) + m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER_MODS)));
+
+	static_cast< Player* >( m_target )->UpdateChanceFields();
+}
+
+void Aura::SpellAuraModExpertise(bool apply)
 {
 	if( p_target != NULL )
 	{
 		SetPositive();
 		if( apply )
 		{
-			p_target->_ModifySkillBonus( SKILL_AXES, mod->m_amount );
-			p_target->_ModifySkillBonus( SKILL_2H_AXES, mod->m_amount );
+			p_target->ModUInt32Value( PLAYER_RATING_MODIFIER_EXPERTISE, mod->m_amount );
+			p_target->ModUInt32Value( PLAYER_EXPERTISE, mod->m_amount );
 		}
 		else
 		{
-			p_target->_ModifySkillBonus( SKILL_AXES, -mod->m_amount );
-			p_target->_ModifySkillBonus( SKILL_2H_AXES, -mod->m_amount );
+			p_target->ModUInt32Value( PLAYER_RATING_MODIFIER_EXPERTISE, -mod->m_amount );
+			p_target->ModUInt32Value( PLAYER_EXPERTISE, -mod->m_amount );
 		}
 		p_target->UpdateStats();
 	}
