@@ -1785,7 +1785,9 @@ void MapMgr::HookOnAreaTrigger(Player * plr, uint32 id)
 	{
 	case 4591:
 		GameObject *door = GetInterface()->GetGameObjectNearestCoords(803.827f, 6869.38f, -38.5434f, 184212);
-		if (door && (door->GetUInt32Value(GAMEOBJECT_STATE) == 1))
+		if (!door)
+			return;
+		if (door->GetUInt32Value(GAMEOBJECT_STATE) == 1)
 		{
 			door->SetUInt32Value(GAMEOBJECT_STATE, 0);
 			sEventMgr.AddEvent(door, &GameObject::EventCloseDoor, EVENT_GAMEOBJECT_DOOR_CLOSE, 20000, 1, 0);
