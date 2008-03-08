@@ -1977,6 +1977,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
         sp->EffectTriggerSpell[0] = 31803;
+		sp->procChance = 25;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 	}
 
