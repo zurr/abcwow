@@ -7888,10 +7888,11 @@ void Aura::SpellAuraHealingByAttackPowerPct(bool apply)
 	else
 		val =- val;
 
-	m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, 
-		m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) 
-			+ float2int32(((float)val/100)*(m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER)+ m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER_MODS))));
+	int32 bonus = float2int32(((float)val/100)*(m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER)+ m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER_MODS)));
+	m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) + bonus);
 
+	for( uint32 x=1; x<7; x++ )
+		m_target->HealDoneMod[x] += bonus;
 }
 
 void Aura::SpellAuraDamageByAttackPowerPct(bool apply)
@@ -7907,12 +7908,9 @@ void Aura::SpellAuraDamageByAttackPowerPct(bool apply)
 	else
 		val =- val;
 
-	for(uint32 x=0;x<7;x++)
-		m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x,
-			m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) 
-				+ float2int32(((float)val/100)*(m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER)) + m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER_MODS)));
-
-	static_cast< Player* >( m_target )->UpdateChanceFields();
+	int32 bonus = float2int32(((float)val/100)*(m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER)+ m_target->GetUInt32Value(UNIT_FIELD_ATTACK_POWER_MODS)));
+	for( uint32 x=1; x<7; x++ )
+		m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) + bonus);
 }
 
 void Aura::SpellAuraModExpertise(bool apply)
