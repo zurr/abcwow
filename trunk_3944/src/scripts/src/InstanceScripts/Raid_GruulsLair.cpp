@@ -1167,7 +1167,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = itr->first;
-			if (temp->IsPlayer() && temp->isAlive())
+			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
 				knockback(temp);
 				temp->CastSpell(temp, GROUND_SLAM, true);
@@ -1191,7 +1191,7 @@ public:
 		data << affect;
 		data << -affect;
 		target->SendMessageToSet(&data, true);
-		if (target->IsPlayer())
+		if (target->GetTypeId() == TYPEID_PLAYER)
 			static_cast<Player*>(target)->blinked = true;
 	}
 
@@ -1205,7 +1205,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = itr->first;
-			if (temp->IsPlayer() && temp->isAlive())
+			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
 				temp->CastSpell(temp, STONED, true);
 			}
@@ -1222,7 +1222,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = itr->first;
-			if (temp->IsPlayer() && temp->isAlive())
+			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
 
 				for(set<Player*>::iterator itr2 = temp->GetInRangePlayerSetBegin(); itr2 != temp->GetInRangePlayerSetEnd(); ++itr2)

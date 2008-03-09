@@ -1257,13 +1257,13 @@ public:
 				switch (val)
 				{
 				case 0:
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "It will soon be over.");
-					_unit->PlaySoundToSet(11325);
-					break;
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "It will soon be over.");
+				_unit->PlaySoundToSet(11325);
+				break;
 				case 1:
-					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "There is nowhere to hide!");
-					_unit->PlaySoundToSet(11324);
-					break;
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "There is nowhere to hide!");
+				_unit->PlaySoundToSet(11324);
+				break;
 				}
 				*/
 				_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " summons watery globules!");
@@ -1647,12 +1647,12 @@ public:
 			m_eventstarted = false;
 			if (_unit->isAlive())
 			{
-			if (caribdis)
-				caribdis->Despawn(100, 0);
-			if (sharkkis)
-				sharkkis->Despawn(100, 0);
-			if (tidalvess)
-				tidalvess->Despawn(100, 0);
+				if (caribdis)
+					caribdis->Despawn(100, 0);
+				if (sharkkis)
+					sharkkis->Despawn(100, 0);
+				if (tidalvess)
+					tidalvess->Despawn(100, 0);
 				RemoveAIUpdateEvent();
 				_unit->Despawn(100, 2500);
 			}
@@ -2416,10 +2416,10 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		if (shadow)
-			{
-				shadow->Despawn(0, 0);
-				shadow = NULL;
-			}
+		{
+			shadow->Despawn(0, 0);
+			shadow = NULL;
+		}
 		_unit->PlaySoundToSet(11317);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You cannot kill me! Fools, I'll be back! I'll... aarghh...");
 		RemoveAIUpdateEvent();
