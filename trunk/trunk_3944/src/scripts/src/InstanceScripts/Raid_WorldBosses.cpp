@@ -1374,7 +1374,7 @@ Remaining:
 #define CAPTURE_SOUL				32966
 #define MARK_OF_KAZZAK				32960
 
-class KazzakAI : public CreatureAIScript
+class KazzakAI : public CreatureAIScript, public EventableObject
 {
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(KazzakAI);
@@ -1638,7 +1638,7 @@ protected:
 
 	int enrage;
 	int nrspells;
-	int timer_speech
+	int timer_speech;
 };
 
 // Azuregos
