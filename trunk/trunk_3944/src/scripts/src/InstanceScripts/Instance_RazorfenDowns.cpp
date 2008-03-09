@@ -10,7 +10,7 @@ class AmnennarTheColdbringer : public CreatureAIScript
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(AmnennarTheColdbringer);
 	SP_AI_Spell spells[3];
- bool m_spellcheck[3];
+	bool m_spellcheck[3];
 
     AmnennarTheColdbringer(Creature* pCreature) : CreatureAIScript(pCreature)
     {

@@ -1,21 +1,3 @@
-/*
- * Moon++ Scripts for Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
- * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 #include "StdAfx.h"
 #include "Setup.h"
 
@@ -71,7 +53,7 @@ public:
 	{
 		plaguecount++;
 		randomplague = 16 + RandomUInt(3);
-		if(plaguecount >= randomplague)
+		if(plaguecount >= randomplague && _unit->GetAIInterface()->GetNextTarget())
 		{
 			plaguecount = 0;
 			Unit *target = NULL;
@@ -138,7 +120,7 @@ public:
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-		antusul = NULL;
+		Unit *antusul = NULL;
 		antusul = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(1815.030029f, 686.817017f, 14.519000f, 8127);
 		if(antusul)
 		{
@@ -149,9 +131,6 @@ public:
 			}
 		}
 	}
-
-protected:
-	Unit * antusul;
 };
 /*--------------------------------------------------------------------------------------*/
 /*antusul  healing ward and earthgrab ward commented out since they need time and work wich i dont have right now */
@@ -198,7 +177,8 @@ public:
 		/*healingwardcount = earthgrabcount = hmax = emax =*/ secondspawncount = 0;
         RemoveAIUpdateEvent();
 		trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(1811.943726f, 714.839417f, 12.897189f, 133337);
-		trigger->Despawn(100, 0);
+		if (trigger)
+			trigger->Despawn(100, 0);
 	}
 
 	void AIUpdate() 
@@ -233,30 +213,34 @@ public:
 		{
 			Unit * Target = NULL;
 			Target = _unit->GetAIInterface()->GetNextTarget();
-			if(add1 && Target)
+			if (_unit->GetAIInterface()->GetNextTarget())
 			{
-				add1->GetAIInterface()->AttackReaction(Target, 0, 0);
+				if(add1 && Target)
+				{
+					add1->GetAIInterface()->AttackReaction(Target, 0, 0);
+				}
+				if(add2 && Target)
+				{
+					add2->GetAIInterface()->AttackReaction(Target, 0, 0);
+				}
+				if(add3 && Target)
+				{
+					add3->GetAIInterface()->AttackReaction(Target, 0, 0);
+				}
+				if(add4 && Target)
+				{
+					add4->GetAIInterface()->AttackReaction(Target, 0, 0);
+				}
+				if(add5 && Target)
+				{
+					add5->GetAIInterface()->AttackReaction(Target, 0, 0);
+				}
+				if(add6 && Target)
+				{
+					add6->GetAIInterface()->AttackReaction(Target, 0, 0);
+				}
 			}
-			if(add2 && Target)
-			{
-				add2->GetAIInterface()->AttackReaction(Target, 0, 0);
-			}
-			if(add3 && Target)
-			{
-				add3->GetAIInterface()->AttackReaction(Target, 0, 0);
-			}
-			if(add4 && Target)
-			{
-				add4->GetAIInterface()->AttackReaction(Target, 0, 0);
-			}
-			if(add5 && Target)
-			{
-				add5->GetAIInterface()->AttackReaction(Target, 0, 0);
-			}
-			if(add6 && Target)
-			{
-				add6->GetAIInterface()->AttackReaction(Target, 0, 0);
-			}
+
 			attack = false;
 		}
 		if(spawns2)
@@ -367,7 +351,7 @@ protected:
 
 void SetupZulFarrak(ScriptMgr * mgr)
 {
-	//mgr->register_creature_script(8127, &antusulAI::Create);
-	//mgr->register_creature_script(7272, &thekaAI::Create);
-	//mgr->register_creature_script(133337, &antusulTriggerAI::Create);
+	/*mgr->register_creature_script(8127, &antusulAI::Create);
+	mgr->register_creature_script(7272, &thekaAI::Create);
+	mgr->register_creature_script(133337, &antusulTriggerAI::Create);*/
 }
