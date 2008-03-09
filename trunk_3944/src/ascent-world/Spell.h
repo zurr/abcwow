@@ -705,7 +705,7 @@ enum SPELL_ENTRY
     SPELL_ENTRY_Flags3,
     SPELL_ENTRY_field10,
     SPELL_ENTRY_field11,
-    SPELL_ENTRY_unk201_1,
+    SPELL_ENTRY_FlagsTargets,
     SPELL_ENTRY_RequiredShapeShift,
     SPELL_ENTRY_UNK14,
     SPELL_ENTRY_Targets,

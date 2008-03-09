@@ -5061,14 +5061,18 @@ void Unit::RemoveAurasByBuffType(uint32 buff_type, const uint64 &guid, uint32 sk
 
 void Unit::RemoveAurasByBuffIndexType(uint32 buff_index_type, const uint64 &guid)
 {
-	if( buff_index_type == SPELL_TYPE_INDEX_JUDGEMENT )
-		return;
-
 	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		if( m_auras[x] != NULL && m_auras[x]->GetSpellProto()->buffIndexType == buff_index_type )
-			if( !guid || ( guid && m_auras[x]->m_casterGuid == guid ) )
+		if( m_auras[x] != NULL && (m_auras[x]->GetSpellProto()->FlagsTargets & 0x0020) 
+			&& m_auras[x]->GetSpellProto()->MechanicsType == buff_index_type)
+		{
+			/*
+			if( m_auras[x]->GetSpellProto()->procCharges && guid == GetGUID())
+				continue;
+				*/
+			if( !guid || ( guid && m_auras[x]->m_casterGuid == guid ))
 				m_auras[x]->Remove();
+		}
 	}
 }
 
