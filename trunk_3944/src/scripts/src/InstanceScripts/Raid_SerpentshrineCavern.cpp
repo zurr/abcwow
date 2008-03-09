@@ -763,7 +763,7 @@ public:
 
 		Unit *target = GetAttackTarget();
 		if (target)
-			_unit->GetAIInterface()->AttackReaction(target, 0, 0);
+			_unit->GetAIInterface()->AttackReaction(target, 1, 0);
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -908,7 +908,7 @@ public:
 
 		Unit *target = GetAttackTarget();
 		if (target)
-			_unit->GetAIInterface()->AttackReaction(target, 0, 0);
+			_unit->GetAIInterface()->AttackReaction(target, 1, 0);
 
 	}
 
@@ -1458,27 +1458,14 @@ class KARATHRESSAI : public CreatureAIScript
 {
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(KARATHRESSAI);
-	SP_AI_Spell spells[1];
-	bool m_spellcheck[1];
 
 	KARATHRESSAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		nrspells = 1;
-		for(int i=0; i<nrspells; i++)
-		{
-			m_spellcheck[i] = false;
-		}
-		spells[0].info = dbcSpell.LookupEntry(KARATHRESS_CATACLYSMICBOLT);
-		spells[0].targettype = TARGET_RANDOM_SINGLE;
-		spells[0].instant = true;
-		spells[0].cooldown = 10;
-		spells[0].perctrigger = 10.0f;
-		spells[0].attackstoptimer = 1000;
-
 		m_eventstarted = false;
 		sharkkisalive = true;
 		caribdisalive = true;
 		tidalvessalive = true;
+		cataclymboltcd = 60;
 		caribdis = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDCARIBDIS, 459.759521f, -544.832397f, -7.547507f, 1.845423f, true, false, 0, 0);
 		sharkkis = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDSHARKKIS, 462.492615f, -540.305237f, -7.547507f, 3.143288f, true, false, 0, 0);
 		tidalvess = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDTIDALVESS, 459.759521f, -536.210449f, -7.547507f, 4.197681f, true, false, 0, 0);
@@ -1490,7 +1477,6 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Guards, attention! We have visitors....");
 		EventStart(mTarget);
 		RegisterAIUpdateEvent(1000);
-		CastTime();
 	}
 	void OnCombatStop(Unit *mTarget)
 	{
@@ -1525,19 +1511,31 @@ public:
 
 	void AIUpdate()
 	{
-		if (!caribdis->isAlive() && caribdisalive)
+		cataclymboltcd--;
+		if (!cataclymboltcd)
+		{
+			Unit *target = RandomTarget(false, true, 6400);
+			if (target)
+			{
+				SpellEntry *tempbolt = dbcSpell.LookupEntry(KARATHRESS_CATACLYSMICBOLT);
+				tempbolt->EffectBasePoints[0] = target->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/2;
+				_unit->CastSpell(target, tempbolt, true);
+			}
+			cataclymboltcd = 60;
+		}
+		if (caribdis && !caribdis->isAlive() && caribdisalive)
 		{
 			caribdisalive = false;
 			randomspeech();
 			tidalsurgecd = 15;
 		}
-		if (!sharkkis->isAlive() && sharkkisalive)
+		if (sharkkis && !sharkkis->isAlive() && sharkkisalive)
 		{
 			sharkkisalive = false;
 			randomspeech();
 			beastwithincd = 15;
 		}
-		if (!tidalvess->isAlive() && tidalvessalive)
+		if (tidalvess && !tidalvess->isAlive() && tidalvessalive)
 		{
 			tidalvessalive = false;
 			randomspeech();
@@ -1579,61 +1577,6 @@ public:
 				firetotemcd--;
 			}
 		}
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
-	}
-
-	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
-			float comulativeperc = 0;
-			Unit *target = NULL;
-			for(int i=0; i<nrspells; i++)
-			{
-				if(!spells[i].perctrigger) continue;
-
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant);
-						break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					case TARGET_RANDOM_SINGLE:
-						target = RandomTarget(false, false, spells[i].info->base_range_or_radius_sqr);
-						if (target)
-						{
-							_unit->GetAIInterface()->SetNextTarget(target);
-							spells[i].info->dmg_bonus = (target->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/2);
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-						}
-						break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-		}
-	}
-
-	void CastTime()
-	{
-		for(int i=0; i<nrspells; i++)
-			spells[i].casttime = spells[i].cooldown;
 	}
 
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
@@ -1744,6 +1687,7 @@ protected:
 	uint32 tidalsurgecd;
 	uint32 beastwithincd;
 	uint32 firetotemcd;
+	uint32 cataclymboltcd;
 };
 
 // Caribdis
@@ -2535,7 +2479,7 @@ public:
 					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 					_unit->RemoveAura(LEOTHERAS_BANISH);
 					_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
-					_unit->GetAIInterface()->AttackReaction(target, 0, 0);
+					_unit->GetAIInterface()->AttackReaction(target, 1, 0);
 				}
 				else
 				{
@@ -2784,9 +2728,12 @@ public:
 		if (!m_eventstarted)
 		{
 			m_eventstarted = true;
-			channeler1->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			channeler2->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			channeler3->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (channeler1)
+				channeler1->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (channeler2)
+				channeler2->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+			if (channeler3)
+				channeler3->GetAIInterface()->AttackReaction(mTarget, 1, 0);
 		}
 	}
 	void EventStop(Unit* mTarget)
@@ -3429,7 +3376,7 @@ public:
 	}
 	void PhaseTwo()
 	{
-		_unit->GetAIInterface()->AttackReaction(_unit->GetAIInterface()->GetMostHated(), 0, 0);
+		_unit->GetAIInterface()->AttackReaction(_unit->GetAIInterface()->GetMostHated(), 1, 0);
 		if (!forgedlightningcd)
 		{
 			int spelldest = RandomUInt(100)%4;
