@@ -576,7 +576,7 @@ enum SPELL_INDEX
 	SPELL_TYPE_INDEX_EARTH_SHIELD	= 7,
 	SPELL_TYPE_INDEX_CYCLONE		= 8,
 	SPELL_TYPE_INDEX_BANISH			= 9,
-	SPELL_TYPE_INDEX_JUDGEMENT		= 10,
+	SPELL_TYPE_INDEX_JUDGEMENT		= 10, // < -- only this one used
 	NUM_SPELL_TYPE_INDEX			= 11,
 };
 
@@ -628,6 +628,7 @@ typedef std::map<uint32, PlayerSkill>				SkillMap;
 typedef std::set<Player**>							ReferenceSet;
 
 //#define OPTIMIZED_PLAYER_SAVING
+#define MECHANIC_END 28
 
 class SERVER_DECL Player : public Unit
 {
@@ -684,9 +685,9 @@ public:
 
 	bool ok_to_remove;
 	PlayerInfo * m_playerInfo;
-	uint64 m_spellIndexTypeTargets[NUM_SPELL_TYPE_INDEX];
+	uint64 m_spellIndexTypeTargets[MECHANIC_END];
 	void OnLogin();//custom stuff on player login.
-	void RemoveSpellTargets(uint32 Type);
+	void RemoveSpellTargets(uint32 Type, Unit* target);
 	void RemoveSpellIndexReferences(uint32 Type);
 	void SetSpellTargetType(uint32 Type, Unit* target);
 	void SendMeetingStoneQueue(uint32 DungeonId, uint8 Status);

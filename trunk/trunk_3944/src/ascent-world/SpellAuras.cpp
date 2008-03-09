@@ -361,13 +361,10 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 
 	if( caster->IsUnit() )
 	{
-		if( m_spellProto->buffIndexType > 0 && caster->IsPlayer() )
+		if( (m_spellProto->FlagsTargets & 0x0020) && caster->IsPlayer() )
 		{
-			if( m_spellProto->buffIndexType != SPELL_TYPE_INDEX_JUDGEMENT )
-			{
-				static_cast< Player* >( caster )->RemoveSpellTargets( m_spellProto->buffIndexType );
-				static_cast< Player* >( caster )->SetSpellTargetType( m_spellProto->buffIndexType, target );
-			}
+			static_cast< Player* >( caster )->RemoveSpellTargets( m_spellProto->MechanicsType, target );
+			static_cast< Player* >( caster )->SetSpellTargetType( m_spellProto->MechanicsType, target );
 		}
 
 		if( isAttackable( ( Unit* )caster, target ) )
@@ -483,12 +480,9 @@ void Aura::Remove()
 			m_target->CombatStatus.RemoveAttacker( caster, caster->GetGUID() );
 		}
 
-		if( m_spellProto->buffIndexType != 0 && m_target->IsPlayer() )
+		if( (m_spellProto->FlagsTargets & 0x0020) && m_target->IsPlayer() )
 		{
-			if( m_spellProto->buffIndexType != SPELL_TYPE_INDEX_JUDGEMENT )
-			{
-				static_cast< Player* >( m_target )->RemoveSpellIndexReferences( m_spellProto->buffIndexType );
-			}
+			static_cast< Player* >( m_target )->RemoveSpellIndexReferences( m_spellProto->MechanicsType );
 		}
 	}
 	else
