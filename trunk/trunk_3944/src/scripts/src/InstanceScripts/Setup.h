@@ -5,8 +5,8 @@
 //Instances
 void SetupArcatraz(ScriptMgr * mgr);
 void SetupAuchenaiCrypts(ScriptMgr * mgr);
-//void SetupBlackMorass(ScriptMgr * mgr);
-//void SetupBlackrockSpire(ScriptMgr *mgr);
+void SetupBlackMorass(ScriptMgr * mgr);
+void SetupBlackrockSpire(ScriptMgr *mgr);
 void SetupBlackrockDepths(ScriptMgr * mgr);
 void SetupBloodFurnace(ScriptMgr * mgr);
 void SetupBotanica(ScriptMgr * mgr);
@@ -15,7 +15,7 @@ void SetupDireMaul(ScriptMgr * mgr);
 void SetupHellfireRamparts(ScriptMgr * mgr);
 void SetupManaTombs(ScriptMgr * mgr);
 void SetupMaraudon(ScriptMgr * mgr);
-//void SetupOldHillsbradFoothills(ScriptMgr * mgr);
+void SetupOldHillsbradFoothills(ScriptMgr * mgr);
 void SetupRagefireChasm(ScriptMgr * mgr);
 void SetupRazorfenDowns(ScriptMgr * mgr);
 void SetupScarletMonastery(ScriptMgr * mgr);
@@ -29,7 +29,7 @@ void SetupTheSlavePens(ScriptMgr * mgr);
 void SetupTheSteamvault(ScriptMgr * mgr);
 void SetupTheUnderbog(ScriptMgr * mgr);
 void SetupUldaman(ScriptMgr * mgr);
-//void SetupTheStockade(ScriptMgr * mgr);
+void SetupTheStockade(ScriptMgr * mgr);
 void SetupZulFarrak(ScriptMgr * mgr);
 //Raids
 void SetupBlackTemple(ScriptMgr * mgr);
