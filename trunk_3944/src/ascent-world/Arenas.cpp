@@ -100,11 +100,11 @@ void Arena::OnAddPlayer(Player * plr)
 	{
 		ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
 		ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
-		if(doneteams.find(t) == doneteams.end())
+		if(inscribe_teams[plr->m_bgTeam].find(t) == inscribe_teams[plr->m_bgTeam].end())
 		{
 			t->m_stat_gamesplayedseason++;
 			t->m_stat_gamesplayedweek++;
-			doneteams.insert(t);
+			inscribe_teams[plr->m_bgTeam].insert(t);
 		}
 
 		if(tp != NULL)
@@ -300,48 +300,54 @@ void Arena::Finish()
 	sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
 
 	/* update arena team stats */
-	doneteams.clear();
 	if(rated_match)
 	{
 		uint32 averageRating[2] = {0,0};
-		for(uint32 i = 0; i < 2; ++i) {
-			uint32 teamCount = 0;
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+		uint32 teamCount = 0;
+		for(uint32 i = 0; i < 2; ++i)
+		{
+			for(set<ArenaTeam*>::iterator itr = inscribe_teams[i].begin(); itr != inscribe_teams[i].end(); ++itr)
 			{
-				Player * plr = *itr;
-				if(plr->m_arenaTeams[m_arenateamtype] != NULL)
-				{
-					ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
-					if(doneteams.find(t) == doneteams.end())
-					{
-						averageRating[i] += t->m_stat_rating;
-						teamCount++;
-						doneteams.insert(t);
-					}
-				}
+				averageRating[i] += (*itr)->m_stat_rating;
+				++teamCount;
 			}
+			
 			if(teamCount)
 				averageRating[i] /= teamCount;
+
+			teamCount = 0;
 		}
-		doneteams.clear();
-		for (uint32 i = 0; i < 2; ++i) {
+
+		for (uint32 i = 0; i < 2; ++i)
+		{
 			uint32 j = i ? 0 : 1; // opposing side
 			bool outcome;
 
 			outcome = (i == m_winningteam);
 
-			// ---- Elo Rating System ----
-			// Expected Chance to Win for Team A vs Team B
-			//                     1
-			// -------------------------------------------
-			//                   (PB - PA)/400
-			//              1 + 10
-
 			double power = (int)(averageRating[j] - averageRating[i]) / 400.0f;
 			double divisor = pow(((double)(10.0)), power);
 			divisor += 1.0;
-
 			double winChance = 1.0 / divisor;
+
+			for(set<ArenaTeam*>::iterator itr = inscribe_teams[i].begin(); itr != inscribe_teams[i].end(); ++itr)
+			{
+				if (outcome)
+				{
+					(*itr)->m_stat_gameswonseason++;
+					(*itr)->m_stat_gameswonweek++;
+				}
+
+				double multiplier = (outcome ? 1.0 : 0.0) - winChance;
+				double deltaRating = 32.0 * multiplier;
+				if ( deltaRating < 0 && (-1.0 * deltaRating) > (*itr)->m_stat_rating )
+					(*itr)->m_stat_rating = 0;
+				else
+					(*itr)->m_stat_rating += long2int32(deltaRating);
+				objmgr.UpdateArenaTeamRankings();
+
+				(*itr)->SaveToDB();
+			}
 
 			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
@@ -350,38 +356,15 @@ void Arena::Finish()
 				{
 					ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
 					ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
-					if(doneteams.find(t) == doneteams.end())
-					{
-						if (outcome)
-						{
-							t->m_stat_gameswonseason++;
-							t->m_stat_gameswonweek++;
-						}
-						// New Rating Calculation via Elo
-						// New Rating = Old Rating + K * (outcome - Expected Win Chance)
-						// outcome = 1 for a win and 0 for a loss (0.5 for a draw ... but we cant have that)
-						// K is the maximum possible change
-						// Through investigation, K was estimated to be 32 (same as chess)
-						double multiplier = (outcome ? 1.0 : 0.0) - winChance;
-						double deltaRating = 32.0 * multiplier;
-						if ( deltaRating < 0 && (-1.0 * deltaRating) > t->m_stat_rating )
-							t->m_stat_rating = 0;
-						else
-							t->m_stat_rating += long2int32(deltaRating);
-						objmgr.UpdateArenaTeamRankings();
 
-						doneteams.insert(t);
-					}
-
-					if(tp != NULL && outcome)
+					if( tp != NULL && outcome )
 					{
 						tp->Won_ThisWeek++;
 						tp->Won_ThisSeason++;
 					}
-
-					t->SaveToDB();
 				}
 			}
+
 		}
 	}
 }
