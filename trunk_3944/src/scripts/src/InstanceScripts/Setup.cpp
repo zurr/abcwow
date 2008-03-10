@@ -16,8 +16,8 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 	//Instances
 	SetupArcatraz(mgr);
 	SetupAuchenaiCrypts(mgr);
-	//SetupBlackMorass(mgr);
-	//SetupBlackrockSpire(mgr);
+	SetupBlackMorass(mgr);
+	SetupBlackrockSpire(mgr);
 	SetupBlackrockDepths(mgr);
 	SetupBloodFurnace(mgr);
 	SetupBotanica(mgr);
@@ -26,7 +26,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 	SetupHellfireRamparts(mgr);
 	SetupManaTombs(mgr);
 	SetupMaraudon(mgr);
-	//SetupOldHillsbradFoothills(mgr);
+	SetupOldHillsbradFoothills(mgr);
 	SetupRagefireChasm(mgr);
 	SetupRazorfenDowns(mgr);
 	SetupScarletMonastery(mgr);
@@ -40,7 +40,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 	SetupTheSteamvault(mgr);
 	SetupTheUnderbog(mgr);
 	SetupUldaman(mgr);
-	//SetupTheStockade(mgr);
+	SetupTheStockade(mgr);
 	SetupZulFarrak(mgr);
 	//Raids
 	SetupBlackTemple(mgr);
