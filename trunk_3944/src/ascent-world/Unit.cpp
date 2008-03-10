@@ -1800,6 +1800,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 	iter=m_chargeSpells.begin();
 	while(iter!= m_chargeSpells.end())
 	{
+		
 		iter2=iter++;
 		if(iter2->second.count)
 		{
@@ -1843,6 +1844,69 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						}break;
 					}
 				}
+
+				if ( iter2->second.spellId == 41635 ) //Prayer of Mending
+				{
+
+					SpellEntry* sp = dbcSpell.LookupEntryForced( 41635 );
+					if ( sp != NULL ) //heal us up
+					{
+						Spell spell( this, sp , true, NULL );
+						spell.SetUnitTarget( this );
+						spell.Heal( 800 );
+					}
+
+					//count charges left
+					uint32 count = 0;
+					for( uint32 x = 0; x < MAX_POSITIVE_AURAS; ++x )
+					{
+						if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == SPELL_HASH_PRAYER_OF_MENDING)
+							count++;
+					}
+
+					this->RemoveAllAuraByNameHash( SPELL_HASH_PRAYER_OF_MENDING );
+
+					if ( count <= 1 )
+						continue;
+					--count;
+
+					//get new target
+					SubGroup* pGroup = static_cast< Player* >( this )->GetGroup() ?
+						static_cast< Player* >( this )->GetGroup()->GetSubGroup( static_cast< Player* >( this )->GetSubGroup() ) : NULL;
+					if( pGroup == NULL )
+						continue;
+
+					std::vector< Player* > TargetVector;
+					GroupMembersSet::iterator itr;
+					static_cast< Player* >( this )->GetGroup()->Lock();
+					for(itr = pGroup->GetGroupMembersBegin(); itr != pGroup->GetGroupMembersEnd(); ++itr)
+					{
+						Player *p = (*itr)->m_loggedInPlayer;
+						if( !p || p == this || !p->isAlive() )
+							continue;
+						if ( this->GetDistance2dSq( p ) <= 500 ) //bit extra for lag
+							TargetVector.push_back( p );
+					}
+					static_cast< Player* >( this )->GetGroup()->Unlock();
+
+					if ( !TargetVector.size() )
+						continue;
+
+					size_t Rand_id = rand()%TargetVector.size();
+					Unit * newTarget = TargetVector[Rand_id];
+					TargetVector.clear();
+
+					if ( newTarget == NULL )
+						continue;
+
+					this->CastSpell( newTarget, 41635, true );
+
+					for( uint32 x=0; x< 5-count; ++x )
+						newTarget->RemoveAuraByNameHash( SPELL_HASH_PRAYER_OF_MENDING );
+
+					continue;
+				}
+
 				if(iter2->second.lastproc!=0)
 				{
 					if(iter2->second.procdiff>3000)

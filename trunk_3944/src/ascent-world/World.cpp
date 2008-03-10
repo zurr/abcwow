@@ -1515,6 +1515,12 @@ bool World::SetInitialWorldSettings()
 		sp->maxstack = 0;
 	}
 
+	sp = dbcSpell.LookupEntry(33076); //Prayer of Mending
+	if(sp != NULL)
+	{
+		sp->Effect[0] = 64;
+	}
+
 	//Crusader Strike
 	sp = dbcSpell.LookupEntryForced( 35395 );
 	if( sp != NULL && sp->Id == 35395 )
