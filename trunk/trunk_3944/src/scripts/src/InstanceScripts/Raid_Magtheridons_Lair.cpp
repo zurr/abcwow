@@ -95,8 +95,8 @@ public:
 
 		_unit->AddAuraVisual(BANISH2, 1, false);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
-		door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
 		m_phase = 1;
 		enrage = 0;
 		timer_enrage = 1320;
