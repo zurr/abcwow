@@ -2373,7 +2373,9 @@ public:
 		enraged = 0;
 		shadow = NULL;
 		m_eventstarted = false;
-		_unit->CastSpell(_unit, LEOTHERAS_BANISH, true);
+		_unit->GetAIInterface()->disable_melee = false;
+		_unit->GetAIInterface()->m_moveRun = true;
+		_unit->AddAuraVisual(LEOTHERAS_BANISH, 1, false);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
@@ -2397,7 +2399,7 @@ public:
 		{
 			if (shadow)
 			{
-				shadow->Despawn(0, 0);
+				shadow->Despawn(100, 0);
 				shadow = NULL;
 			}
 			if (channeler1)
@@ -2477,7 +2479,7 @@ public:
 				{
 					m_phase = 1;
 					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-					_unit->RemoveAura(LEOTHERAS_BANISH);
+					_unit->RemoveAuraVisual(LEOTHERAS_BANISH, 1);
 					_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 					_unit->GetAIInterface()->AttackReaction(target, 1, 0);
 				}
@@ -2618,46 +2620,7 @@ public:
 					_unit->PlaySoundToSet(11305);
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "We all have our demons");
 					_unit->CastSpell(_unit, LEOTHERAS_INSIDIOUSWHISPER, false);
-					Player *target1 = (Player *) RandomTarget(false, true, 10000);
-					Player *target2 = (Player *) RandomTarget(false, true, 10000);
-					while(target2 == target1)
-					{
-						target2 = (Player *) RandomTarget(false, true, 10000);
-					}
-					Player *target3 = (Player *) RandomTarget(false, true, 10000);
-					while (target3 == target1 || target3 == target2)
-					{
-						target3 = (Player *) RandomTarget(false, true, 10000);
-					}
-					Player *target4 = (Player *) RandomTarget(false, true, 10000);
-					while (target4 == target1 || target4 == target2 || target4 == target3)
-					{
-						target4 = (Player *) RandomTarget(false, true, 10000);
-					}
-					Player *target5 =  (Player *) RandomTarget(false, true, 10000);
-					while (target5 == target1 || target5 == target2 || target5 == target3 || target5 == target4)
-					{
-						target5 = (Player *) RandomTarget(false, true, 10000);
-					}
-					Creature *summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target1->GetPositionX(), target1->GetPositionY(), target1->GetPositionZ(), target1->GetOrientation(), true, false, 0, 0);
-					summon1->GetAIInterface()->SetSoulLinkedWith(target1);
-					summon1->GetAIInterface()->AttackReaction( target1, 10000, 0);
-
-					Creature *summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target2->GetPositionX(), target2->GetPositionY(), target2->GetPositionZ(), target2->GetOrientation(), true, false, 0, 0);
-					summon2->GetAIInterface()->SetSoulLinkedWith(target2);
-					summon2->GetAIInterface()->AttackReaction( target2, 10000, 0);
-
-					Creature *summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target3->GetPositionX(), target3->GetPositionY(), target3->GetPositionZ(), target3->GetOrientation(), true, false, 0, 0);
-					summon3->GetAIInterface()->SetSoulLinkedWith(target3);
-					summon3->GetAIInterface()->AttackReaction( target3, 10000, 0);
-
-					Creature *summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target4->GetPositionX(), target4->GetPositionY(), target4->GetPositionZ(), target4->GetOrientation(), true, false, 0, 0);
-					summon4->GetAIInterface()->SetSoulLinkedWith(target4);
-					summon4->GetAIInterface()->AttackReaction( target4, 10000, 0);
-
-					Creature *summon5 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, target5->GetPositionX(), target5->GetPositionY(), target5->GetPositionZ(), target5->GetOrientation(), true, false, 0, 0);
-					summon5->GetAIInterface()->SetSoulLinkedWith(target5);
-					summon5->GetAIInterface()->AttackReaction( target5, 10000, 0);
+					innerDemons();
 				}
 				innerdemons = 1;
 			}
@@ -2741,17 +2704,44 @@ public:
 		if (m_eventstarted)
 		{
 			m_eventstarted = false;
-			if (_unit->isAlive())
+			if (channeler1)
+				channeler1->Despawn(100, 0);
+			if (channeler2)
+				channeler2->Despawn(100, 0);
+			if (channeler3)
+				channeler3->Despawn(100, 0);
+			RemoveAIUpdateEvent();
+			_unit->Despawn(100, 2500);
+		}
+	}
+
+	void innerDemons()
+	{
+		std::vector<Unit*> targetTable;
+		for (TargetMap::iterator itr = _unit->GetAIInterface()->GetAITargets()->begin(); itr != _unit->GetAIInterface()->GetAITargets()->end(); itr++)
+		{
+			Unit *temp = itr->first;
+			if (_unit->GetDistance2dSq(temp) <= 10000)
 			{
-				if (channeler1)
-					channeler1->Despawn(100, 0);
-				if (channeler2)
-					channeler2->Despawn(100, 0);
-				if (channeler3)
-					channeler3->Despawn(100, 0);
-				RemoveAIUpdateEvent();
-				_unit->Despawn(100, 2500);
+				if (temp != _unit->GetAIInterface()->GetNextTarget() && temp->GetTypeId() == TYPEID_PLAYER)
+				{
+					targetTable.push_back(temp);
+				}
 			}
+		}
+		if (targetTable.size() < 5)
+			return;
+
+		while(targetTable.size() > 5)
+			targetTable.erase(targetTable.begin()+rand()%targetTable.size());
+
+		for(std::vector<Unit*>::iterator itr2 = targetTable.begin(); itr2 != targetTable.end(); ++itr2)
+		{
+			Unit *temp = (*itr2);
+			Creature *summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_INNERDEMON, temp->GetPositionX(), temp->GetPositionY(), temp->GetPositionZ(), 0, true, false, 0, 0);
+			summon->GetAIInterface()->SetSoulLinkedWith(temp);
+			summon->GetAIInterface()->taunt(temp, true);
+			summon->GetAIInterface()->AttackReaction(temp, 1, 0);
 		}
 	}
 
@@ -2781,6 +2771,7 @@ public:
 		Unit * randomtarget = targetTable[randt];
 		return randomtarget;
 	}
+
 	int GetPlayerCount()
 	{
 		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
@@ -2949,7 +2940,7 @@ public:
 	}
 	void OnCombatStart(Unit* mTarget)
 	{
-		if (leotheras)
+		if (leotheras && leotheras->isAlive())
 		{
 			CreatureAIScript *mob_script = leotheras->GetScript();
 			((LEOTHERASAI*)mob_script)->EventStart(mTarget);
@@ -4367,25 +4358,25 @@ public:
 		case 0:
 			m_type = 1;
 			nrspells = 1;
-			specialcd = 12;
+			specialcd = 25;
 
 			spells[0].info = dbcSpell.LookupEntry(RAMPANTINFECTION);
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = true;
 			spells[0].cooldown = 15;
-			spells[0].perctrigger = 5.0f;
+			spells[0].perctrigger = 3.0f;
 			spells[0].attackstoptimer = 1000;
 			break;
 		case 1:
 			m_type = 2;
 			nrspells = 1;
-			specialcd = 8;
+			specialcd = 20;
 
 			spells[0].info = dbcSpell.LookupEntry(ACIDGEYSER);
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = false;
 			spells[0].cooldown = 36;
-			spells[0].perctrigger = 3.0f;
+			spells[0].perctrigger = 1.0f;
 			spells[0].attackstoptimer = 8000;
 			break;
 		case 2:
@@ -4395,14 +4386,14 @@ public:
 			spells[0].targettype = TARGET_SELF;
 			spells[0].instant = true;
 			spells[0].cooldown = 20;
-			spells[0].perctrigger = 5.0f;
+			spells[0].perctrigger = 3.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(ATROPHICBLOW);
 			spells[1].targettype = TARGET_ATTACKING;
 			spells[1].instant = true;
 			spells[1].cooldown = 16;
-			spells[1].perctrigger = 5.0f;
+			spells[1].perctrigger = 3.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		}
@@ -4488,7 +4479,7 @@ public:
 					_unit->CastSpell(_unit, SPOREQUAKE, true);
 					_unit->setAttackTimer(8000, false);
 					quaking = 1;
-					specialcd = 40;
+					specialcd = 50;
 				}
 				else
 					specialcd--;
@@ -4615,7 +4606,7 @@ public:
 			{
 				if (_unit->GetDistance2dSq(itr->first) <= 900)
 				{
-					val = RandomUInt(100)%3;
+					val = RandomUInt(100)%4;
 					if (!val)
 						itr->first->CastSpell(itr->first, SPOREQUAKEKNOCKDOWN, true);
 				}
