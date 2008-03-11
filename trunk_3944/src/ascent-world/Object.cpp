@@ -2433,7 +2433,7 @@ void Object::SendSpellLog(Object *Caster, Object *Target,uint32 Ability, uint8 S
 
 void Object::SendSpellNonMeleeDamageLog( Object* Caster, Object* Target, uint32 SpellID, uint32 Damage, uint8 School, uint32 AbsorbedDamage, uint32 ResistedDamage, bool PhysicalDamage, uint32 BlockedDamage, bool CriticalHit, bool bToset )
 {
-	if ((!Caster || !Target) && SpellID)
+	if ( Caster == NULL || Target == NULL || !SpellID )
 		return;
 
 	WorldPacket data(SMSG_SPELLNONMELEEDAMAGELOG,40);
