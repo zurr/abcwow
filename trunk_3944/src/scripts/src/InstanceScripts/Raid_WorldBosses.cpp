@@ -1940,7 +1940,7 @@ public:
 		{
 			_unit->CastSpell(_unit, OVERRUN, true);
 			int RandomSpeach = RandomUInt(100)%2;
-			_unit->WipeHateList();
+			_unit->ClearHateList();
 			switch (RandomSpeach)
 			{
 			case 0:
