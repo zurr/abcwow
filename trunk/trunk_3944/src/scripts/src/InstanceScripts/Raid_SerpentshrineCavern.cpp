@@ -166,7 +166,7 @@ public:
 				_unit->PlaySoundToSet(11297);
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Aaghh, the poison...");
 				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20609);
-				_unit->GetAIInterface()->WipeHateList();
+				_unit->GetAIInterface()->ClearHateList();
 				m_markcd = 15;
 				m_markstate = 1;
 				m_vilesludge = 15;
@@ -230,7 +230,7 @@ public:
 				_unit->PlaySoundToSet(11290);
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Better, much better.");
 				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20162);
-				_unit->GetAIInterface()->WipeHateList();
+				_unit->GetAIInterface()->ClearHateList();
 				m_markcd = 15;
 				m_markstate = 1;
 				m_watertomb = 7;
@@ -499,6 +499,7 @@ public:
 	}
 	void AIUpdate()
 	{
+		submergetimer--;
 		if (!submerged)
 		{
 			if (!submergetimer)
@@ -532,6 +533,7 @@ public:
 				{
 					if (GetPlayerCount() == 0)
 					{
+						waterboltcd++;
 						if (waterboltcd >= 5)
 						{
 							if (_unit->GetCurrentSpell() == NULL)
@@ -544,8 +546,6 @@ public:
 								}
 							}
 						}
-						else
-							waterboltcd++;
 					}
 					else
 					{
@@ -555,7 +555,7 @@ public:
 						if (target)
 						{
 							_unit->GetAIInterface()->modThreatByPtr(target, threat);
-							_unit->GetAIInterface()->AttackReaction(target, 0, 0);
+							_unit->GetAIInterface()->AttackReaction(target, 1, 0);
 							waterboltcd = 0;
 						}
 					}
@@ -564,7 +564,6 @@ public:
 					_unit->GetAIInterface()->modThreatByPtr(_unit->GetAIInterface()->GetNextTarget(), 100000);
 				float val = (float)RandomFloat(100.0f);
 				SpellCast(val);
-				submergetimer--;
 			}
 		}
 		else
@@ -578,8 +577,6 @@ public:
 				submerged = 0;
 				whirlcd = 18;
 			}
-			else
-				submergetimer--;
 		}
 	}
 
@@ -2544,7 +2541,7 @@ public:
 			_unit->GetAIInterface()->StopMovement(0);
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20125);
 			_unit->GetAIInterface()->disable_melee = true;
-			_unit->GetAIInterface()->WipeHateList();
+			_unit->GetAIInterface()->ClearHateList();
 			_unit->PlaySoundToSet(11304);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Be gone, trifling elf. I am in control now.");
 			phasecd = 60;
@@ -2587,7 +2584,7 @@ public:
 					whirlwindcd = 20;
 					_unit->GetAIInterface()->disable_melee = false;
 					_unit->GetAIInterface()->m_moveRun = true;
-					_unit->GetAIInterface()->WipeHateList();
+					_unit->GetAIInterface()->ClearHateList();
 					_unit->GetAIInterface()->StopMovement(0);
 					break;
 				}
@@ -2606,7 +2603,7 @@ public:
 				_unit->GetCurrentSpell()->cancel();
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20514);
 			_unit->GetAIInterface()->disable_melee = false;
-			_unit->GetAIInterface()->WipeHateList();
+			_unit->GetAIInterface()->ClearHateList();
 			phasecd = 45;
 			whirlwindcd = 20;
 			whirlwinding = 0;
@@ -2680,7 +2677,7 @@ public:
 				whirlwinding = 0;
 				_unit->GetAIInterface()->disable_melee = false;
 				_unit->GetAIInterface()->m_moveRun = true;
-				_unit->GetAIInterface()->WipeHateList();
+				_unit->GetAIInterface()->ClearHateList();
 				break;
 			}
 		}
@@ -3219,7 +3216,7 @@ public:
 			_unit->SchoolImmunityList[4] = 0;
 			_unit->SchoolImmunityList[5] = 0;
 			_unit->SchoolImmunityList[6] = 0;
-			_unit->GetAIInterface()->WipeHateList();
+			_unit->GetAIInterface()->ClearHateList();
 			_unit->GetAIInterface()->disable_melee = false;
 			multishootcd = 5;
 			shootcd = 1;

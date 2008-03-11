@@ -258,7 +258,7 @@ public:
 		{
 			// we've mounted so reset hp
 			static_cast<Creature*>(_unit)->RegenerateHealth();
-			_unit->GetAIInterface()->WipeHateList();
+			_unit->GetAIInterface()->ClearHateList();
 			m_phase = 2;
 		}
 		else if(_unit->GetHealthPct() <= 25)
