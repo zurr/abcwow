@@ -375,7 +375,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_speedChangeCounter=1;
 	memset(&m_bgScore,0,sizeof(BGScore));
 	m_arenaPoints = 0;
-	memset(&m_spellIndexTypeTargets, 0, sizeof(uint64)*NUM_SPELL_TYPE_INDEX);
+	memset(&m_spellIndexTypeTargets, 0, sizeof(uint64)*MECHANIC_END);
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
 	m_arenateaminviteguid=0;
@@ -5187,7 +5187,7 @@ void Player::OnRemoveInRangeObject( Object* pObj )
 		m_spellTypeTargets[2] = NULL;*/
 	if(pObj->IsUnit())
 	{
-		for(uint32 x = 0; x < NUM_SPELL_TYPE_INDEX; ++x)
+		for(uint32 x = 0; x < MECHANIC_END; ++x)
 			if(m_spellIndexTypeTargets[x] == pObj->GetGUID())
 				m_spellIndexTypeTargets[x] = 0;
 	}
@@ -8684,7 +8684,7 @@ void Player::CalcDamage()
 
 /////////////////////////////////RANGED end
 		/*
-		tmp = 1;
+		tmp = 1; 
 		for(i = damagedone.begin();i != damagedone.end();i++)
 		if(i->second.wclass==(uint32)-1)  //any weapon
 			tmp += i->second.value/100.0f;

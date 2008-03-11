@@ -2242,6 +2242,13 @@ bool Spell::HasPower()
 		cost +=float2int32(cost*u_caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER+m_spellInfo->School));
 	}
 
+	if (p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_SHIV && p_caster->GetItemInterface()) //hackfix for shiv's energy cost
+	{
+		Item *it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+		if( it != NULL )
+			cost += (uint32)(10* (it->GetProto()->Delay / 1000.0f));
+	}
+
 	//apply modifiers
 	if( m_spellInfo->SpellGroupType && u_caster)
 	{
@@ -2338,6 +2345,13 @@ bool Spell::TakePower()
 		else
 			cost += u_caster->PowerCostMod[0];
 		cost +=float2int32(cost*u_caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER+m_spellInfo->School));
+	}
+
+	if (p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_SHIV && p_caster->GetItemInterface()) //hackfix for shiv's energy cost
+	{
+		Item *it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+		if( it != NULL )
+			cost += (uint32)(10* (it->GetProto()->Delay / 1000.0f));
 	}
 
 	//apply modifiers

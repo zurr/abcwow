@@ -423,6 +423,46 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 	switch( spellId )
 	{
+	case 5938: //shiv
+		{
+			if( p_caster == NULL || unitTarget == NULL )
+				return;
+
+			p_caster->Strike( unitTarget, OFFHAND, m_spellInfo, 0, 0, 0, false, true );
+			p_caster->AddComboPoints( unitTarget->GetGUID(), 1 );
+
+			if( p_caster->GetItemInterface() )
+			{
+				Item *it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+				if( it == NULL )
+					return;
+		
+				EnchantmentInstance * ench = it->GetEnchantment( 1 ); // temp enchantment slot
+				if(ench)
+				{
+					EnchantEntry* Entry = ench->Enchantment;
+					for( uint32 c = 0; c < 3; c++ )
+					{
+						if( Entry->type[c] && Entry->spell[c] )
+						{
+							SpellEntry *sp = dbcSpell.LookupEntry( Entry->spell[c] );
+							if( sp == NULL )
+								return;
+
+							if( sp->c_is_flags & SPELL_FLAG_IS_POISON )
+							{
+								SpellCastTargets targets( unitTarget->GetGUID() );
+								Spell* spell;
+								spell = new Spell( unitTarget, sp, true, 0 );
+								spell->p_caster = p_caster;
+								spell->prepare( &targets );
+							}
+						}
+					}
+				}
+			}
+
+		}
 	case 30427: // Extract Gas
 		{
 			bool check = false;

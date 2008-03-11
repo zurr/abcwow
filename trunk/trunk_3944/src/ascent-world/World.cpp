@@ -808,19 +808,6 @@ bool World::SetInitialWorldSettings()
 
 		// find diminishing status
 		sp->DiminishStatus = GetDiminishingGroup(namehash);
-		sp->buffIndexType = 0;
-
-
-		switch( namehash )
-		{
-		//case SPELL_HASH_JUDGEMENT_OF_VENGEANCE:
-		case SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER:
-		case SPELL_HASH_JUDGEMENT_OF_LIGHT:
-		case SPELL_HASH_JUDGEMENT_OF_WISDOM:
-		case SPELL_HASH_JUDGEMENT_OF_JUSTICE:
-			sp->buffIndexType = SPELL_TYPE_INDEX_JUDGEMENT;
-			break;
-		}
 
 		// HACK FIX: Break roots/fear on damage.. this needs to be fixed properly!
 		if(!(sp->AuraInterruptFlags & AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN))
@@ -1366,7 +1353,7 @@ bool World::SetInitialWorldSettings()
 			sp->SpellGroupType |= 16384; //some of them do have the flags but i's hard to write down those some from 130 spells
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
 		}
-		else if( strstr( nametext, "Mind-Numbing Poison"))
+		else if( strstr( nametext, "Mind-numbing Poison"))
 		{
 			sp->SpellGroupType |= 32768; //some of them do have the flags but i's hard to write down those some from 130 spells
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
@@ -1385,6 +1372,22 @@ bool World::SetInitialWorldSettings()
 		{
 			sp->SpellGroupType |= 268435456; //some of them do have the flags but i's hard to write down those some from 130 spells
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
+		else if( strstr( nametext, "Anesthetic Poison"))
+		{
+			//sp->SpellGroupType |= 268435456;
+			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
+
+		switch( namehash )
+		{
+		//case SPELL_HASH_JUDGEMENT_OF_VENGEANCE:
+		case SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER:
+		case SPELL_HASH_JUDGEMENT_OF_LIGHT:
+		case SPELL_HASH_JUDGEMENT_OF_WISDOM:
+		case SPELL_HASH_JUDGEMENT_OF_JUSTICE:
+			sp->c_is_flags = SPELL_FLAG_IS_JUDGEMENT;
+			break;
 		}
 
 		//warlock - shadow bolt
@@ -4715,10 +4718,6 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 12497 );
 	if( sp != NULL )
 		sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-	//rogue-shiv -> add 1 combo point
-	sp = dbcSpell.LookupEntryForced( 5938 );
-	if( sp != NULL )
-		sp->Effect[1]=80;
 
 	//warlock - Improved Curse of Weakness
 	sp = dbcSpell.LookupEntryForced( 18179 );
