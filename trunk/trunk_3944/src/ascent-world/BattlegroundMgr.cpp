@@ -1378,29 +1378,36 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 		{
 			/* make sure all players are 70 */
 			uint32 maxplayers;
+			uint32 arenateamtype;
 			switch(BattlegroundType)
 			{
 			case BATTLEGROUND_ARENA_2V2:
 				maxplayers=2;
+				arenateamtype=0;
 				break;
 
 			case BATTLEGROUND_ARENA_3V3:
 				maxplayers=3;
+				arenateamtype=1;
 				break;
 
 			case BATTLEGROUND_ARENA_5V5:
 				maxplayers=5;
+				arenateamtype=2;
 				break;
 
 			default:
 				maxplayers=2;
+				arenateamtype=0;
 				break;
 			}
+
+			uint32 team_id = 0;
 
 			pGroup->Lock();
 			for(itx = pGroup->GetSubGroup(0)->GetGroupMembersBegin(); itx != pGroup->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
 			{
-				if(maxplayers==0)
+				if( maxplayers == 0 )
 				{
 					m_session->SystemMessage("You have too many players in your party to join this type of arena.");
 					pGroup->Unlock();
@@ -1413,19 +1420,38 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 					pGroup->Unlock();
 					return;
 				}
-				/*
+
 				if((*itx)->m_loggedInPlayer)
 				{
+					ArenaTeam * t = (*itx)->m_loggedInPlayer->m_arenaTeams[arenateamtype];
+					if( t != NULL )
+					{
+						if ( team_id == 0 )
+							team_id = t->m_id;
+
+						if ( team_id != t->m_id )
+						{
+							m_session->SystemMessage("Sorry, not all your party members are in same arena team.");
+							pGroup->Unlock();
+							return;
+						}
+					}
+
+					if( (*itx)->m_loggedInPlayer->m_bgIsQueued )
+						BattlegroundManager.RemovePlayerFromQueues((*itx)->m_loggedInPlayer);
+
+					/*
 					if((*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bgIsQueued)
 					{
 						m_session->SystemMessage("One or more of your party members are already queued or inside a battleground.");
 						pGroup->Unlock();
 						return;
 					}
+					*/
 
 					--maxplayers;
 				}
-				*/
+	
 			}
 			WorldPacket data(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
 			data << uint32(6);		// all arenas

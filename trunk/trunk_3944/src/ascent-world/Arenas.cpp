@@ -48,6 +48,9 @@ Arena::Arena(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t, uint32 players_pe
 		break;
 	}
 	rated_match=false;
+
+	for (uint32 i = 0; i < 2; ++i)
+		inscribe_teams[i] = NULL;
 }
 
 Arena::~Arena()
@@ -99,14 +102,14 @@ void Arena::OnAddPlayer(Player * plr)
 	if(rated_match && plr->m_arenaTeams[m_arenateamtype] != NULL)
 	{
 		ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
-		ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
-		if(inscribe_teams[plr->m_bgTeam].find(t) == inscribe_teams[plr->m_bgTeam].end())
+		if ( inscribe_teams[plr->m_bgTeam] == NULL )
 		{
 			t->m_stat_gamesplayedseason++;
 			t->m_stat_gamesplayedweek++;
-			inscribe_teams[plr->m_bgTeam].insert(t);
+			inscribe_teams[plr->m_bgTeam] = t;
 		}
 
+		ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
 		if(tp != NULL)
 		{
 			tp->Played_ThisWeek++;
@@ -302,22 +305,6 @@ void Arena::Finish()
 	/* update arena team stats */
 	if(rated_match)
 	{
-		uint32 averageRating[2] = {0,0};
-		uint32 teamCount = 0;
-		for(uint32 i = 0; i < 2; ++i)
-		{
-			for(set<ArenaTeam*>::iterator itr = inscribe_teams[i].begin(); itr != inscribe_teams[i].end(); ++itr)
-			{
-				averageRating[i] += (*itr)->m_stat_rating;
-				++teamCount;
-			}
-			
-			if(teamCount)
-				averageRating[i] /= teamCount;
-
-			teamCount = 0;
-		}
-
 		for (uint32 i = 0; i < 2; ++i)
 		{
 			uint32 j = i ? 0 : 1; // opposing side
@@ -325,29 +312,26 @@ void Arena::Finish()
 
 			outcome = (i == m_winningteam);
 
-			double power = (int)(averageRating[j] - averageRating[i]) / 400.0f;
+			double power = (int)( inscribe_teams[j]->m_stat_rating - inscribe_teams[i]->m_stat_rating ) / 400.0f;
 			double divisor = pow(((double)(10.0)), power);
 			divisor += 1.0;
 			double winChance = 1.0 / divisor;
 
-			for(set<ArenaTeam*>::iterator itr = inscribe_teams[i].begin(); itr != inscribe_teams[i].end(); ++itr)
+			if (outcome)
 			{
-				if (outcome)
-				{
-					(*itr)->m_stat_gameswonseason++;
-					(*itr)->m_stat_gameswonweek++;
-				}
-
-				double multiplier = (outcome ? 1.0 : 0.0) - winChance;
-				double deltaRating = 32.0 * multiplier;
-				if ( deltaRating < 0 && (-1.0 * deltaRating) > (*itr)->m_stat_rating )
-					(*itr)->m_stat_rating = 0;
-				else
-					(*itr)->m_stat_rating += long2int32(deltaRating);
-				objmgr.UpdateArenaTeamRankings();
-
-				(*itr)->SaveToDB();
+				inscribe_teams[i]->m_stat_gameswonseason++;
+				inscribe_teams[i]->m_stat_gameswonweek++;
 			}
+
+			double multiplier = (outcome ? 1.0 : 0.0) - winChance;
+			double deltaRating = 32.0 * multiplier;
+			if ( deltaRating < 0 && (-1.0 * deltaRating) > inscribe_teams[i]->m_stat_rating )
+				inscribe_teams[i]->m_stat_rating = 0;
+			else
+				inscribe_teams[i]->m_stat_rating += long2int32(deltaRating);
+			objmgr.UpdateArenaTeamRankings();
+
+			inscribe_teams[i]->SaveToDB();
 
 			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
@@ -367,6 +351,7 @@ void Arena::Finish()
 
 		}
 	}
+
 }
 
 LocationVector Arena::GetStartingCoords(uint32 Team)
