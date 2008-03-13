@@ -20,6 +20,31 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
+// Shadowmoon Valley Wildlife Quest
+class ShadowmoonValleyWildlifeQAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(FelOrcScavengersQAI);
+	ShadowmoonValleyWildlifeQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
+
+	void OnDied(Unit * mKiller)
+	{
+		if (mKiller->IsPlayer()) 
+		{
+			questID = static_cast<Player*>(mKiller)->GetTeam() ? 10702 : 10703;
+			QuestLogEntry *en = NULL;
+			en = static_cast<Player*>(mKiller)->GetQuestLogForEntry(questID);
+			if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
+			{
+				uint32 newcount = en->GetMobCount(0) + 1;
+				en->SetMobCount(0, newcount);
+				en->SendUpdateAddKill(0);
+				en->UpdatePlayerFields();
+			}
+		}
+	}
+};
+
 bool CrystalOfDeepShadows(uint32 i, Spell* pSpell) // Becoming a Shadoweave Tailor
 {
   if(!pSpell->u_caster->IsPlayer())
@@ -63,14 +88,18 @@ public:
 
 void SetupShadowmoon(ScriptMgr * mgr)
 {
-  mgr->register_dummy_spell(39094, &CrystalOfDeepShadows);
-  mgr->register_creature_script(11980, &InfiltratingDragonmawFortressQAI::Create);
-  mgr->register_creature_script(21718, &InfiltratingDragonmawFortressQAI::Create);
-  mgr->register_creature_script(21719, &InfiltratingDragonmawFortressQAI::Create);
-  mgr->register_creature_script(21720, &InfiltratingDragonmawFortressQAI::Create);
-  mgr->register_creature_script(22253, &InfiltratingDragonmawFortressQAI::Create);
-  mgr->register_creature_script(22274, &InfiltratingDragonmawFortressQAI::Create);
-  mgr->register_creature_script(22331, &InfiltratingDragonmawFortressQAI::Create);
-  mgr->register_creature_script(23188, &InfiltratingDragonmawFortressQAI::Create);
-  mgr->register_creature_script(21717, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(21878, &ShadowmoonValleyWildlifeQAI::Create);
+	mgr->register_creature_script(21879, &ShadowmoonValleyWildlifeQAI::Create);
+	mgr->register_creature_script(21864, &ShadowmoonValleyWildlifeQAI::Create);
+
+	mgr->register_dummy_spell(39094, &CrystalOfDeepShadows);
+	mgr->register_creature_script(11980, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(21718, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(21719, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(21720, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(22253, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(22274, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(22331, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(23188, &InfiltratingDragonmawFortressQAI::Create);
+	mgr->register_creature_script(21717, &InfiltratingDragonmawFortressQAI::Create);
 }

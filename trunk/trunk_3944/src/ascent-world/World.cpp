@@ -6486,6 +6486,31 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1;
 
+	//Libram of the Lightbringer
+	sp = dbcSpell.LookupEntryForced( 34231 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x80000000;
+
+	//Libram of Absolute Truth
+	sp = dbcSpell.LookupEntryForced( 37739 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x80000000;
+
+	//Libram of Divinity
+	sp = dbcSpell.LookupEntryForced( 28853 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x40000000;
+
+	//Blessed Book of Nagrand
+	sp = dbcSpell.LookupEntryForced( 32403 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x40000000;
+
+	//Libram of Light
+	sp = dbcSpell.LookupEntryForced( 28851 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x40000000;
+
 	//Everbloom Idol
 	sp = dbcSpell.LookupEntryForced( 33693 );
 	if( sp != NULL )
