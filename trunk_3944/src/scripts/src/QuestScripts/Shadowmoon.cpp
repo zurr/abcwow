@@ -24,14 +24,14 @@
 class ShadowmoonValleyWildlifeQAI : public CreatureAIScript
 {
 public:
-	ADD_CREATURE_FACTORY_FUNCTION(FelOrcScavengersQAI);
+	ADD_CREATURE_FACTORY_FUNCTION(ShadowmoonValleyWildlifeQAI);
 	ShadowmoonValleyWildlifeQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
 	void OnDied(Unit * mKiller)
 	{
 		if (mKiller->IsPlayer()) 
 		{
-			questID = static_cast<Player*>(mKiller)->GetTeam() ? 10702 : 10703;
+			int questID = static_cast<Player*>(mKiller)->GetTeam() ? 10702 : 10703;
 			QuestLogEntry *en = NULL;
 			en = static_cast<Player*>(mKiller)->GetQuestLogForEntry(questID);
 			if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
