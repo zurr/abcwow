@@ -1163,8 +1163,7 @@ public:
 			return;
 
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
-		TargetMap::iterator itr;
-		for (itr = targets->begin(); itr != targets->end(); itr++)
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = itr->first;
 			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
@@ -1177,7 +1176,7 @@ public:
 
 	void knockback(Unit *target)
 	{
-		float ori = (float)RandomFloat(6.283f);
+		float ori = (float)RandomFloat(6.282f);
 		float dx,dy;
 		float affect = 20 + RandomFloat(6.0f);
 
@@ -1201,14 +1200,11 @@ public:
 			return;
 
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
-		TargetMap::iterator itr;
-		for (itr = targets->begin(); itr != targets->end(); itr++)
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = itr->first;
 			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
-			{
 				temp->CastSpell(temp, STONED, true);
-			}
 		}
 	}
 
@@ -1218,8 +1214,7 @@ public:
 			return;
 
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
-		TargetMap::iterator itr;
-		for (itr = targets->begin(); itr != targets->end(); itr++)
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = itr->first;
 			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
@@ -1232,10 +1227,13 @@ public:
 
 					if (currentTarget != tempPlayer && currentTarget->isAlive() && tempPlayer->GetDistance2dSq(currentTarget) <= 400)
 					{
-						int damage = 9000 - 430 * (int)sqrt(temp->GetDistance2dSq(currentTarget));
-						SpellEntry *tempspell = dbcSpell.LookupEntry(SHATTER);
-						tempspell->EffectBasePoints[0] = damage;
-						tempPlayer->CastSpell(currentTarget, tempspell, true);
+						int damage = (int)(9000 - 430 * sqrt(temp->GetDistance2dSq(currentTarget)));
+						if (damage > 0)
+						{
+							SpellEntry *tempspell = dbcSpell.LookupEntry(SHATTER);
+							tempspell->EffectBasePoints[0] = damage;
+							tempPlayer->CastSpell(currentTarget, tempspell, true);
+						}
 					}
 				}
 
@@ -1253,8 +1251,7 @@ public:
 
 		std::vector<Unit*> targetTable;
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
-		TargetMap::iterator itr;
-		for (itr = targets->begin(); itr != targets->end(); itr++)
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = itr->first;
 			if (_unit->GetDistance2dSq(temp) <= dist)
