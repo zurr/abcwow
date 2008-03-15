@@ -171,10 +171,10 @@ public:
 				m_markstate = 1;
 				m_vilesludge = 15;
 
-				summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-				summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-				summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-				summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ() + 1, 90, true, false, 0, 0);
+				summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ() + 1, 90, true, false, 0, 0);
+				summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ() + 1, 90, true, false, 0, 0);
+				summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDSPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ() + 1, 90, true, false, 0, 0);
 				_unit->SchoolImmunityList[4] = 0;
 				_unit->SchoolImmunityList[3] = 1;
 				_unit->BaseAttackType = 3;
@@ -235,10 +235,10 @@ public:
 				m_markstate = 1;
 				m_watertomb = 7;
 
-				summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-				summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-				summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
-				summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ(), 90, true, false, 0, 0);
+				summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ() + 1, 90, true, false, 0, 0);
+				summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() - 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ() + 1, 90, true, false, 0, 0);
+				summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() - 5, _unit->GetPositionZ() + 1, 90, true, false, 0, 0);
+				summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PURESPAWN, _unit->GetPositionX() + 5, _unit ->GetPositionY() + 5, _unit->GetPositionZ() + 1, 90, true, false, 0, 0);
 				_unit->SchoolImmunityList[4] = 1;
 				_unit->SchoolImmunityList[3] = 0;
 				_unit->BaseAttackType = 4;
