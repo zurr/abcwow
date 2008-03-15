@@ -1209,35 +1209,7 @@ public:
 		{
 			if (GetPlayerCount() >= 5)
 			{
-				_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " sends his enemies to their watery graves!");
-				Player *target1 = (Player *) RandomTarget(false, true, 10000);
-				Player *target2 = (Player *) RandomTarget(false, true, 10000);
-				while(target2 == target1)
-				{
-					target2 = (Player *) RandomTarget(false, true, 10000);
-				}
-				Player *target3 = (Player *) RandomTarget(false, true, 10000);
-				while (target3 == target1 || target3 == target2)
-				{
-					target3 = (Player *) RandomTarget(false, true, 10000);
-				}
-				Player *target4 = (Player *) RandomTarget(false, true, 10000);
-				while (target4 == target1 || target4 == target2 || target4 == target3)
-				{
-					target4 = (Player *) RandomTarget(false, true, 10000);
-				}
-				target1->SafeTeleport(target1->GetMapId(), target1->GetInstanceID(), 366.443512f, -708.822388f, -13.0f, target1->GetOrientation());
-				//target1->_Relocate(_unit->GetMapId(), LocationVector(366.443512f, -708.822388f, -12.0f, target1->GetOrientation()), false, false, _unit->GetInstanceID());
-				target1->CastSpell(target1, MOROGRIM_WATERYGRAVE, true);
-				target2->SafeTeleport(target2->GetMapId(), target2->GetInstanceID(), 373.805511f, -691.146116f, -13.0f, target2->GetOrientation());
-				//target2->_Relocate(_unit->GetMapId(), LocationVector(373.805511f, -691.146116f, -12.0f, target2->GetOrientation()), false, false, _unit->GetInstanceID());
-				target2->CastSpell(target2, MOROGRIM_WATERYGRAVE, true);
-				target3->SafeTeleport(target3->GetMapId(), target3->GetInstanceID(), 365.522644f, -737.217712f, -13.0f, target3->GetOrientation());
-				//target3->_Relocate(_unit->GetMapId(), LocationVector(365.522644f, -737.217712f, -12.0f, target3->GetOrientation()), false, false, _unit->GetInstanceID());
-				target3->CastSpell(target3, MOROGRIM_WATERYGRAVE, true);
-				target4->SafeTeleport(target4->GetMapId(), target4->GetInstanceID(), 337.470581f, -732.931885f, -13.0f, target4->GetOrientation());
-				//target4->_Relocate(_unit->GetMapId(), LocationVector(337.470581f, -732.931885f, -12.0f, target4->GetOrientation()), false, false, _unit->GetInstanceID());
-				target4->CastSpell(target4, MOROGRIM_WATERYGRAVE, true);
+				wateryGraves();
 			}
 			waterygravecd = 30 + RandomUInt(100)%5;
 		}
@@ -1264,32 +1236,109 @@ public:
 				}
 				*/
 				_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " summons watery globules!");
-				Player *target1 = (Player *) RandomTarget(true, true, 10000);
-				Player *target2 = (Player *) RandomTarget(true, true, 10000);
-				while(target2 == target1)
-				{
-					target2 = (Player *) RandomTarget(true, true, 10000);
-				}
-				Player *target3 = (Player *) RandomTarget(true, true, 10000);
-				while (target3 == target1 || target3 == target2)
-				{
-					target3 = (Player *) RandomTarget(true, true, 10000);
-				}
-				Player *target4 = (Player *) RandomTarget(true, true, 10000);
-				while (target4 == target1 || target4 == target2 || target4 == target3)
-				{
-					target4 = (Player *) RandomTarget(true, true, 10000);
-				}
-				Creature *summon1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 366.443512f, -708.822388f, -14.357947f, 0, true, false, 0, 0);
-				summon1->GetAIInterface()->AttackReaction(target1, 100000, 0);
-				Creature *summon2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 373.805511f, -691.146116f, -14.446006f, 0, true, false, 0, 0);
-				summon2->GetAIInterface()->AttackReaction(target2, 100000, 0);
-				Creature *summon3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 365.522644f, -737.217712f, -14.444579f, 0, true, false, 0, 0);
-				summon3->GetAIInterface()->AttackReaction(target3, 100000, 0);
-				Creature *summon4 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 337.470581f, -732.931885f, -14.173863f, 0, true, false, 0, 0);
-				summon4->GetAIInterface()->AttackReaction(target4, 100000, 0);
+				wateryGlobules();
 			}
 			waterglobulecd = 25 + RandomUInt(100)%10;
+		}
+	}
+
+	void wateryGraves()
+	{
+		std::vector<Unit*> targetTable;
+		for (TargetMap::iterator itr = _unit->GetAIInterface()->GetAITargets()->begin(); itr != _unit->GetAIInterface()->GetAITargets()->end(); itr++)
+		{
+			Unit *temp = itr->first;
+			if (_unit->GetDistance2dSq(temp) <= 10000)
+			{
+				if (temp != _unit->GetAIInterface()->GetNextTarget() && temp->GetTypeId() == TYPEID_PLAYER)
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (targetTable.size() < 4)
+			return;
+
+		while(targetTable.size() > 4)
+			targetTable.erase(targetTable.begin()+rand()%targetTable.size());
+
+		int unitid = 1;
+		for(std::vector<Unit*>::iterator itr2 = targetTable.begin(); itr2 != targetTable.end(); ++itr2)
+		{
+			Unit *temp = (*itr2);
+			switch (unitid)
+			{
+			case 1:
+				static_cast<Player*>(temp)->SafeTeleport(temp->GetMapId(), temp->GetInstanceID(), 366.443512f, -708.822388f, -13.0f, temp->GetOrientation());
+				break;
+			case 2:
+				static_cast<Player*>(temp)->SafeTeleport(temp->GetMapId(), temp->GetInstanceID(), 373.805511f, -691.146116f, -13.0f, temp->GetOrientation());
+				break;
+			case 3:
+				static_cast<Player*>(temp)->SafeTeleport(temp->GetMapId(), temp->GetInstanceID(), 365.522644f, -737.217712f, -13.0f, temp->GetOrientation());
+				break;
+			case 4:
+				static_cast<Player*>(temp)->SafeTeleport(temp->GetMapId(), temp->GetInstanceID(), 337.470581f, -732.931885f, -13.0f, temp->GetOrientation());
+				break;
+			}
+			temp->CastSpell(temp, MOROGRIM_WATERYGRAVE, true);
+			unitid++;
+		}
+	}
+
+	void wateryGlobules()
+	{
+		std::vector<Unit*> targetTable;
+		for (TargetMap::iterator itr = _unit->GetAIInterface()->GetAITargets()->begin(); itr != _unit->GetAIInterface()->GetAITargets()->end(); itr++)
+		{
+			Unit *temp = itr->first;
+			if (_unit->GetDistance2dSq(temp) <= 10000)
+			{
+				if (temp != _unit->GetAIInterface()->GetNextTarget() && temp->GetTypeId() == TYPEID_PLAYER)
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (targetTable.size() < 4)
+			return;
+
+		while(targetTable.size() > 4)
+			targetTable.erase(targetTable.begin()+rand()%targetTable.size());
+
+		int unitid = 1;
+		for(std::vector<Unit*>::iterator itr2 = targetTable.begin(); itr2 != targetTable.end(); ++itr2)
+		{
+			Unit *temp = (*itr2);
+			Creature *summon;
+			switch (unitid)
+			{
+			case 1:
+				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 366.443512f, -708.822388f, -14.357947f, 0, true, false, 0, 0);
+				summon->GetAIInterface()->SetSoulLinkedWith(temp);
+				summon->GetAIInterface()->taunt(temp, true);
+				summon->GetAIInterface()->AttackReaction(temp, 1, 0);
+				break;
+			case 2:
+				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 373.805511f, -691.146116f, -14.446006f, 0, true, false, 0, 0);
+				summon->GetAIInterface()->SetSoulLinkedWith(temp);
+				summon->GetAIInterface()->taunt(temp, true);
+				summon->GetAIInterface()->AttackReaction(temp, 1, 0);
+				break;
+			case 3:
+				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 365.522644f, -737.217712f, -14.444579f, 0, true, false, 0, 0);
+				summon->GetAIInterface()->SetSoulLinkedWith(temp);
+				summon->GetAIInterface()->taunt(temp, true);
+				summon->GetAIInterface()->AttackReaction(temp, 1, 0);
+				break;
+			case 4:
+				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 337.470581f, -732.931885f, -14.173863f, 0, true, false, 0, 0);
+				summon->GetAIInterface()->SetSoulLinkedWith(temp);
+				summon->GetAIInterface()->taunt(temp, true);
+				summon->GetAIInterface()->AttackReaction(temp, 1, 0);
+				break;
+			}
+			unitid++;
 		}
 	}
 
