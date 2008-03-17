@@ -1518,6 +1518,11 @@ bool World::SetInitialWorldSettings()
 		sp->maxstack = 0;
 	}
 
+	//rogue - Vanish
+    sp = dbcSpell.LookupEntryForced( 18461 );
+    if( sp != NULL )
+        sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+
 	sp = dbcSpell.LookupEntry(33076); //Prayer of Mending
 	if(sp != NULL)
 	{
