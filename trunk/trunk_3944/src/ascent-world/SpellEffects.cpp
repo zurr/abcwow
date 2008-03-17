@@ -4784,9 +4784,16 @@ void Spell::SpellEffectKnockBack(uint32 i)
 	float dx,dy;//,dz;
 	float affect = float(damage)/10;
 
-	//Not sure about /100
-	dx = sinf(m_caster->GetOrientation());
-	dy = cosf(m_caster->GetOrientation());
+	if (u_caster == NULL || u_caster != unitTarget)
+	{
+		dx = sinf(m_caster->GetOrientation());
+		dy = cosf(m_caster->GetOrientation());
+	}
+	else
+	{
+		dx = 0.0f;
+		dy = 0.0f;
+	}
 
 	WorldPacket data(SMSG_MOVE_KNOCK_BACK, 50);
 	data << unitTarget->GetNewGUID();
