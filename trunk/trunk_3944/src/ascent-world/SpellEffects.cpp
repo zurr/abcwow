@@ -423,6 +423,19 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 	switch( spellId )
 	{
+	case 5420: //Tree of Life
+		{
+			if( unitTarget == NULL )
+				return;
+
+			SpellEntry *spellInfo = dbcSpell.LookupEntry( 34123 );
+
+			Spell *sp = new Spell( unitTarget, spellInfo, true, NULL );
+			SpellCastTargets tgt;
+			tgt.m_unitTarget = unitTarget->GetGUID();
+			sp->prepare(&tgt);
+			
+		} break;
 	case 5938: //shiv
 		{
 			if( p_caster == NULL || unitTarget == NULL )
@@ -462,7 +475,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				}
 			}
 
-		}
+		} break;
 	case 30427: // Extract Gas
 		{
 			bool check = false;
