@@ -177,7 +177,8 @@ public:
 						{
 							if (channelers[x]->isAlive() && (channelers[i] != channelers[x]))
 							{
-								channelers[x]->CastSpell(channelers[x], SOUL_TRANSFER, true);
+								Aura *aura = new Aura( dbcSpell.LookupEntry(SOUL_TRANSFER), -1, channelers[x], channelers[x]);
+								channelers[x]->AddAura(aura);
 							}
 						}
 					}
