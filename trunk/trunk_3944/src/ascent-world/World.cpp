@@ -6260,6 +6260,13 @@ bool World::SetInitialWorldSettings()
         }
     }
 
+	// druid - Force of Nature
+	sp = dbcSpell.LookupEntryForced( 33831 );
+	if( sp != NULL )
+	{
+		sp->EffectRadiusIndex[1] = 13;
+	}
+
 	// druid - Tree of Life
 	sp = dbcSpell.LookupEntryForced( 5420 );
 	if( sp != NULL )
