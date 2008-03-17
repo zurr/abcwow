@@ -2569,6 +2569,7 @@ public:
 				whirlwindcd = 22;
 				whirlwinding = 0;
 				shadow = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_LEOTHERASSHADOW,_unit->GetPositionX(), _unit->GetPositionY(),_unit->GetPositionZ(), _unit->GetOrientation(),true, false, 0, 0);
+				shadow->GetAIInterface()->AttackReaction(_unit->GetAIInterface()->GetNextTarget(), 1, 0);
 			}
 			switch (m_phase)
 			{
