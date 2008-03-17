@@ -2374,12 +2374,8 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	{
 		for(uint32 a = 0; a < 6; a++)
 			bonus += float2int32( static_cast< Player* >( c )->SpellHealDoneByAttribute[a][m_spellProto->School] * static_cast< Player* >( c )->GetUInt32Value( UNIT_FIELD_STAT0 + a) );
-		
 
 		bonus += c->HealDoneMod[GetSpellProto()->School];
-		//Druid Tree of Life form. it should work not like this, but it's better then nothing. 
-		if( static_cast< Player* >( c )->IsInFeralForm() && static_cast< Player* >( c )->GetShapeShift() == FORM_TREE)
-			bonus += float2int32( 0.25f * static_cast< Player* >( c )->GetUInt32Value( UNIT_FIELD_STAT4 ) );
 	}
 
 	if( c != NULL )
@@ -6211,6 +6207,13 @@ void Aura::SpellAuraModRangedDamageTaken(bool apply)
 void Aura::SpellAuraModHealing(bool apply)
 {
 	int32 val;
+
+	 //Tree of Life - do not use namehash here
+	if ( m_spellProto->Id == 34123 && GetCaster() != NULL && GetCaster()->IsPlayer() )
+	{
+		mod->m_amount =  float2int32( 0.25f * GetCaster()->GetUInt32Value(UNIT_FIELD_STAT4) );
+	}
+
 	if( apply )
 	{
 		 val = mod->m_amount;
