@@ -177,8 +177,7 @@ public:
 						{
 							if (channelers[x]->isAlive() && (channelers[i] != channelers[x]))
 							{
-								Aura * aura = new Aura( dbcSpell.LookupEntry(SOUL_TRANSFER), -1, channelers[i], channelers[x]);
-								channelers[x]->AddAura(aura);
+								channelers[x]->CastSpell(channelers[x], SOUL_TRANSFER, true);
 							}
 						}
 					}
@@ -1030,7 +1029,6 @@ public:
 		myTrigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, magtheridon->GetGUID());
 		myTrigger->SetUInt32Value(UNIT_CHANNEL_SPELL, SHADOWGRASP);
 		Channeler = pPlayer;
-		RegisterAIUpdateEvent(100);
 
 		uint32 Counter = 0;
 		Creature *cubeTrigger;
@@ -1059,6 +1057,8 @@ public:
 				auramag->Remove();
 			sEventMgr.AddEvent(this, &ManticronCubeAI::MagtheridonUnbanish, EVENT_SCRIPT_UPDATE_EVENT, 5000, 1, 0);
 		}
+
+		RegisterAIUpdateEvent(1000);
 	}
 
 	void FindMagtheridon()

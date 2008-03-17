@@ -1563,9 +1563,13 @@ public:
 			Unit *target = RandomTarget(false, true, 6400);
 			if (target)
 			{
-				SpellEntry *tempbolt = dbcSpell.LookupEntry(KARATHRESS_CATACLYSMICBOLT);
-				tempbolt->EffectBasePoints[0] = target->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/2;
-				_unit->CastSpell(target, tempbolt, true);
+				int32 damage = (target->GetUInt32Value(UNIT_FIELD_MAXHEALTH) / 2);
+				if (damage > 1)
+				{
+					SpellEntry *tempspell = dbcSpell.LookupEntry(KARATHRESS_CATACLYSMICBOLT);
+					tempspell->EffectBasePoints[0] = damage;
+					_unit->CastSpell(target, tempspell, true);
+				}
 			}
 			cataclymboltcd = 60;
 		}

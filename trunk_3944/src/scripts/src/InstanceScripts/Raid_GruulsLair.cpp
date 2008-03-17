@@ -1227,7 +1227,7 @@ public:
 
 					if (currentTarget != tempPlayer && currentTarget->isAlive() && tempPlayer->GetDistance2dSq(currentTarget) <= 400)
 					{
-						int damage = (int)(9000 - 430 * sqrt(temp->GetDistance2dSq(currentTarget)));
+						int32 damage = (int32)(9000 - 430 * sqrt(temp->GetDistance2dSq(currentTarget)));
 						if (damage > 0)
 						{
 							SpellEntry *tempspell = dbcSpell.LookupEntry(SHATTER);
