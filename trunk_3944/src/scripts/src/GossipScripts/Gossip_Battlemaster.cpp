@@ -136,12 +136,58 @@ public:
     }
 };
 
+class SCRIPT_DECL EyeOfTheStormBattlemaster : public GossipScript
+{
+public:
+    void GossipHello(Object* pObject, Player * plr, bool AutoSend)
+	{
+        GossipMenu *Menu;
+        uint32 Team = plr->GetTeam();
+        if(Team > 1) Team = 1;
+
+        // Check if the player can be entered into the bg or not.
+        if(plr->getLevel() < 70)
+        {
+            uint32 FactMessages[2] = { 7658, 7658 };
+
+            // Send "you cannot enter" message.
+            objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), FactMessages[Team], plr);
+        }
+        else
+        {
+            uint32 FactMessages[2] = { 7658, 7659 }; // need to find the second one
+
+            // Send "you cannot enter" message.
+            objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), FactMessages[Team], plr);
+            Menu->AddItem( 0, "I would like to enter the battleground.", 1);
+        }
+
+        if(AutoSend)
+            Menu->SendTo(plr);
+    }
+
+    void GossipSelectOption(Object* pObject, Player * plr, uint32 Id, uint32 IntId, const char * Code)
+    {
+		// Send battleground list.
+		if(pObject->GetTypeId()!=TYPEID_UNIT)
+			return;
+
+		plr->GetSession()->SendBattlegroundList(((Creature*)pObject), 1);  // WSG = 2
+    }
+
+    void Destroy()
+    {
+        delete this;
+    }
+};
+
 void SetupBattlemaster(ScriptMgr * mgr)
 {
 	GossipScript * wsg = (GossipScript*) new WarsongGulchBattlemaster;
 	GossipScript * ab = (GossipScript*) new ArathiBasinBattlemaster;
 	GossipScript * av = (GossipScript*) new AlteracValleyBattlemaster;
-
+	GossipScript * eye = (GossipScript*) new EyeOfTheStormBattlemaster;
+	
     /* Battlemaster List */
     mgr->register_gossip_script(19910, wsg); // Gargok
     mgr->register_gossip_script(15105, wsg); // Warsong Emissary
@@ -184,6 +230,11 @@ void SetupBattlemaster(ScriptMgr * mgr)
     mgr->register_gossip_script(15106, av); // Frostwolf Emissary
     mgr->register_gossip_script(15103, av); // Stormpike Emissary
     mgr->register_gossip_script(14942, av); // Kartra Bloodsnarl
+
+	mgr->register_gossip_script(20384, eye); // Yula the Fair
+	mgr->register_gossip_script(20362, eye); // Iravar
+	
+	
 
    //cleanup:
    //removed Sandfury Soul Eater(hes a npc in Zul'Farrak and has noting to do whit the battleground masters) 

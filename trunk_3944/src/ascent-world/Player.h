@@ -1650,6 +1650,7 @@ public:
     void SendEnvironmentalDamageLog(const uint64 & guid, uint8 type, uint32 damage);
     void SendLoginVerifyWorld(uint32 MapId, float x, float y, float z, float o);
     void SendLoginVerifyWorld();
+	void SendWorldStateUpdate(uint32 WorldState, uint32 Value);
     /************************************************************************/
     /* End of SpellPacket wrapper                                           */
     /************************************************************************/
