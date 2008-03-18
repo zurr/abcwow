@@ -2929,10 +2929,6 @@ uint8 Spell::CanCast(bool tolerate)
 			case SPELL_EFFECT_ENCHANT_ITEM:
 			case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
 			{
-				// check for enchants that can only be done on your own items, make sure they are soulbound
-				if( m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY && !(i_target->IsSoulbound()))
-					return SPELL_FAILED_BAD_TARGETS;
-
 				// check if we have the correct class, subclass, and inventory type of target item
 				if( m_spellInfo->EquippedItemClass != proto->Class)
 					return SPELL_FAILED_BAD_TARGETS;
