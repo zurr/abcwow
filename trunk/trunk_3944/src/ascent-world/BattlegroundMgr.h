@@ -122,7 +122,8 @@ static inline uint32 GetLevelGrouping(uint32 level)
 		return 7;
 }
 #define MAX_LEVEL_GROUP 8
-#define MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG 1
+#define MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG 5
+#define PLAYERS_DIFF_ON_EACH_SIDE_IN_BG 3
 #define MAXIMUM_BATTLEGROUNDS_PER_LEVEL_GROUP 3
 #define LEVEL_GROUP_70 7
 
@@ -285,7 +286,16 @@ public:
 	ASCENT_INLINE bool IsFull() { return !(HasFreeSlots(0) || HasFreeSlots(1)); }
 
 	/* Are we full? */
-	bool HasFreeSlots(uint32 Team) { m_mainLock.Acquire(); bool res = ((m_players[Team].size() + m_pendPlayers[Team].size()) < m_playerCountPerTeam); m_mainLock.Release(); return res; }
+	bool HasFreeSlots(uint32 Team) { 
+		m_mainLock.Acquire();
+		uint32 opTeam = Team ? 0 : 1;
+		uint32 count = (uint32)(m_players[Team].size() + m_pendPlayers[Team].size());
+		uint32 count1 = (uint32)(m_players[opTeam].size() + m_pendPlayers[opTeam].size());
+		uint32 diff = ((count - count1) >= 0)?(count - count1):(count1 - count);
+		bool res = ( (count < m_playerCountPerTeam) && ( diff < PLAYERS_DIFF_ON_EACH_SIDE_IN_BG ) );
+		m_mainLock.Release(); 
+		return res; 
+	}
 
 	/* Add Player */
 	void AddPlayer(Player * plr, uint32 team);
