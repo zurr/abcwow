@@ -6523,6 +6523,39 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 0x40000000;
 
+	//Gladiator's Libram of Justice
+	sp = dbcSpell.LookupEntryForced( 34139 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x40000000;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	}
+
+	//Merciless Gladiator's Libram of Justice
+	sp = dbcSpell.LookupEntryForced( 42368 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x40000000;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	}
+
+	//Vengeful Gladiator's Libram of Justice
+	sp = dbcSpell.LookupEntryForced( 43726 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x40000000;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	}
+
+	//Libram of Mending
+	sp = dbcSpell.LookupEntryForced( 43741 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x80000000;
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+	}
+
+
 	//Everbloom Idol
 	sp = dbcSpell.LookupEntryForced( 33693 );
 	if( sp != NULL )
