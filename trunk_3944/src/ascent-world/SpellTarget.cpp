@@ -751,7 +751,7 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 	TargetsList *tmpMap=&m_targetUnits[i];
 	//float range = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 	//range *= range;
-	float range = 400 //taken from wow-europe forum
+	float range = 400; //taken from wow-europe forum
 	Unit *currentTarget = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
 	if (!currentTarget)
 		return;
