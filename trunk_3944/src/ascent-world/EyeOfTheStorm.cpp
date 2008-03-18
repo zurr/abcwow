@@ -42,7 +42,7 @@ const float EOTSStartLocations[2][3] = {
 
 const float EOTSBubbleLocations[2][4] = {
 	{ 2527.596924f, 1596.906494f, 1262.128052f, -3.124139f },
-	{ 0.0f, 0.0f, 0.0f, 0.0f },
+	{ 1807.735962f, 1539.415649f, 1263.627319f, -3.124139f },
 };
 
 const float EOTSBubbleRotations[2][4] = {
@@ -405,11 +405,7 @@ void EyeOfTheStorm::OnCreate()
 	/* BUBBLES! */
 	for( i = 0; i < 2; ++i )
 	{
-		m_bubbles[i] = m_mapMgr->CreateGameObject();
-		m_bubbles[i]->CreateFromProto( 184719, m_mapMgr->GetMapId(), EOTSBubbleLocations[i][0], EOTSBubbleLocations[i][1], EOTSBubbleLocations[i][2], EOTSBubbleLocations[i][3] );
-		m_bubbles[i]->SetFloatValue(OBJECT_FIELD_SCALE_X,0.1f);
-		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_STATE,1);
-		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_FLAGS, 32);
+		m_bubbles[i] = SpawnGameObject( 184719, m_mapMgr->GetMapId(), EOTSBubbleLocations[i][0], EOTSBubbleLocations[i][1], EOTSBubbleLocations[i][2], EOTSBubbleLocations[i][3], 33, 114, 0.1f );
 		m_bubbles[i]->PushToWorld( m_mapMgr );
 	}
 
