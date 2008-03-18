@@ -20,7 +20,7 @@
 #include "StdAfx.h"
 
 #define ENABLE_AB
-//#define ENABLE_EOTS
+#define ENABLE_EOTS
 //#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
 
 initialiseSingleton(CBattlegroundManager);
@@ -298,8 +298,7 @@ void CBattlegroundManager::EventQueueUpdate()
 			else
 			{
 #ifdef ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
-				if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG ||
-					tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
+				if(tempPlayerVec[0].size() >= 1 || tempPlayerVec[1].size() >= 1)
 #else
 				if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG &&
 					tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
@@ -490,6 +489,7 @@ void CBattleground::SendWorldStates(Player * plr)
 	case  529: bflag = 0x0D1E; break;
 	case   30: bflag = 0x0A25; break;
 	case  559: bflag = 3698; break;
+	case  566: bflag = 0x0eec; bflag2 = 0; break;			// EOTS
 	
 	default:		/* arenas */
 		bflag  = 0x0E76;
@@ -709,6 +709,15 @@ void CBattleground::RemovePendingPlayer(Player * plr)
 	m_mainLock.Release();
 }
 
+void CBattleground::OnPlayerPushed(Player * plr)
+{
+	if(plr->GetGroup())
+		plr->GetGroup()->RemovePlayer(plr->m_playerInfo);
+
+	plr->ProcessPendingUpdates();
+	m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
+}
+
 void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 {
 	m_mainLock.Acquire();
@@ -764,9 +773,6 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		// remove them from their group
 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo);
 	}
-
-	plr->ProcessPendingUpdates();
-	m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
 
 	if(!m_countdownStage)
 	{

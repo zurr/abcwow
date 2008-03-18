@@ -3291,6 +3291,9 @@ void Player::OnPushToWorld()
 		m_bg = m_mapMgr->m_battleground;
 		m_bg->PortPlayer( this, true );
 	}
+
+	if( m_bg != NULL )
+		m_bg->OnPlayerPushed( this );
 }
 
 void Player::ResetHeartbeatCoords()

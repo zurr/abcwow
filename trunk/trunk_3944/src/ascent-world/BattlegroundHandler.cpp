@@ -76,6 +76,8 @@ void WorldSession::SendBattlegroundList(Creature* pCreature, uint32 mapid)
 			t = BATTLEGROUND_ARATHI_BASIN;
 		else if(strstr(pCreature->GetCreatureName()->SubName, "Warsong") != NULL)
 			t = BATTLEGROUND_WARSUNG_GULCH;
+		else if(strstr(pCreature->GetCreatureName()->SubName, "Eye") != NULL)
+			t = BATTLEGROUND_EYE_OF_THE_STORM;
 	}
 
     BattlegroundManager.HandleBattlegroundListPacket(this, t);
