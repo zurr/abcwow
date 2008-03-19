@@ -465,9 +465,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 							if( sp->c_is_flags & SPELL_FLAG_IS_POISON )
 							{
 								SpellCastTargets targets( unitTarget->GetGUID() );
-								Spell* spell;
-								spell = new Spell( unitTarget, sp, true, 0 );
-								spell->p_caster = p_caster;
+								Spell *spell = new Spell( p_caster, sp, true, 0 );
 								spell->prepare( &targets );
 							}
 						}
