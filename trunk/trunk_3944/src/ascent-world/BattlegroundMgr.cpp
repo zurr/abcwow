@@ -1442,6 +1442,12 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 							return;
 						}
 					}
+					else
+					{
+						m_session->SystemMessage("Sorry, not all your party members are in same arena team.");
+						pGroup->Unlock();
+						return;
+					}
 
 					if( (*itx)->m_loggedInPlayer->m_bgIsQueued )
 						BattlegroundManager.RemovePlayerFromQueues((*itx)->m_loggedInPlayer);
@@ -1459,6 +1465,12 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 				}
 	
 			}
+			if( maxplayers > 0 )
+			{
+				m_session->SystemMessage("Sorry, you have too few valid arena members in your group.");
+				return;
+			}
+
 			WorldPacket data(SMSG_GROUP_JOINED_BATTLEGROUND, 4);
 			data << uint32(6);		// all arenas
 

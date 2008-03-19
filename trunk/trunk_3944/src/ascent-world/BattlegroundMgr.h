@@ -286,13 +286,22 @@ public:
 	ASCENT_INLINE bool IsFull() { return !(HasFreeSlots(0) || HasFreeSlots(1)); }
 
 	/* Are we full? */
-	bool HasFreeSlots(uint32 Team) { 
+	bool HasFreeSlots(uint32 Team)
+	{
 		m_mainLock.Acquire();
-		uint32 opTeam = Team ? 0 : 1;
+		bool res = false;
 		int count = (int)(m_players[Team].size() + m_pendPlayers[Team].size());
-		int count1 = (int)(m_players[opTeam].size() + m_pendPlayers[opTeam].size());
-		bool res = ( ((uint32)count < m_playerCountPerTeam) &&
+		if ( m_type >= BATTLEGROUND_ARENA_2V2 && m_type <= BATTLEGROUND_ARENA_5V5 )
+		{
+			res = ( (uint32)count < m_playerCountPerTeam );
+		}
+		else
+		{
+			uint32 opTeam = Team ? 0 : 1;
+			int count1 = (int)(m_players[opTeam].size() + m_pendPlayers[opTeam].size());
+			res = ( ((uint32)count < m_playerCountPerTeam) &&
 					( (count <= count1) || ( (uint32)abs(count - count1) < PLAYERS_DIFF_ON_EACH_SIDE_IN_BG ) ) );
+		}
 		m_mainLock.Release();
 		return res; 
 	}

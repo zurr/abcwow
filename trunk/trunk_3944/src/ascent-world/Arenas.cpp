@@ -102,7 +102,7 @@ void Arena::OnAddPlayer(Player * plr)
 	if(rated_match && plr->m_arenaTeams[m_arenateamtype] != NULL)
 	{
 		ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
-		if ( inscribe_teams[plr->m_bgTeam] == NULL )
+		if ( t != NULL && inscribe_teams[plr->m_bgTeam] == NULL )
 		{
 			t->m_stat_gamesplayedseason++;
 			t->m_stat_gamesplayedweek++;
@@ -305,6 +305,9 @@ void Arena::Finish()
 	/* update arena team stats */
 	if(rated_match)
 	{
+		if (inscribe_teams[0] == NULL || inscribe_teams[1] == NULL )
+			return;
+
 		for (uint32 i = 0; i < 2; ++i)
 		{
 			uint32 j = i ? 0 : 1; // opposing side
@@ -336,7 +339,7 @@ void Arena::Finish()
 			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
 				Player * plr = *itr;
-				if(plr->m_arenaTeams[m_arenateamtype] != NULL)
+				if( plr != NULL && plr->m_arenaTeams[m_arenateamtype] != NULL )
 				{
 					ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
 					ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
