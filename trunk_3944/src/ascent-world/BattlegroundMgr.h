@@ -289,11 +289,11 @@ public:
 	bool HasFreeSlots(uint32 Team) { 
 		m_mainLock.Acquire();
 		uint32 opTeam = Team ? 0 : 1;
-		uint32 count = (uint32)(m_players[Team].size() + m_pendPlayers[Team].size());
-		uint32 count1 = (uint32)(m_players[opTeam].size() + m_pendPlayers[opTeam].size());
-		uint32 diff = ((count - count1) >= 0)?(count - count1):(count1 - count);
-		bool res = ( (count < m_playerCountPerTeam) && ( diff < PLAYERS_DIFF_ON_EACH_SIDE_IN_BG ) );
-		m_mainLock.Release(); 
+		int count = (int)(m_players[Team].size() + m_pendPlayers[Team].size());
+		int count1 = (int)(m_players[opTeam].size() + m_pendPlayers[opTeam].size());
+		bool res = ( ((uint32)count < m_playerCountPerTeam) &&
+					( (count <= count1) || ( (uint32)abs(count - count1) < PLAYERS_DIFF_ON_EACH_SIDE_IN_BG ) ) );
+		m_mainLock.Release();
 		return res; 
 	}
 
