@@ -863,6 +863,7 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 			}
 			if (newTarget == NULL)
 				return;
+
 			else
 			{
 				currentTarget = newTarget;
