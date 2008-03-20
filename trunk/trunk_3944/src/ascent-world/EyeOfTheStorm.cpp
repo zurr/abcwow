@@ -109,6 +109,7 @@ static uint32 TowerWorldStates[EOTS_TOWER_COUNT][2] = {
 
 EyeOfTheStorm::EyeOfTheStorm(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : CBattleground(mgr,id,lgroup,t)
 {
+	m_playerCountPerTeam = 15;
 	uint32 i;
 
 	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
