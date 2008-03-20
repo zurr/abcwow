@@ -513,6 +513,7 @@ void EyeOfTheStorm::UpdateCPs()
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_HORDE )
 				{
+					SetWorldState( TowerWorldStates[i][0], 0);
 					SetWorldState( TowerWorldStates[i][1], 1);
 
 					RespawnCPFlag(i, EOTS_BANNER_HORDE);
@@ -532,6 +533,7 @@ void EyeOfTheStorm::UpdateCPs()
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_ALLIANCE )
 				{
+					SetWorldState( TowerWorldStates[i][1], 0);
 					SetWorldState( TowerWorldStates[i][0], 1);
 
 					RespawnCPFlag(i, EOTS_BANNER_ALLIANCE);
