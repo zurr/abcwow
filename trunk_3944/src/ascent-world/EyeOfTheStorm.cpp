@@ -366,6 +366,7 @@ void EyeOfTheStorm::OnCreate()
 	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_BASES, 0);
 	SetWorldState(EOTS_WORLDSTATE_HORDE_VICTORYPOINTS, 0);
 	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_VICTORYPOINTS, 0);
+	// those 8 ( 2742 - 2735 ) are markes for changing tower control on map - TODO : find which one's which. 
 	SetWorldState(2742, 0);
 	SetWorldState(2741, 0);
 	SetWorldState(2740, 0);

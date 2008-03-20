@@ -1234,6 +1234,9 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 
 	Player *plyr = GetPlayer();
    
+	if ( _player->IsStealth() )
+		_player->RemoveAllAuraType( SPELL_AURA_MOD_STEALTH );
+
 	CALL_GO_SCRIPT_EVENT(obj, OnActivate)(_player);
 
 	uint32 type = obj->GetUInt32Value(GAMEOBJECT_TYPE_ID);
