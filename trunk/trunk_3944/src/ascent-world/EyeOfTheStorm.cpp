@@ -72,16 +72,40 @@ const uint32 EOTSTowerIds[EOTS_TOWER_COUNT] = { EOTS_GO_BE_TOWER, EOTS_GO_FELREA
 /**
  * WorldStates
  */
-#define EOTS_WORLDSTATE_DISPLAYON 2718
-#define EOTS_WORLDSTATE_DISPLAYVALUE 2719
-#define EOTS_WORLDSTATE_ALLIANCE_VICTORYPOINTS 2749
-#define EOTS_WORLDSTATE_HORDE_VICTORYPOINTS 2750
-#define EOTS_WORLDSTATE_ALLIANCE_BASES 2752
-#define EOTS_WORLDSTATE_HORDE_BASES 2753
+#define EOTS_WORLDSTATE_DISPLAYON				2718
+#define EOTS_WORLDSTATE_DISPLAYVALUE			2719
+#define EOTS_WORLDSTATE_ALLIANCE_VICTORYPOINTS	2749
+#define EOTS_WORLDSTATE_HORDE_VICTORYPOINTS		2750
+#define EOTS_WORLDSTATE_ALLIANCE_BASES			2752
+#define EOTS_WORLDSTATE_HORDE_BASES				2753
+#define EOTS_WORLDSTATE_FLAG_STATE				2757
+
+/* ruins marked full blue/red on world map but not on minimap
+ however, status remains "uncontrolled" on map */
+#define EOTS_WORLDSTATE_ALLIANCE_CONTROLL_FELREAVER		2726
+#define EOTS_WORLDSTATE_HORDE_CONTROLL_FELREAVER		2727
+#define EOTS_WORLDSTATE_HORDE_CONTROLL_MAGETOWER		2729
+#define EOTS_WORLDSTATE_ALLIANCE_CONTROLL_MAGETOWER		2730
+#define EOTS_WORLDSTATE_HORDE_CONTROLL_DRAENEI			2733
+#define EOTS_WORLDSTATE_ALLIANCE_CONTROLL_DRAENEI		2732
+#define EOTS_WORLDSTATE_HORDE_CONTROLL_ELFTOWER			2724
+#define EOTS_WORLDSTATE_ALLIANCE_CONTROLL_ELFTOWER		2723
+
+#define EOTS_WORLDSTATE_SHOW_MAGETOWER  2728
+#define EOTS_WORLDSTATE_SHOW_FELREAVER	2725
+#define EOTS_WORLDSTATE_SHOW_ELFTOWER	2722
+#define EOTS_WORLDSTATE_SHOW_DRAENEI	2731
+
 #define EOTS_NETHERWING_FLAG_SPELL 34976
 
+#define EOTS_CAPTURE_RATE 20 
 
-#define EOTS_CAPTURE_RATE 20
+static uint32 TowerWorldStates[EOTS_TOWER_COUNT][2] = {
+		{ EOTS_WORLDSTATE_ALLIANCE_CONTROLL_ELFTOWER, EOTS_WORLDSTATE_HORDE_CONTROLL_ELFTOWER}, // EOTS_TOWER_BE
+		{ EOTS_WORLDSTATE_ALLIANCE_CONTROLL_FELREAVER, EOTS_WORLDSTATE_HORDE_CONTROLL_FELREAVER },	// EOTS_TOWER_FELREAVER
+		{ EOTS_WORLDSTATE_ALLIANCE_CONTROLL_MAGETOWER, EOTS_WORLDSTATE_HORDE_CONTROLL_MAGETOWER },	// EOTS_TOWER_MAGE
+		{ EOTS_WORLDSTATE_ALLIANCE_CONTROLL_DRAENEI, EOTS_WORLDSTATE_HORDE_CONTROLL_DRAENEI },	// EOTS_TOWER_DRAENEI
+	};
 
 EyeOfTheStorm::EyeOfTheStorm(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : CBattleground(mgr,id,lgroup,t)
 {
@@ -216,7 +240,7 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 
 	m_standFlag->PushToWorld( m_mapMgr );
 	m_flagHolder = 0;
-	SetWorldState( 2757, 1 );
+	SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 1 );
 
 	plr->RemoveAura( EOTS_NETHERWING_FLAG_SPELL );
 }
@@ -235,7 +259,7 @@ void EyeOfTheStorm::HookFlagDrop(Player * plr, GameObject * obj)
 	m_dropFlag->RemoveFromWorld(false);
 	plr->CastSpell( plr->GetGUID(), EOTS_NETHERWING_FLAG_SPELL, true );
 
-	SetWorldState( 2757, 0 );
+	SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 0 );
 	PlaySoundToAll( 8212 );
 	SendChatMessage( 0x53, plr->GetGUID(), "$n has taken the flag!" );
 	m_flagHolder = plr->GetGUIDLow();
@@ -256,7 +280,7 @@ bool EyeOfTheStorm::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell *
 	m_standFlag->RemoveFromWorld(false);
 	pPlayer->CastSpell( pPlayer->GetGUID(), EOTS_NETHERWING_FLAG_SPELL, true );
 
-	SetWorldState( 2757, 0 );
+	SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 0 );
 	PlaySoundToAll( 8212 );
 	SendChatMessage( 0x53, pPlayer->GetGUID(), "$n has taken the flag!" );
 	m_flagHolder = pPlayer->GetGUIDLow();
@@ -319,7 +343,7 @@ void EyeOfTheStorm::EventResetFlag()
 	m_dropFlag->RemoveFromWorld(false);
 	m_standFlag->PushToWorld(m_mapMgr);
 
-	SetWorldState( 2757, 1 );
+	SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 1 );
 	PlaySoundToAll( 8192 );
 	SendChatMessage( 0x52, 0, "The flag has been reset." );
 	m_flagHolder = 0;
@@ -330,18 +354,18 @@ void EyeOfTheStorm::OnCreate()
 	GameObjectInfo* goi;
 	uint32 i;
 
-
 	/* eww worldstates */
-	SetWorldState(2565, 142);
-	SetWorldState(2720, 0);
-	SetWorldState(2719, 0);
-	SetWorldState(2718, 0);
-	SetWorldState(2260, 0);
-	SetWorldState(2264, 0);
-	SetWorldState(2263, 0);
-	SetWorldState(2262, 0);
-	SetWorldState(2261, 0);
-	SetWorldState(2259, 0);
+	SetWorldState(3218, 0);
+	SetWorldState(3217, 0);
+	SetWorldState(3191, 2);
+	SetWorldState(3085, 379);
+	SetWorldState(2770, 1);
+	SetWorldState(2769, 1);
+	SetWorldState(EOTS_WORLDSTATE_FLAG_STATE, 1);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_BASES, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_BASES, 0);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_VICTORYPOINTS, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_VICTORYPOINTS, 0);
 	SetWorldState(2742, 0);
 	SetWorldState(2741, 0);
 	SetWorldState(2740, 0);
@@ -350,29 +374,28 @@ void EyeOfTheStorm::OnCreate()
 	SetWorldState(2737, 0);
 	SetWorldState(2736, 0);
 	SetWorldState(2735, 0);
-	SetWorldState(2733, 0);
-	SetWorldState(2732, 0);
-	SetWorldState(2731, 1);
-	SetWorldState(2730, 0);
-	SetWorldState(2729, 0);
-	SetWorldState(2728, 1);
-	SetWorldState(2727, 0);
-	SetWorldState(2726, 0);
-	SetWorldState(2725, 1);
-	SetWorldState(2724, 0);
-	SetWorldState(2723, 0);
-	SetWorldState(2722, 1);
-	SetWorldState(2757, 1);
-	SetWorldState(2753, 0);
-	SetWorldState(2752, 0);
-	SetWorldState(2770, 1);
-	SetWorldState(2769, 1);
-	SetWorldState(2750, 0);
-	SetWorldState(2749, 0);
-	SetWorldState(3191, 2);
-	SetWorldState(3218, 0);
-	SetWorldState(3217, 0);
-	SetWorldState(3085, 379);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_CONTROLL_DRAENEI, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_CONTROLL_DRAENEI, 0);
+	SetWorldState(EOTS_WORLDSTATE_SHOW_DRAENEI, 1);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_CONTROLL_MAGETOWER, 0);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_CONTROLL_MAGETOWER, 0);
+	SetWorldState(EOTS_WORLDSTATE_SHOW_MAGETOWER, 1);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_CONTROLL_FELREAVER, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_CONTROLL_FELREAVER, 0);
+	SetWorldState(EOTS_WORLDSTATE_SHOW_FELREAVER, 1);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_CONTROLL_ELFTOWER, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_CONTROLL_ELFTOWER, 0);
+	SetWorldState(EOTS_WORLDSTATE_SHOW_ELFTOWER, 1);
+	SetWorldState(2720, 0);
+	SetWorldState(EOTS_WORLDSTATE_DISPLAYVALUE, 0);
+	SetWorldState(EOTS_WORLDSTATE_DISPLAYON, 0);
+	SetWorldState(2565, 142);
+	SetWorldState(2264, 0);
+	SetWorldState(2263, 0);
+	SetWorldState(2262, 0);
+	SetWorldState(2261, 0);
+	SetWorldState(2260, 0);
+	SetWorldState(2259, 0);
 
 	/* create gameobjects */
 	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
@@ -469,7 +492,6 @@ void EyeOfTheStorm::UpdateCPs()
 		}
 
 		/* score diff calculation */
-		//printf("EOTS: Playercounts = %u %u\n", playercounts[0], playercounts[1]);
 		if(playercounts[0] != playercounts[1])
 		{
 			if(playercounts[0] > playercounts[1])
@@ -489,6 +511,8 @@ void EyeOfTheStorm::UpdateCPs()
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_HORDE )
 				{
+					SetWorldState( TowerWorldStates[i][1], 1);
+
 					RespawnCPFlag(i, EOTS_BANNER_HORDE);
 					if( m_spiritGuides[i] != NULL )
 					{
@@ -506,6 +530,8 @@ void EyeOfTheStorm::UpdateCPs()
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_ALLIANCE )
 				{
+					SetWorldState( TowerWorldStates[i][0], 1);
+
 					RespawnCPFlag(i, EOTS_BANNER_ALLIANCE);
 					if( m_spiritGuides[i] != NULL )
 					{
@@ -604,8 +630,6 @@ void EyeOfTheStorm::GeneratePoints()
 
 bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 {
-	//printf("EOTS: Give team %u %u points.\n", team, points);
-
 	m_points[team] += points;
 	if( m_points[team] >= 2000 )
 	{
