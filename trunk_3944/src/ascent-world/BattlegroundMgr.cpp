@@ -1469,6 +1469,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 			if( maxplayers > 0 )
 			{
 				m_session->SystemMessage("Sorry, you have too few valid arena members in your group.");
+				pGroup->Unlock();
 				return;
 			}
 
