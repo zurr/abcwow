@@ -3276,7 +3276,6 @@ void Spell::SpellEffectSummonObject(uint32 i)
 	}
 	else
 	{
-		//portal, lightwell
 		posx = px;
 		posy = py;		
 		GameObjectInfo* goI = GameObjectNameStorage.LookupEntry(entry);
@@ -3328,10 +3327,17 @@ void Spell::SpellEffectSummonObject(uint32 i)
 			go->m_ritualtarget = pTarget->GetGUIDLow();
 			go->m_ritualspell = m_spellInfo->Id;	 
 		}
-		else//Lightwell,if there is some other type -- add it
+		else if( entry == 186811 ) // Portal for Ritual of Refreshment
 		{
-			go->charges=5;//Max 5 charges
+			go->m_ritualmembers[0] = p_caster->GetGUIDLow();
+			go->m_ritualcaster = p_caster->GetGUIDLow();
+			go->m_ritualspell = m_spellInfo->Id;	 
 		}
+		else
+		{
+			go->charges = goI->sound1;
+		}
+		
 		p_caster->SetSummonedObject(go);		
 	}
 }

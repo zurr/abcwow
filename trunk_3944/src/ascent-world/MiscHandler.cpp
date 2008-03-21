@@ -1414,6 +1414,21 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					/* expire the gameobject */
 					obj->ExpireAndDelete();
 				}
+				else if(goinfo->ID == 186811)		// Ritual of Refreshment
+				{
+					Player * pCaster = _player->GetMapMgr()->GetPlayer(obj->m_ritualcaster);
+					if( pCaster == NULL )
+						return;
+
+					info = dbcSpell.LookupEntry(goinfo->sound1);
+					spell = new Spell(pCaster, info, true, NULL);
+					SpellCastTargets targets;
+					targets.m_unitTarget = pCaster->GetGUID();
+					spell->prepare(&targets);		
+
+					obj->ExpireAndDelete();
+				}
+
 			}
 		}break;
 	case GAMEOBJECT_TYPE_GOOBER:
