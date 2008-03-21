@@ -1633,6 +1633,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 
+	// Conjure Refreshment Table (Ritual of Refreshment)
+	sp = dbcSpell.LookupEntryForced( 43985 );
+    if( sp != NULL )
+    {
+        sp->AttributesEx = 0;
+		sp->EffectImplicitTargetA[0] = 47;
+    }
+
     //Priest - Holy Nova
     sp = dbcSpell.LookupEntryForced( 15237 );
     if( sp != NULL )
