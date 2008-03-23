@@ -2816,11 +2816,15 @@ else
 			// burlex: fixed this crap properly
 			float inital_dmg = float(dmg.full_damage);
 			float dd_mod = GetDamageDonePctMod( dmg.school_type );
+			float dd_mod2 = 1.0f + DamageDoneModPCT[dmg.school_type];
 			if( pVictim->DamageTakenPctMod[dmg.school_type] > 1.0f )
 				dmg.full_damage += float2int32( ( inital_dmg * pVictim->DamageTakenPctMod[ dmg.school_type ] ) - inital_dmg );
 
-			if( dd_mod > 1.0f && ( dmg.school_type != SCHOOL_NORMAL || !this->IsPlayer() ) )
+			if( dd_mod > 1.0f && ( dmg.school_type != SCHOOL_NORMAL ) )
 				dmg.full_damage += float2int32( ( inital_dmg * dd_mod) - inital_dmg );
+
+			if (dd_mod2 > 1.0f)
+				dmg.full_damage += float2int32( ( inital_dmg * dd_mod2) - inital_dmg );
 
 			if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
 				dmg.full_damage += float2int32( ( inital_dmg * (1 + pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING]) ) - inital_dmg );
@@ -4615,7 +4619,7 @@ float Unit::GetDamageDonePctMod(uint32 school)
    if(this->IsPlayer())
 	   return m_floatValues[PLAYER_FIELD_MOD_DAMAGE_DONE_PCT+school];
 	else
-	   return ((Creature*)this)->ModDamageDonePct[school];
+		return static_cast< Creature* >(this)->ModDamageDonePct[school];
 }
 
 void Unit::CalcDamage()

@@ -5273,12 +5273,10 @@ Zack : shady, next time check all possible spells, yes there are spells that are
 	}
 	else 
 	{
-		uint32 school_selector = 1;
 		for( uint32 x = 0; x < 7; x++ )
 		{
-			if( school_selector & mod->m_miscValue )
+			if(mod->m_miscValue & (((uint32)1)<<x) )
 				m_target->DamageDoneModPCT[x] += val;
-			school_selector = school_selector << 1;
 
 		}
 	}
