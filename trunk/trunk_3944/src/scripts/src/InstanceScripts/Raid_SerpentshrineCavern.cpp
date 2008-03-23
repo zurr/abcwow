@@ -148,13 +148,13 @@ public:
 		m_markcd--;
 		if (!m_enrage && !enraged)
 		{
-			_unit->DamageDoneModPCT[0] = 2;
-			_unit->DamageDoneModPCT[1] = 2;
-			_unit->DamageDoneModPCT[2] = 2;
-			_unit->DamageDoneModPCT[3] = 2;
-			_unit->DamageDoneModPCT[4] = 2;
-			_unit->DamageDoneModPCT[5] = 2;
-			_unit->DamageDoneModPCT[6] = 2;
+			_unit->DamageDoneModPCT[0] = 5;
+			_unit->DamageDoneModPCT[1] = 5;
+			_unit->DamageDoneModPCT[2] = 5;
+			_unit->DamageDoneModPCT[3] = 5;
+			_unit->DamageDoneModPCT[4] = 5;
+			_unit->DamageDoneModPCT[5] = 5;
+			_unit->DamageDoneModPCT[6] = 5;
 			enraged = 1;
 		}
 		uint32 dist = FL2UINT(_unit->GetAIInterface()->_CalcDistanceFromHome());
@@ -1512,6 +1512,9 @@ public:
 		caribdisalive = true;
 		tidalvessalive = true;
 		cataclymboltcd = 60;
+
+		m_enrage = 600;
+		enraged = 0;
 		caribdis = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDCARIBDIS, 459.759521f, -544.832397f, -7.547507f, 1.845423f, true, false, 0, 0);
 		sharkkis = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDSHARKKIS, 462.492615f, -540.305237f, -7.547507f, 3.143288f, true, false, 0, 0);
 		tidalvess = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDTIDALVESS, 459.759521f, -536.210449f, -7.547507f, 4.197681f, true, false, 0, 0);
@@ -1534,6 +1537,10 @@ public:
 				sharkkis->Despawn(100, 0);
 			if (tidalvess != NULL)
 				tidalvess->Despawn(100, 0);
+
+			m_enrage = 600;
+			enraged = 0;
+
 			_unit->Despawn(100, 2500);
 		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
@@ -1557,6 +1564,18 @@ public:
 
 	void AIUpdate()
 	{
+		m_enrage--;
+		if (!m_enrage && !enraged)
+		{
+			_unit->DamageDoneModPCT[0] = 5;
+			_unit->DamageDoneModPCT[1] = 5;
+			_unit->DamageDoneModPCT[2] = 5;
+			_unit->DamageDoneModPCT[3] = 5;
+			_unit->DamageDoneModPCT[4] = 5;
+			_unit->DamageDoneModPCT[5] = 5;
+			_unit->DamageDoneModPCT[6] = 5;
+			enraged = 1;
+		}
 		cataclymboltcd--;
 		if (!cataclymboltcd)
 		{
@@ -1738,6 +1757,9 @@ protected:
 	uint32 beastwithincd;
 	uint32 firetotemcd;
 	uint32 cataclymboltcd;
+
+	int m_enrage;
+	int enraged;
 };
 
 // Caribdis
@@ -2458,6 +2480,14 @@ public:
 				channeler2->Despawn(100, 0);
 			if (channeler3 != NULL)
 				channeler3->Despawn(100, 0);
+
+			m_phase = 0;
+			whirlwindcd = 18;
+			whirlwinding = 0;
+			phasecd = 60;
+			m_enrage = 600;
+			enraged = 0;
+
 			_unit->Despawn(100, 2500);
 		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
@@ -2543,13 +2573,13 @@ public:
 		{
 			if (!m_enrage && !enraged)
 			{
-				_unit->DamageDoneModPCT[0] = 2;
-				_unit->DamageDoneModPCT[1] = 2;
-				_unit->DamageDoneModPCT[2] = 2;
-				_unit->DamageDoneModPCT[3] = 2;
-				_unit->DamageDoneModPCT[4] = 2;
-				_unit->DamageDoneModPCT[5] = 2;
-				_unit->DamageDoneModPCT[6] = 2;
+				_unit->DamageDoneModPCT[0] = 5;
+				_unit->DamageDoneModPCT[1] = 5;
+				_unit->DamageDoneModPCT[2] = 5;
+				_unit->DamageDoneModPCT[3] = 5;
+				_unit->DamageDoneModPCT[4] = 5;
+				_unit->DamageDoneModPCT[5] = 5;
+				_unit->DamageDoneModPCT[6] = 5;
 				enraged = 1;
 			}
 			else
