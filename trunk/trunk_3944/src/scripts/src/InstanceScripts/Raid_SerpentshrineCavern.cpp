@@ -2680,15 +2680,14 @@ public:
 				if(_unit->GetCurrentSpell() == NULL)
 				{
 					Unit *target = _unit->GetAIInterface()->GetNextTarget();
-					LocationVector locvec( target->GetPositionX() , target->GetPositionY() , target->GetPositionZ() );
-					uint32 dist = FL2UINT(_unit->CalcDistance(locvec));
-					if (dist < 40)
+					if (target != NULL)
 					{
-						_unit->CastSpell(target, LEOTHERAS_CHAOSBLAST, false);
-					}
-					else
-					{
-						_unit->GetAIInterface()->_CalcDestinationAndMove(target, 32);
+						LocationVector locvec( target->GetPositionX() , target->GetPositionY() , target->GetPositionZ() );
+						uint32 dist = FL2UINT(_unit->CalcDistance(locvec));
+						if (dist < 40)
+							_unit->CastSpell(target, LEOTHERAS_CHAOSBLAST, false);
+						else
+							_unit->GetAIInterface()->_CalcDestinationAndMove(target, 32);
 					}
 				}
 			}
@@ -2742,11 +2741,11 @@ public:
 		if (!m_eventstarted)
 		{
 			m_eventstarted = true;
-			if (channeler1)
+			if (channeler1 != NULL)
 				channeler1->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (channeler2)
+			if (channeler2 != NULL)
 				channeler2->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (channeler3)
+			if (channeler3 != NULL)
 				channeler3->GetAIInterface()->AttackReaction(mTarget, 1, 0);
 		}
 	}
@@ -2755,11 +2754,11 @@ public:
 		if (m_eventstarted)
 		{
 			m_eventstarted = false;
-			if (channeler1)
+			if (channeler1 != NULL)
 				channeler1->Despawn(100, 0);
-			if (channeler2)
+			if (channeler2 != NULL)
 				channeler2->Despawn(100, 0);
-			if (channeler3)
+			if (channeler3 != NULL)
 				channeler3->Despawn(100, 0);
 			RemoveAIUpdateEvent();
 			_unit->Despawn(100, 2500);
@@ -2870,7 +2869,6 @@ protected:
 	int whirlwindcd;
 	int whirlwinding;
 	int phasecd;
-	int chaosblastcd;
 	int innerdemonscd;
 	int innerdemons;
 	int m_enrage;
@@ -2898,7 +2896,6 @@ public:
 
 	LEOTHERASSHADOWAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		chaosblastcd = 2;
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -2906,7 +2903,6 @@ public:
 		_unit->PlaySoundToSet(11309);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "At last I am liberated. It has been too long since I have tasted true freedom!");
 		_unit->GetAIInterface()->disable_melee = true;
-		chaosblastcd = 0;
 		RegisterAIUpdateEvent(1000);
 	}
 
@@ -2927,32 +2923,63 @@ public:
 	}
 	void AIUpdate()
 	{
-		if (!chaosblastcd)
+		if(_unit->GetCurrentSpell() == NULL)
 		{
-			if(_unit->GetCurrentSpell() == NULL)
+			Unit *target = _unit->GetAIInterface()->GetNextTarget();
+			if (target)
 			{
-				Unit *target = _unit->GetAIInterface()->GetNextTarget();
 				LocationVector locvec( target->GetPositionX() , target->GetPositionY() , target->GetPositionZ() );
 				uint32 dist = FL2UINT(_unit->CalcDistance(locvec));
 				if (dist < 40)
-				{
 					_unit->CastSpell(target, SHADOWOFLEOTHERAS_CHAOSBLAST, false);
-					chaosblastcd = 2;
-				}
 				else
-				{
 					_unit->GetAIInterface()->_CalcDestinationAndMove(_unit->GetAIInterface()->GetNextTarget(), 32);
-				}
 			}
-		}
-		else
-		{
-			chaosblastcd--;
 		}
 	}
 
 protected:
-	uint32 chaosblastcd;
+};
+
+// Inner demon
+
+#define CN_INNERDEMON 21857
+
+class INNERDEMONAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(INNERDEMONAI);
+
+	INNERDEMONAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+	}
+
+	void OnCombatStart(Unit* mTarget)
+	{
+		RegisterAIUpdateEvent(1000);
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		_unit->Despawn(100, 0);
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void OnTargetDied(Unit* mTarget)
+	{ 
+	}
+	void AIUpdate()
+	{
+	}
+
+protected:
 };
 
 // Greyheart Spellbinder
@@ -2979,10 +3006,10 @@ public:
 		} 
 
 		spells[0].info = dbcSpell.LookupEntry(SPELLBINDER_MINDBLAST);
-		spells[0].targettype = TARGET_RANDOM_SINGLE;
+		spells[0].targettype = TARGET_RANDOM_DESTINATION;
 		spells[0].instant = false;
 		spells[0].cooldown = 12;
-		spells[0].perctrigger = 2.0f;
+		spells[0].perctrigger = 4.0f;
 		spells[0].attackstoptimer = 1000;
 
 		leotheras = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(380.700989f, -445.562988f, 29.525999f, CN_LEOTHERAS);
@@ -4920,6 +4947,7 @@ void SetupSerpentshrineCavern(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_LEOTHERAS, &LEOTHERASAI::Create);
 	mgr->register_creature_script(CN_LEOTHERASSHADOW, &LEOTHERASSHADOWAI::Create);
 	mgr->register_creature_script(CN_SPELLBINDER, &GREYHEARTSPELLBINDERAI::Create);
+	mgr->register_creature_script(CN_INNERDEMON, &INNERDEMONAI::Create);
 
 	//Lady Vashj
 	mgr->register_creature_script(CN_VASHJ, &VASHJAI::Create);
