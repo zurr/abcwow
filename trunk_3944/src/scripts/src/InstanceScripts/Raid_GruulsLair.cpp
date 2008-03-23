@@ -401,13 +401,13 @@ public:
 		{
 			m_eventstarted = true;
 			_unit->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (summoner)
+			if (summoner != NULL)
 				summoner->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (mage)
+			if (mage != NULL)
 				mage->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (priest)
+			if (priest != NULL)
 				priest->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (shaman)
+			if (shaman != NULL)
 				shaman->GetAIInterface()->AttackReaction(mTarget, 1, 0);
 		}
 	}
@@ -418,13 +418,13 @@ public:
 			m_eventstarted = false;
 			if (_unit->isAlive())
 			{
-				if (summoner)
+				if (summoner != NULL)
 					summoner->Despawn(100, 0);
-				if (mage)
+				if (mage != NULL)
 					mage->Despawn(100, 0);
-				if (priest)
+				if (priest != NULL)
 					priest->Despawn(100, 0);
-				if (shaman)
+				if (shaman != NULL)
 					shaman->Despawn(100, 0);
 				RemoveAIUpdateEvent();
 				_unit->Despawn(100, 2500);
@@ -1178,7 +1178,7 @@ public:
 	{
 		float ori = (float)RandomFloat(6.282f);
 		float dx,dy;
-		float affect = 20 + RandomFloat(6.0f);
+		float affect = 18 + RandomFloat(6.0f);
 
 		dx = sinf(ori);
 		dy = cosf(ori);

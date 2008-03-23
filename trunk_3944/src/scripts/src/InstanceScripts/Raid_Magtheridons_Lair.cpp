@@ -398,15 +398,18 @@ public:
 		{
 			_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, "'s bonds begin to weaken!");
 			m_eventstarted = true;
-			if (!door)
+			if (door == NULL)
 				door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);
-			if (door)
+			if (door != NULL)
 				door->SetUInt32Value(GAMEOBJECT_STATE, 1);
 			for (int i = 0; i < 5; i++)
 			{
-				if (!channelers[i]->GetAIInterface()->GetAllowedToEnterCombat())
-					channelers[i]->GetAIInterface()->SetAllowedToEnterCombat(true);
-				channelers[i]->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+				if (channelers[i] != NULL)
+				{
+					if (!channelers[i]->GetAIInterface()->GetAllowedToEnterCombat())
+						channelers[i]->GetAIInterface()->SetAllowedToEnterCombat(true);
+					channelers[i]->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+				}
 			}
 		}
 	}
@@ -419,12 +422,12 @@ public:
 			{
 				for (int i = 0; i < 5; i++)
 				{
-					if (channelers[i])
+					if (channelers[i] != NULL)
 						channelers[i]->Despawn(100, 0);
-					if (cubes[i])
+					if (cubes[i] != NULL)
 						cubes[i]->Despawn(0);
 				}
-				if (door)
+				if (door != NULL)
 					door->SetUInt32Value(GAMEOBJECT_STATE, 0);
 				RemoveAIUpdateEvent();
 				_unit->Despawn(100, 2500);
@@ -1017,11 +1020,13 @@ public:
 		Aura *aura = pPlayer->FindAura(MINDEXHAUSTION);
 		if (aura)
 			return;
-		if (!myTrigger)
+		if (myTrigger == NULL)
 			myTrigger = _gameobject->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ(), CN_CUBETRIGGER);
-		if (!magtheridon || !magtheridon->isAlive() || !magtheridon->GetAIInterface()->GetNextTarget())
+		if (magtheridon == NULL || !magtheridon->isAlive() || !magtheridon->GetAIInterface()->GetNextTarget())
 			return;
-		if (Channeler)
+		if (Channeler != NULL)
+			return;
+		if (myTrigger = NULL)
 			return;
 
 		aura = new Aura(dbcSpell.LookupEntry(MINDEXHAUSTION), 90000, magtheridon, pPlayer);
@@ -1037,7 +1042,7 @@ public:
 		{
 			cubeTrigger = NULL;
 			cubeTrigger = _gameobject->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(cubeSpawns[i].x, cubeSpawns[i].y, cubeSpawns[i].z, 17376);
-			if (cubeTrigger && (cubeTrigger->GetUInt32Value(UNIT_CHANNEL_SPELL) == SHADOWGRASP))
+			if (cubeTrigger != NULL && (cubeTrigger->GetUInt32Value(UNIT_CHANNEL_SPELL) == SHADOWGRASP))
 			{
 				Counter++;
 			}

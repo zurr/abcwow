@@ -100,13 +100,13 @@ public:
 			break;
 		}
 		RemoveAIUpdateEvent();
-		if (summon1)
+		if (summon1 != NULL)
 			summon1->Despawn(100, 0);
-		if (summon2)
+		if (summon2 != NULL)
 			summon2->Despawn(100, 0);
-		if (summon3)
+		if (summon3 != NULL)
 			summon3->Despawn(100, 0);
-		if (summon4)
+		if (summon4 != NULL)
 			summon4->Despawn(100, 0);
 	}
 	void OnTargetDied(Unit* mTarget)
@@ -1528,11 +1528,11 @@ public:
 	{
 		if (_unit->isAlive())
 		{
-			if (caribdis)
+			if (caribdis != NULL)
 				caribdis->Despawn(100, 0);
-			if (sharkkis)
+			if (sharkkis != NULL)
 				sharkkis->Despawn(100, 0);
-			if (tidalvess)
+			if (tidalvess != NULL)
 				tidalvess->Despawn(100, 0);
 			_unit->Despawn(100, 2500);
 		}
@@ -1681,11 +1681,11 @@ public:
 		{
 			m_eventstarted = true;
 			_unit->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (caribdis)
+			if (caribdis != NULL)
 				caribdis->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (sharkkis)
+			if (sharkkis != NULL)
 				sharkkis->GetAIInterface()->AttackReaction(mTarget, 1, 0);
-			if (tidalvess)
+			if (tidalvess != NULL)
 				tidalvess->GetAIInterface()->AttackReaction(mTarget, 1, 0);
 		}
 	}
@@ -1697,11 +1697,11 @@ public:
 			m_eventstarted = false;
 			if (_unit->isAlive())
 			{
-				if (caribdis)
+				if (caribdis != NULL)
 					caribdis->Despawn(100, 0);
-				if (sharkkis)
+				if (sharkkis != NULL)
 					sharkkis->Despawn(100, 0);
-				if (tidalvess)
+				if (tidalvess != NULL)
 					tidalvess->Despawn(100, 0);
 				RemoveAIUpdateEvent();
 				_unit->Despawn(100, 2500);
@@ -2447,16 +2447,16 @@ public:
 	{
 		if (_unit->isAlive())
 		{
-			if (shadow)
+			if (shadow != NULL)
 			{
 				shadow->Despawn(100, 0);
 				shadow = NULL;
 			}
-			if (channeler1)
+			if (channeler1 != NULL)
 				channeler1->Despawn(100, 0);
-			if (channeler2)
+			if (channeler2 != NULL)
 				channeler2->Despawn(100, 0);
-			if (channeler3)
+			if (channeler3 != NULL)
 				channeler3->Despawn(100, 0);
 			_unit->Despawn(100, 2500);
 		}
