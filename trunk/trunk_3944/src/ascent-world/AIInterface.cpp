@@ -3659,11 +3659,11 @@ bool AIInterface::TargetUpdateCheck(Unit * ptr)
 {
 	__try
 	{
-		if( ptr->event_GetCurrentInstanceId() != m_Unit->event_GetCurrentInstanceId() ||
-			!ptr->isAlive() || m_Unit->GetDistanceSq(ptr) >= 6400.0f )
-		{
+		bool boss = false;
+		if (m_Unit->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
+			boss = true;
+		if( ptr->event_GetCurrentInstanceId() != m_Unit->event_GetCurrentInstanceId() || !ptr->isAlive() || (!boss && m_Unit->GetDistanceSq(ptr) >= 6400.0f))
 			return false;
-		}
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{

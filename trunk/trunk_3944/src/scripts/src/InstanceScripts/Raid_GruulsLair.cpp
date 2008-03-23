@@ -990,7 +990,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(CAVE_IN);
 		spells[0].targettype = TARGET_RANDOM_DESTINATION;
 		spells[0].instant = true;
-		spells[0].perctrigger = 8.0f;
+		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(HURTFUL_STRIKE);
@@ -1074,7 +1074,7 @@ public:
 		GrowthCooldown--;
 		if(!GrowthCooldown)
 		{
-			_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " grows in size!");
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, " grows in size!");
 			_unit->CastSpell(_unit, GROWTH, true);
 			GrowthCooldown=30;
 		}
@@ -1095,8 +1095,8 @@ public:
 			_unit->setAttackTimer(12000, false);
 			_unit->GetAIInterface()->StopMovement(12000);
 			groundSlam();
-			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::stoned, EVENT_SCRIPT_UPDATE_EVENT, 6000, 1, 0);
-			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::shatter, EVENT_SCRIPT_UPDATE_EVENT, 8000, 1, 0);
+			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::stoned, EVENT_SCRIPT_UPDATE_EVENT, 7000, 1, 0);
+			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::shatter, EVENT_SCRIPT_UPDATE_EVENT, 9000, 1, 0);
 			groundSlamcd = 80;
 		}
 		float val = (float)RandomFloat(100.0f);
