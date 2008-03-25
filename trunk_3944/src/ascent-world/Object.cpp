@@ -2136,7 +2136,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			static_cast< Player* >( pVictim )->m_BreathDamageTimer = 0;
 			static_cast< Player* >( pVictim )->m_SwimmingTime = 0;
 
-			/* -------------------- KILL PET WHEN PLAYER DIES ---------------*/
+			/* -------------------- KILL PET AND TOTEMS WHEN PLAYER DIES ---------------*/
 			if( static_cast< Player* >( pVictim )->GetSummon() != NULL )
 			{
 				if( pVictim->GetUInt32Value( UNIT_CREATED_BY_SPELL ) > 0 )
@@ -2144,7 +2144,12 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				else
 					static_cast< Player* >( pVictim )->GetSummon()->Remove( true, true, true );
 			}
-			/* -------------------- KILL PET WHEN PLAYER DIES END---------------*/
+			for (int slot = 0; slot < 4; slot++)
+			{
+				if (static_cast<Player*>(pVictim)->m_TotemSlots[slot] != 0)
+					static_cast<Player*>(pVictim)->m_TotemSlots[slot]->TotemExpire();
+			}
+			/* -------------------- KILL PET AND TOTEMS WHEN PLAYER DIES END---------------*/
 		}
 		else sLog.outError("DealDamage for Unknown Object.");
 	}
