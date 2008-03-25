@@ -553,6 +553,10 @@ void EyeOfTheStorm::UpdateCPs()
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_NEUTRAL )
 				{
+
+					for( uint32 j = 0; j < 2; ++j )
+						SetWorldState( TowerWorldStates[i][j], 0);
+
 					RespawnCPFlag(i, EOTS_BANNER_NEUTRAL);
 					if( m_spiritGuides[i] != NULL )
 					{
