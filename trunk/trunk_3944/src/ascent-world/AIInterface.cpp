@@ -107,6 +107,7 @@ AIInterface::AIInterface()
 	waiting_for_cooldown = false;
 	UnitToFollow_backup = NULL;
 	m_isGuard = false;
+	m_isNeutralGuard = false;
 	m_is_in_instance=false;
 	skip_reset_hp=false;
 }
@@ -1391,6 +1392,54 @@ Unit* AIInterface::FindTarget()
 	{
 		return 0;
 	}
+	if (m_isNeutralGuard)
+	{
+		Player *tmpPlr;
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			tmpPlr = (*itrPlr);
+			if (tmpPlr->GetTaxiState())
+				continue;
+			if (tmpPlr->bInvincible)
+				continue;
+			if (tmpPlr->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
+				continue;
+			if (tmpPlr->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9))
+				continue;
+			if (tmpPlr->m_invisible)
+				continue;
+			if (tmpPlr->CombatStatus.GetPrimaryAttackTarget() == NULL)
+				continue;
+			else
+			{
+				Unit *pPTarget = GetUnit()->GetMapMgr()->GetUnit( tmpPlr->CombatStatus.GetPrimaryAttackTarget() );
+				if(!pPTarget->IsPlayer())
+					continue;
+			}
+
+			dist = m_Unit->GetDistanceSq(tmpPlr);
+
+			if (dist > 2500.0f)
+				continue;
+			if (distance > dist)
+			{
+				distance = dist;
+				target = static_cast<Unit*>(tmpPlr);
+			}
+		}
+		if (target)
+		{
+			m_Unit->m_runSpeed = m_Unit->m_base_runSpeed * 2.0f;
+			AttackReaction(target, 1, 0);
+
+			WorldPacket data(SMSG_AI_REACTION, 12);
+			data << m_Unit->GetGUID() << uint32(2);		// Aggro sound
+			static_cast< Player* >( target )->GetSession()->SendPacket( &data );
+
+			return target;
+		}
+		distance = 999999.0f; //Reset Distance for normal check
+	}
 
 	for( itr = m_Unit->GetInRangeOppFactsSetBegin(); itr != m_Unit->GetInRangeOppFactsSetEnd(); )
 	{
@@ -1427,20 +1476,6 @@ Unit* AIInterface::FindTarget()
 				continue;
 			}
 		}
-
-		/* neutral guard that attacks pvpers */
-		/*
-		if( m_Unit->IsNeutralGuard() )
-		{
-			if( pUnit->IsPlayer() && pUnit->CombatStatus.GetPrimaryAttackTarget() )
-			{
-				// get the target of the potential target :P
-				Unit * pPTarget = GetUnit()->GetMapMgr()->GetUnit( pUnit->CombatStatus.GetPrimaryAttackTarget() );
-				if( !pPTarget->IsPlayer() )
-					continue;
-			}
-		}
-		*/
 		/* is it a player? we have to check for our pvp flag. */
 //		if(m_U)
 		crange = _CalcCombatRange(pUnit,false);
@@ -3597,6 +3632,39 @@ bool isGuard(uint32 id)
 		{
 			return true;
 		}break;
+	}
+	return false;
+}
+
+bool isNeutralGuard(uint32 id)
+{
+	switch(id)
+	{
+		// Ratchet
+	case 3502:
+		// Booty Bay
+	case 4624:
+		// Gadgetzan
+	case 9460:
+		// Moonglade
+	case 11822:
+		// Everlook
+	case 11190:
+		// Cenarion Refuge
+	case 17855:
+		// Area 52
+	case 20484:
+	case 20485:
+		// Cosmowrench
+	case 22494:
+		// Mudsprocket
+	case 23636:
+		// Concert Bruiser
+	case 23721:
+		{
+			return true;
+		}
+		break;
 	}
 	return false;
 }

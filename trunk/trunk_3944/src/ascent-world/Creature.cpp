@@ -1049,6 +1049,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	has_combat_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_ENTER_COMBAT);
 	has_waypoint_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_RANDOM_WAYPOINT);
 	m_aiInterface->m_isGuard = isGuard(GetEntry());
+	m_aiInterface->m_isNeutralGuard = isNeutralGuard(GetEntry());
 
 	m_aiInterface->getMoveFlags();
 
