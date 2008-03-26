@@ -241,37 +241,34 @@ void Spell::SpellEffectInstantKill(uint32 i)
 			return;
 		}break;
 	case 18788: //Demonic Sacrifice (508745)
-		uint32 spellid1 = 0;
-		switch(unitTarget->GetEntry())
 		{
-			case 416: //Imp
-			{   
-				spellid1 = 18789;
-		
-			}break;
-			case 417: //Felhunter
+			if ( unitTarget->isDead() )
+				return;
+
+			uint32 spellid1 = 0;
+			switch(unitTarget->GetEntry())
 			{
-				spellid1 = 18792;
-		
-			}break;
-			case 1860: //VoidWalker
-			{
-				spellid1 = 18790;
-			}break;
-			case 1863: //Succubus
-			{
-				spellid1 = 18791;
-			}break;
-			case 17252: //felguard
-			{
-				spellid1 = 35701;
-			}break;
-		}
-		//now caster gains this buff
-		if( spellid1 > 0 )
-		{
-			u_caster->CastSpell( u_caster, dbcSpell.LookupEntry( spellid1 ), true );
-		}
+				case 416: //Imp  
+					spellid1 = 18789;
+				break;
+				case 417: //Felhunter
+					spellid1 = 18792;
+				break;
+				case 1860: //VoidWalker
+					spellid1 = 18790;
+				break;
+				case 1863: //Succubus
+					spellid1 = 18791;
+				break;
+				case 17252: //felguard
+					spellid1 = 35701;
+				break;
+			}
+			//now caster gains this buff
+			if( spellid1 != 0 )
+				u_caster->CastSpell( u_caster, dbcSpell.LookupEntry( spellid1 ), true );
+
+		}break;
 	}
 
 	//instant kill effects don't have a log
