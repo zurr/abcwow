@@ -2293,7 +2293,7 @@ void Aura::SpellAuraModFear(bool apply)
 	if( m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() )
 		return;
 
-	if( apply )
+	if(apply)
 	{
 		if( u_caster == NULL ) return;
 
@@ -2304,7 +2304,7 @@ void Aura::SpellAuraModFear(bool apply)
 
 		m_target->setAItoUse(true);
 		m_target->GetAIInterface()->HandleEvent(EVENT_FEAR, u_caster, 0);
-
+		m_target->m_fearmodifiers++;
 		if(p_target)
 		{
 			// this is a hackfix to stop player from moving -> see AIInterface::_UpdateMovement() Fear AI for more info
@@ -2316,26 +2316,31 @@ void Aura::SpellAuraModFear(bool apply)
 	}
 	else
 	{
-		m_target->m_special_state &= ~UNIT_STATE_FEAR;
-		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+		m_target->m_fearmodifiers--;
 
-		m_target->GetAIInterface()->HandleEvent( EVENT_UNFEAR, NULL, 0 );
-
-		if(p_target)
+		if(m_target->m_fearmodifiers <= 0)
 		{
-			// re-enable movement
-			WorldPacket data1(9);
-			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
-			data1 << m_target->GetNewGUID() << uint8(0x01);
-			p_target->GetSession()->SendPacket(&data1);
+			m_target->m_special_state &= ~UNIT_STATE_FEAR;
+			m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
 
-			m_target->setAItoUse(false);
+			m_target->GetAIInterface()->HandleEvent( EVENT_UNFEAR, NULL, 0 );
 
-			if( u_caster != NULL )
-				sHookInterface.OnEnterCombat( p_target, u_caster );
+			if(p_target)
+			{
+				// re-enable movement
+				WorldPacket data1(9);
+				data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
+				data1 << m_target->GetNewGUID() << uint8(0x01);
+				p_target->GetSession()->SendPacket(&data1);
+
+				m_target->setAItoUse(false);
+
+				if( u_caster != NULL )
+					sHookInterface.OnEnterCombat( p_target, u_caster );
+			}
+			else
+				m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
 		}
-		else
-			m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
 	}
 }
 
@@ -3132,6 +3137,24 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 	if(spellInfo->dummy == 225 ) // this is arcane missles to avoid casting on self
 		if(m_casterGuid == pTarget->GetGUID())
 			return;
+
+	// set up our max Range
+	float maxRange = GetMaxRange( dbcSpellRange.LookupEntry( spellInfo->rangeIndex ) );
+
+	if( spellInfo->SpellGroupType )
+	{
+		SM_FFValue( m_caster->SM_FRange, &maxRange, spellInfo->SpellGroupType );
+		SM_PFValue( m_caster->SM_PRange, &maxRange, spellInfo->SpellGroupType );
+	}
+
+	if( m_caster->IsStunned() || m_caster->IsFeared() || m_caster->GetDistance2dSq( pTarget ) > ( maxRange*maxRange ) )
+	{
+		// no longer valid
+		SendInterrupted(SPELL_FAILED_INTERRUPTED, m_caster);
+		SendChannelUpdate(0, m_caster);
+		this->Remove();
+		return;
+	}
 
 	Spell *spell = new Spell(m_caster, spellInfo, true, this);
 	SpellCastTargets targets;

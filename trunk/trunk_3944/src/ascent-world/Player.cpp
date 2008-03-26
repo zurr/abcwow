@@ -965,6 +965,9 @@ void Player::_EventAttack( bool offhand )
 		return;
 	}
 
+	if ( IsFeared() || IsStunned() )
+		return;
+
 	Unit *pVictim = 0;
 	if(m_curSelection)
 		pVictim = GetMapMgr()->GetUnit(m_curSelection);

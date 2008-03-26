@@ -40,6 +40,9 @@
  * As of last update, it was nowhere near complete. Only enable for dev use.
  * Default: Disabled
  */
+
+//#define ENABLE_COLLISION 1
+
 #ifdef ENABLE_COLLISION
 # define COLLISION 1
 #endif
