@@ -3652,6 +3652,10 @@ bool isNeutralGuard(uint32 id)
 	case 11190:
 		// Cenarion Refuge
 	case 17855:
+		// Throne of the elements
+	case 18099:
+	case 18101:
+	case 18102:
 		// Area 52
 	case 20484:
 	case 20485:
