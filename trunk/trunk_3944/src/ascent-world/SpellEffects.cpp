@@ -242,9 +242,6 @@ void Spell::SpellEffectInstantKill(uint32 i)
 		}break;
 	case 18788: //Demonic Sacrifice (508745)
 		{
-			if ( unitTarget->isDead() )
-				return;
-
 			uint32 spellid1 = 0;
 			switch(unitTarget->GetEntry())
 			{
@@ -4986,9 +4983,11 @@ void Spell::SpellEffectSummonDeadPet(uint32 i)
 	if(pPet)
 	{
 		pPet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
-		pPet->SetUInt32Value(UNIT_FIELD_HEALTH, (uint32)(pPet->GetUInt32Value(UNIT_FIELD_MAXHEALTH) * 0.5));
+		// stored in EffectBasePoints[] but since only one spell uses this effect ...
+		pPet->SetUInt32Value(UNIT_FIELD_HEALTH, (uint32)(pPet->GetUInt32Value(UNIT_FIELD_MAXHEALTH) * 0.15));
 		pPet->setDeathState(ALIVE);
 		pPet->GetAIInterface()->HandleEvent(EVENT_FOLLOWOWNER, pPet, 0);
+		pPet->SendSpellsToOwner();
 		sEventMgr.RemoveEvents(pPet, EVENT_PET_DELAYED_REMOVE);
 	}
 }
