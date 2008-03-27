@@ -2112,6 +2112,8 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				if(pVictim->IsPet())
 				{
 					static_cast< Pet* >( pVictim )->DelayedRemove( false, true );
+					static_cast< Pet* >( pVictim )->SendNullSpellsToOwner();
+
 					//remove owner warlock soul link from caster
 					Player* owner = static_cast<Pet*>( pVictim )->GetPetOwner();
 					if( owner != NULL )
