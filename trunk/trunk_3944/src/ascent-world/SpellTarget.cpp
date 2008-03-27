@@ -372,21 +372,24 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 
 	if(m_spellInfo->EffectChainTarget[i])
 	{
-		uint32 jumps=m_spellInfo->EffectChainTarget[i]-1;
+		uint32 jumps = m_spellInfo->EffectChainTarget[i]-1;
 		float range=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong
 		range*=range;
-		std::set<Object*>::iterator itr;
-		for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+
+		std::set< uint64 > tmpSet;
+		for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 		{
-			if((*itr)->GetGUID()==m_targets.m_unitTarget)
+			if((*itr)->GetGUID() == m_targets.m_unitTarget)
 				continue;
 			if( !((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
 				continue;
 
 			if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr),range))
 			{
-				if(isAttackable(u_caster,(Unit*)(*itr)))
+				if(isAttackable(u_caster,(Unit*)(*itr)) && ( tmpSet.find( ((Unit*)(*itr))->GetGUID()) == tmpSet.end() ) )
 				{
+					tmpSet.insert( ((Unit*)(*itr))->GetGUID() );
+
 					did_hit_result = DidHit(i,((Unit*)*itr));
 					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
 						SafeAddTarget(tmpMap, (*itr)->GetGUID());
@@ -398,6 +401,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 				}
 			}
 		}
+		tmpSet.clear();
 	}
 }
 
