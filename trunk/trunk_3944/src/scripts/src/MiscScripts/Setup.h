@@ -3,6 +3,5 @@
 
 //void SetupDJ(ScriptMgr * mgr);
 void SetupGameobjects(ScriptMgr * mgr);
-//void SetupSCRIPT(ScriptMgr * mgr);
 
 #endif
