@@ -137,7 +137,6 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 {
 
 	// no water breathing is required
-	/*
 	if( !sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || _player->isDead() || _player->GodModeCheat )
 	{
 		// player is flagged as in water
@@ -190,6 +189,7 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 	else
 	{
 		// Test to see if we can stop water breathing hack
+		/*
 		if( sWorld.antihack_water_breathing )
 		{
 			if( ( sWorld.no_antihack_on_gm && !pSession->HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
@@ -203,8 +203,9 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 						_player->SetMovement( MOVE_ROOT, 1 );
 			}
 		}
+		*/
 	}
-	*/
+	
 	//player is swiming and not flagged as in the water
 	if( movement_info.flags & MOVEFLAG_SWIMMING && !( _player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING ) )
 	{
