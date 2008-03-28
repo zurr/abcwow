@@ -10,7 +10,6 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 {
 	//SetupDJ(mgr);
 	SetupGameobjects(mgr);
-	//SetupSCRIPT(mgr);
 }
 
 #ifdef WIN32
