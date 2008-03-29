@@ -336,7 +336,7 @@ class SERVER_DECL Aura : public EventableObject
 {
 	uint64 periodic_target;
 public:
-    Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target);
+    Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target, Item* i_caster = NULL );
 	void ExpireRemove();
     void Remove();
     void Expire();

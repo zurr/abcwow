@@ -2532,7 +2532,7 @@ void Spell::HandleAddAura(uint64 guid)
 				Aura* aur = NULL;
 				for( int i = 0;i < itr->second->GetSpellProto()->procCharges - 1; i++ )
 				{
-					aur = new Aura( itr->second->GetSpellProto(), itr->second->GetDuration(), itr->second->GetCaster(), itr->second->GetTarget() );
+					aur = new Aura( itr->second->GetSpellProto(), itr->second->GetDuration(), itr->second->GetCaster(), itr->second->GetTarget(), i_caster  );
 					Target->AddAura( aur );
 					aur = NULL;
 				}

@@ -329,13 +329,18 @@ Object* Aura::GetCaster()
 		return NULL;
 }
 
-Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
+Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target, Item* i_caster )
 {
 	m_castInDuel = false;
 	m_spellProto = proto;
 	m_duration = duration;
 	m_positive = 0; //we suppose spell will have positive impact on target
 	m_deleted = false;
+
+	if ( i_caster != NULL && i_caster->GetProto() )
+		m_castedItemId = i_caster->GetProto()->ItemId;
+	else
+		m_castedItemId = 0;
 
 	m_casterGuid = caster->GetGUID();
 	m_target = target;
@@ -390,7 +395,6 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 		timeleft = ( uint32 )UNIXTIME;
 	}
 
-	m_castedItemId = 0;
 	m_visualSlot = 0xFF;
 	pSpellId = 0;
 	periodic_target = 0;
