@@ -1482,7 +1482,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 		if( g_caster != NULL && g_caster->GetUInt32Value( OBJECT_FIELD_CREATED_BY ) && g_caster->m_summoner != NULL )
 			pAura = new Aura( m_spellInfo, Duration, g_caster->m_summoner, unitTarget);
 		else
-			pAura = new Aura( m_spellInfo, Duration, m_caster, unitTarget );
+			pAura = new Aura( m_spellInfo, Duration, m_caster, unitTarget, i_caster );
 
 		pAura->pSpellId = pSpellId; //this is required for triggered spells
 		
@@ -2750,7 +2750,7 @@ void Spell::SpellEffectApplyAA(uint32 i) // Apply Area Aura
 	std::map< uint32, Aura* >::iterator itr = unitTarget->tmpAura.find( m_spellInfo->Id );
 	if( itr == unitTarget->tmpAura.end() )
 	{
-		pAura = new Aura( m_spellInfo, GetDuration(), m_caster, unitTarget );
+		pAura = new Aura( m_spellInfo, GetDuration(), m_caster, unitTarget, i_caster  );
 
 		//unitTarget->tmpAura[m_spellInfo->Id] = pAura;
 		unitTarget->tmpAura.insert( make_pair( m_spellInfo->Id, pAura ) );
