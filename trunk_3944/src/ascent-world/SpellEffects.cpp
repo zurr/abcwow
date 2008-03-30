@@ -3321,7 +3321,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 			go->m_ritualtarget = pTarget->GetGUIDLow();
 			go->m_ritualspell = m_spellInfo->Id;	 
 		}
-		else if( entry == 186811 ) // Portal for Ritual of Refreshment
+		else if( entry == 186811 || entry == 181622) // Portal for Ritual of Refreshment/Souls
 		{
 			go->m_ritualmembers[0] = p_caster->GetGUIDLow();
 			go->m_ritualcaster = p_caster->GetGUIDLow();

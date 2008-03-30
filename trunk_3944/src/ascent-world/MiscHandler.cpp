@@ -1414,7 +1414,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					/* expire the gameobject */
 					obj->ExpireAndDelete();
 				}
-				else if(goinfo->ID == 186811)		// Ritual of Refreshment
+				else if( goinfo->ID == 186811 || goinfo->ID == 181622)		// Ritual of Refreshment/Souls
 				{
 					Player * pCaster = _player->GetMapMgr()->GetPlayer(obj->m_ritualcaster);
 					if( pCaster == NULL )
