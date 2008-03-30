@@ -1226,33 +1226,28 @@ public:
 			return;
 
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
-		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+		for ( TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++ )
 		{
-			Unit *temp = itr->first;
-			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
+			if (itr->first->GetTypeId() != TYPEID_PLAYER || itr->first->isDead() )
+				continue;
+
+			Player* _plr = (Player*)(itr->first);
+
+			for(set<Player*>::iterator itr2 = _plr->GetInRangePlayerSetBegin(); itr2 != _plr->GetInRangePlayerSetEnd(); ++itr2)
 			{
-
-				for(set<Player*>::iterator itr2 = temp->GetInRangePlayerSetBegin(); itr2 != temp->GetInRangePlayerSetEnd(); ++itr2)
+				if ( (*itr2) != _plr && (*itr2)->isAlive() && _plr->GetDistance2dSq( *itr2 ) <= 400 )
 				{
-					Player *currentTarget = (*itr2);
-					Player *tempPlayer = (Player*)temp;
-
-					if (currentTarget != tempPlayer && currentTarget->isAlive() && tempPlayer->GetDistance2dSq(currentTarget) <= 400)
+					int32 damage = (int32)(9000 - 35 * _plr->GetDistance2dSq(*itr2) );
+					if ( damage > 0 )
 					{
-						int32 damage = (int32)(9000 - 430 * sqrt(temp->GetDistance2dSq(currentTarget)));
-						if (damage > 0)
-						{
-							SpellEntry *tempspell = dbcSpell.LookupEntry(SHATTER);
-							tempspell->EffectBasePoints[0] = damage;
-							tempPlayer->CastSpell(currentTarget, tempspell, true);
-						}
+						SpellEntry *tempspell = dbcSpell.LookupEntry( SHATTER );
+						tempspell->EffectBasePoints[0] = damage;
+						_plr->CastSpell( *itr2, tempspell, true );
 					}
 				}
-
-				Aura *aur = temp->FindAura(STONED);
-				if (aur)
-					aur->Remove();
 			}
+
+			_plr->RemoveAura( STONED );
 		}
 	}
 	void hurtfulStrike()
