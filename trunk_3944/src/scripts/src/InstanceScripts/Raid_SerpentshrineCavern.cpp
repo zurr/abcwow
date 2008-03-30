@@ -2487,6 +2487,8 @@ public:
 			phasecd = 60;
 			m_enrage = 600;
 			enraged = 0;
+			for ( uint32 x = 0; x < 7; x++ )
+				_unit->DamageDoneModPCT[x] = 0;
 
 			_unit->Despawn(100, 2500);
 		}
@@ -2571,19 +2573,19 @@ public:
 		}
 		else
 		{
-			if (!m_enrage && !enraged)
+			if ( m_enrage <= 0 && !enraged )
 			{
-				_unit->DamageDoneModPCT[0] = 5;
-				_unit->DamageDoneModPCT[1] = 5;
-				_unit->DamageDoneModPCT[2] = 5;
-				_unit->DamageDoneModPCT[3] = 5;
-				_unit->DamageDoneModPCT[4] = 5;
-				_unit->DamageDoneModPCT[5] = 5;
-				_unit->DamageDoneModPCT[6] = 5;
+				// isn't there some aura we can use instead?
+				for ( uint32 x = 0; x < 7; x++ )
+					_unit->DamageDoneModPCT[x] = 5;
+
 				enraged = 1;
 			}
 			else
+			{
 				m_enrage--;
+			}
+
 			if (_unit->GetHealthPct() <= 15 && m_phase < 3)
 			{
 				if (_unit->GetCurrentSpell())
@@ -2902,7 +2904,7 @@ protected:
 	int innerdemonscd;
 	int innerdemons;
 	int m_enrage;
-	int enraged;
+	uint32 enraged;
 
 	bool m_eventstarted;
 	int m_phase;
