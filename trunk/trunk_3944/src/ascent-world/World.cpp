@@ -1641,6 +1641,15 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[0] = 47;
     }
 
+	// Create Soulwell (Ritual of Refreshment)
+	sp = dbcSpell.LookupEntryForced( 29886 );
+    if( sp != NULL )
+    {
+        sp->AttributesEx = 0;
+		sp->EffectImplicitTargetA[0] = 47;
+    }
+
+	
     //Priest - Holy Nova
     sp = dbcSpell.LookupEntryForced( 15237 );
     if( sp != NULL )
