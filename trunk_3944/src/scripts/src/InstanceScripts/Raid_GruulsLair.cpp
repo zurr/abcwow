@@ -973,14 +973,15 @@ class GruulsTheDragonkillerAI : public CreatureAIScript, public EventableObject
 {
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(GruulsTheDragonkillerAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
 
 	GruulsTheDragonkillerAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
 		GrowthCooldown = 30;
 		groundSlamcd = 45;
-		nrspells = 3;
+		hurtfulStrikecd = 20 + RandomUInt(16);
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -993,17 +994,19 @@ public:
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
+		/*
 		spells[1].info = dbcSpell.LookupEntry(HURTFUL_STRIKE);
 		spells[1].targettype = TARGET_ATTACKING; // Should attk party member with second the highest aggro in melee range
 		spells[1].instant = true;
 		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 1000;
+		*/
 
-		spells[2].info = dbcSpell.LookupEntry(REVERBERATION);
-		spells[2].targettype = TARGET_VARIOUS;
-		spells[2].instant = true;
-		spells[2].perctrigger = 3.0f;
-		spells[2].attackstoptimer = 1000;
+		spells[1].info = dbcSpell.LookupEntry(REVERBERATION);
+		spells[1].targettype = TARGET_VARIOUS;
+		spells[1].instant = true;
+		spells[1].perctrigger = 3.0f;
+		spells[1].attackstoptimer = 1000;
 
 	}
 
@@ -1072,6 +1075,7 @@ public:
 	{
 		groundSlamcd--;
 		GrowthCooldown--;
+		hurtfulStrikecd--;
 		if(!GrowthCooldown)
 		{
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, " grows in size!");
@@ -1084,7 +1088,7 @@ public:
 			switch (RandomSpeech)
 			{
 			case 0:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL,"Scary!");
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL,"Scurry!");
 				_unit->PlaySoundToSet(11357);
 				break;
 			case 1:
@@ -1099,8 +1103,16 @@ public:
 			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::shatter, EVENT_SCRIPT_UPDATE_EVENT, 9000, 1, 0);
 			groundSlamcd = 80;
 		}
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
+		else if (!hatefulStrikecd)
+		{
+			hurtfulStrike();
+			hurtfulStrikecd = 20 + RandomUInt(16);
+		}
+		else
+		{
+			float val = (float)RandomFloat(100.0f);
+			SpellCast(val);
+		}
 	}
 
 	void CastTime()
@@ -1243,6 +1255,39 @@ public:
 			}
 		}
 	}
+	void hurtfulStrike()
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return;
+
+		uint32 highestAggro = _unit->GetAIInterface()->getThreatByPtr(_unit->GetAIInterface()->GetMostHated());
+		Unit *currentTarget;
+		uint32 currentAggro = 0;
+
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			Unit *temp = itr->first;
+			if (temp->GetTypeId() != TYPEID_PLAYER)
+				continue;
+
+			if (_unit->GetDistance2dSq(temp) <= 100.0f)
+			{
+				if (_unit->GetAIInterface()->getThreatByPtr(temp) < highestAggro && _unit->GetAIInterface()->getThreatByPtr(temp) > currentAggro)
+				{
+					currentTarget = temp;
+					currentAggro = _unit->GetAIInterface()->getThreatByPtr(temp)
+				}
+			}
+		}
+
+		if (currentTarget == NULL)
+			if (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetMostHated()) <= 100)
+				currentTarget = _unit->GetAIInterface()->GetMostHated();
+
+		if (currentTarget != NULL)
+			_unit->CastSpell(currentTarget, HURTFUL_STRIKE, true)
+	}
 
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
 	{
@@ -1273,6 +1318,7 @@ protected:
 
 	uint32 GrowthCooldown;
 	uint32 groundSlamcd;
+	uint32 hurtfulStrikecd;
 	int nrspells;
 };
 void SetupGruulsLair(ScriptMgr * mgr)

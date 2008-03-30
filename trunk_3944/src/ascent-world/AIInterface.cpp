@@ -1415,6 +1415,8 @@ Unit* AIInterface::FindTarget()
 				Unit *pPTarget = GetUnit()->GetMapMgr()->GetUnit( tmpPlr->CombatStatus.GetPrimaryAttackTarget() );
 				if(!pPTarget->IsPlayer())
 					continue;
+				if (tmpPlr->DuelingWith == static_cast<Player*>(pPTarget))
+					continue;
 			}
 
 			dist = m_Unit->GetDistanceSq(tmpPlr);
