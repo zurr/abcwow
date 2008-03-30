@@ -44,6 +44,14 @@ public:
 
 	HYDROSSAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
+		_unit->DamageDoneModPCT[0] = 0;
+		_unit->DamageDoneModPCT[1] = 0;
+		_unit->DamageDoneModPCT[2] = 0;
+		_unit->DamageDoneModPCT[3] = 0;
+		_unit->DamageDoneModPCT[4] = 0;
+		_unit->DamageDoneModPCT[5] = 0;
+		_unit->DamageDoneModPCT[6] = 0;
+
 		m_phase = 1;
 		m_markcd = 15;
 		m_markstate = 1;
@@ -54,34 +62,19 @@ public:
 		_unit->SchoolImmunityList[4] = 1;
 		_unit->BaseAttackType = 4;
 	}
+
 	void OnCombatStart(Unit* mTarget)
 	{
 		_unit->PlaySoundToSet(11289);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I cannot allow you to interfere!");
 		RegisterAIUpdateEvent(1000);
-		m_phase = 1;
-		m_markcd = 15;
-		m_markstate = 1;
-		m_enrage = 600;
-		enraged = 0;
-		m_watertomb = 7;
-		_unit->SchoolImmunityList[3] = 0;
-		_unit->SchoolImmunityList[4] = 1;
-		_unit->BaseAttackType = 4;
 	}
+
 	void OnCombatStop(Unit *mTarget)
 	{
 		if (_unit->isAlive())
-		{
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20162);
-			_unit->DamageDoneModPCT[0] = 0;
-			_unit->DamageDoneModPCT[1] = 0;
-			_unit->DamageDoneModPCT[2] = 0;
-			_unit->DamageDoneModPCT[3] = 0;
-			_unit->DamageDoneModPCT[4] = 0;
-			_unit->DamageDoneModPCT[5] = 0;
-			_unit->DamageDoneModPCT[6] = 0;
-		}
+
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -100,6 +93,7 @@ public:
 			break;
 		}
 		RemoveAIUpdateEvent();
+
 		if (summon1 != NULL)
 			summon1->Despawn(100, 0);
 		if (summon2 != NULL)
@@ -109,6 +103,7 @@ public:
 		if (summon4 != NULL)
 			summon4->Despawn(100, 0);
 	}
+
 	void OnTargetDied(Unit* mTarget)
 	{
 		int val = RandomUInt(100)%2;
@@ -142,12 +137,14 @@ public:
 			break;
 		}
 	}
+
 	void AIUpdate()
 	{
 		m_enrage--;
 		m_markcd--;
 		if (!m_enrage && !enraged)
 		{
+			enraged = 1;
 			_unit->DamageDoneModPCT[0] = 5;
 			_unit->DamageDoneModPCT[1] = 5;
 			_unit->DamageDoneModPCT[2] = 5;
@@ -155,7 +152,6 @@ public:
 			_unit->DamageDoneModPCT[4] = 5;
 			_unit->DamageDoneModPCT[5] = 5;
 			_unit->DamageDoneModPCT[6] = 5;
-			enraged = 1;
 		}
 		uint32 dist = FL2UINT(_unit->GetAIInterface()->_CalcDistanceFromHome());
 		if (dist > 700)
@@ -179,47 +175,44 @@ public:
 				_unit->SchoolImmunityList[3] = 1;
 				_unit->BaseAttackType = 3;
 			}
-			else 
+			else if (!m_markcd)
 			{
-				if (!m_markcd)
+				switch (m_markstate)
 				{
-					switch (m_markstate)
-					{
-					case 1:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT1, true);
-						break;
-					case 2:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT2, true);
-						break;
-					case 3:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT3, true);
-						break;
-					case 4:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT4, true);
-						break;
-					case 5:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT5, true);
-						break;
-					case 6:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT6, true);
-						break;
-					default:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT6, true);
-						break;
-					}
-					m_markstate++;
-					m_markcd = 15;
+				case 1:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT1, true);
+					break;
+				case 2:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT2, true);
+					break;
+				case 3:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT3, true);
+					break;
+				case 4:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT4, true);
+					break;
+				case 5:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT5, true);
+					break;
+				case 6:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT6, true);
+					break;
+				default:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFCORRUPT6, true);
+					break;
 				}
-				m_vilesludge--;
-				if (!m_vilesludge)
+				m_markstate++;
+				m_markcd = 15;
+			}
+			m_vilesludge--;
+			if (!m_vilesludge)
+			{
+				Unit *target = RandomTarget(false, true, 10000);
+				if (target)
 				{
-					Unit *target = RandomTarget(false, true, 10000);
-					if (target)
-					{
-						_unit->CastSpell(target, HYDROSS_VILESLUDGE, false);
-					}
-					m_vilesludge = 15;
+					_unit->CastSpell(target, HYDROSS_VILESLUDGE, false);
 				}
+				m_vilesludge = 15;
 			}
 		}
 		else
@@ -243,45 +236,42 @@ public:
 				_unit->SchoolImmunityList[3] = 0;
 				_unit->BaseAttackType = 4;
 			}
-			else
+			else if (!m_markcd)
 			{
-				if (!m_markcd)
+				switch (m_markstate)
 				{
-					switch (m_markstate)
-					{
-					case 1:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS1, true);
-						break;
-					case 2:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS2, true);
-						break;
-					case 3:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS3, true);
-						break;
-					case 4:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS4, true);
-						break;
-					case 5:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS5, true);
-						break;
-					case 6:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS6, true);
-						break;
-					default:
-						_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS6, true);
-						break;
-					}
-					m_markstate++;
-					m_markcd = 15;
+				case 1:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS1, true);
+					break;
+				case 2:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS2, true);
+					break;
+				case 3:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS3, true);
+					break;
+				case 4:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS4, true);
+					break;
+				case 5:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS5, true);
+					break;
+				case 6:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS6, true);
+					break;
+				default:
+					_unit->CastSpell(_unit, HYDROSS_MARKOFHYDROSS6, true);
+					break;
 				}
-				m_watertomb--;
-				if (!m_watertomb)
-				{
-					Unit *target = RandomTarget(false, true, 10000);
-					if (target)
-						_unit->CastSpell(target, HYDROSS_WATERTOMB, false);
-					m_watertomb = 7;
-				}
+				m_markstate++;
+				m_markcd = 15;
+			}
+			m_watertomb--;
+			if (!m_watertomb)
+			{
+				Unit *target = RandomTarget(false, true, 10000);
+				if (target)
+					_unit->CastSpell(target, HYDROSS_WATERTOMB, false);
+				m_watertomb = 7;
 			}
 		}
 	}
@@ -495,8 +485,9 @@ public:
 	}
 
 	void OnTargetDied(Unit* mTarget)
-	{ 
+	{
 	}
+
 	void AIUpdate()
 	{
 		submergetimer--;
@@ -692,13 +683,13 @@ public:
 
 	void OnReachWP(uint32 iWaypointId, bool bForwards)
 	{
-		//_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 		_unit->GetAIInterface()->m_canMove = false;
 		_unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
 	}
+
 	inline WayPoint* CreateWaypoint(int id, uint32 waittime, uint32 flags)
 	{
 		WayPoint * wp = _unit->CreateWaypointStruct();
@@ -1098,6 +1089,7 @@ public:
 	}
 	void AIUpdate()
 	{
+		earthquakecd--;
 		if (_unit->GetHealthPct() <= 25 && m_phase == 1)
 		{
 			m_phase = 2;
@@ -1141,12 +1133,8 @@ public:
 			}
 			earthquakecd = 50 + RandomUInt(100)%10;
 		}
-		else
-		{
-			earthquakecd--;
-		}
-		//float val = (float)RandomFloat(100.0f);
-		//SpellCast(val);
+		float val = (float)RandomFloat(100.0f);
+		SpellCast(val);
 	}
 
 	void CastTime()
@@ -1315,29 +1303,20 @@ public:
 			{
 			case 1:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 366.443512f, -708.822388f, -14.357947f, 0, true, false, 0, 0);
-				summon->GetAIInterface()->SetSoulLinkedWith(temp);
-				summon->GetAIInterface()->taunt(temp, true);
-				summon->GetAIInterface()->AttackReaction(temp, 1, 0);
 				break;
 			case 2:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 373.805511f, -691.146116f, -14.446006f, 0, true, false, 0, 0);
-				summon->GetAIInterface()->SetSoulLinkedWith(temp);
-				summon->GetAIInterface()->taunt(temp, true);
-				summon->GetAIInterface()->AttackReaction(temp, 1, 0);
 				break;
 			case 3:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 365.522644f, -737.217712f, -14.444579f, 0, true, false, 0, 0);
-				summon->GetAIInterface()->SetSoulLinkedWith(temp);
-				summon->GetAIInterface()->taunt(temp, true);
-				summon->GetAIInterface()->AttackReaction(temp, 1, 0);
 				break;
 			case 4:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 337.470581f, -732.931885f, -14.173863f, 0, true, false, 0, 0);
-				summon->GetAIInterface()->SetSoulLinkedWith(temp);
-				summon->GetAIInterface()->taunt(temp, true);
-				summon->GetAIInterface()->AttackReaction(temp, 1, 0);
 				break;
 			}
+			summon->GetAIInterface()->SetSoulLinkedWith(temp);
+			summon->GetAIInterface()->taunt(temp, true);
+			summon->GetAIInterface()->AttackReaction(temp, 1, 0);
 			unitid++;
 		}
 	}
@@ -1507,6 +1486,14 @@ public:
 
 	KARATHRESSAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
+		_unit->DamageDoneModPCT[0] = 0;
+		_unit->DamageDoneModPCT[1] = 0;
+		_unit->DamageDoneModPCT[2] = 0;
+		_unit->DamageDoneModPCT[3] = 0;
+		_unit->DamageDoneModPCT[4] = 0;
+		_unit->DamageDoneModPCT[5] = 0;
+		_unit->DamageDoneModPCT[6] = 0;
+
 		m_eventstarted = false;
 		sharkkisalive = true;
 		caribdisalive = true;
@@ -1537,9 +1524,6 @@ public:
 				sharkkis->Despawn(100, 0);
 			if (tidalvess != NULL)
 				tidalvess->Despawn(100, 0);
-
-			m_enrage = 600;
-			enraged = 0;
 
 			_unit->Despawn(100, 2500);
 		}
@@ -1612,38 +1596,29 @@ public:
 		}
 		if (!caribdisalive)
 		{
+			tidalsurgecd--;
 			if (!tidalsurgecd)
 			{
 				tidalsurge();
 				tidalsurgecd = 15 + RandomUInt(100)%3;
 			}
-			else
-			{
-				tidalsurgecd--;
-			}
 		}
 		if (!sharkkisalive)
 		{
+			beastwithincd--;
 			if (!beastwithincd)
 			{
 				_unit->CastSpell(_unit, KARATHRESS_BEASTWITHIN, true);
 				beastwithincd = 60;
 			}
-			else
-			{
-				beastwithincd--;
-			}
 		}
 		if (!tidalvessalive)
 		{
+			firetotemcd--;
 			if (!firetotemcd)
 			{
 				Creature *totem = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPITFIRE, _unit->GetPositionX() + 2, _unit->GetPositionY() + 2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
 				firetotemcd = 85;
-			}
-			else
-			{
-				firetotemcd--;
 			}
 		}
 	}
@@ -1829,14 +1804,11 @@ public:
 	}
 	void AIUpdate()
 	{
+		tidalsurgecd--;
 		if (!tidalsurgecd)
 		{
 			tidalsurge();
 			tidalsurgecd = 15 + RandomUInt(100)%3;
-		}
-		else
-		{
-			tidalsurgecd--;
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
@@ -1987,6 +1959,8 @@ public:
 	}
 	void AIUpdate()
 	{
+		petcd--;
+		beastwithincd--;
 		if (!petcd)
 		{
 			if (!pet)
@@ -2020,20 +1994,12 @@ public:
 			}
 			petcd = 60;
 		}
-		else
-		{
-			petcd--;
-		}
 		if (!beastwithincd)
 		{
 			_unit->CastSpell(_unit, SHARKKIS_BEASTWITHIN, true);
-			if (pet && pet->isAlive())
+			if (pet != NULL && pet->isAlive())
 				pet->CastSpell(pet, SHARKKIS_BEASTWITHIN, true); 
 			beastwithincd = 60;
-		}
-		else
-		{
-			beastwithincd--;
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
@@ -2249,23 +2215,17 @@ public:
 	}
 	void AIUpdate()
 	{
+		earthtotemcd--;
+		firetotemcd--;
 		if (!earthtotemcd)
 		{
 			Creature *totem = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_EARTHBIND, _unit->GetPositionX() + 2, _unit->GetPositionY() + 2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
 			earthtotemcd = 55;
 		}
-		else
-		{
-			earthtotemcd--;
-		}
 		if (!firetotemcd)
 		{
 			Creature *totem = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPITFIRE, _unit->GetPositionX() - 2, _unit->GetPositionY() - 2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
 			firetotemcd = 85;
-		}
-		else
-		{
-			firetotemcd--;
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
@@ -2364,7 +2324,8 @@ public:
 	}
 	void AIUpdate()
 	{
-		_unit->CastSpell(_unit, SPITFIRE, false);
+		if (_unit->GetCurrentSpell() == NULL)
+			_unit->CastSpell(_unit, SPITFIRE, false);
 	}
 protected:
 };
@@ -2412,7 +2373,8 @@ public:
 	}
 	void AIUpdate()
 	{
-		_unit->CastSpell(_unit, EARTHBIND, true);
+		if (_unit->GetCurrentSpell() == NULL)
+			_unit->CastSpell(_unit, EARTHBIND, true);
 	}
 
 protected:
@@ -2437,6 +2399,14 @@ public:
 
 	LEOTHERASAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
+		_unit->DamageDoneModPCT[0] = 0;
+		_unit->DamageDoneModPCT[1] = 0;
+		_unit->DamageDoneModPCT[2] = 0;
+		_unit->DamageDoneModPCT[3] = 0;
+		_unit->DamageDoneModPCT[4] = 0;
+		_unit->DamageDoneModPCT[5] = 0;
+		_unit->DamageDoneModPCT[6] = 0;
+
 		m_phase = 0;
 		whirlwindcd = 18;
 		whirlwinding = 0;
@@ -2445,6 +2415,7 @@ public:
 		enraged = 0;
 		shadow = NULL;
 		m_eventstarted = false;
+
 		_unit->GetAIInterface()->disable_melee = false;
 		_unit->GetAIInterface()->m_moveRun = true;
 		_unit->AddAuraVisual(LEOTHERAS_BANISH, 1, false);
@@ -2481,15 +2452,6 @@ public:
 			if (channeler3 != NULL)
 				channeler3->Despawn(100, 0);
 
-			m_phase = 0;
-			whirlwindcd = 18;
-			whirlwinding = 0;
-			phasecd = 60;
-			m_enrage = 600;
-			enraged = 0;
-			for ( uint32 x = 0; x < 7; x++ )
-				_unit->DamageDoneModPCT[x] = 0;
-
 			_unit->Despawn(100, 2500);
 		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
@@ -2499,7 +2461,7 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		if (shadow)
+		if (shadow != NULL)
 		{
 			shadow->Despawn(0, 0);
 			shadow = NULL;
@@ -2559,6 +2521,7 @@ public:
 				Unit *target = GetAttackTarget();
 				if (target)
 				{
+					ModifyAIUpdateEvent(1000);
 					m_phase = 1;
 					_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 					_unit->RemoveAuraVisual(LEOTHERAS_BANISH, 1);
@@ -2566,26 +2529,23 @@ public:
 					_unit->GetAIInterface()->AttackReaction(target, 1, 0);
 				}
 				else
-				{
 					EventStop(NULL);
-				}
 			}
 		}
 		else
 		{
-			if ( m_enrage <= 0 && !enraged )
+			m_enrage--;
+			if (!m_enrage && !enraged)
 			{
-				// isn't there some aura we can use instead?
-				for ( uint32 x = 0; x < 7; x++ )
-					_unit->DamageDoneModPCT[x] = 5;
-
+				_unit->DamageDoneModPCT[0] = 5;
+				_unit->DamageDoneModPCT[1] = 5;
+				_unit->DamageDoneModPCT[2] = 5;
+				_unit->DamageDoneModPCT[3] = 5;
+				_unit->DamageDoneModPCT[4] = 5;
+				_unit->DamageDoneModPCT[5] = 5;
+				_unit->DamageDoneModPCT[6] = 5;
 				enraged = 1;
 			}
-			else
-			{
-				m_enrage--;
-			}
-
 			if (_unit->GetHealthPct() <= 15 && m_phase < 3)
 			{
 				if (_unit->GetCurrentSpell())
@@ -2904,7 +2864,7 @@ protected:
 	int innerdemonscd;
 	int innerdemons;
 	int m_enrage;
-	uint32 enraged;
+	int enraged;
 
 	bool m_eventstarted;
 	int m_phase;

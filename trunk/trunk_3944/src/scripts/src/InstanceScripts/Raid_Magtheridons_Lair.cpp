@@ -217,6 +217,7 @@ public:
 				Unit *target = GetPlayerCount();
 				if (target)
 				{
+					ModifyAIUpdateEvent(1000);
 					_unit->PlaySoundToSet(10253);
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I... am... unleashed!");
 					m_phase = 2;
