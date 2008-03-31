@@ -2998,10 +2998,10 @@ public:
 		} 
 
 		spells[0].info = dbcSpell.LookupEntry(SPELLBINDER_MINDBLAST);
-		spells[0].targettype = TARGET_RANDOM_DESTINATION;
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = false;
 		spells[0].cooldown = 12;
-		spells[0].perctrigger = 4.0f;
+		spells[0].perctrigger = 3.0f;
 		spells[0].attackstoptimer = 1000;
 
 		leotheras = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(380.700989f, -445.562988f, 29.525999f, CN_LEOTHERAS);
