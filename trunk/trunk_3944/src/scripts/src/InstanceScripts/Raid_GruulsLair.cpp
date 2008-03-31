@@ -1190,7 +1190,7 @@ public:
 	{
 		float ori = (float)RandomFloat(6.282f);
 		float dx,dy;
-		float affect = 18 + RandomFloat(6.0f);
+		float affect = 18 + RandomFloat(4.0f);
 
 		dx = sinf(ori);
 		dy = cosf(ori);
@@ -1237,7 +1237,7 @@ public:
 			{
 				if ( (*itr2) != _plr && (*itr2)->isAlive() && _plr->GetDistance2dSq( *itr2 ) <= 400 )
 				{
-					int32 damage = (int32)(9000 - 21,5 * _plr->GetDistance2dSq(*itr2) );
+					int32 damage = (int32)(9000 - 21.5f * _plr->GetDistance2dSq(*itr2) );
 					if ( damage > 0 )
 					{
 						SpellEntry *tempspell = dbcSpell.LookupEntry( SHATTER );
