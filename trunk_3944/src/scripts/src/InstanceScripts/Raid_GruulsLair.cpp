@@ -1237,7 +1237,7 @@ public:
 			{
 				if ( (*itr2) != _plr && (*itr2)->isAlive() && _plr->GetDistance2dSq( *itr2 ) <= 400 )
 				{
-					int32 damage = (int32)(9000 - 35 * _plr->GetDistance2dSq(*itr2) );
+					int32 damage = (int32)(9000 - 21,5 * _plr->GetDistance2dSq(*itr2) );
 					if ( damage > 0 )
 					{
 						SpellEntry *tempspell = dbcSpell.LookupEntry( SHATTER );
@@ -1246,10 +1246,10 @@ public:
 					}
 				}
 			}
-
 			_plr->RemoveAura( STONED );
 		}
 	}
+
 	void hurtfulStrike()
 	{
 		if (_unit->GetAIInterface()->getAITargetsCount() == 0)

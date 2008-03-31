@@ -1547,9 +1547,7 @@ public:
 			}
 		}
 		else
-		{
 			RandomSpeech();
-		}
 	}
 
 	void SpellCast(float val)
