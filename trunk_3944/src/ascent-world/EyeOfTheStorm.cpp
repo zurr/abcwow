@@ -655,7 +655,7 @@ bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 		m_mainLock.Acquire();
 
 		SpellEntry * winner_spell = dbcSpell.LookupEntry(24953);
-		 // little hack here - since there is no spell for EotS rewards
+		 // little hack here - since there is no spell for EotS rewards - should be reimplemented
 		winner_spell->EffectSpellGroupRelation[1] = 29024;
 		SpellEntry * loser_spell = dbcSpell.LookupEntry(24952);
 		loser_spell->EffectSpellGroupRelation[1] = 29024;
@@ -670,7 +670,9 @@ bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 					(*itr)->CastSpell((*itr), loser_spell, true);
 			}
 		}
-
+		winner_spell->EffectSpellGroupRelation[1] = 20559;
+		loser_spell->EffectSpellGroupRelation[1] = 20559;
+		
 		m_mainLock.Release();
 		return true;
 	}

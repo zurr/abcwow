@@ -417,6 +417,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 	switch( spellId )
 	{
+
 	case 5420: //Tree of Life
 		{
 			if( unitTarget == NULL )
@@ -428,7 +429,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			SpellCastTargets tgt;
 			tgt.m_unitTarget = unitTarget->GetGUID();
 			sp->prepare(&tgt);
-			
+
 		} break;
 	case 5938: //shiv
 		{
@@ -3539,7 +3540,7 @@ void Spell::SpellEffectTriggerSpell(uint32 i) // Trigger Spell
 	if(!unitTarget)
 		return;
 
-	Spell*sp=new Spell(m_caster,dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]),true,NULL);
+	Spell* sp = new Spell(m_caster,dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]),true,NULL);
 	SpellCastTargets tgt(unitTarget->GetGUID());
 	sp->prepare(&tgt);
 
