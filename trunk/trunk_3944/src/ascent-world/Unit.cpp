@@ -1878,35 +1878,32 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 					if( pGroup == NULL )
 						continue;
 
-					std::vector< Player* > TargetVector;
+					Player* newTarget = NULL;
+					uint32 minHP = uint32(-1);
+
 					GroupMembersSet::iterator itr;
 					static_cast< Player* >( this )->GetGroup()->Lock();
 					for(itr = pGroup->GetGroupMembersBegin(); itr != pGroup->GetGroupMembersEnd(); ++itr)
 					{
 						Player *p = (*itr)->m_loggedInPlayer;
-						if( !p || p == this || !p->isAlive() )
-							continue;
-						if ( this->GetDistance2dSq( p ) <= 500 ) //bit extra for lag
-							TargetVector.push_back( p );
+						if( p && p != this && p->isAlive() && this->GetDistance2dSq( p ) <= 500 && p->GetUInt32Value(UNIT_FIELD_HEALTH) < minHP )
+						{
+							minHP = p->GetUInt32Value(UNIT_FIELD_HEALTH);
+							newTarget = p;
+						}
 					}
 					static_cast< Player* >( this )->GetGroup()->Unlock();
-
-					if ( !TargetVector.size() )
-						continue;
-
-					size_t Rand_id = rand()%TargetVector.size();
-					Unit * newTarget = TargetVector[Rand_id];
-					TargetVector.clear();
 
 					if ( newTarget == NULL )
 						continue;
 
-					this->CastSpell( newTarget, 41635, true );
+					sp->procCharges = count; //ugly hack :(
+					Spell* spe = new Spell( this, sp, true, NULL );
+					SpellCastTargets tgt( newTarget->GetGUID() );
+					spe->prepare(&tgt);
+					sp->procCharges = 5;
 
-					for( uint32 x=0; x< 5-count; ++x )
-						newTarget->RemoveAuraByNameHash( SPELL_HASH_PRAYER_OF_MENDING );
-
-					continue;
+					//continue;
 				}
 
 				if(iter2->second.lastproc!=0)

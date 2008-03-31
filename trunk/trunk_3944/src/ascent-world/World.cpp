@@ -6289,6 +6289,13 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[2] = 2 | 4096 | 128 | 524288 ;
 	}
 
+	// druid - Moonkin aura
+	sp = dbcSpell.LookupEntryForced( 24907 );
+	if( sp != NULL )
+	{
+		sp->RequiredShapeShift = 0;
+	}
+
 	// druid - Shredding Attacks
 	sp = dbcSpell.LookupEntryForced( 16966 );
 	if( sp != NULL )

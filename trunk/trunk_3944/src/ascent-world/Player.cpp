@@ -407,6 +407,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 
 void Player::OnLogin()
 {
+	/*
 	if (this->getClass() == DRUID)
 	{
 		SSAura* aura = new SSAura();
@@ -414,6 +415,7 @@ void Player::OnLogin()
 		aura->forms = FORM_MOONKIN;
 		this->m_ssAuras.insert(aura);
 	}
+	*/
 }
 
 
