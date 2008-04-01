@@ -517,6 +517,11 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	if( u_victim == NULL )
 		return SPELL_DID_HIT_MISS;
 	
+	//multiple effects from same same spell cannot be resisted separately
+	for(SpellTargetsList::iterator itr = ModeratedTargets.begin(); itr != ModeratedTargets.end(); ++itr)
+		if( (*itr).TargetGuid == u_victim->GetGUID() )
+			return (*itr).TargetModType;
+
 	/************************************************************************/
 	/* Elite mobs always hit                                                */
 	/************************************************************************/
@@ -557,24 +562,16 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	
 	/**** HACK FIX: AoE Snare/Root spells (i.e. Frost Nova) ****/
 	/* If you find any other AoE effects that also apply something that SHOULD be a mechanic, add it here. */
-	if( u_victim->MechanicsDispels[MECHANIC_ROOTED] ||
-		u_victim->MechanicsDispels[MECHANIC_ENSNARED]
-		)
+	if( u_victim->MechanicsDispels[MECHANIC_ROOTED] || u_victim->MechanicsDispels[MECHANIC_ENSNARED] )
 	{
-	for( int i = 1 ; i <= 3 ; i ++ )
+		for( int i = 1 ; i <= 3 ; i ++ )
 		{
 			if( u_victim->MechanicsDispels[MECHANIC_ROOTED] && m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
 				return SPELL_DID_HIT_IMMUNE;
 			if( u_victim->MechanicsDispels[MECHANIC_ENSNARED] && m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED )
 				return SPELL_DID_HIT_IMMUNE;
 		}
-
 	}
-
-	/************************************************************************/
-	/* Check if the target has a % resistance to this mechanic              */
-	/************************************************************************/
-		/* Never mind, it's already done below. Lucky I didn't go through with this, or players would get double resistance. */
 
 	/************************************************************************/
 	/* Check if the spell is a melee attack and if it was missed/parried    */
@@ -601,9 +598,6 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	/************************************************************************/
 	/* Check if the spell is resisted.                                      */
 	/************************************************************************/
-	if( m_spellInfo->School==0)
-		return SPELL_DID_HIT_SUCCESS;
-
 	bool pvp =(p_caster && p_victim);
 
 	if(pvp)
@@ -628,15 +622,16 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 				resistchance = baseresist[2] + (((float)lvldiff-2.0f)*11.0f);
 		}
 	}
+
 	//check mechanical resistance
-	//i have no idea what is the best pace for this code
-	if( m_spellInfo->MechanicsType<27)
+	if( m_spellInfo->MechanicsType < 27)
 	{
 		if(p_victim)
 			resistchance += p_victim->MechanicsResistancesPCT[m_spellInfo->MechanicsType];
 		else 
 			resistchance += u_victim->MechanicsResistancesPCT[m_spellInfo->MechanicsType];
 	}
+
 	//rating bonus
 	if( p_caster != NULL )
 	{
@@ -682,7 +677,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 		if(resistchance<=1.0)//resist chance >=1
 			res =  (Rand(1.0f) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 		else
-			res =  (Rand(resistchance) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
+			res =  ( Rand(resistchance ) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 
 		if (res == SPELL_DID_HIT_SUCCESS) // proc handling. mb should be moved outside this function
 			target->HandleProc(PROC_ON_SPELL_LAND_VICTIM,this->u_caster,this->m_spellInfo);
