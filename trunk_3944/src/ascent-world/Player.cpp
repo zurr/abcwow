@@ -1356,6 +1356,9 @@ void Player::BuildEnumData( WorldPacket * p_data )
 ///  It assumes you will send out an UpdateObject packet at a later time.
 void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 {
+	if ( isDead() )
+		return;
+
 	if ( xp < 1 )
 		return;
 
