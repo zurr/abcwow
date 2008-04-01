@@ -1103,7 +1103,7 @@ public:
 			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::shatter, EVENT_SCRIPT_UPDATE_EVENT, 9000, 1, 0);
 			groundSlamcd = 80;
 		}
-		else if (!hatefulStrikecd)
+		else if (!hurtfulStrikecd)
 		{
 			hurtfulStrike();
 			hurtfulStrikecd = 20 + RandomUInt(16);
@@ -1241,6 +1241,7 @@ public:
 					if ( damage > 0 )
 					{
 						SpellEntry *tempspell = dbcSpell.LookupEntry( SHATTER );
+						tempspell->c_is_flags |= 0x00000040;
 						tempspell->EffectBasePoints[0] = damage;
 						_plr->CastSpell( *itr2, tempspell, true );
 					}
@@ -1271,7 +1272,7 @@ public:
 				if (_unit->GetAIInterface()->getThreatByPtr(temp) < highestAggro && _unit->GetAIInterface()->getThreatByPtr(temp) > currentAggro)
 				{
 					currentTarget = temp;
-					currentAggro = _unit->GetAIInterface()->getThreatByPtr(temp)
+					currentAggro = _unit->GetAIInterface()->getThreatByPtr(temp);
 				}
 			}
 		}
@@ -1281,7 +1282,7 @@ public:
 				currentTarget = _unit->GetAIInterface()->GetMostHated();
 
 		if (currentTarget != NULL)
-			_unit->CastSpell(currentTarget, HURTFUL_STRIKE, true)
+			_unit->CastSpell(currentTarget, HURTFUL_STRIKE, true);
 	}
 
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
