@@ -3143,6 +3143,14 @@ else
 			}
 		}
 
+		//ugly hack for shadowfiend restoring mana
+		if( GetUInt64Value(UNIT_FIELD_SUMMONEDBY) != 0 && GetUInt32Value(OBJECT_FIELD_ENTRY) == 19668 )
+		{
+			Player* owner = GetMapMgr()->GetPlayer((uint32)GetUInt64Value(UNIT_FIELD_SUMMONEDBY));
+			if ( owner != NULL )
+				this->Energize(owner, 34433, 2*realdamage, POWER_TYPE_MANA );
+		}
+
 	}
 	
 //==========================================================================================
