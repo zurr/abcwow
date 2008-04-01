@@ -2190,8 +2190,22 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 	       pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
 	       pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, p_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 	       pCreature->_setFaction();
+		   pCreature->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, p_caster->GetGUID());
+		   pCreature->SetUInt64Value(UNIT_FIELD_CREATEDBY, p_caster->GetGUID());
 	       p_caster->SetUInt64Value(UNIT_FIELD_SUMMON, pCreature->GetGUID());
+		  
 	       p_caster->m_tempSummon = pCreature;
+
+		   if ( m_spellInfo->EffectMiscValue[i] == 19668 ) //shadowfiend
+			{
+				float parent_bonus = (float)(p_caster->GetDamageDoneMod(SCHOOL_SHADOW)*0.065f);
+				pCreature->SetFloatValue(UNIT_FIELD_MINDAMAGE, pCreature->GetFloatValue(UNIT_FIELD_MINDAMAGE) + parent_bonus);
+				pCreature->SetFloatValue(UNIT_FIELD_MAXDAMAGE, pCreature->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + parent_bonus);
+				pCreature->BaseDamage[0] += parent_bonus;
+				pCreature->BaseDamage[1] += parent_bonus;
+				//TODO add avoidance chance 75%
+			}
+
 	       pCreature->PushToWorld(p_caster->GetMapMgr());
 
 	       /*if(p_caster->isInCombat())
@@ -2202,7 +2216,7 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 	       }*/
 	       
 	       /* not sure on this */
-	       sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE, /*GetDuration()*/45000, 1, 0);
+	       sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE, GetDuration()+2000 /*45000*/, 1, 0);
 	}
 }
 
