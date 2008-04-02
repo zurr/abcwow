@@ -7346,21 +7346,52 @@ void Aura::SpellAuraReduceEnemyRCritChance(bool apply)
 
 void Aura::SpellAuraIncreaseTimeBetweenAttacksPCT(bool apply)
 {
-	int32 val =  (apply) ? mod->m_amount : -mod->m_amount;
-	float pct_value = -val/100.0f;
-	m_target->ModFloatValue(UNIT_MOD_CAST_SPEED,pct_value);
+	if( mod->m_amount < 0 )
+		SetNegative();
+	else 
+		SetPositive();
+
+	float pct_value = mod->m_amount/100.0f;
+	
 	if( m_target->IsPlayer() )
 	{
 		if( apply )
 		{
 			static_cast< Player* >( m_target )->m_meleeattackspeedmod += mod->m_amount;
+			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, pct_value);
 		}
 		else
 		{
 			static_cast< Player* >( m_target )->m_meleeattackspeedmod -= mod->m_amount;
+			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, -pct_value);
 		}
 		static_cast< Player* >(m_target)->UpdateAttackSpeed();
 	}
+	else
+	{
+		if( apply )
+		{
+			mod->fixed_amount[0] = m_target->GetModPUInt32Value( UNIT_FIELD_BASEATTACKTIME, mod->m_amount );
+			mod->fixed_amount[1] = m_target->GetModPUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, mod->m_amount );
+
+			if( (int32)m_target->GetUInt32Value ( UNIT_FIELD_BASEATTACKTIME ) <= mod->fixed_amount[0] )
+				mod->fixed_amount[0] = m_target->GetUInt32Value ( UNIT_FIELD_BASEATTACKTIME );
+			if( (int32)m_target->GetUInt32Value ( UNIT_FIELD_BASEATTACKTIME_01 ) <= mod->fixed_amount[1] )
+				mod->fixed_amount[1] = m_target->GetUInt32Value ( UNIT_FIELD_BASEATTACKTIME_01 );
+
+			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME, -mod->fixed_amount[0] );
+			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, -mod->fixed_amount[1] );
+
+			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, pct_value);
+		}
+		else
+		{
+			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME, mod->fixed_amount[0] );
+			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, mod->fixed_amount[1] );
+			m_target->ModFloatValue( UNIT_MOD_CAST_SPEED, -pct_value);
+		}
+	}
+
 }
 
 /*
