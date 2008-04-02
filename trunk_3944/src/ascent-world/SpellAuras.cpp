@@ -7346,12 +7346,24 @@ void Aura::SpellAuraReduceEnemyRCritChance(bool apply)
 
 void Aura::SpellAuraIncreaseTimeBetweenAttacksPCT(bool apply)
 {
+	sLog.outString("im used");
 	int32 val =  (apply) ? mod->m_amount : -mod->m_amount;
 	float pct_value = -val/100.0f;
 	m_target->ModFloatValue(UNIT_MOD_CAST_SPEED,pct_value);
-	static_cast< Player* >( m_target )->m_meleeattackspeedmod += val;
-	static_cast< Player* >(m_target)->UpdateAttackSpeed();
+	if( m_target->IsPlayer() )
+	{
+		if( apply )
+		{
+			static_cast< Player* >( m_target )->m_meleeattackspeedmod += mod->m_amount;
+		}
+		else
+		{
+			static_cast< Player* >( m_target )->m_meleeattackspeedmod -= mod->m_amount;
+		}
+		static_cast< Player* >(m_target)->UpdateAttackSpeed();
+	}
 }
+
 /*
 void Aura::SpellAuraIncreaseSpellDamageByInt(bool apply)
 {
