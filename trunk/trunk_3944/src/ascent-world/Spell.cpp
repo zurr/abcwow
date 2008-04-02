@@ -271,7 +271,7 @@ void Spell::FillSpecifiedTargetsInArea(uint32 i,float srcx,float srcy,float srcz
                 {
 					did_hit_result = DidHit(i, static_cast< Unit* >( *itr ) );
 					if( did_hit_result != SPELL_DID_HIT_SUCCESS )
-						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(), did_hit_result));
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result);
 					else
 						tmpMap->push_back((*itr)->GetGUID());
                 }
@@ -335,7 +335,7 @@ void Spell::FillAllTargetsInArea(uint32 i,float srcx,float srcy,float srcz, floa
 					if( did_hit_result == SPELL_DID_HIT_SUCCESS )
 						tmpMap->push_back( (*itr)->GetGUID() );
 					else
-						ModeratedTargets.push_back( SpellTargetMod( (*itr)->GetGUID(), did_hit_result ) );
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result );
 				}
 			}
 			else //cast from GO
@@ -386,7 +386,7 @@ void Spell::FillAllFriendlyInArea( uint32 i, float srcx, float srcy, float srcz,
 					if( did_hit_result == SPELL_DID_HIT_SUCCESS )
 						tmpMap->push_back( (*itr)->GetGUID() );
 					else
-						ModeratedTargets.push_back( SpellTargetMod( (*itr)->GetGUID(), did_hit_result ) );
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result );
 				}
 			}
 			else //cast from GO
@@ -519,8 +519,19 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	
 	//multiple effects from same same spell cannot be resisted separately
 	for(SpellTargetsList::iterator itr = ModeratedTargets.begin(); itr != ModeratedTargets.end(); ++itr)
+	{
 		if( (*itr).TargetGuid == u_victim->GetGUID() )
 			return (*itr).TargetModType;
+	}
+
+	/*
+	for(std::vector< uint64 >::iterator trg = m_targetUnits[effindex].begin(); trg != m_targetUnits[effindex].end(); trg++)
+	{
+		if( (*trg) == u_victim->GetGUID() )
+			return SPELL_DID_HIT_SUCCESS;
+			//m_targetUnits[effindex].erase( m_targetUnits[effindex].begin() + k );
+	}
+	*/
 
 	/************************************************************************/
 	/* Elite mobs always hit                                                */
@@ -585,7 +596,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 		else
 		{
 			if (m_spellInfo->Flags4 & 0x1000000)
-				_type =  OFFHAND;
+				_type = OFFHAND;
 			else
 				_type = MELEE;
 		}
@@ -669,22 +680,25 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 #endif
 	}
 
+	uint32 res;
+
 	if(resistchance >= 100.0f)
-		return SPELL_DID_HIT_RESIST;
+		res = SPELL_DID_HIT_RESIST;
 	else
 	{
-		uint32 res;
 		if(resistchance<=1.0)//resist chance >=1
-			res =  (Rand(1.0f) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
+			res =  ( Rand(1.0f) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 		else
-			res =  ( Rand(resistchance ) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
+			res =  ( Rand(resistchance) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 
-		if (res == SPELL_DID_HIT_SUCCESS) // proc handling. mb should be moved outside this function
-			target->HandleProc(PROC_ON_SPELL_LAND_VICTIM,this->u_caster,this->m_spellInfo);
-
-		return res;
 	}
- 
+	
+	if (res == SPELL_DID_HIT_SUCCESS)
+	{
+		target->HandleProc(PROC_ON_SPELL_LAND_VICTIM,this->u_caster,this->m_spellInfo);
+	}
+
+	return res;
 }
 //generate possible target list for a spell. Use as last resort since it is not acurate
 //this function makes a rough estimation for possible target !
@@ -1892,8 +1906,6 @@ enum SpellGoFlags
 
 void Spell::SendSpellGo()
 {
-    
-
 	// Fill UniqueTargets
 	TargetsList::iterator i, j;
 	for( uint32 x = 0; x < 3; x++ )
@@ -4239,20 +4251,6 @@ void Spell::SafeAddTarget(TargetsList* tgt,uint64 guid)
 			return;
 	
 	tgt->push_back(guid);
-}
-
-void Spell::SafeAddMissedTarget(uint64 guid)
-{
-    for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
-        if((*i).TargetGuid==guid)
-        {
-            //sLog.outDebug("[SPELL] Something goes wrong in spell target system");
-			// this isnt actually wrong, since we only have one missed target map,
-			// whereas hit targets have multiple maps per effect.
-            return;
-        }
-
-    ModeratedTargets.push_back(SpellTargetMod(guid,2));
 }
 
 void Spell::SafeAddModeratedTarget(uint64 guid, uint16 type)

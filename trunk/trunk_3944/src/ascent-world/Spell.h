@@ -1924,7 +1924,6 @@ private:
     TargetsList m_targetUnits[3];
     void SafeAddTarget(TargetsList* tgt,uint64 guid);
     
-    void SafeAddMissedTarget(uint64 guid);
     void SafeAddModeratedTarget(uint64 guid, uint16 type);
 
     friend class DynamicObject;

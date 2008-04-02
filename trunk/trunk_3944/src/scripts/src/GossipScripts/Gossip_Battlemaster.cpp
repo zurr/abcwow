@@ -233,8 +233,14 @@ void SetupBattlemaster(ScriptMgr * mgr)
 
 	mgr->register_gossip_script(20384, eye); // Yula the Fair
 	mgr->register_gossip_script(20362, eye); // Iravar
-	
-	
+	mgr->register_gossip_script(20388, eye);
+	mgr->register_gossip_script(20385, eye);
+	mgr->register_gossip_script(20390, eye);
+	mgr->register_gossip_script(20338, eye);
+	mgr->register_gossip_script(20381, eye);
+	mgr->register_gossip_script(20374, eye);
+	mgr->register_gossip_script(20386, eye);
+	mgr->register_gossip_script(20382, eye);
 
    //cleanup:
    //removed Sandfury Soul Eater(hes a npc in Zul'Farrak and has noting to do whit the battleground masters) 
