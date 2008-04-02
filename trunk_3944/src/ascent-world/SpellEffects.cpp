@@ -1449,7 +1449,6 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 					}
 					if (immune)
 					{
-						SendCastResult(SPELL_FAILED_IMMUNE);
 						return;
 					}
 				}
