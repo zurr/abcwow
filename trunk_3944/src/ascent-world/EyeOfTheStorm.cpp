@@ -20,6 +20,22 @@
 
 #include "StdAfx.h"
 
+static float EOTSBuffCoordinates[4][4] = {
+ { 2050.542236f, 1372.680176f, 1194.561279f, 1.67552f },
+ { 2047.728271f, 1749.736084f, 1190.198608f, -0.872665f },
+ { 2283.300049f, 1748.891235f, 1189.706787f, 1.76278f },
+ { 2301.271484f, 1388.116943f, 1197.304810f, -1.50098f },
+};
+
+static float EOTSBuffRotations[4][2] = {
+ { 0.681998f, -0.731354f },
+ { 0.771625f, 0.636078f },
+ { 0.422618f, -0.906308f },
+ { 0.743145f, 0.669131f },
+};
+
+uint32 EOTSbuffentrys[4] = {184964,184971,184978,184973};
+
 const float EOTSGraveyardLocations[EOTS_TOWER_COUNT][3] = {
 	{ 2012.403442f, 1455.412354f, 1172.201782f },			// BE Tower
 	{ 2013.061890f, 1677.238037f, 1182.125732f },			// Fel Reaver Ruins
@@ -114,6 +130,7 @@ EyeOfTheStorm::EyeOfTheStorm(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) :
 
 	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
 	{
+		m_buffs[i] = NULL;
 		m_CPStatus[i] = 50;
 		m_CPBanner[i] = NULL;
 		m_CPStatusGO[i] = NULL;
@@ -127,6 +144,29 @@ EyeOfTheStorm::EyeOfTheStorm(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) :
 
 EyeOfTheStorm::~EyeOfTheStorm()
 {
+	for(uint32 i = 0; i < EOTS_TOWER_COUNT; ++i)
+	{
+		if( m_buffs[i] != NULL && m_buffs[i]->IsInWorld() == false )
+			delete m_buffs[i];
+
+		if( m_CPStatusGO[i] != NULL && m_CPStatusGO[i]->IsInWorld() == false )
+			delete m_CPStatusGO[i];
+
+		if( m_CPBanner[i] != NULL && m_CPBanner[i]->IsInWorld() == false )
+			delete m_CPBanner[i];
+	}
+
+	for(uint32 i = 0; i < 2; ++i)
+	{
+		if( m_bubbles[i] != NULL && m_bubbles[i]->IsInWorld() == false )
+			delete m_bubbles[i];
+	}
+
+	if( m_dropFlag != NULL && m_dropFlag->IsInWorld() == false )
+		delete m_dropFlag;
+
+	if( m_standFlag != NULL && m_standFlag->IsInWorld() == false )
+		delete m_standFlag;
 
 }
 
@@ -180,20 +220,30 @@ bool EyeOfTheStorm::HookHandleRepop(Player * plr)
 void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 {
 	int32 tid = -1;
+	bool buff = false;
+
 	switch(id)
 	{
+	case 4568:
+		buff = true;
 	case 4476:			// BE Tower
 		tid = EOTS_TOWER_BE;
 		break;
 
+	case 4569:
+		buff = true;
 	case 4514:			// Fel Reaver Tower
 		tid = EOTS_TOWER_FELREAVER;
 		break;
 
+	case 4571:
+		buff = true;
 	case 4518:			// Draenei Tower
 		tid = EOTS_TOWER_DRAENEI;
 		break;
 
+	case 4570:
+		buff = true;
 	case 4516:			// Mage Tower
 		tid = EOTS_TOWER_MAGE;
 		break;
@@ -202,26 +252,47 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 	if( tid < 0 )
 		return;
 
-	uint32 team = plr->GetTeam();
-	if( plr->GetGUIDLow() != m_flagHolder )
-		return;
-
-	int32 val;
-	uint32 i;
-	uint32 towers = 0;
-	if( team == 0 )
-		val = 100;
-	else
-		val = 0;
-
-	if( m_CPStatus[tid] != val )
-		return;			// not captured by our team
-
-	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
+	if( buff )
 	{
-		if(m_CPStatus[i] == val)
-			towers++;
+		uint32 spellid=0;
+		uint32 x = (uint32)tid;
+
+		if( m_buffs[x] && m_buffs[x]->IsInWorld() )
+		{
+			m_buffs[x]->RemoveFromWorld(false);
+			sEventMgr.AddEvent(this,&EyeOfTheStorm::SpawnBuff,x,EVENT_EOTS_RESPAWN_BUFF,EOTS_BUFF_RESPAWN_TIME,1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+
+			SpellEntry * sp = dbcSpell.LookupEntryForced( m_buffs[x]->GetInfo()->sound3 );
+			if(sp)
+			{
+				Spell * pSpell = new Spell(plr, sp, true, NULL);
+				SpellCastTargets targets(plr->GetGUID());
+				pSpell->prepare(&targets);
+			}
+		}
 	}
+	else
+	{
+		uint32 team = plr->GetTeam();
+		if( plr->GetGUIDLow() != m_flagHolder )
+			return;
+
+		int32 val;
+		uint32 i;
+		uint32 towers = 0;
+		if( team == 0 )
+			val = 100;
+		else
+			val = 0;
+
+		if( m_CPStatus[tid] != val )
+			return;			// not captured by our team
+
+		for(i = 0; i < EOTS_TOWER_COUNT; ++i)
+		{
+			if(m_CPStatus[i] == val)
+				towers++;
+		}
 
 	/*
 	Points from flag captures
@@ -233,17 +304,18 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 	*/
 
 	// 25 is guessed
-	const static uint32 points[5] = { 25, 75, 85, 100, 500 };
-	const char * msgs[2] = { "The Alliance have captured the flag.", "The Horde have captured the flag." };
+		const static uint32 points[5] = { 25, 75, 85, 100, 500 };
+		const char * msgs[2] = { "The Alliance have captured the flag.", "The Horde have captured the flag." };
 
-	SendChatMessage( 0x54, 0, msgs[team] );
-	GivePoints( team, points[towers] );
+		SendChatMessage( 0x54, 0, msgs[team] );
+		GivePoints( team, points[towers] );
 
-	m_standFlag->PushToWorld( m_mapMgr );
-	m_flagHolder = 0;
-	SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 1 );
+		m_standFlag->PushToWorld( m_mapMgr );
+		m_flagHolder = 0;
+		SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 1 );
 
-	plr->RemoveAura( EOTS_NETHERWING_FLAG_SPELL );
+		plr->RemoveAura( EOTS_NETHERWING_FLAG_SPELL );
+	}
 }
 
 void EyeOfTheStorm::HookOnPlayerDeath(Player * plr)
@@ -425,6 +497,8 @@ void EyeOfTheStorm::OnCreate()
 		m_CPBanner[i] = m_mapMgr->CreateGameObject();
 		m_CPBanner[i]->CreateFromProto( goi->ID, m_mapMgr->GetMapId(), EOTSCPLocations[i][0], EOTSCPLocations[i][1], EOTSCPLocations[i][2], 0);
 		m_CPBanner[i]->PushToWorld( m_mapMgr );
+
+		SpawnBuff(i);
 	}
 
 	/* BUBBLES! */
@@ -645,7 +719,7 @@ bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 		SetWorldState( EOTS_WORLDSTATE_ALLIANCE_VICTORYPOINTS + team, m_points[team] );
 
 		m_ended = true;
-		m_winningteam = team;
+		m_winningteam = ( team ) ? 0 : 1;
 		m_nextPvPUpdateTime = 0;
 
 		sEventMgr.RemoveEvents(this);
@@ -653,27 +727,42 @@ bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 
 		/* add the marks of honor to all players */
 		m_mainLock.Acquire();
-
-		SpellEntry * winner_spell = dbcSpell.LookupEntry(24953);
-		 // little hack here - since there is no spell for EotS rewards - should be reimplemented
-		winner_spell->EffectSpellGroupRelation[1] = 29024;
-		SpellEntry * loser_spell = dbcSpell.LookupEntry(24952);
-		loser_spell->EffectSpellGroupRelation[1] = 29024;
 		for(uint32 i = 0; i < 2; ++i)
 		{
 			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
 				(*itr)->Root();
-				if(i == m_winningteam)
-					(*itr)->CastSpell((*itr), winner_spell, true);
+				
+				uint32 reward_count;
+
+				if( i != m_winningteam )
+					reward_count = 3;
 				else
-					(*itr)->CastSpell((*itr), loser_spell, true);
+					reward_count = 1;
+
+				ItemPrototype* it = ItemPrototypeStorage.LookupEntry(29024);
+				if( it != NULL )
+				{
+					Item *item = objmgr.CreateItem( 29024, (*itr) );
+					item->SetUInt32Value(ITEM_FIELD_STACK_COUNT, reward_count );
+					item->SoulBind();
+
+					if( (*itr)->GetItemInterface()->AddItemToFreeSlot(item) )
+					{
+						SlotResult *lr = (*itr)->GetItemInterface()->LastSearchResult();
+						(*itr)->GetSession()->SendItemPushResult(item, false, true, false, true, lr->ContainerSlot, lr->Slot, reward_count);
+					}
+					else
+					{
+						delete item;
+					}
+
+				}
+
 			}
 		}
-		winner_spell->EffectSpellGroupRelation[1] = 20559;
-		loser_spell->EffectSpellGroupRelation[1] = 20559;
-		
 		m_mainLock.Release();
+
 		return true;
 	}
 
@@ -695,6 +784,35 @@ void EyeOfTheStorm::HookOnHK(Player * plr)
 
 void EyeOfTheStorm::SpawnBuff(uint32 x)
 {
+	uint32 chosen_buffid = EOTSbuffentrys[RandomUInt(3)];
+	GameObjectInfo * goi = GameObjectNameStorage.LookupEntry( chosen_buffid );
+	if( goi == NULL )
+		return;
+
+	if( m_buffs[x] == NULL )
+	{
+		m_buffs[x] = SpawnGameObject(chosen_buffid, m_mapMgr->GetMapId(), EOTSBuffCoordinates[x][0], EOTSBuffCoordinates[x][1], EOTSBuffCoordinates[x][2], EOTSBuffCoordinates[x][3], 0, 114, 1);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02, EOTSBuffRotations[x][0]);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03, EOTSBuffRotations[x][1]);
+		m_buffs[x]->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		m_buffs[x]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
+		m_buffs[x]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
+		m_buffs[x]->PushToWorld(m_mapMgr);
+	 }
+	else
+	{
+		if( m_buffs[x]->IsInWorld() )
+			m_buffs[x]->RemoveFromWorld(false);
+	
+		if(chosen_buffid != m_buffs[x]->GetEntry())
+		{
+			m_buffs[x]->SetNewGuid(m_mapMgr->GenerateGameobjectGuid());
+			m_buffs[x]->SetUInt32Value(OBJECT_FIELD_ENTRY, chosen_buffid);
+			m_buffs[x]->SetInfo(goi);
+		}
+	
+		m_buffs[x]->PushToWorld(m_mapMgr);
+	}
 
 }
 
