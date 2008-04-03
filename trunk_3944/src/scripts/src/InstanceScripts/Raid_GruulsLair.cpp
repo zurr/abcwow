@@ -1012,7 +1012,7 @@ public:
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		void CastTime();
+		CastTime();
 		GrowthCooldown = 30;
 		groundSlamcd = 45;
 		hurtfulStrikecd = 20 + RandomUInt(16);
