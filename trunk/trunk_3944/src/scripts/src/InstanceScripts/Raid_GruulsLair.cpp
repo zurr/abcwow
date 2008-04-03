@@ -291,13 +291,13 @@ public:
 		m_eventstarted = false;
 		if (_unit->isAlive())
 		{
-			if (summoner)
+			if (summoner != NULL)
 				summoner->Despawn(100, 0);
-			if (mage)
+			if (mage != NULL)
 				mage->Despawn(100, 0);
-			if (priest)
+			if (priest != NULL)
 				priest->Despawn(100, 0);
-			if (shaman)
+			if (shaman != NULL)
 				shaman->Despawn(100, 0);
 			_unit->Despawn(100, 2500);
 		}
@@ -1015,6 +1015,7 @@ public:
 		void CastTime();
 		GrowthCooldown = 30;
 		groundSlamcd = 45;
+		hurtfulStrikecd = 20 + RandomUInt(16);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come and die.");
 		_unit->PlaySoundToSet(11355);
 		RegisterAIUpdateEvent(1000);
@@ -1061,7 +1062,7 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Wraaaa!"); // more correct please ? :P
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Wraaaa!");
 		_unit->PlaySoundToSet(11363);
 		RemoveAIUpdateEvent();
 		GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(166.897f, 368.226f, 16.9209f, 184662);
@@ -1103,7 +1104,7 @@ public:
 			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::shatter, EVENT_SCRIPT_UPDATE_EVENT, 9000, 1, 0);
 			groundSlamcd = 80;
 		}
-		else if (!hurtfulStrikecd)
+		if (!hurtfulStrikecd)
 		{
 			hurtfulStrike();
 			hurtfulStrikecd = 20 + RandomUInt(16);
