@@ -1829,24 +1829,100 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 
 		if (skill && skill->skilline == SKILL_ALCHEMY)
 		{
+			// potions learned by discovery variables
+			uint32 cast_spell = 0;
+			uint32 cast_chance = 5;
+			uint32 learn_spell = 0;
+
 			//Potion Master
 			if (strstr(m_itemProto->Name1, "Potion"))
 			{
 				if(p_caster->HasSpell(28675)) 
 					while (Rand(20) && item_count<10) item_count++;
+
+				/*
+				cast_spell = XXXX; //cant find this one
+				cast_chance = 2;
+				learn_spell = 28586;
+				*/
 			}
 			//Elixir Master
 			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
 			{
-				if(p_caster->HasSpell(28677)) 
+				if(p_caster->HasSpell(28677))
 					while (Rand(20) && item_count<10) item_count++;
+
+				//TODO: add chance of random discovery of flasks here
+				//http://www.wowhead.com/?spells&filter=cr=9;crs=7;crv=0
 			}
 			//Transmutation Master
 			if (m_spellInfo->Category == 310)
 			{
 				if(p_caster->HasSpell(28672)) 
 					while (Rand(20) && item_count<10) item_count++;
+
+				//TODO: add chance of random discovery of transmutions here
+				//http://www.wowhead.com/?spells&filter=cr=9;crs=7;crv=0
 			}
+
+			//random discovery by crafter item id
+			switch ( m_itemProto->ItemId )
+			{
+			case 22845: //Major Arcane Protection Potion
+				{
+					cast_spell = 41460;
+					cast_chance = 20;
+					learn_spell = 41458;
+				}break;
+			case 22841: //Major Fire Protection Potion
+				{
+					cast_spell = 41504;
+					cast_chance = 20;
+					learn_spell = 41500;
+				}break;
+			case 22842: //Major Frost Protection Potion
+				{
+					cast_spell = 41505;
+					cast_chance = 20;
+					learn_spell = 41501;
+				}break;
+			case 22847: //Major Holy Protection Potion
+				{
+					// there is none
+				}break;
+			case 22844: //Major Nature Protection Potion
+				{
+					cast_spell = 41506;
+					cast_chance = 20;
+					learn_spell = 41502;
+				}break;
+			case 22846: //Major Shadow Protection Potion
+				{
+					cast_spell = 41507;
+					cast_chance = 20;
+					learn_spell = 41503;
+				}break;
+			}
+
+			if ( cast_spell && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
+			{
+				SpellEntry* spellproto = dbcSpell.LookupEntry( cast_spell );
+				if( spellproto != NULL )
+				{
+					SpellEntry* learned_spellproto = dbcSpell.LookupEntry( learn_spell );
+					if( learned_spellproto != NULL )
+					{
+						std::string disco_msg;
+						disco_msg = "DISCOVERY! You discovered the ";
+						disco_msg += learned_spellproto->Name;
+						disco_msg += "! ";
+						sChatHandler.SystemMessage(p_caster->GetSession(), disco_msg.c_str());
+					}
+
+					p_caster->CastSpell(p_caster, spellproto, true);
+				}
+			}
+
 		}
 
 		// item count cannot be more than allowed in a single stack
