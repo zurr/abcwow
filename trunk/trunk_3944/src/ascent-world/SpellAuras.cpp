@@ -7358,12 +7358,12 @@ void Aura::SpellAuraIncreaseTimeBetweenAttacksPCT(bool apply)
 		if( apply )
 		{
 			static_cast< Player* >( m_target )->m_meleeattackspeedmod += mod->m_amount;
-			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, pct_value);
+			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, -pct_value);
 		}
 		else
 		{
 			static_cast< Player* >( m_target )->m_meleeattackspeedmod -= mod->m_amount;
-			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, -pct_value);
+			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, pct_value);
 		}
 		static_cast< Player* >(m_target)->UpdateAttackSpeed();
 	}
@@ -7382,13 +7382,13 @@ void Aura::SpellAuraIncreaseTimeBetweenAttacksPCT(bool apply)
 			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME, -mod->fixed_amount[0] );
 			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, -mod->fixed_amount[1] );
 
-			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, pct_value);
+			m_target->ModFloatValue(UNIT_MOD_CAST_SPEED, -pct_value);
 		}
 		else
 		{
 			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME, mod->fixed_amount[0] );
 			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, mod->fixed_amount[1] );
-			m_target->ModFloatValue( UNIT_MOD_CAST_SPEED, -pct_value);
+			m_target->ModFloatValue( UNIT_MOD_CAST_SPEED, pct_value);
 		}
 	}
 
