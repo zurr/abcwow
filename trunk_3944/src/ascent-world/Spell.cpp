@@ -587,8 +587,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	/************************************************************************/
 	/* Check if the spell is a melee attack and if it was missed/parried    */
 	/************************************************************************/
-	uint32 melee_test_result;
-	if( m_spellInfo->is_melee_spell)
+	if( m_spellInfo->is_melee_spell )
 	{
 		uint32 _type;
 		if( GetType() == SPELL_DMG_TYPE_RANGED )
@@ -601,9 +600,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 				_type = MELEE;
 		}
 
-		melee_test_result = u_caster->GetSpellDidHitResult( u_victim, _type, m_spellInfo );
-		if(melee_test_result != SPELL_DID_HIT_SUCCESS)
-			return (uint8)melee_test_result;
+		return uint8( u_caster->GetSpellDidHitResult( u_victim, _type, m_spellInfo ) );
 	}
 
 	/************************************************************************/
@@ -690,7 +687,6 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 			res =  ( Rand(1.0f) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 		else
 			res =  ( Rand(resistchance) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
-
 	}
 	
 	if (res == SPELL_DID_HIT_SUCCESS)
