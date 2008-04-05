@@ -1840,11 +1840,10 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 				if(p_caster->HasSpell(28675)) 
 					while (Rand(20) && item_count<10) item_count++;
 
-				/*
-				cast_spell = XXXX; //cant find this one
+				// Super Rejuvenation Potion
+				cast_spell = 28600;
 				cast_chance = 2;
 				learn_spell = 28586;
-				*/
 			}
 			//Elixir Master
 			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
