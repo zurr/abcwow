@@ -1133,8 +1133,8 @@ public:
 			}
 			earthquakecd = 50 + RandomUInt(100)%10;
 		}
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
+		//float val = (float)RandomFloat(100.0f);
+		//SpellCast(val);
 	}
 
 	void CastTime()
@@ -1564,14 +1564,14 @@ public:
 		if (!cataclymboltcd)
 		{
 			Unit *target = RandomTarget(false, true, 6400);
-			if (target)
+			if (target && target->GetUInt32Value(UNIT_FIELD_MAXHEALTH) > 2)
 			{
-				int32 damage = (target->GetUInt32Value(UNIT_FIELD_MAXHEALTH) / 2);
+				int32 damage = target->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/2;
 				if (damage > 1)
 				{
 					SpellEntry *tempspell = dbcSpell.LookupEntry(KARATHRESS_CATACLYSMICBOLT);
 					tempspell->EffectBasePoints[0] = damage;
-					_unit->CastSpell(target, tempspell, true);
+					_unit->CastSpell(target, tempspell, false);
 				}
 			}
 			cataclymboltcd = 60;

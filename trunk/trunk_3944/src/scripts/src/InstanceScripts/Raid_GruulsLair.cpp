@@ -994,14 +994,6 @@ public:
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
-		/*
-		spells[1].info = dbcSpell.LookupEntry(HURTFUL_STRIKE);
-		spells[1].targettype = TARGET_ATTACKING; // Should attk party member with second the highest aggro in melee range
-		spells[1].instant = true;
-		spells[1].perctrigger = 3.0f;
-		spells[1].attackstoptimer = 1000;
-		*/
-
 		spells[1].info = dbcSpell.LookupEntry(REVERBERATION);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
