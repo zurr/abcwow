@@ -358,6 +358,19 @@ MapMgr * InstanceMgr::GetInstance(Object* obj)
 	}
 }
 
+MapMgr * InstanceMgr::GetStaticInstance(int mapID)
+{
+	MapInfo * inf = WorldMapInfoStorage.LookupEntry(mapID);
+
+	if( inf == NULL || mapID >= NUM_MAPS )
+		return NULL;
+
+	if ( inf->type != INSTANCE_NULL )
+		return NULL;
+
+	return m_singleMaps[mapID];
+}
+
 MapMgr * InstanceMgr::_CreateInstance(uint32 mapid, uint32 instanceid)
 {
 	Log.Notice("InstanceMgr", "Creating static instance %u on map %u.", instanceid, mapid);
