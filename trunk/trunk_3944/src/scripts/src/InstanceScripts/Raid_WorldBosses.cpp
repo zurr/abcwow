@@ -1816,7 +1816,7 @@ protected:
 
 #define EARTHQUAKE					32686
 #define MARK_OF_DEATH				37128
-#define CHAIN_LIGHTNING				28167
+#define CHAIN_LIGHTNING				33665
 #define OVERRUN						32636
 #define ENRAGE						34624
 #define AURA_OF_DEATH				37131
