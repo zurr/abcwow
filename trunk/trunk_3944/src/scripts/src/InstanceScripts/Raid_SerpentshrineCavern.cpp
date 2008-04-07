@@ -1576,19 +1576,19 @@ public:
 			}
 			cataclymboltcd = 60;
 		}
-		if (caribdis && !caribdis->isAlive() && caribdisalive)
+		if (caribdis != NULL && !caribdis->isAlive() && caribdisalive)
 		{
 			caribdisalive = false;
 			randomspeech();
 			tidalsurgecd = 15;
 		}
-		if (sharkkis && !sharkkis->isAlive() && sharkkisalive)
+		if (sharkkis != NULL && !sharkkis->isAlive() && sharkkisalive)
 		{
 			sharkkisalive = false;
 			randomspeech();
 			beastwithincd = 15;
 		}
-		if (tidalvess && !tidalvess->isAlive() && tidalvessalive)
+		if (tidalvess != NULL && !tidalvess->isAlive() && tidalvessalive)
 		{
 			tidalvessalive = false;
 			randomspeech();
@@ -1911,17 +1911,18 @@ public:
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
 		spells[0].cooldown = 35;
-		spells[0].perctrigger = 10.0f;
+		spells[0].perctrigger = 8.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(SHARKKIS_MULTISHOT);
 		spells[1].targettype = TARGET_RANDOM_SINGLE;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
-		spells[1].perctrigger = 10.0f;
+		spells[1].perctrigger = 4.0f;
 		spells[1].attackstoptimer = 1000;
 
 		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
+		pet = NULL;
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -1963,7 +1964,7 @@ public:
 		beastwithincd--;
 		if (!petcd)
 		{
-			if (!pet)
+			if (pet == NULL)
 			{
 				int val = RandomUInt(100)%2;
 				switch (val)

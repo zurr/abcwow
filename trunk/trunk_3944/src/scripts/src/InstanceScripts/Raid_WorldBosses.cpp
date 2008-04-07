@@ -1840,7 +1840,7 @@ public:
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].cooldown = -1;
-		spells[0].perctrigger = 8.0f;
+		spells[0].perctrigger = 4.0f;
 		spells[0].attackstoptimer = 1000;
 
 		earthquakecd = 50;
