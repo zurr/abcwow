@@ -1919,29 +1919,36 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			if( pVictim->IsPlayer() )
 			{
 				sHookInterface.OnKillPlayer( plr, static_cast< Player* >( pVictim ) );
+				bool setAurastateFlag = false;
 				if(plr->getLevel() > pVictim->getLevel())
 				{
 					unsigned int diff = plr->getLevel() - pVictim->getLevel();
 					if( diff <= 8 )
 					{
 						HonorHandler::OnPlayerKilledUnit(plr, pVictim);
-						SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+						setAurastateFlag = true;
 					}
-					else
-						RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 				}
 				else
 				{
 					HonorHandler::OnPlayerKilledUnit( plr, pVictim );
-					SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+					setAurastateFlag = true;
+				}
+
+				if (setAurastateFlag)
+				{
+					this->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+					if(!sEventMgr.HasEvent(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+						sEventMgr.AddEvent((Unit*)this,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+					else sEventMgr.ModifyEventTimeLeft(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
 				}
 			}
 			else
 			{
 				// REPUTATION
 				plr->Reputation_OnKilledUnit( pVictim, false );
-				RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 			}
+
 		}
 		/* -------------------------------- HONOR + BATTLEGROUND CHECKS END------------------------ */
 
@@ -2071,7 +2078,14 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				{
 					uint32 xp = CalculateXpToGive( pVictim, static_cast< Unit* >( this ) );
 					if( xp )
+					{
 						static_cast< Player* >( this )->GiveXP( xp, victimGuid, true );
+
+						this->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+						if(!sEventMgr.HasEvent(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+							sEventMgr.AddEvent((Unit*)this,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+						else sEventMgr.ModifyEventTimeLeft(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
+					}
 
 					if( static_cast< Player* >( this )->GetSummon() && static_cast< Player* >( this )->GetSummon()->GetUInt32Value( UNIT_CREATED_BY_SPELL ) == 0 )
 					{

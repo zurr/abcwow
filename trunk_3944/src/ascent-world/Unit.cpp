@@ -562,6 +562,11 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 		for( int i = 0; i < active_player_count; i++ )
 		{
 			active_player_list[i]->GiveXP( float2int32( ( ( xp * active_player_list[i]->getLevel()) / total_level ) * xp_mod ), pVictim->GetGUID(), true );
+
+			active_player_list[i]->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+			if(!sEventMgr.HasEvent(active_player_list[i],EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+				sEventMgr.AddEvent((Unit*)active_player_list[i],&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+			else sEventMgr.ModifyEventTimeLeft(active_player_list[i],EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
 		}
 	}
 		/* old code start before 2007 04 22
