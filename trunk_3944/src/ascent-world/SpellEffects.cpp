@@ -5353,7 +5353,7 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 			}
 		}
 		if(!spellInfo)
-			return; //omg how did this happen ?
+			return;
 		//we should also cast sunder armor effect on target with or without dmg
 		Spell *spell = new Spell(u_caster, spellInfo ,true, NULL);
 		spell->ProcedOnSpell = m_spellInfo;
@@ -5361,7 +5361,8 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		SpellCastTargets targets(unitTarget->GetGUID());
 		spell->prepare(&targets);
 		if(!sunder_count)
-			return; //no damage = no joy
+			return;
+		if ( sunder_count > 5 ) sunder_count = 5;
 		damage = (int32)(0.01*damage*(m_spellInfo->EffectBasePoints[0]+1)+(1+ m_spellInfo->EffectBasePoints[1])*sunder_count);
 	}
 
