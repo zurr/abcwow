@@ -4399,10 +4399,12 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_SAP:					// Sap
 	case SPELL_HASH_GOUGE:					// Gouge
 	case SPELL_HASH_REPENTANCE:			// Repentance
+	case SPELL_HASH_MAIM:
 		{
 			grp = 0;
 		}break;
 
+	case SPELL_HASH_POUNCE:
 	case SPELL_HASH_CHEAP_SHOT:				// Cheap Shot
 	case SPELL_HASH_KIDNEY_SHOT:			// Kidney Shot
 	case SPELL_HASH_HAMMER_OF_JUSTICE:		// Hammer of Justice
