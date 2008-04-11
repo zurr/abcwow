@@ -2303,6 +2303,7 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 	if( SrcItem != NULL && DstItem != NULL && SrcItem->GetEntry()==DstItem->GetEntry() && SrcItem->GetProto()->MaxCount > 1 && SrcItem->wrapped_item_id == 0 && DstItem->wrapped_item_id == 0 )
 	{
 		uint32 total = SrcItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) + DstItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT );
+		SrcItem->m_isDirty = DstItem->m_isDirty = true;
 		if( total <= DstItem->GetProto()->MaxCount )
 		{
 			DstItem->ModUInt32Value( ITEM_FIELD_STACK_COUNT, SrcItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) );
