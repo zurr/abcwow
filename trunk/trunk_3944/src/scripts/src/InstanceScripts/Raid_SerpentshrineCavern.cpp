@@ -1125,9 +1125,13 @@ public:
 			for (int z = 0; z < 7; z++)
 			{
 				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 445.17f, -719.20f, -7.14f, 0, true, false, 0, 0);
+				if ( murloc == NULL )
+					continue;
 				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 				murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 314.42f, -729.91f, -13.15f, 0, true, false, 0, 0);
+				if ( murloc == NULL )
+					continue;
 				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 				murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			}
@@ -1314,6 +1318,8 @@ public:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_WATERGLOBULE, 337.470581f, -732.931885f, -14.173863f, 0, true, false, 0, 0);
 				break;
 			}
+			if ( summon == NULL )
+				continue;
 			summon->GetAIInterface()->SetSoulLinkedWith(temp);
 			summon->GetAIInterface()->taunt(temp, true);
 			summon->GetAIInterface()->AttackReaction(temp, 1, 0);
@@ -1754,7 +1760,6 @@ public:
 
 	CARIBDISAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
 		nrspells = 1;
 		for(int i=0; i<nrspells; i++)
 		{
@@ -1901,7 +1906,6 @@ public:
 
 	SHARKKISAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
 		nrspells = 2;
 		for(int i=0; i<nrspells; i++)
 		{
@@ -1988,7 +1992,7 @@ public:
 						pet = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMLURKER, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
 						break;
 					case 1:
-						pet = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMLURKER, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
+						pet = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMSPOREBAT, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
 						break;
 					}
 				}
@@ -2151,7 +2155,6 @@ public:
 
 	TIDALVESSAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		karathress = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(456.138336f, -541.419678f, -7.547507f, CN_KARATHRESS);
 		nrspells = 3;
 		for(int i=0; i<nrspells; i++)
 		{

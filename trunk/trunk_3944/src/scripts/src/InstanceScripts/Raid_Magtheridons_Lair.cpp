@@ -81,12 +81,15 @@ public:
 		for (int i = 0; i < 5; i++)
 		{
 			cube = _unit->GetMapMgr()->GetInterface()->SpawnGameObject(MANTICRONCUBE, cubeSpawns[i].x, cubeSpawns[i].y, cubeSpawns[i].z, 0, true, 0, 0);
-			cubes.push_back(cube);
+			if ( cube != NULL )
+				cubes.push_back(cube);
 		}
 		Creature *channeler;
 		for (int i = 0; i < 5; i++)
 		{
 			channeler = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HELLFIRE_CHANNELER, channelerSpawns[i].x, channelerSpawns[i].y, channelerSpawns[i].z,  channelerSpawns[i].o, true, false, 0, 0);
+			if ( channeler == NULL )
+				continue;
 			channeler->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, _unit->GetGUID());
 			channeler->SetUInt32Value(UNIT_CHANNEL_SPELL, 30207);
 			channelers.push_back(channeler);
@@ -100,6 +103,7 @@ public:
 		m_phase = 1;
 		enrage = 0;
 		timer_enrage = 1320;
+		_unit->DamageDoneModPCT[0] = 0;
 		m_eventstarted = false;
 		timer_banish = 120;
 		RegisterAIUpdateEvent(1000);
@@ -138,7 +142,9 @@ public:
 					falling->SetUInt32Value(GAMEOBJECT_STATE, 1);
 			}
 		}
-		door->SetUInt32Value(GAMEOBJECT_STATE, 0);
+		if ( door != NULL )
+			door->SetUInt32Value(GAMEOBJECT_STATE, 0);
+
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -149,7 +155,8 @@ public:
 		sEventMgr.RemoveEvents(this);
 		_unit->PlaySoundToSet(10258);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The Legion... will consume you... all....");
-		door->SetUInt32Value(GAMEOBJECT_STATE, 0);
+		if ( door != NULL )
+			door->SetUInt32Value(GAMEOBJECT_STATE, 0);
 		RemoveAIUpdateEvent();
 	}
 
@@ -1025,12 +1032,13 @@ public:
 			myTrigger = _gameobject->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ(), CN_CUBETRIGGER);
 		if (magtheridon == NULL || !magtheridon->isAlive() || !magtheridon->GetAIInterface()->GetNextTarget())
 			return;
-		if (Channeler != NULL)
-			return;
-		if (myTrigger = NULL)
+		if (Channeler != NULL || myTrigger == NULL)
 			return;
 
 		aura = new Aura(dbcSpell.LookupEntry(MINDEXHAUSTION), 90000, magtheridon, pPlayer);
+		if ( aura == NULL )
+			return;
+
 		pPlayer->AddAura(aura);
 		pPlayer->CastSpell(pPlayer, SHADOWGRASP2, false);
 		myTrigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, magtheridon->GetGUID());
@@ -1038,17 +1046,14 @@ public:
 		Channeler = pPlayer;
 
 		uint32 Counter = 0;
-		Creature *cubeTrigger;
 		for (int i = 0; i < 5; i++)
 		{
-			cubeTrigger = NULL;
-			cubeTrigger = _gameobject->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(cubeSpawns[i].x, cubeSpawns[i].y, cubeSpawns[i].z, 17376);
+			Creature *cubeTrigger = _gameobject->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(cubeSpawns[i].x, cubeSpawns[i].y, cubeSpawns[i].z, 17376);
 			if (cubeTrigger != NULL && (cubeTrigger->GetUInt32Value(UNIT_CHANNEL_SPELL) == SHADOWGRASP))
-			{
 				Counter++;
-			}
 		}
-		if (Counter == 5)
+
+		if (Counter >= 5)
 		{
 			//TODO: ADD DMG BOOST
 			magtheridon->PlaySoundToSet(10256);
