@@ -282,6 +282,8 @@ bool ShatariTorch(uint32 i, Spell* pSpell)
 		obj = sEAS.SpawnGameobject(plr, 183816, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
 		sEAS.GameobjectDelete(obj, 1*60*1000);
 	}
+	else
+		return true;
 
 	target->Despawn(0, 1*60*1000);
 	qle->UpdatePlayerFields();
