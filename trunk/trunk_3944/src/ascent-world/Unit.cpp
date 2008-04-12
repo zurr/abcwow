@@ -2914,6 +2914,9 @@ else
 //--------------------------------critical hit----------------------------------------------
 			case 5:
 				{
+					if ( ability && (ability->Flags3 & FLAGS3_CANNOT_CRIT) )
+						break;
+
 					hit_status |= HITSTATUS_CRICTICAL;
 					int32 dmgbonus = dmg.full_damage;
 					//sLog.outString( "DEBUG: Critical Strike! Full_damage: %u" , dmg.full_damage );
