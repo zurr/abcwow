@@ -2240,74 +2240,81 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		{
 			//------------------------------critical strike chance--------------------------------------	
 			// lol ranged spells were using spell crit chance
-			float CritChance;
-			if( spellInfo->is_ranged_spell )
+			if ( spellInfo && (spellInfo->Flags3 & FLAGS3_CANNOT_CRIT) )
 			{
-
-				if( IsPlayer() )
-				{
-					CritChance = GetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE );
-				}
-				else
-				{
-					CritChance = 5.0f; // static value for mobs.. not blizzlike, but an unfinished formula is not fatal :)
-				}
-				if( pVictim->IsPlayer() )
-				{
-					CritChance += static_cast< Player* >( pVictim )->res_R_crit_get();
-					CritChance += float( pVictim->AttackerCritChanceMod[spellInfo->School] );
-					CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE );
-				}
+				// do we need to do something extra ?
 			}
 			else
 			{
-				CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerCritChanceMod[school];
-				if( caster->IsPlayer() && ( pVictim->m_rooted - pVictim->m_stunned ) )	
-					CritChance += static_cast< Player* >( caster )->m_RootedCritChanceBonus;
-
-				if( spellInfo->SpellGroupType )
+				float CritChance;
+				if( spellInfo->is_ranged_spell )
 				{
-					SM_FFValue(caster->SM_CriticalChance, &CritChance, spellInfo->SpellGroupType);
-	#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-					float spell_flat_modifers=0;
-					SM_FFValue(caster->SM_CriticalChance,&spell_flat_modifers,spellInfo->SpellGroupType);
-					if(spell_flat_modifers!=0)
-						printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,spellInfo->SpellGroupType);
-	#endif
+
+					if( IsPlayer() )
+					{
+						CritChance = GetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE );
+					}
+					else
+					{
+						CritChance = 5.0f; // static value for mobs.. not blizzlike, but an unfinished formula is not fatal :)
+					}
+					if( pVictim->IsPlayer() )
+					{
+						CritChance += static_cast< Player* >( pVictim )->res_R_crit_get();
+						CritChance += float( pVictim->AttackerCritChanceMod[spellInfo->School] );
+						CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE );
+					}
 				}
-				if( pVictim->IsPlayer() )
-				CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE );
-			}
-			if( CritChance < 0 ) CritChance = 0;
-			if( CritChance > 95 ) CritChance = 95;
-			critical = Rand(CritChance);
-			//sLog.outString( "SpellNonMeleeDamageLog: Crit Chance %f%%, WasCrit = %s" , CritChance , critical ? "Yes" : "No" );
+				else
+				{
+					CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerCritChanceMod[school];
+					if( caster->IsPlayer() && ( pVictim->m_rooted - pVictim->m_stunned ) )	
+						CritChance += static_cast< Player* >( caster )->m_RootedCritChanceBonus;
+
+					if( spellInfo->SpellGroupType )
+					{
+						SM_FFValue(caster->SM_CriticalChance, &CritChance, spellInfo->SpellGroupType);
+	#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+						float spell_flat_modifers=0;
+						SM_FFValue(caster->SM_CriticalChance,&spell_flat_modifers,spellInfo->SpellGroupType);
+						if(spell_flat_modifers!=0)
+							printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,spellInfo->SpellGroupType);
+	#endif
+					}
+					if( pVictim->IsPlayer() )
+					CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE );
+				}
+				if( CritChance < 0 ) CritChance = 0;
+				if( CritChance > 95 ) CritChance = 95;
+				critical = Rand(CritChance);
+				//sLog.outString( "SpellNonMeleeDamageLog: Crit Chance %f%%, WasCrit = %s" , CritChance , critical ? "Yes" : "No" );
 //==========================================================================================
 //==============================Spell Critical Hit==========================================
 //==========================================================================================
-			if (critical)
-			{		
-				float b = res / 2.0f;
-				if( spellInfo->SpellGroupType )
-					SM_PFValue( caster->SM_PCriticalDamage, &b, spellInfo->SpellGroupType );
-				res += b;
-				if( pVictim->IsPlayer() )
-				{
+				if (critical)
+				{		
+					float b = res / 2.0f;
+					if( spellInfo->SpellGroupType )
+						SM_PFValue( caster->SM_PCriticalDamage, &b, spellInfo->SpellGroupType );
+					res += b;
+					if( pVictim->IsPlayer() )
+					{
 					//res = res*(1.0f-2.0f*static_cast< Player* >(pVictim)->CalcRating(PLAYER_RATING_MODIFIER_MELEE_CRIT_RESISTANCE));
 					//Resilience is a special new rating which was created to reduce the effects of critical hits against your character.
 					//It has two components; it reduces the chance you will be critically hit by x%, 
 					//and it reduces the damage dealt to you by critical hits by 2x%. x is the percentage resilience granted by a given resilience rating. 
 					//It is believed that resilience also functions against spell crits, 
 					//though it's worth noting that NPC mobs cannot get critical hits with spells.
-					float dmg_reduction_pct = 2 * static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
-					if( dmg_reduction_pct > 1.0f )
-						dmg_reduction_pct = 1.0f; //we cannot resist more then he is criticalling us, there is no point of the critical then :P
-					res = res - res * dmg_reduction_pct;
-				}
+						float dmg_reduction_pct = 2 * static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
+						if( dmg_reduction_pct > 1.0f )
+							dmg_reduction_pct = 1.0f; //we cannot resist more then he is criticalling us, there is no point of the critical then :P
+						res = res - res * dmg_reduction_pct;
+					}
 
-				pVictim->Emote( EMOTE_ONESHOT_WOUNDCRITICAL );
-				aproc |= PROC_ON_SPELL_CRIT_HIT;
-				vproc |= PROC_ON_SPELL_CRIT_HIT_VICTIM;
+					pVictim->Emote( EMOTE_ONESHOT_WOUNDCRITICAL );
+					aproc |= PROC_ON_SPELL_CRIT_HIT;
+					vproc |= PROC_ON_SPELL_CRIT_HIT_VICTIM;
+				}
 			}
 		}
 	}

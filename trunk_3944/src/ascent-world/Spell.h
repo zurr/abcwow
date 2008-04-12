@@ -402,7 +402,7 @@ enum Flags3
     FLAGS3_NULL               = 0x0,
     FLAGS3_UNK2               = 0x1,
     FLAGS3_UNK3               = 0x2,    // Can be used while stealthed
-    FLAGS3_UNK4               = 0x4,    // request pet maybe
+    FLAGS3_CANNOT_CRIT        = 0x4,    // cannot crit
     FLAGS3_UNK5               = 0x8,    // something todo with temp enchanted items
     FLAGS3_PARTY_EFFECTING_AURA = 0x10, // Party affecting aura's
     FLAGS3_ACTIVATE_AUTO_SHOT = 0x20,   // spell that enable's auto shoot

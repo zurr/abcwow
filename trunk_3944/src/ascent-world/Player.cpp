@@ -5523,7 +5523,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 					{
 						for(GroupMembersSet::iterator itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
 						{
-							if((*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer->GetItemInterface()->CanReceiveItem(itemProto, iter->iItemsCount) == 0)
+							if((*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer->GetItemInterface()->CanReceiveItem(itemProto, iter->iItemsCount) == 0 && this->GetMapId() == (*itr)->m_loggedInPlayer->GetMapId() )
 							{
 								(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&data2);
 							}
