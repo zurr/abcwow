@@ -534,11 +534,12 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	*/
 
 	/************************************************************************/
-	/* Elite mobs always hit                                                */
+	/* Elite mobs always hit - mooo?                                        */
 	/************************************************************************/
+	/*
 	if( u_caster != NULL && u_caster->GetTypeId() == TYPEID_UNIT && static_cast< Creature* >( u_caster )->GetCreatureName() && static_cast< Creature* >( u_caster )->GetCreatureName()->Rank >= 3 )
 		return SPELL_DID_HIT_SUCCESS;
-
+	*/
 	/************************************************************************/
 	/* Can't resist non-unit                                                */
 	/************************************************************************/
