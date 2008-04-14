@@ -1138,7 +1138,7 @@ public:
 						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					case TARGET_RANDOM_DESTINATION:
 						target = RandomTarget(false, true, 10000);
-						if (target)
+						if (target != NULL)
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
 
@@ -1228,9 +1228,9 @@ public:
 
 			for(set<Player*>::iterator itr2 = _plr->GetInRangePlayerSetBegin(); itr2 != _plr->GetInRangePlayerSetEnd(); ++itr2)
 			{
-				if ( (*itr2) != _plr && (*itr2)->isAlive() && _plr->GetDistance2dSq( *itr2 ) <= 400 )
+				if ( (*itr2) != _plr && (*itr2)->isAlive() && _plr->GetDistance2dSq( *itr2 ) <= 400.0f )
 				{
-					int32 damage = (int32)(9000 - 21.5f * _plr->GetDistance2dSq(*itr2) );
+					int32 damage = (int32)(9000 - 21.5f * _plr->GetDistance2dSq(*itr2));
 					if ( damage > 0 )
 					{
 						SpellEntry *tempspell = dbcSpell.LookupEntry( SHATTER );
@@ -1246,10 +1246,13 @@ public:
 
 	void hurtfulStrike()
 	{
-		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0 || _unit->GetAIInterface()->GetMostHated() == NULL)
 			return;
 
 		uint32 highestAggro = _unit->GetAIInterface()->getThreatByPtr(_unit->GetAIInterface()->GetMostHated());
+		if (highestAggro < 1)
+			return;
+
 		Unit *currentTarget;
 		uint32 currentAggro = 0;
 
