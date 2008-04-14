@@ -1586,19 +1586,19 @@ public:
 		{
 			caribdisalive = false;
 			randomspeech();
-			tidalsurgecd = 15;
+			tidalsurgecd = 5 + RandomUInt(100)%15;
 		}
 		if (sharkkis != NULL && !sharkkis->isAlive() && sharkkisalive)
 		{
 			sharkkisalive = false;
 			randomspeech();
-			beastwithincd = 15;
+			beastwithincd = 5 + RandomUInt(100)%15;
 		}
 		if (tidalvess != NULL && !tidalvess->isAlive() && tidalvessalive)
 		{
 			tidalvessalive = false;
 			randomspeech();
-			firetotemcd = 15;
+			firetotemcd = 5 + RandomUInt(100)%15;
 		}
 		if (!caribdisalive)
 		{
@@ -1615,7 +1615,7 @@ public:
 			if (!beastwithincd)
 			{
 				_unit->CastSpell(_unit, KARATHRESS_BEASTWITHIN, true);
-				beastwithincd = 60;
+				beastwithincd = 50 + RandomUInt(100)%15;
 			}
 		}
 		if (!tidalvessalive)
@@ -1624,7 +1624,7 @@ public:
 			if (!firetotemcd)
 			{
 				Creature *totem = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPITFIRE, _unit->GetPositionX() + 2, _unit->GetPositionY() + 2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
-				firetotemcd = 85;
+				firetotemcd = 40 + RandomUInt(100)%15;
 			}
 		}
 	}
@@ -2192,8 +2192,8 @@ public:
 			CreatureAIScript *mob_script = karathress->GetScript();
 			((KARATHRESSAI*)mob_script)->EventStart(mTarget);
 		}
-		earthtotemcd = 15;
-		firetotemcd = 25;
+		earthtotemcd = 5 + RandomUInt(100)%15;
+		firetotemcd = 10 + RandomUInt(100)%15;
 		CastTime();
 	}
 
@@ -2224,12 +2224,12 @@ public:
 		if (!earthtotemcd)
 		{
 			Creature *totem = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_EARTHBIND, _unit->GetPositionX() + 2, _unit->GetPositionY() + 2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
-			earthtotemcd = 55;
+			earthtotemcd = 30 + RandomUInt(100)%15;
 		}
 		if (!firetotemcd)
 		{
 			Creature *totem = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPITFIRE, _unit->GetPositionX() - 2, _unit->GetPositionY() - 2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
-			firetotemcd = 85;
+			firetotemcd = 40 + RandomUInt(100)%15;
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
