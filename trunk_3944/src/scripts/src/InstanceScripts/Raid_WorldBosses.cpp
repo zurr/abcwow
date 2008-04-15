@@ -1830,19 +1830,21 @@ public:
 
 	DoomwalkerAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		nrspells = 1;
+		//nrspells = 1;
+		nrspells = 0;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
 
+		/*
 		spells[0].info = dbcSpell.LookupEntry(CHAIN_LIGHTNING);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].cooldown = -1;
 		spells[0].perctrigger = 4.0f;
 		spells[0].attackstoptimer = 1000;
-
+*/
 		earthquakecd = 50;
 		overruncd = 35;
 
