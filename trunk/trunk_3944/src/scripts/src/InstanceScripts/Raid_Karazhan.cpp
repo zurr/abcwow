@@ -2692,7 +2692,8 @@ public:
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(3, 0, FLY));
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(4, 0, FLY));
 
-		nrspells = 5;
+		nrspells = 4;
+		//nrspells = 5;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -2719,26 +2720,28 @@ public:
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
-		spells[2].info = dbcSpell.LookupEntry(SMOLDERING_BREATH);
+		spells[2].info = dbcSpell.LookupEntry(CLEAVE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = false;
 		spells[2].cooldown = 7;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
-		spells[3].info = dbcSpell.LookupEntry(CLEAVE);
+		spells[3].info = dbcSpell.LookupEntry(DISTRACTING_ASH);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = false;
-		spells[3].cooldown = 7;
+		spells[3].cooldown = 20;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
 
-		spells[4].info = dbcSpell.LookupEntry(DISTRACTING_ASH);
+		/*
+		spells[4].info = dbcSpell.LookupEntry(SMOLDERING_BREATH);
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = false;
-		spells[4].cooldown = 20;
+		spells[4].cooldown = 7;
 		spells[4].perctrigger = 0.0f;
 		spells[4].attackstoptimer = 1000;
+		*/
 	}
 
 	void OnCombatStart(Unit* mTarget)
