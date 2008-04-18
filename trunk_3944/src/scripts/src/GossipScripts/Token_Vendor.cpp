@@ -4,8 +4,8 @@
 
 #define TOKEN_COST				3
 #define FACTION_TOKEN_COST		50
-#define HONOR_COST				7000
-#define ARENA_COST				300
+#define HONOR_COST				3000
+#define ARENA_COST				200
 /*--------------------------------*/
 #define HALAA_TOKEN				26045
 #define HONOR_HOLD_TOKEN		24579

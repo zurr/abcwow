@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Setup.h"
+#include "Base.h"
 
 /************************************************************************/
 /* Raid_TheEye.cpp Script												*/
@@ -174,7 +175,6 @@ public:
 	}
 	
 protected:
-
 	int nrspells;
 };
 
@@ -1701,7 +1701,7 @@ protected:
 #define POUNDING 34164
 #define ARCANE_ORB 34190
 #define ARCANE_ORB_TRIGGER 34172
-#define KNOCK_AWAY 21737
+#define KNOCK_AWAY 25778 //21737
 #define ENRAGE 27680 // Needs checking (as it can be wrong [or maybe IS wrong])
 
 class VoidReaverAI : public CreatureAIScript
@@ -1737,8 +1737,8 @@ public:
     void OnCombatStart(Unit* mTarget)
     {
 		ResetCastTime();
-		mEnrageTimer = 600; //10 minutes
-		mArcaneOrbTimer = 10; //first cast after 10 seconds
+		EnrageTimer = 600; //10 minutes
+		ArcaneOrbTimer = 10; //first cast after 10 seconds
 		Enraged = false;
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Alert, you are marked for extermination!");
 		_unit->PlaySoundToSet(11213);
@@ -1792,8 +1792,8 @@ public:
 		//Enrage
 		if(!Enraged)
 		{
-			mEnrageTimer--;
-			if(!mEnrageTimer)
+			EnrageTimer--;
+			if(!EnrageTimer)
 			{
 				_unit->CastSpell(_unit, dbcSpell.LookupEntry(ENRAGE), true);
 				Enraged = true;
@@ -1802,8 +1802,8 @@ public:
 
 		//Arcane Orb
 		//6+k (on cloth) AoE with 6s silence, randomly targeted at the place where a non-melee player is standing (resistable, binary), 3 sec cooldown
-		mArcaneOrbTimer--;
-		if(!mArcaneOrbTimer)
+		ArcaneOrbTimer--;
+		if(!ArcaneOrbTimer)
 		{
 			Unit* RandomTarget = NULL;
 			std::vector<Unit*> TargetTable;
@@ -1831,7 +1831,7 @@ public:
 				//2) send the missile
 				_unit->CastSpellAoF(RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER), true);
 			}
-			mArcaneOrbTimer = 3; //3secs
+			ArcaneOrbTimer = 3; //3secs
 		}
 
 		float val = (float)RandomFloat(100.0f);
@@ -1902,8 +1902,8 @@ public:
 
 protected:
 	int nrspells;
-	uint32 mEnrageTimer;
-	uint32 mArcaneOrbTimer;
+	uint32 EnrageTimer;
+	uint32 ArcaneOrbTimer;
 	bool Enraged;
 };
 
@@ -1920,311 +1920,202 @@ public:
 
 		//explode in some seconds
 		//TODO: On official servers it explodes exactly when arcane orb trigger reaches it
-		sEventMgr.AddEvent(((Unit*)_unit), &Unit::EventCastSpell, ((Unit*)_unit), dbcSpell.LookupEntry(ARCANE_ORB), EVENT_UNK, 2500, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-		_unit->Despawn(3000, 0);
+		sEventMgr.AddEvent(((Unit*)_unit), &Unit::EventCastSpell, ((Unit*)_unit), dbcSpell.LookupEntry(ARCANE_ORB), EVENT_UNK, 3000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+		_unit->Despawn(3200, 0);
 	}
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//High Astromancer Solarian AI Script
+//
+// Phase timers based on boss mods:
+// - Split every 90sec (except first split happens 50sec after engage)
+// - 3x4 Solarium Agents spawns 6sec after split
+// - Solarian comes back with two Solarium Priest 22sec after split (end of phase 2)
+// - Once phase 2 is finished, phase 1 starts again
+// - At 20% health, Solarian enter phase 3 until she dies
+//
+#define CN_SOLARIAN								18805
+#define CN_SOLARIUMAGENT						18925
+#define CN_SOLARIUMPRIEST						18806
+#define CN_SPOT_LIGHT							15631
+#define SOLARIAN_WRATH_OF_THE_ASTROMANCER		42783	//Infuses an enemy with Arcane power, causing them to harm nearby allies for 5400 to 6600. Arcane damage after 6 sec.
+#define SOLARIAN_WRATH_OF_THE_ASTROMANCER_BOMB	42787	//The actual spell that triggers the explosion with arcane damage and slow fall
+#define SOLARIAN_ARCANE_MISSILES				33031	//Launches magical missiles at an enemy, inflicting Arcane damage each second for 3 sec. Trigger spell (3000 arcane damage)
+#define SOLARIAN_BLINDING_LIGHT					33009	//Hits everyone in the raid for 2280 to 2520 arcane damage. 20sec cooldown.
+#define SOLARIAN_SOLARIANS_TRANSFORM			39117	//Transforms into void walker.
+#define SOLARIAN_VOID_BOLT						39329	//The Void Walker casts this every 10 seconds. It deals 4394 to 5106 shadow damage to the target with the highest aggro.
+#define SOLARIAN_PSYCHIC_SCREAM					34322	//Fears up to 5 targets in melee range.
+#define SOLARIUMPRIEST_GREATER_HEAL				38580	//Heals 23125 to 26875 any friendly target
+#define SOLARIUMPRIEST_HOLY_SMITE				31740	//Deals 553 to 747 holy damage
 
-// High Astromancer Solarian AI
-// First try to make it in phase system. For now not enough luck (as I want to update spell list
-// when next phase has just started.
+bool Dummy_Solarian_WrathOfTheAstromancer(uint32 pEffectIndex, Spell* pSpell);
+void SpellFunc_Solarian_Disappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType);
+void SpellFunc_Solarian_Reappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType);
 
-#define CN_HIGH_ASTROMANCER_SOLARIAN 18805
-#define CN_SOLARIUM_AGENT 18925
-#define CN_SOLARIUM_PRIEST 18806
-//Phase 1 spells
-#define ARCANE_MISSILES 39414 // Should have random targeting
-#define WRATH_OF_THE_ASTROMANCER 33045 // Needs random function
-#define MARK_OF_SOLARIAN 33023 // not sure... but should be used on random target
-//Phase 2 spells
-// Just to define portal summoning + summoning creatures + creatures AI
-// Add sounds to creature summoning events
-//Phase 3 spells
-#define VOID_BOLT 39329 // RANDOM target, but because of lack of feature ATTACKING
-#define FEAR 10890 // probably wrong id; maybe one of these are correct: 31970, 31358 (?)
-
-// TO DO: Rewrite it to phase style.
-/*
-Quotes
-
-Phase 1 (Astromancer Phase):
-Tal anu'men no Sin'dorei!
-Phase 2 (Solarium Agents):
-I will crush your delusions of grandeur!
-Ha ha ha! You are hopelessly outmatched!
-Phase 3 (Voidwalker Form):
-Enough of this! Now I call upon the fury of the cosmos itself.
-I become ONE... with the VOID!
-Slaying:
-Your soul belongs to the Abyss!
-By the blood of the Highborne!
-For the Sunwell!
-Dying:
-The warmth of the sun... awaits.
-*/
-class HighAstromancerSolarianAI : public CreatureAIScript
+class HighAstromancerSolarianAI : public MoonScriptBossAI
 {
-public:
-    ADD_CREATURE_FACTORY_FUNCTION(HighAstromancerSolarianAI);
-	SP_AI_Spell spells[5];
-	bool m_spellcheck[5];
-
-    HighAstromancerSolarianAI(Creature* pCreature) : CreatureAIScript(pCreature)
-    {
-		nrspells = 3;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-		}
-		spells[0].info = dbcSpell.LookupEntry(ARCANE_MISSILES);
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = false;
-		spells[0].cooldown = 2;
-		spells[0].perctrigger = 80.0f;
-		spells[0].attackstoptimer = 1000;
-
-		spells[1].info = dbcSpell.LookupEntry(WRATH_OF_THE_ASTROMANCER);
-		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
-		spells[1].perctrigger = 10.0f;
-		spells[1].attackstoptimer = 2000;
-
-		spells[2].info = dbcSpell.LookupEntry(MARK_OF_SOLARIAN);
-		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].instant = true;
-		spells[2].perctrigger = 10.0f;
-		spells[2].attackstoptimer = 1000;
-
-		spells[3].info = dbcSpell.LookupEntry(VOID_BOLT);
-		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
-		spells[3].perctrigger = 40.0f;
-		spells[3].attackstoptimer = 2000;
-
-		spells[4].info = dbcSpell.LookupEntry(FEAR);
-		spells[4].targettype = TARGET_ATTACKING;
-		spells[4].instant = true;
-		spells[4].perctrigger = 20.0f;
-		spells[4].attackstoptimer = 1000;
-
-		priestTimer = 0;
-		spawnTimer = 0;
-		spmin = 0;
-	} 
-
-    void OnCombatStart(Unit* mTarget)
-    {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Tal anu'men no Sin'dorei!");
-		_unit->PlaySoundToSet(11134);
-
-        RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-
-		spmin = 0;
-    }
-
-	void OnTargetDied(Unit* mTarget)
-    {
-		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
-		{
-			switch (rand()%3)
-			{
-			case 0: 
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your soul belongs to the Abyss!");
-				_unit->PlaySoundToSet(11136);
-				break;
-			case 1:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "By the blood of the Highborne!");
-				_unit->PlaySoundToSet(11137);
-				break;
-			case 2:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "For the Sunwell!");
-				_unit->PlaySoundToSet(11138);
-				break;
-			}
-		}
-    }
-
-    void OnCombatStop(Unit *mTarget)
-    {
-		_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , 18239); //Human Form
-        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-        RemoveAIUpdateEvent();
-    }
-
-	void OnDied(Unit * mKiller)
-    {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The warmth of the sun... awaits.");
-        _unit->PlaySoundToSet(11135);
-       RemoveAIUpdateEvent();
-    }
-
-    void AIUpdate()
-    {
-		spawnTimer++;
-		priestTimer++;
-
-		if(spawnTimer > 50 && !setVoidForm)
-		{
-			
-			_unit->ClearHateList();
-			_unit->GetAIInterface()->m_canMove = false;
-			_unit->CastSpell(_unit, dbcSpell.LookupEntry(24699), true);
-			_unit->CastSpell(_unit, dbcSpell.LookupEntry(35182), true);
-
-			//Spawn "StageLight" first
-			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19525, 421.254822f, -352.720978f, 17.001482f, 0.0f, false, false, 0, 0)->Despawn(6000, 0);
-			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19525, 410.456543f, -367.723816f, 16.994316f, 0.0f, false, false, 0, 0)->Despawn(6000, 0);
-			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19525, 439.210846f, -351.484894f, 17.009836f, 0.0f, false, false, 0, 0)->Despawn(6000, 0);
-
-			for(int i = 1;i <= 4;i++)
-			{
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature( CN_SOLARIUM_AGENT, 421.254822f, -352.720978f, 17.001482f, 0.0f, false, false, 0, 0);
-			}
-			for(int i = 1;i <= 4;i++)
-			{
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature( CN_SOLARIUM_AGENT, 410.456543f, -367.723816f, 16.994316f, 0.0f, false, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
-			}
-			for(int i = 1;i <= 4;i++)
-			{
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature( CN_SOLARIUM_AGENT, 439.210846f, -351.484894f, 17.009836f, 0.0f, false, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
-			}
-			priestTimer = 100;
-			spawnTimer = 0;
-		}
-		if(priestTimer > 115 && !setVoidForm)
-		{
-			_unit->GetAIInterface()->m_canMove = true;
-			_unit->RemoveAllAuras();
-			_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SOLARIUM_PRIEST, _unit->GetPositionX(), _unit->GetPositionY() + 5.0f, _unit->GetPositionZ(), _unit->GetOrientation(), false, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
-			_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SOLARIUM_PRIEST, _unit->GetPositionX(), _unit->GetPositionY() + -5.0f, _unit->GetPositionZ(), _unit->GetOrientation(), false, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
-			priestTimer = 0;
-		}
-		if(_unit->GetHealthPct() > 20)
-		{
-			nrspells = 3;
-		}
-		else
-		{
-			if(!setVoidForm)
-			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I become ONE... with the VOID!");
-				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , 18953); //VoidWalker Form
-				setVoidForm = true;
-			}
-			spmin = 4;
-			nrspells = 5;
-		}
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
-    }
-
-
-	void SpellCast(float val)
-    {
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-			float comulativeperc = 0;
-		    Unit *target = NULL;
-			for(int i=spmin;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-						case TARGET_SELF:
-						case TARGET_VARIOUS:
-							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-						case TARGET_DESTINATION:
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-                  	m_spellcheck[i] = false;
-					return;
-				}
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
-        }
-    }
-
-protected:
-
-	int nrspells;
-	int spmin;
-	bool setVoidForm;
-	int spawnTimer;
-	int priestTimer;
-};
-
-#define SP_HEAL 41378 //Heals 40500 to 49500 (might not be the correct one, but for now it will do the job)
-#define SP_SMITE 20696 //1350 to 1650 holy damage
-
-class SolariumPriestAI : public CreatureAIScript
-{
-public:
-	ADD_CREATURE_FACTORY_FUNCTION(SolariumPriestAI);
-	SP_AI_Spell spells[2];
-
-	SolariumPriestAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    MOONSCRIPT_FACTORY_FUNCTION(HighAstromancerSolarianAI, MoonScriptBossAI);
+	HighAstromancerSolarianAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 	{
-		spells[0].info = dbcSpell.LookupEntry(SP_HEAL);
-		spells[0].instant = false;
-		
-		spells[1].info = dbcSpell.LookupEntry(SP_SMITE);
-		spells[1].instant = false;
+		//Initialize timers
+		mSplitTimer = mAgentsTimer = mSolarianTimer = INVALIDATE_TIMER;
+
+		//Phase 1 spells
+		AddPhaseSpell(1, AddSpell(SOLARIAN_ARCANE_MISSILES, Target_RandomUnit, 60, 3, 0, 0, 45));
+		AddPhaseSpell(1, AddSpell(SOLARIAN_WRATH_OF_THE_ASTROMANCER, Target_RandomPlayerNotCurrent, 20, 0, 6, 0, 50000));
+		AddPhaseSpell(1, AddSpell(SOLARIAN_BLINDING_LIGHT, Target_Self, 20, 0, 20, 0, 50));
+		mDisappear = AddSpellFunc(&SpellFunc_Solarian_Disappear, Target_Self, 0, 22, 0);
+		mDisappear->AddEmote("You are hopelessly outmatched!", Text_Yell, 11139);
+		mDisappear->AddEmote("I will crush your delusions of grandeur!", Text_Yell, 11140);
+
+		//Phase 2 spells
+		mReappear = AddSpellFunc(&SpellFunc_Solarian_Reappear, Target_Self, 0, 0, 0);
+
+		//Phase 3 spells
+		AddPhaseSpell(3, AddSpell(SOLARIAN_VOID_BOLT, Target_Current, 100, 3, 10, 0, 100));
+		AddPhaseSpell(3, AddSpell(SOLARIAN_PSYCHIC_SCREAM, Target_Self, 10, 0, 0));
+		mVoidForm = AddSpell(SOLARIAN_SOLARIANS_TRANSFORM, Target_Self, 0, 0, 0);
+		mVoidForm->AddEmote("Enough of this! Now I call upon the fury of the cosmos itself.");
+		mVoidForm->AddEmote("I become ONE... with the VOID!");
+
+		//Emotes
+		AddEmote(Event_OnCombatStart, "Tal anu'men no sin'dorei!", Text_Yell, 11134);
+		AddEmote(Event_OnDied, "The warmth of the sun... awaits.", Text_Yell, 11135);
+		AddEmote(Event_OnTargetDied, "Your soul belongs to the Abyss!", Text_Yell, 11136);
+		AddEmote(Event_OnTargetDied, "By the blood of the Highborne!", Text_Yell, 11137);
+		AddEmote(Event_OnTargetDied, "For the Sunwell!", Text_Yell, 11138);
 	}
 
-	void OnCombatStart(Unit *mTarget)
+	void OnCombatStart(Unit* pTarget)
 	{
-		RegisterAIUpdateEvent(5000);
+		mSplitTimer = AddTimer(50000);	//First split after 50sec
+		ParentClass::OnCombatStart(pTarget);
 	}
-	
-	void OnCombatStop(Unit *mTarget)
-	{
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		RemoveAIUpdateEvent();
-	}
-
-	void OnDied(Unit *mKiller)
-	{
-		RemoveAIUpdateEvent();
-	}
-
+   
 	void AIUpdate()
 	{
-		_unit->Root();
-		_unit->GetAIInterface()->disable_melee = true;
-		Unit* solarian = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), CN_HIGH_ASTROMANCER_SOLARIAN);
-		switch(RandomUInt(1))
+		if( GetPhase() == 1 )
 		{
-			case 0:
-				_unit->CastSpell(solarian, spells[0].info, spells[0].instant);
-				break;
-			case 1:
-				_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(), spells[1].info, spells[1].instant);
-				break;
+			if( GetHealthPercent() <= 20 && !IsCasting() )
+			{
+				SetPhase(3, mVoidForm);
+				CancelAllTimers();
+			}
+			else if( IsTimerFinished(mSplitTimer) && !IsCasting() )
+			{
+				SetPhase(2, mDisappear);
+				ResetTimer(mSplitTimer, 90000);		//Next split in 90sec
+				mAgentsTimer = AddTimer(6000);		//Agents spawns 6sec after the split
+				mSolarianTimer = AddTimer(22000);	//Solarian with 2 priests spawns 22sec after split
+			}
 		}
-		_unit->GetAIInterface()->disable_melee = false;
-		_unit->Unroot();
+		else if( GetPhase() == 2 )
+		{
+			if( IsTimerFinished(mSolarianTimer) && !IsCasting() )
+			{
+				SetPhase(1, mReappear);
+				RemoveTimer(mSolarianTimer);
+			}
+			else if( IsTimerFinished(mAgentsTimer) && !IsCasting() )
+			{
+				for( int SpawnIter = 0; SpawnIter < 4; SpawnIter++ )
+				{
+					SpawnCreature(CN_SOLARIUMAGENT, mSpawnPositions[0][0], mSpawnPositions[0][1], 17, 0, true);
+					SpawnCreature(CN_SOLARIUMAGENT, mSpawnPositions[1][0], mSpawnPositions[1][1], 17, 0, true);
+					SpawnCreature(CN_SOLARIUMAGENT, mSpawnPositions[2][0], mSpawnPositions[2][1], 17, 0, true);
+				}
+				RemoveTimer(mAgentsTimer);
+			}
+		}
+		ParentClass::AIUpdate();
+	}
+
+	SpellDesc*	mVoidForm;
+	SpellDesc*	mDisappear;
+	SpellDesc*	mReappear;
+	int32		mSplitTimer, mAgentsTimer, mSolarianTimer;
+	float		mSpawnPositions[3][2];
+};
+
+bool Dummy_Solarian_WrathOfTheAstromancer(uint32 pEffectIndex, Spell* pSpell)
+{
+	Unit* Caster = pSpell->u_caster;
+	if( !Caster ) return true;
+
+	Unit* Target = Caster->GetAIInterface()->GetNextTarget();
+	if( !Target ) return true;
+
+	SpellEntry* SpellInfo = dbcSpell.LookupEntry(SOLARIAN_WRATH_OF_THE_ASTROMANCER_BOMB);
+	if( !SpellInfo ) return true;
+
+	//Explode bomb after 6sec
+	sEventMgr.AddEvent(Target, &Unit::EventCastSpell, Target, SpellInfo, EVENT_UNK, 6000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	return true;
+}
+
+void SpellFunc_Solarian_Disappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType)
+{
+	HighAstromancerSolarianAI* Solarian = ( pCreatureAI ) ? (HighAstromancerSolarianAI*)pCreatureAI : NULL;
+	if( Solarian )
+	{
+		SpellFunc_Disappear(pThis, pCreatureAI, pTarget, pType);
+
+		//Spawn spot lights, and despawn them after 26sec X(400,460) Y(-340,-400)
+		Solarian->mSpawnPositions[0][0] = 400 + RandomFloat(60); Solarian->mSpawnPositions[0][1] = -400 + RandomFloat(60);
+		Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[0][0], Solarian->mSpawnPositions[0][1], 17)->Despawn(26000, 0);
+		Solarian->mSpawnPositions[1][0] = 400 + RandomFloat(60); Solarian->mSpawnPositions[1][1] = -400 + RandomFloat(60);
+		Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[1][0], Solarian->mSpawnPositions[1][1], 17)->Despawn(26000, 0);
+		Solarian->mSpawnPositions[2][0] = 400 + RandomFloat(60); Solarian->mSpawnPositions[2][1] = -400 + RandomFloat(60);
+		Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[2][0], Solarian->mSpawnPositions[2][1], 17)->Despawn(26000, 0);
+	}
+}
+
+void SpellFunc_Solarian_Reappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType)
+{
+	HighAstromancerSolarianAI* Solarian = ( pCreatureAI ) ? (HighAstromancerSolarianAI*)pCreatureAI : NULL;
+	if( Solarian )
+	{
+		//Spawn two priest friend to help Solarian
+		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->mSpawnPositions[0][0], Solarian->mSpawnPositions[0][1], 17);
+		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->mSpawnPositions[1][0], Solarian->mSpawnPositions[1][1], 17);
+		//Solarian->MoveTo(Solarian->mSpawnPositions[2][0], Solarian->mSpawnPositions[2][1], 17);	//Doesn't work quite right yet
+
+		SpellFunc_Reappear(pThis, pCreatureAI, pTarget, pType);
+	}
+}
+
+class SolariumAgentAI : public MoonScriptCreatureAI
+{
+    MOONSCRIPT_FACTORY_FUNCTION(SolariumAgentAI, MoonScriptCreatureAI);
+    SolariumAgentAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+    {
+		AggroNearestUnit(); //Aggro on spawn
+	}
+};
+
+class SolariumPriestAI : public MoonScriptCreatureAI
+{
+	MOONSCRIPT_FACTORY_FUNCTION(SolariumPriestAI, MoonScriptCreatureAI);
+	SolariumPriestAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
+	{
+		AddSpell(SOLARIUMPRIEST_GREATER_HEAL, Target_WoundedFriendly, 20, 2, 0, 0, 40);
+		AddSpell(SOLARIUMPRIEST_HOLY_SMITE, Target_Current, 80, 2.5f, 0, 0, 40);
+		AggroNearestUnit(); //Aggro on spawn
 	}
 };
 
 // Al'ar AI
+class AlarAuxClass: public Object
+{
+public:
+AlarAuxClass(CreatureAIScript *);
+~AlarAuxClass();
+void Rebirth();
+
+protected:
+	CreatureAIScript *alar;
+};
 
 #define WALK 0
 #define RUN 256
@@ -2239,10 +2130,10 @@ public:
 
 // Phase2 spells
 #define FLAME_PATCH 35383	// 35383, 35380;
-#define METEOR 35181		// but shouldn't be instant imho
-#define EMBER_BLAST 34133	// used when one of adds has low health
-/*#define MELT_ARMOR		// maybe they are used, but not sure
-#define RANDOM_CHARGE*/
+#define METEOR 35181		// but shouldn't be instant imho --Dive Bomb 35367
+//#define EMBER_BLAST 34133	// used when one of adds has low health
+#define MELT_ARMOR 35410 // maybe they are used, but not sure
+//#define RANDOM_CHARGE
 
 // Other spells
 #define REBIRTH 34342
@@ -2267,11 +2158,9 @@ static Coords fly[] =
 	{ 392.815369f,  31.636963f, 25.414761f, 0.551340f },
 	{ 388.397308f, -38.834595f, 22.335297f, 5.702067f },
 	{ 333.922229f, -60.645069f, 24.484278f, 1.454599f },	// ... to here
-	{ 328.103455f,  -0.192393f, 52.216309f, 4.188326f },	// fire quills cast position	// EMOTE_STATE_WHIRLWIND = 382,
+	{ 328.103455f,  -0.192393f, 50.216309f, 4.188326f },	// fire quills cast position	// EMOTE_STATE_WHIRLWIND = 382,
 	{ 326.225647f,   2.381837f, -2.389485f, 4.877070f }	// center of the room which is used in phase 2
 };
-
-
 
 class AlarAI : public CreatureAIScript
 {
@@ -2300,42 +2189,42 @@ public:
         spells[0].info = dbcSpell.LookupEntry(FLAME_BUFFET);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
-		spells[0].cooldown = -1;
+		spells[0].cooldown = 4;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 
         spells[1].info = dbcSpell.LookupEntry(FLAME_QUILLS);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
-		spells[1].cooldown = -1;
+		spells[1].cooldown = 3;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(SUMMON_PHOENIX_ADDS);
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
-		spells[2].cooldown = -1;
+		spells[2].cooldown = 5;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(FLAME_PATCH);
 		spells[3].targettype = TARGET_VARIOUS;
 		spells[3].instant = true;
-		spells[3].cooldown = -1;
+		spells[3].cooldown = 10;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
 
 		spells[4].info = dbcSpell.LookupEntry(METEOR);
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = true;	// =(
-		spells[4].cooldown = -1;
+		spells[4].cooldown = 30;
 		spells[4].perctrigger = 0.0f;
 		spells[4].attackstoptimer = 1000;
 
-		spells[5].info = dbcSpell.LookupEntry(EMBER_BLAST);
-		spells[5].targettype = TARGET_VARIOUS;
+		spells[5].info = dbcSpell.LookupEntry(MELT_ARMOR);
+		spells[5].targettype = TARGET_ATTACKING;
 		spells[5].instant = true;
-		spells[5].cooldown = -1;
+		spells[5].cooldown = 60;
 		spells[5].perctrigger = 0.0f;
 		spells[5].attackstoptimer = 1000;
 
@@ -2351,47 +2240,39 @@ public:
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
 		_unit->GetAIInterface()->m_moveFly = true;
 
-		PositionChange=rand()%8+15;
-		PhoenixSummon=rand()%6+17;
 		FlameQuills = false;
 		Meteor = false;
-		Phase = 0;
+		SetPhase(0);
+		nDeath=0;
+		timer=lasttime=0;
+		_unit->GetAIInterface()->setOutOfCombatRange(200000);
         //RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-    }
-    
-    void OnCombatStart(Unit* mTarget)
-    {
-		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);	// reseting movetype and adding it once again to let it move from 1-5 again
-		_unit->GetAIInterface()->setWaypointToMove(0);
-
+		_unit->GetAIInterface()->m_moveFly = true;
 		_unit->GetAIInterface()->StopMovement(0);
 		_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+		_unit->GetAIInterface()->setWaypointToMove(1);
+		Flying=true;
 		CastTime();
+    }
 
-		FlyWay = rand()%2;
-		switch (FlyWay)
-		{
-		case 0:	// Clock like
-			{
-				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-				_unit->GetAIInterface()->setWaypointToMove(6);
-			}break;
-
-		case 1:	// hmm... other?
-			{
-
-				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-				_unit->GetAIInterface()->setWaypointToMove(9);
-			}break;
+	void OnDamageTaken(Unit* mAttacker, float fAmount) 
+	{
+		if (!_unit->event_HasEvents()) {
+			RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+			ModifyAIUpdateEvent(1000);
+			NextWP=6;
 		}
-		
-		PositionChange=rand()%8+15;	// 30-45sec /*** if attack time 1000 (%15+31) ***/
-		PhoenixSummon=rand()%6+17;	// 34-44sec /*** if attack time 1000 (%11+34) ***/
+	}
+
+    void OnCombatStart(Unit* mTarget)
+    {
 		FlameQuills = false;
 		Meteor = false;
-		Phase = 1;
+		NextWP=6;
 
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		ModifyAIUpdateEvent(1000);
     }
 
 	void CastTime()
@@ -2400,75 +2281,95 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
+	void SetPhase(uint32 ph)
+	{
+		Phase=ph;
+		_unit->SetUInt32Value(UNIT_FIELD_BASE_MANA,Phase);
+	}
+
     void OnCombatStop(Unit *mTarget)
     {
-		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);	// reseting movetype and adding it once again to let it move from 1-5 again
-		_unit->GetAIInterface()->setWaypointToMove(0);
-
-		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-		_unit->GetAIInterface()->m_moveFly = true;
 		CastTime();
 
-		PositionChange=rand()%8+15;
-		PhoenixSummon=rand()%6+17;
 		FlameQuills = false;
 		Meteor = false;
-		Phase = 0;
+		SetPhase(0);
 
-        //_unit->GetAIInterface()->StopMovement(0);
-        //_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-		//_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-		//_unit->GetAIInterface()->setWaypointToMove(1);
-        //_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        //_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-        //RemoveAIUpdateEvent();
+		if (_unit->isAlive()) {
+			if (_unit != NULL) _unit->SafeDelete();
+			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19514, fly[11].x, fly[11].y, fly[11].z, 0, false, false, 0, 0);
+		}
+
+        RemoveAIUpdateEvent();
     }
+
+	void Rebirth()
+	{
+		//_unit->SetPosition( fly[11].x, fly[11].y, fly[11].z, fly[11].o);
+		SetPhase(2);
+		_unit->CastSpell(_unit, spells[6].info, spells[6].instant);
+		_unit->SetUInt64Value(UNIT_FIELD_HEALTH,_unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		_unit->setDeathState(ALIVE);
+		_unit->RemoveFlag(UNIT_DYNAMIC_FLAGS,U_DYN_FLAG_TAGGED_BY_OTHER);
+		_unit->SetFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
+		_unit->Tagged = false;
+		_unit->TaggerGuid = 0;
+		_unit->GetAIInterface()->StopMovement(0); // after respawn monster can move
+
+		_unit->WipeTargetList();
+		_unit->WipeHateList();
+		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+		_unit->GetAIInterface()->m_canMove = true;
+		Flying=false;lasttime=timer;
+	}
 
     void OnDied(Unit * mKiller)
     {
-		Phase = 0;
+		nDeath++;
+		if (nDeath==1) {
+			_unit->SetFlag(UNIT_DYNAMIC_FLAGS,U_DYN_FLAG_TAGGED_BY_OTHER);
+			_unit->RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
+			_unit->Tagged = true;
+			_unit->TaggerGuid = 0;
+			AlarAuxClass *cAux=new AlarAuxClass(this);
+			return;
+		}
+		SetPhase(0);nDeath=0;
 		FlameQuills = false;
 		Meteor = false;
-		PositionChange=rand()%8+15;
-		PhoenixSummon=rand()%6+17;
 		CastTime();
-       //RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
     }
+
+	bool HostileInMeleeRange()
+	{
+		for(Object::InRangeSet::iterator i = _unit->GetInRangeSetBegin(); i != _unit->GetInRangeSetEnd(); ++i)
+		{
+			if(isHostile(_unit, (*i)) && _unit->GetDistance2dSq((*i)) < 225)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void UPCastTime()
+	{
+		for(int i=0;i<nrspells;i++)
+			if (spells[i].casttime>0) spells[i].casttime--;
+	}
 
     void AIUpdate()
     {
-		if (FlameQuills == true)
-		{
-			QuillsCount++;
-			if (QuillsCount == 9)
-			{
-				FlameQuills = false;
-				switch (FlyWay)
-				{
-				case 0:	// Clock like
-					{
-						_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-						_unit->GetAIInterface()->setWaypointToMove(6);
-					}break;
-		
-				case 1:	// hmm... other?
-					{
-						_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-						_unit->GetAIInterface()->setWaypointToMove(9);
-					}break;
-				}
-			}
-			_unit->CastSpell(_unit, spells[1].info, spells[1].instant);
+		UPCastTime();
+		if (!HostileInMeleeRange() && spells[0].casttime==0 && !FlameQuills && !Flying) {
+			_unit->CastSpell(_unit, spells[0].info, spells[0].instant); 
+			spells[0].casttime=spells[0].cooldown;
 		}
+		if (!Flying) timer++;
 
-		if (Meteor == true)
+		switch (Phase)
 		{
-		}
-		
-		else 
-		{
-			switch (Phase)
-			{
 			case 0: return;
 			case 1: 
 				{
@@ -2480,203 +2381,171 @@ public:
 				}break;
 			default:
 				{
-					Phase = 0;
+					SetPhase(0);
 				};
-			};
 		}
-		//float val = (float)RandomFloat(100.0f);
-		//SpellCast(val);
     }
 
     void PhaseOne()
     {
-		PositionChange--;
-		PhoenixSummon--;
-
-		if (_unit->GetHealthPct() == 0)
+		if (FlameQuills == true)
 		{
-			Phase = 2;
-			_unit->CastSpell(_unit, spells[6].info, spells[6].instant);
+			
+			//_unit->CastSpell(_unit, dbcSpell.LookupEntry(34229), true);
+			if (lasttime+11==timer)
+			{
+				_unit->CastSpellAoF(fly[1].x,fly[1].y,fly[1].z, spells[1].info, spells[1].instant); 
+				_unit->CastSpellAoF(fly[2].x,fly[2].y,fly[2].z, spells[1].info, spells[1].instant); 
+				_unit->CastSpellAoF(fly[3].x,fly[3].y,fly[3].z, spells[1].info, spells[1].instant); 
+				_unit->CastSpellAoF(fly[4].x,fly[4].y,fly[4].z, spells[1].info, spells[1].instant); 
+				_unit->GetAIInterface()->m_canMove = true;
+				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
+				_unit->GetAIInterface()->setWaypointToMove(NextWP);
+				FlameQuills=false;
+				Flying=true;
+				lasttime=timer;
+			}
 		}
-
-		if (!PhoenixSummon--)
+		else
+		if (lasttime+35==timer)
 		{
-			_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
-			PhoenixSummon=rand()%6+17;
-		}
+			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19551, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0, false, false, 0, 0);
+			//_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+			lasttime=timer+rand()%10;
+			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+			_unit->GetAIInterface()->StopMovement(0);
+			_unit->GetAIInterface()->m_canMove = true;
 
-		if (!PositionChange)
-		{
+			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
 			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
 			_unit->GetAIInterface()->setWaypointToMove(NextWP);
-			PositionChange=rand()%8+17;	// added 4 sec fit time + time needed to move to next pos.
-		}
-
-		else
-		{
-			uint32 val = RandomUInt(100);
-
-			if (val > 0 && val < 5)	// Flame Quills wp here!
-			{
-				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-				_unit->GetAIInterface()->setWaypointToMove(10);
-			}
+			_unit->GetAIInterface()->SetNextTarget(NULL);
+			Flying=true;
 		}
     }
 
 	void PhaseTwo()
 	{
-
-	}
-
-	void SpellCast(float val)
-	{
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-			float comulativeperc = 0;
-		    Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				spells[i].casttime--;
-				
-				if (m_spellcheck[i])
-				{					
-					spells[i].casttime = spells[i].cooldown;
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-						case TARGET_SELF:
-						case TARGET_VARIOUS:
-							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-						case TARGET_DESTINATION:
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-
-					m_spellcheck[i] = false;
-					return;
+		CastSpell(5);
+		CastSpell(4);
+		if ((rand()%100)<2) {
+			Unit *target=GetRandomTarget();
+			Creature* patch;
+			if (target!=NULL) {
+				patch =_unit->GetMapMgr()->GetInterface()->SpawnCreature(20602, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, false, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
+				if (patch!=NULL) {
+					patch->SetUInt32Value(UNIT_FIELD_DISPLAYID, 16946 );
+					patch->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, 16946 );
 				}
-
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
 			}
 		}
+		if (Meteor == true)
+		{
+		}
+		if (lasttime+35==timer)
+		{
+			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19551, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0, false, false, 0, 0);
+			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19551, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0, false, false, 0, 0);
+			lasttime=timer;
+		}
+	}
+
+	Unit *GetRandomTarget()
+	{
+		for(Object::InRangeSet::iterator i = _unit->GetInRangeSetBegin(); i != _unit->GetInRangeSetEnd(); ++i)
+		{
+			if(isHostile(_unit, (*i)) && (*i)->GetInstanceID() == _unit->GetInstanceID())
+			{
+				Unit *RandomTarget = static_cast< Unit* >(*i);
+
+				if(RandomTarget->isAlive())
+					return RandomTarget;
+			}
+		}
+		return NULL;
+	}
+
+	void CastSpell(int id)
+	{
+		if (spells[id].casttime>0) return;
+		if (_unit->GetCurrentSpell() != NULL) return;
+		
+		Unit *target = NULL;
+		target = _unit->GetAIInterface()->GetNextTarget();
+		switch(spells[id].targettype)
+		{
+			case TARGET_SELF:
+			case TARGET_VARIOUS:
+				_unit->CastSpell(_unit, spells[id].info, spells[id].instant); break;
+			case TARGET_ATTACKING:
+				_unit->CastSpell(target, spells[id].info, spells[id].instant); break;
+			case TARGET_DESTINATION:
+				_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[id].info, spells[id].instant); break;
+			case TARGET_RANDOM_SINGLE: {
+				target=GetRandomTarget();
+				if (target!=NULL)
+				_unit->CastSpell(target, spells[id].info, spells[id].instant);
+			} break;
+		}	
+		spells[id].casttime=spells[id].cooldown;
+	}
+
+	void SetNextWP(uint32 wp)
+	{
+		_unit->GetAIInterface()->SetAIState(STATE_ATTACKING);//STATE_IDLE
+		NextWP=wp;
+		Flying=false;
+		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+		_unit->GetAIInterface()->m_canMove = false;
+		lasttime=timer;
 	}
 
     void OnReachWP(uint32 iWaypointId, bool bForwards)
     {
-		if (Phase == 1)
+
+		if (Phase == 0)
 		{
+			if (NextWP==6) Phase=1;
+			else NextWP=iWaypointId%5+1;
+			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
 			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-			_unit->GetAIInterface()->setWaypointToMove(6);
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Phase 1 Test!");
-			_unit->PlaySoundToSet(11243);
+			_unit->GetAIInterface()->setWaypointToMove(NextWP);
 		}
 
 		switch(iWaypointId)
 		{
-			case 5:
-			    {
-					_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);	// reseting movetype and adding it once again to let it move from 1-5 again
-					_unit->GetAIInterface()->setWaypointToMove(0);
-			        _unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_FORWARDTHANSTOP);
-			    }break;
-
 			case 6:
-			    {
-					//_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
-					//_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-					_unit->GetAIInterface()->m_canMove = false;
-					switch (FlyWay)
-					{
-					case 0:
-						{
-							NextWP = 7;
-						}break;
+			{
+				SetNextWP(7);
+			} break;
 
-					case 1:
-						{	
-							NextWP = 9;
-						}break;
-					}
-				}break;
-				
 			case 7:
-			    {
-					//_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
-					//_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-					_unit->GetAIInterface()->m_canMove = false;
-					switch (FlyWay)
-					{
-					case 0:
-						{
-							NextWP = 8;
-						}break;
-
-					case 1:
-						{	
-							NextWP = 6;
-						}break;
-					}
-			    }break;
-		
+			{
+				SetNextWP(8);
+			} break;
 			case 8:
-		    {
-				_unit->GetAIInterface()->m_canMove = false;
-				//_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
-                //_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-				switch (FlyWay)
-				{
-				case 0:
-					{
-						NextWP = 9;
-					}break;
-	
-				case 1:
-					{	
-						NextWP = 7;
-					}break;
-				}
-		    }break;
-
+			{
+				SetNextWP(9);
+			} break;
 			case 9:
-		    {
-				_unit->GetAIInterface()->m_canMove = false;
-				//_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
-                //_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
-				switch (FlyWay)
-				{
-				case 0:
-					{
-						NextWP = 6;
-					}break;
-
-				case 1:
-					{	
-						NextWP = 8;
-					}break;
-				}
-			}break;
+			{
+				SetNextWP(10);
+			} break;
 
 			case 10:
 		    {
-				//_unit->GetAIInterface()->SetAIState(STATE_SCRIPTIDLE);
-                //_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 				if (Phase == 1)
 				{
 					FlameQuills = true;
 					QuillsCount = 0;
+					Flying=false;
+					_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
+					_unit->GetAIInterface()->m_canMove = false;
+					NextWP=6;
+					lasttime=timer;
+					//_unit->Emote(EMOTE_STATE_WHIRLWIND);
+					_unit->CastSpell(_unit, dbcSpell.LookupEntry(34229), true);
 				}
 
 				if (Phase == 2)
@@ -2716,14 +2585,198 @@ protected:
 	bool FlameQuills;
 	uint32 QuillsCount;
 	bool Meteor;
-	int PositionChange;
-	int PhoenixSummon;
 	uint32 NextWP;
     uint32 m_entry;
     uint32 FlyWay;
 	uint32 Phase;
+	uint32 nDeath;
+	int nrspells;
+	uint32 timer,lasttime;
+	bool Flying;
+};
+
+#define CN_EMBEROFALAR	19551
+
+class EmberAlarAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(EmberAlarAI);
+	SP_AI_Spell spells[1];
+	bool m_spellcheck[1];
+
+    EmberAlarAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		nrspells = 1;
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+		}
+		spells[0].info = dbcSpell.LookupEntry(34341);
+		spells[0].targettype = TARGET_VARIOUS;
+		spells[0].instant = true;
+		spells[0].cooldown = 15;
+		spells[0].perctrigger = 50.0f;
+		spells[0].attackstoptimer = 1000;
+
+    }
+    
+    void OnCombatStart(Unit* mTarget)
+    {
+		CastTime();
+		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+    }
+
+	void CastTime()
+	{
+		for(int i=0;i<nrspells;i++)
+			spells[i].casttime = spells[i].cooldown;
+	}
+
+	void OnTargetDied(Unit* mTarget)
+    {
+    }
+
+    void OnCombatStop(Unit *mTarget)
+    {
+		CastTime();
+        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+        RemoveAIUpdateEvent();
+    }
+
+	Unit *GetAlar()
+	{
+		for(Object::InRangeSet::iterator i = _unit->GetInRangeSetBegin(); i != _unit->GetInRangeSetEnd(); ++i)
+			{
+				if((*i)->GetTypeId() == TYPEID_UNIT && _unit->GetDistance2dSq((*i)) < 400000)
+				{
+					Creature *creature=static_cast<Creature *>((*i));
+					if(creature->GetEntry() == 19514 && (*i)->GetInstanceID() == _unit->GetInstanceID())
+					{
+						return creature;
+					}
+				}
+			}
+		return NULL;
+	}
+
+    void OnDied(Unit * mKiller)
+    {
+
+		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
+		CastTime();
+
+		Unit* Alar = NULL;
+		//Alar=_unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 19514);
+
+		Alar=GetAlar();
+		if (Alar==NULL) {
+			return;
+		}
+
+		uint32 Phase=Alar->GetUInt32Value(UNIT_FIELD_BASE_MANA);
+		if (Phase==2/*&& Alar->isAlive()*/) {
+			uint32 maxhp=Alar->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+			Alar->DealDamage(Alar,(maxhp*3)/100,0,0,0);
+		}
+    }
+
+    void AIUpdate()
+	{
+    }
+	
+protected:
 	int nrspells;
 };
+
+
+#define CN_PATCHALAR	20602
+
+class PatchAlarAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(PatchAlarAI);
+	SP_AI_Spell spells[1];
+	bool m_spellcheck[1];
+
+    PatchAlarAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		nrspells = 1;
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+		}
+		spells[0].info = dbcSpell.LookupEntry(35380);
+		spells[0].targettype = TARGET_VARIOUS;
+		spells[0].instant = true;
+		spells[0].cooldown = 15;
+		spells[0].perctrigger = 50.0f;
+		spells[0].attackstoptimer = 1000;
+
+		//_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
+		//_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		//_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
+		_unit->GetAIInterface()->m_canMove = false;
+		_unit->Despawn(120000,0);
+    }
+    
+    void OnCombatStart(Unit* mTarget)
+    {
+		CastTime();
+		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		_unit->CastSpell(_unit, spells[0].info, true);
+    }
+
+	void CastTime()
+	{
+		for(int i=0;i<nrspells;i++)
+			spells[i].casttime = spells[i].cooldown;
+	}
+
+	void OnTargetDied(Unit* mTarget)
+    {
+    }
+
+    void OnCombatStop(Unit *mTarget)
+    {
+		CastTime();
+        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
+        RemoveAIUpdateEvent();
+    }
+
+	
+    void OnDied(Unit * mKiller)
+    {
+		CastTime();
+    }
+
+    void AIUpdate()
+	{
+    }
+	
+protected:
+	int nrspells;
+};
+
+	AlarAuxClass::AlarAuxClass (CreatureAIScript *al)
+	{
+		alar=al;
+		sEventMgr.AddEvent(this, &AlarAuxClass::Rebirth, EVENT_CORPSE_DESPAWN, 3000, 1,0);
+	}
+
+	AlarAuxClass::~AlarAuxClass ()
+	{
+		sEventMgr.RemoveEvents(this);
+	}
+
+	void AlarAuxClass::Rebirth()
+	{
+		((AlarAI *)alar)->Rebirth();
+		delete this;
+	}
+
 
 //-----------------------------------------------------------//
 //---------------Kael'thas Encounter Script------------------//
@@ -2767,7 +2820,7 @@ public:
 		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 1000;
 
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 
 		CurrentTarget = NULL;
@@ -2779,6 +2832,8 @@ public:
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
 
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Prepare yourselves!");
+		_unit->PlaySoundToSet(11203);
 
 		CurrentTarget = mTarget;
 		if (CurrentTarget)
@@ -2788,8 +2843,8 @@ public:
 			{
 				Player *pPlayer = (Player*)CurrentTarget;
 				char msg[256];
-				snprintf((char*)msg, 256, "Thaladred sets his gaze on %s", pPlayer->GetName());
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
+				snprintf((char*)msg, 256, " sets his gaze on %s", pPlayer->GetName());
+				_unit->SendChatMessageAlternateEntry(CN_DARKENER, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
 			}
 		}
 
@@ -2808,7 +2863,7 @@ public:
 
 		if (_unit->GetHealthPct() > 0)
 		{
-			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		}
 	}
@@ -2818,6 +2873,8 @@ public:
 		RemoveAIUpdateEvent();
 
 		CurrentTarget = NULL;
+		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "");
+		_unit->PlaySoundToSet(11204);
 	}
 
 	void OnTargetDied(Unit *mTarget)
@@ -2830,8 +2887,8 @@ public:
 			{
 				Player *pPlayer = (Player*)CurrentTarget;
 				char msg[256];
-				snprintf((char*)msg, 256, "Thaladred sets his gaze on %s", pPlayer->GetName());
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
+				snprintf((char*)msg, 256, " sets his gaze on %s", pPlayer->GetName());
+				_unit->SendChatMessageAlternateEntry(CN_DARKENER, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
 			}
 		}
 	}
@@ -2840,7 +2897,66 @@ public:
 	{
 		float val = RandomFloat(100.0f);
 		SpellCast(val);
+		
+		float rand = RandomFloat(100.0f);
+		if (rand < 20)
+		{
+			ResetTarget();
+		}
 	}
+	Unit* FindTargetForSpell()
+	{
+		Unit* target = NULL;
+		float distance = 1500.0f;
+
+		Unit *pUnit;
+		float dist;
+
+		for (std::set<Object*>::iterator itr = _unit->GetInRangeOppFactsSetBegin(); itr != _unit->GetInRangeOppFactsSetEnd(); itr++)
+		{
+			if((*itr)->GetTypeId() != TYPEID_UNIT && (*itr)->GetTypeId() != TYPEID_PLAYER)
+				continue;
+
+			pUnit = static_cast<Unit*>((*itr));
+
+			if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
+				continue;
+
+			if(pUnit->m_invisible)
+				continue;
+			
+			if(!pUnit->isAlive() || _unit == pUnit)
+				continue;
+
+			dist = _unit->GetDistance2dSq(pUnit);
+
+			if(dist > distance*distance)
+				continue;
+
+			target = pUnit;
+			break;
+		}
+
+		return target;
+	}
+	void ResetTarget()
+	{
+		Unit* target = FindTargetForSpell();
+		if (target)
+		{
+			CurrentTarget = NULL;
+			if (target->IsPlayer())
+			{
+				_unit->GetAIInterface()->modThreatByPtr(target, 1000000);
+				Player *pPlayer = (Player*)target;
+				char msg[256];
+				snprintf((char*)msg, 256, " sets his gaze on %s", pPlayer->GetName());
+				_unit->SendChatMessageAlternateEntry(CN_DARKENER, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
+				CurrentTarget = target;
+			}
+	}
+	}
+	
 	
 	void SpellCast(float val)
     {
@@ -2908,7 +3024,7 @@ public:
 		spells[0].instant = true;
 		spells[0].cooldown = 30;
 
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 	}
 
@@ -2916,6 +3032,8 @@ public:
     {
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Blood for blood!");
+		_unit->PlaySoundToSet(11152);
 
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 
@@ -2931,7 +3049,7 @@ public:
 
 		if (_unit->GetHealthPct() > 0)
 		{
-			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		}
 	}
@@ -2939,6 +3057,8 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "");
+		_unit->PlaySoundToSet(11153);
 	}
 	
 	void AIUpdate()
@@ -3000,7 +3120,7 @@ public:
 		spells[2].perctrigger = 8.0f;
 		spells[2].attackstoptimer = 2000;
 
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 	}
 
@@ -3008,6 +3128,9 @@ public:
     {
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The sin'dorei reign supreme!");
+		_unit->PlaySoundToSet(11117);
 
 		if (_unit->GetDistance2dSq(mTarget) <= 1225.0f)
 		{
@@ -3029,7 +3152,7 @@ public:
 
 		if (_unit->GetHealthPct() > 0)
 		{
-			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		}
 	}
@@ -3200,7 +3323,7 @@ public:
 		spells[1].mindist2cast = 0.0f;
 		spells[1].maxdist2cast = 30.0f;
 
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 	}
 
@@ -3208,6 +3331,8 @@ public:
     {
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(true);
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Anar'alah belore!");
+		_unit->PlaySoundToSet(11157);
 
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 
@@ -3224,7 +3349,7 @@ public:
 
 		if (_unit->GetHealthPct() > 0)
 		{
-			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 			_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		}
 	}
@@ -3232,6 +3357,8 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "");
+		_unit->PlaySoundToSet(11158);
 	}
 	
 	void AIUpdate()
@@ -3350,7 +3477,7 @@ public:
 	{
 		RegisterAIUpdateEvent(1000);
 
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_canMove = false;
 
@@ -3390,7 +3517,6 @@ public:
 protected:	
 
 	int DespawnTimer;
-	int nrspells;
 };
 
 //Phoenix AI
@@ -3566,9 +3692,7 @@ public:
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_canMove = false;
 
-		RegisterAIUpdateEvent(1000);
-
-		DespawnTimer = 15;
+		RegisterAIUpdateEvent(15000);
 	}
 
 	void OnCombatStop(Unit *mTarget)
@@ -3584,18 +3708,9 @@ public:
 	
 	void AIUpdate()
 	{
-		DespawnTimer--;
-		if (DespawnTimer <= 0)
-		{
-			_unit->GetMapMgr()->GetInterface()->SpawnCreature(21362, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), false, false, 0, 0);
-			_unit->Despawn(0,0);
-		}
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21362, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), false, false, 0, 0);
+		_unit->Despawn(0,0);
 	}
-	
-protected:	
-
-	int nrspells;
-	int DespawnTimer;
 };
 
 //-------------------Kael'thas Weapons------------------//
@@ -3842,7 +3957,7 @@ public:
 		sanityCheck();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 
-		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->GetAIInterface()->m_canMove = false;
 
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Energy. Power. My people are addicted to it. Their dependence made manifest after the Sunwell was destroyed. Welcome to the future...a pity you're too late to stop it. No one can stop me now. Selama ashal'anore.");
@@ -4100,6 +4215,7 @@ public:
 	{
 		if(Speech <= 20)
 		{
+			_unit->setAttackTimer(2000, false);
 			Speech++;
 			return;
 		}
@@ -4647,7 +4763,7 @@ public:
 
 	void WeaponRelease()
 	{
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "As you can see, I have many weapons in my arsenal.");
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "As you see, I have many weapons in my arsenal...");
 		_unit->PlaySoundToSet(11261);
 
 		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21268, _unit->GetPositionX() + 1.0f, _unit->GetPositionY() + 1.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
@@ -5119,12 +5235,16 @@ void SetupTheEye(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_VOID_REAVER, &VoidReaverAI::Create);
 	mgr->register_creature_script(CN_ARCANEORBTARGET, &ArcaneOrbTargetAI::Create);
 
-	//Solarian event
-	mgr->register_creature_script(CN_HIGH_ASTROMANCER_SOLARIAN, &HighAstromancerSolarianAI::Create);
-	mgr->register_creature_script(CN_SOLARIUM_PRIEST, &SolariumPriestAI::Create);
+	//High Astromancer Solarian
+	mgr->register_creature_script(CN_SOLARIAN, &HighAstromancerSolarianAI::Create);
+	mgr->register_creature_script(CN_SOLARIUMAGENT, &SolariumAgentAI::Create);
+	mgr->register_creature_script(CN_SOLARIUMPRIEST, &SolariumPriestAI::Create);
+	mgr->register_dummy_spell(SOLARIAN_WRATH_OF_THE_ASTROMANCER, &Dummy_Solarian_WrathOfTheAstromancer);
 
 	//Al'ar event
-	//mgr->register_creature_script(CN_ALAR, &AlarAI::Create);
+	mgr->register_creature_script(CN_ALAR, &AlarAI::Create);
+	mgr->register_creature_script(CN_EMBEROFALAR, &EmberAlarAI::Create);
+	mgr->register_creature_script(CN_PATCHALAR, &PatchAlarAI::Create);
 
 	//Kael'Thas Encounter
 	mgr->register_creature_script(CN_PHOENIX, &PhoenixAI::Create);
