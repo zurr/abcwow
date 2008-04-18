@@ -1,13 +1,149 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
-//----------------------------------------------------------------------//
-//---------------Caverns of time: Battle of Mount Hyjal-----------------//
-//-------------------------Scripted by M4ksiu---------------------------//
-//----------------------------------------------------------------------//
+/************************************************************************/
+/* Raid_CoT_BattleForMountHyjal.cpp Script								*/
+/************************************************************************/
+
+enum HyjalEvents
+{
+	HYJAL_EVENT_RAGE_WINTERCHILL,
+	HYJAL_EVENT_ANETHERON,
+	HYJAL_EVENT_KAZROGAL,
+	HYJAL_EVENT_AZGALOR,
+	HYJAL_EVENT_ARCHIMONDE
+};
+
+enum HyjalPhases
+{
+	HYJAL_PHASE_NOT_STARTED = 0,
+	HYJAL_PHASE_RAGE_WINTERCHILL_COMPLETE,
+	HYJAL_PHASE_ANETHERON_COMPLETE,
+	HYJAL_PHASE_KAZROGAL_COMPLETE,
+	HYJAL_PHASE_AZGALOR_COMPLETE,
+	HYJAL_PHASE_ARCHIMONDE_COMPLETE
+};
+
+uint32 HyjalPhase[1000000];
+
+//Jaina Proudmoore AI & GS
+#define CN_JAINA_PROUDMOORE 17772
+
+class JainaProudmooreAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(JainaProudmooreAI);
+
+    JainaProudmooreAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		HyjalPhase[_unit->GetInstanceID()] = HYJAL_PHASE_NOT_STARTED;
+		_unit->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+	}
+};
+
+class SCRIPT_DECL JainaProudmooreGS : public GossipScript
+{
+public:
+	void GossipHello(Object * pObject, Player* Plr, bool AutoSend)
+	{
+		GossipMenu *Menu;
+		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 1, Plr);
+
+		switch(HyjalPhase[pObject->GetInstanceID()])
+		{
+		case HYJAL_PHASE_NOT_STARTED:
+			Menu->AddItem(0, "We are ready to defend the Alliance base.", 1); 
+			break;
+
+		case HYJAL_PHASE_RAGE_WINTERCHILL_COMPLETE:
+			Menu->AddItem(0, "We are ready to defend the Alliance base.", 1); 
+			break;
+
+		case HYJAL_PHASE_ANETHERON_COMPLETE:
+			Menu->AddItem(0, "The defenses are holding up: we can continue.", 1); 
+			break;
+		}
+
+		if(AutoSend)
+			Menu->SendTo(Plr);
+	}
+
+	void GossipSelectOption(Object * pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
+	{
+		Creature *creature = static_cast<Creature*>(pObject);
+
+		switch(HyjalPhase[pObject->GetInstanceID()])
+		{
+		case HYJAL_PHASE_NOT_STARTED:
+		case HYJAL_PHASE_RAGE_WINTERCHILL_COMPLETE:
+		case HYJAL_PHASE_ANETHERON_COMPLETE:
+			break;
+		}
+
+		creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+	}
+
+	void GossipEnd(Object * pObject, Player* Plr) { GossipScript::GossipEnd(pObject, Plr); }
+	void Destroy() { delete this; }
+};
+
+//Thrall AI & GS
+#define CN_THRALL 17852
+
+class ThrallAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(ThrallAI);
+
+    ThrallAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+		_unit->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+	}
+};
+
+class SCRIPT_DECL ThrallGS : public GossipScript
+{
+public:
+	void GossipHello(Object * pObject, Player* Plr, bool AutoSend)
+	{
+		GossipMenu *Menu;
+		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 1, Plr);
+
+		switch(HyjalPhase[pObject->GetInstanceID()])
+		{
+		case HYJAL_PHASE_ANETHERON_COMPLETE:
+			Menu->AddItem(0, "We're here to help! The Alliance are overrun.", 1); 
+			break;
+
+		case HYJAL_PHASE_KAZROGAL_COMPLETE:
+			Menu->AddItem(0, "We're okay so far. Let's do this!", 1); 
+			break;
+		}
+
+		if(AutoSend)
+			Menu->SendTo(Plr);
+	}
+
+	void GossipSelectOption(Object * pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
+	{
+		Creature *creature = static_cast<Creature*>(pObject);
+
+		switch(HyjalPhase[pObject->GetInstanceID()])
+		{
+			case HYJAL_PHASE_ANETHERON_COMPLETE:
+			case HYJAL_PHASE_KAZROGAL_COMPLETE:
+			break;
+		}
+
+		creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+	}
+
+	void GossipEnd(Object * pObject, Player* Plr) { GossipScript::GossipEnd(pObject, Plr); }
+	void Destroy() { delete this; }
+};
+
 
 // Rage WinterchillAI
-
 #define CN_RAGE_WINTERCHILL 17767
 
 #define FROSTBOLT 41486			// it's not correct spell for sure (not sure to others too :P)
@@ -1438,13 +1574,20 @@ public:
 	}
 
 protected:
-
 	Creature *Trigger;
 	int nrspells;
 };
 
 void SetupBattleOfMountHyjal(ScriptMgr * mgr)
 {
+	GossipScript * jainaGS = (GossipScript*) new JainaProudmooreGS;
+	mgr->register_gossip_script(CN_JAINA_PROUDMOORE, jainaGS);
+	mgr->register_creature_script(CN_JAINA_PROUDMOORE, &JainaProudmooreAI::Create);
+
+	GossipScript * thrallGS = (GossipScript*) new ThrallGS;
+	mgr->register_gossip_script(CN_THRALL, thrallGS);
+	mgr->register_creature_script(CN_THRALL, &ThrallAI::Create);
+
 	mgr->register_creature_script(CN_RAGE_WINTERCHILL, &RageWinterchillAI::Create);
 	mgr->register_creature_script(CN_ANETHERON, &AnetheronAI::Create);
 	mgr->register_creature_script(CN_KAZROGAL, &KazrogalAI::Create);
