@@ -68,7 +68,8 @@ enum EventType
 {
 	Event_OnCombatStart,
 	Event_OnTargetDied,
-	Event_OnDied
+	Event_OnDied,
+	Event_OnTaunt
 };
 
 enum BehaviorType
@@ -147,120 +148,127 @@ public:
 	virtual ~MoonScriptCreatureAI();
 
 	//Movement
-	bool			GetCanMove();
-	void			SetCanMove(bool pCanMove);
-	void			MoveToUnit(Unit* pUnit);
-	void			MoveToSpawnOrigin();
-	void			MoveTo(float pX, float pY, float pZ);
-	void			StopMovement();
+	bool					GetCanMove();
+	void					SetCanMove(bool pCanMove);
+	void					MoveTo(MoonScriptCreatureAI* pCreature);
+	void					MoveTo(Unit* pUnit);
+	void					MoveTo(float pX, float pY, float pZ);
+	void					MoveToSpawnOrigin();
+	void					StopMovement();
 
 	//Attack and Combat State
-	bool			GetCanEnterCombat();
-	void			SetCanEnterCombat(bool pCanEnterCombat);
-	bool			IsInCombat();
-	void			DelayNextAttack(int32 pMilliseconds);
+	bool					GetCanEnterCombat();
+	void					SetCanEnterCombat(bool pCanEnterCombat);
+	bool					IsInCombat();
+	void					DelayNextAttack(int32 pMilliseconds);
 
 	//Behavior
-	void			SetBehavior(BehaviorType pBehavior);
-	BehaviorType	GetBehavior();
-	void			SetAllowMelee(bool pAllow);
-	bool			GetAllowMelee();
-	void			SetAllowRanged(bool pAllow);
-	bool			GetAllowRanged();
-	void			SetAllowSpell(bool pAllow);
-	bool			GetAllowSpell();
-	void			SetAllowTargeting(bool pAllow);
-	bool			GetAllowTargeting();
-	void			AggroNearestUnit();
+	void					SetBehavior(BehaviorType pBehavior);
+	BehaviorType			GetBehavior();
+	void					SetAllowMelee(bool pAllow);
+	bool					GetAllowMelee();
+	void					SetAllowRanged(bool pAllow);
+	bool					GetAllowRanged();
+	void					SetAllowSpell(bool pAllow);
+	bool					GetAllowSpell();
+	void					SetAllowTargeting(bool pAllow);
+	bool					GetAllowTargeting();
+	void					AggroNearestUnit();
 
 	//Status
-	void			ClearHateList();
-	int32			GetHealthPercent();
-	int32			GetManaPercent();
-	bool			IsAlive(Unit* pUnit);
-	void			SetScale(float pScale);
-	float			GetScale();
+	void					ClearHateList();
+	int32					GetHealthPercent();
+	int32					GetManaPercent();
+	void					Regenerate();
+	bool					IsAlive();
+	void					SetScale(float pScale);
+	float					GetScale();
+	void					SetDisplayId(uint32 pDisplayId);
 
 	//Environment
-	float			GetRangeToUnit(Unit* pUnit);
-	GameObject*		GetNearestGameObject(uint32 pGameObjectId=0);
-	Creature*		GetNearestCreature(uint32 pCreatureId=0);
-	Creature*		SpawnCreature(uint32 pCreatureId, float pX, float pY, float pZ, float pO=0, bool pForceSameFaction=false);
+	float					GetRange(MoonScriptCreatureAI* pCreature);
+	float					GetRangeToUnit(Unit* pUnit);
+	GameObject*				GetNearestGameObject(uint32 pGameObjectId=0);
+	MoonScriptCreatureAI*	GetNearestCreature(uint32 pCreatureId=0);
+	MoonScriptCreatureAI*	SpawnCreature(uint32 pCreatureId, bool pForceSameFaction=false);
+	MoonScriptCreatureAI*	SpawnCreature(uint32 pCreatureId, float pX, float pY, float pZ, float pO=0, bool pForceSameFaction=false);
+	void					Despawn(uint32 pDelay=0, uint32 pRespawnTime=0);
 
 	//Spells
-	SpellDesc*		AddSpell(uint32 pSpellId, TargetType pTargetType, float pChance, float pCastTime, int32 pCooldown, float pMinRange=0, float pMaxRange=0, bool pStrictRange=false, char* pText=NULL, TextType pTextType=Text_Yell, uint32 pSoundId=0);
-	SpellDesc*		AddSpellFunc(SpellFunc pFnc, TargetType pTargetType, float pChance, float pCastTime, int32 pCooldown, float pMinRange=0, float pMaxRange=0, bool pStrictRange=false, char* pText=NULL, TextType pTextType=Text_Yell, uint32 pSoundId=0);
-	void			CastSpell(SpellDesc* pSpell);
-	void			CastSpellNowNoScheduling(SpellDesc* pSpell);
-	SpellDesc*		FindSpellById(uint32 pSpellId);
-	SpellDesc*		FindSpellByFunc(SpellFunc pFnc);
-	bool			IsCasting();
-	void			ApplyAura(uint32 pSpellId);
-	void			RemoveAura(uint32 pSpellId);
-	void			RemoveAuraOnPlayers(uint32 pSpellId);
-	void			RemoveAllAuras();
+	SpellDesc*				AddSpell(uint32 pSpellId, TargetType pTargetType, float pChance, float pCastTime, int32 pCooldown, float pMinRange=0, float pMaxRange=0, bool pStrictRange=false, char* pText=NULL, TextType pTextType=Text_Yell, uint32 pSoundId=0);
+	SpellDesc*				AddSpellFunc(SpellFunc pFnc, TargetType pTargetType, float pChance, float pCastTime, int32 pCooldown, float pMinRange=0, float pMaxRange=0, bool pStrictRange=false, char* pText=NULL, TextType pTextType=Text_Yell, uint32 pSoundId=0);
+	void					CastSpell(SpellDesc* pSpell);
+	void					CastSpellNowNoScheduling(SpellDesc* pSpell);
+	SpellDesc*				FindSpellById(uint32 pSpellId);
+	SpellDesc*				FindSpellByFunc(SpellFunc pFnc);
+	bool					IsCasting();
+	void					ApplyAura(uint32 pSpellId);
+	void					RemoveAura(uint32 pSpellId);
+	void					RemoveAuraOnPlayers(uint32 pSpellId);
+	void					RemoveAllAuras();
 
 	//Emotes
-	EmoteDesc*		AddEmote(EventType pEventType, const char* pText, TextType pType, uint32 pSoundId=0);
-	void			RemoveEmote(EventType pEventType, EmoteDesc* pEmote);
-	void			RemoveAllEmotes(EventType pEventType);
-	void			Emote(EmoteDesc* pEmote);
-	void			Emote(const char* pText, TextType pType=Text_Yell, uint32 pSoundId=0);
+	EmoteDesc*				AddEmote(EventType pEventType, const char* pText, TextType pType, uint32 pSoundId=0);
+	void					RemoveEmote(EventType pEventType, EmoteDesc* pEmote);
+	void					RemoveAllEmotes(EventType pEventType);
+	void					Emote(EmoteDesc* pEmote);
+	void					Emote(const char* pText, TextType pType=Text_Yell, uint32 pSoundId=0);
 
 	//Timers
-	uint32			AddTimer(int32 pDurationMillisec);
-	void			RemoveTimer(int32& pTimerId);
-	void			ResetTimer(int32 pTimerId, int32 pDurationMillisec);
-	bool			IsTimerFinished(int32 pTimerId);
-	void			CancelAllTimers();
+	uint32					AddTimer(int32 pDurationMillisec);
+	void					RemoveTimer(int32& pTimerId);
+	void					ResetTimer(int32 pTimerId, int32 pDurationMillisec);
+	bool					IsTimerFinished(int32 pTimerId);
+	void					CancelAllTimers();
 
 	//Options
-	void			SetAIUpdateFreq(uint32 pUpdateFreq);
-	uint32			GetAIUpdateFreq();
+	void					SetAIUpdateFreq(uint32 pUpdateFreq);
+	uint32					GetAIUpdateFreq();
 
 	//Reimplemented Events
-	virtual void	OnCombatStart(Unit* pTarget);
-	virtual void	OnCombatStop(Unit* pTarget);
-	virtual void	OnTargetDied(Unit* pTarget);
-	virtual void	OnDied(Unit* pKiller);
-	virtual void	AIUpdate();
+	virtual void			OnCombatStart(Unit* pTarget);
+	virtual void			OnCombatStop(Unit* pTarget);
+	virtual void			OnTargetDied(Unit* pTarget);
+	virtual void			OnDied(Unit* pKiller);
+	virtual void			AIUpdate();
 
 protected:
-	enum			TargetFilter {TargetFilter_None=0, TargetFilter_Closest=1<<0, TargetFilter_Friendly=1<<1, TargetFilter_NotCurrent=1<<2, TargetFilter_Wounded=1<<3};
+	enum					TargetFilter {TargetFilter_None=0, TargetFilter_Closest=1<<0, TargetFilter_Friendly=1<<1, TargetFilter_NotCurrent=1<<2, TargetFilter_Wounded=1<<3};
 
-	bool			IsSpellScheduled(SpellDesc* pSpell);
-	bool			CastSpellInternal(SpellDesc* pSpell, uint32 pCurrentTime=0);
-	void			CastSpellOnTarget(Unit* pTarget, TargetType pType, SpellEntry* pEntry, bool pInstant);
-	int32			CalcSpellAttackTime(SpellDesc* pSpell);
-	void			CancelAllSpells();
+	bool					IsSpellScheduled(SpellDesc* pSpell);
+	bool					CastSpellInternal(SpellDesc* pSpell, uint32 pCurrentTime=0);
+	void					CastSpellOnTarget(Unit* pTarget, TargetType pType, SpellEntry* pEntry, bool pInstant);
+	int32					CalcSpellAttackTime(SpellDesc* pSpell);
+	void					CancelAllSpells();
 
-	bool			IsUnitInRange(Unit* pTarget, SpellDesc* pSpell);
-	Unit*			GetTargetForSpell(SpellDesc* pSpell);
-	Unit*			GetBestPlayerTarget(TargetFilter pFilter=TargetFilter_None);
-	Unit*			GetBestUnitTarget(TargetFilter pFilter=TargetFilter_None);
-	Unit*			ChooseBestTargetInArray(UnitArray& pTargetArray, TargetFilter pFilter);
-	Unit*			GetNearestTargetInArray(UnitArray& pTargetArray);
-	bool			IsValidUnitTarget(Object* pObject, TargetFilter pFilter);
-	void			PushRunToTargetCache(Unit* pTarget, SpellDesc* pSpell);
-	void			PopRunToTargetCache();
+	bool					IsUnitInRange(Unit* pTarget, SpellDesc* pSpell);
+	Unit*					GetTargetForSpell(SpellDesc* pSpell);
+	Unit*					GetBestPlayerTarget(TargetFilter pFilter=TargetFilter_None);
+	Unit*					GetBestUnitTarget(TargetFilter pFilter=TargetFilter_None);
+	Unit*					ChooseBestTargetInArray(UnitArray& pTargetArray, TargetFilter pFilter);
+	Unit*					GetNearestTargetInArray(UnitArray& pTargetArray);
+	bool					IsValidUnitTarget(Object* pObject, TargetFilter pFilter);
+	void					PushRunToTargetCache(Unit* pTarget, SpellDesc* pSpell);
+	void					PopRunToTargetCache();
 
-	void			RandomEmote(EmoteArray& pEmoteArray);
+	void					RandomEmote(EmoteArray& pEmoteArray);
 
-	SpellDescArray	mSpells;
-	SpellDescList	mQueuedSpells;
-	SpellDescList	mScheduledSpells;
+	SpellDescArray			mSpells;
+	SpellDescList			mQueuedSpells;
+	SpellDescList			mScheduledSpells;
 
-	Unit*			mRunToTargetCache;
-	SpellDesc*		mRunToTargetSpellCache;
+	Unit*					mRunToTargetCache;
+	SpellDesc*				mRunToTargetSpellCache;
 
-	EmoteArray		mOnCombatStartEmotes;
-	EmoteArray		mOnTargetDiedEmotes;
-	EmoteArray		mOnDiedEmotes;
+	EmoteArray				mOnCombatStartEmotes;
+	EmoteArray				mOnTargetDiedEmotes;
+	EmoteArray				mOnDiedEmotes;
+	EmoteArray				mOnTauntEmotes;
 
-	TimerArray		mTimers;
-	int32			mTimerIdCounter;
-	uint32			mAIUpdateFrequency;
-	uint32			mBaseAttackTime;
+	TimerArray				mTimers;
+	int32					mTimerIdCounter;
+	uint32					mAIUpdateFrequency;
+	uint32					mBaseAttackTime;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

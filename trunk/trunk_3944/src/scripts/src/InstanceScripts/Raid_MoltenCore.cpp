@@ -655,7 +655,7 @@ class FireswornAI : public MoonScriptCreatureAI
 
 	void OnCombatStart(Unit* pTarget)
 	{
-		mGarr = GetNearestCreature(CN_GARR);
+		mGarr = (MoonScriptBossAI*)GetNearestCreature(CN_GARR);
 		ParentClass::OnCombatStart(pTarget);
 	}
 
@@ -667,7 +667,7 @@ class FireswornAI : public MoonScriptCreatureAI
 
 	void AIUpdate()
 	{
-		if( mGarr && IsAlive(mGarr) && GetRangeToUnit(mGarr) > 100 )
+		if( mGarr && mGarr->IsAlive() && GetRange( mGarr ) > 100 )
 		{
 			CastSpell(mSeparationAnxiety);
 		}
@@ -676,7 +676,7 @@ class FireswornAI : public MoonScriptCreatureAI
 
 	SpellDesc*	mEruption;
 	SpellDesc*	mSeparationAnxiety;
-	Creature*	mGarr;
+	MoonScriptBossAI*	mGarr;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

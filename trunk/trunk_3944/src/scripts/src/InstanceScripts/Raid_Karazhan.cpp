@@ -61,375 +61,146 @@ public:
 /*							 */
 /*****************************/
 
-// Midnight
-#define CN_MIDNIGHT		16151
-#define CN_ATTUMEN		15550
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Attumen the Huntsman (and Midnight)
+#define CN_MIDNIGHT					16151
+#define CN_ATTUMEN					15550
+#define ATTUMEN_SHADOW_CLEAVE		29832
+#define ATTUMEN_BERSERKER_CHARGE	22886
+#define ATTUMEN_INTANGIBLE_PRESENCE	29833
 
-class MidnightAI : public CreatureAIScript
+class AttumenTheHuntsmanAI : public MoonScriptBossAI
 {
-public:
-	ADD_CREATURE_FACTORY_FUNCTION(MidnightAI);
-
-	MidnightAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	MOONSCRIPT_FACTORY_FUNCTION(AttumenTheHuntsmanAI, MoonScriptBossAI);
+	AttumenTheHuntsmanAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 	{
-		m_phase = 1;
+		mMidnight = NULL;
+
+		//All phase spells
+		AddSpell(ATTUMEN_SHADOW_CLEAVE, Target_Current, 15, 0, 6, 0, 5, true);
+		AddSpell(ATTUMEN_INTANGIBLE_PRESENCE, Target_Current, 15, 0, 12, 0, 5, true);
+
+		//Phase 2 spells
+		AddPhaseSpell(2, AddSpell(ATTUMEN_BERSERKER_CHARGE, Target_RandomPlayerNotCurrent, 15, 0, 6, 15, 40, true));
+
+		//Emotes
+		AddEmote(Event_OnCombatStart, "Cowards! Wretches!", Text_Yell, 9167);
+		AddEmote(Event_OnCombatStart, "Who dares attack the steed of the Huntsman?", Text_Yell, 9298);
+		AddEmote(Event_OnCombatStart, "Perhaps you would rather test yourselves against a more formidable opponent!", Text_Yell, 9299);
+		AddEmote(Event_OnTargetDied, "It was... inevitable.", Text_Yell, 9169);
+		AddEmote(Event_OnTargetDied, "Another trophy to add to my collection!", Text_Yell, 9300);
+		AddEmote(Event_OnDied, "Always knew... someday I would become... the hunted.", Text_Yell, 9165);
+		AddEmote(Event_OnTaunt, "Such easy sport.", Text_Yell, 9170);
+		AddEmote(Event_OnTaunt, "Amatures! Do not think you can best me! I kill for a living.", Text_Yell, 9304);
+
+		AggroNearestUnit(); //Aggro on spawn
 	}
 
-	void OnCombatStart(Unit* mTarget)
+	void OnCombatStart(Unit* pTarget)
 	{
-		RegisterAIUpdateEvent(1000);
-
-		m_phase = 1;
+		mMidnight = (MoonScriptBossAI*)GetNearestCreature(CN_MIDNIGHT);
+		ParentClass::OnCombatStart(pTarget);
 	}
 
-	void OnCombatStop(Unit *mTarget)
+	void OnCombatStop(Unit* pTarget)
 	{
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-
-		RemoveAIUpdateEvent();
-	}
-
-	void OnDied(Unit * mKiller)
-	{
-	   RemoveAIUpdateEvent();
-	}
-
-	void OnTargetDied(Unit* mTarget)
-	{ 
-		if(m_phase == 2)
-		{
-			pAttumen = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 15550);
-			if(pAttumen != NULL)
-			{
-				pAttumen->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Well done Midnight!");
-				pAttumen->PlaySoundToSet(9173);
-
-				pAttumen = NULL;
-			}
-		}
+		Despawn(10000);
+		ParentClass::OnCombatStop(pTarget);
 	}
 
 	void AIUpdate()
 	{
-		switch(m_phase)
+		if( GetPhase() == 1 )
 		{
-		case 1:
-			PhaseTwo();
-			break;
-		case 2:
-			PhaseThree();
-			break;
-		default:
-			m_phase = 1;
-		}
-	}
-
-	void PhaseTwo()
-	{
-		if (m_phase == 1 && _unit->GetHealthPct() <= 94)
-		{
-			pAttumen = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ATTUMEN, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
-			if(pAttumen != NULL)
+			if( mMidnight && mMidnight->IsAlive() && GetHealthPercent() <= 25 && !IsCasting() )
 			{
-				switch(rand()%3)
-				{	
-				case 0:
-					pAttumen->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Cowards! Wretches!");
-					pAttumen->PlaySoundToSet(9167);
-					break;
-				case 1:	
-					pAttumen->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Who dares attack the steed of the Huntsman?");
-					pAttumen->PlaySoundToSet(9298);
-					break;
-				case 2:
-					pAttumen->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Perhaps you would rather test yourselves against a more formidable opponent!");
-					pAttumen->PlaySoundToSet(9299);
-					break;
-				}
-			}
-
-			m_phase = 2;
-		}
-	}
-
-	void PhaseThree()
-	{
-		if (_unit->GetHealthPct() <= 25 && pAttumen != NULL && pAttumen->isAlive())
-		{
-			_unit->GetAIInterface()->MoveTo(pAttumen->GetPositionX(), pAttumen->GetPositionY(), pAttumen->GetPositionZ(), pAttumen->GetOrientation());
-
-			if (m_phase == 2)
-			{
-				pAttumen->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come Midnight, let's disperse this petty rabble!");
-				pAttumen->PlaySoundToSet(9168);
-
-				m_phase = 1;
-			}
-			if (_unit->GetDistance2dSq(pAttumen) < 64.0f)
-			{
-				static_cast< Creature* >(pAttumen)->RegenerateHealth();
-				pAttumen->SetUInt32Value(UNIT_FIELD_DISPLAYID , 16040);
-				pAttumen->ClearHateList();
-
-				_unit->Despawn(0, 0);
-
-				pAttumen = NULL;
+				SetPhase(2);
+				SetAllowMelee(false);
+				SetAllowSpell(false);
+				Emote("Come Midnight, let's disperse this petty rabble!", Text_Yell, 9168);
+				mMidnight->SetPhase(2);
+				mMidnight->MoveTo(this);
+				mMidnight->SetAllowMelee(false);
 			}
 		}
+		ParentClass::AIUpdate();
 	}
 
-protected:
-
-	Creature *pAttumen;
-	int m_phase;
+	MoonScriptBossAI* mMidnight;
 };
 
-// Attumen
-#define SHADOW_CLEAVE		29832
-#define BERSERKER_CHARGE	22886
-#define INTANGIBLE_PRESENCE	29833
-
-class AttumenAI : public CreatureAIScript
+class MidnightAI : public MoonScriptBossAI
 {
-public:
-	ADD_CREATURE_FACTORY_FUNCTION(AttumenAI);
-	bool m_spellcheck[3];
-	SP_AI_Spell spells[3];
-
-	AttumenAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	MOONSCRIPT_FACTORY_FUNCTION(MidnightAI, MoonScriptBossAI);
+	MidnightAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 	{
-		nrspells = 3;
-		for(int i=0;i<nrspells;i++)
+		mAttumen = NULL;
+	}
+
+	void OnCombatStart(Unit* pTarget)
+	{
+		mAttumen = NULL;
+		ParentClass::OnCombatStart(pTarget);
+	}
+
+	void OnCombatStop(Unit* pTarget)
+	{
+		mAttumen = NULL;
+		SetAllowMelee(true);
+		SetAllowSpell(true);
+		ParentClass::OnCombatStop(pTarget);
+	}
+
+	void OnTargetDied(Unit* pTarget)
+	{
+		if( mAttumen && mAttumen->IsAlive() )
 		{
-			m_spellcheck[i] = false;
+			mAttumen->Emote("Well done Midnight!", Text_Yell, 9173);
 		}
-
-		spells[0].info = dbcSpell.LookupEntry(SHADOW_CLEAVE);
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
-		spells[0].perctrigger = 70.0f;
-		spells[0].cooldown = 19;
-		spells[0].attackstoptimer = 1000;
-
-		spells[1].info = dbcSpell.LookupEntry(INTANGIBLE_PRESENCE);
-		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
-		spells[1].perctrigger = 60.0f;
-		spells[1].cooldown = 26;
-		spells[1].attackstoptimer = 1000;
-
-		spells[2].info = dbcSpell.LookupEntry(BERSERKER_CHARGE);
-		spells[2].targettype = TARGET_RANDOM_SINGLE;
-		spells[2].instant = true;
-		spells[2].perctrigger = 40.0f;
-		spells[2].cooldown = 22;
-		spells[2].attackstoptimer = 2000;
-		spells[2].mindist2cast = 10;
-	}
-
-	void OnCombatStart(Unit* mTarget)
-	{
-		for (int i = 0; i < nrspells; i++)
-			spells[i].casttime = spells[i].cooldown;
-		
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-
-		RandomYellTimer = RandomUInt(10)+35;
-		mount_yell = false;
-		despawner = false;
-	}
-	
-	void TauntSpeech()
-	{
-		if (RandomYellTimer <= 0)
-		{
-			switch (RandomUInt(1))
-			{
-			case 0:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Such easy sport.");
-				_unit->PlaySoundToSet(9170);
-				break;
-			case 1:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Amatures! Do not think you can best me! I kill for a living.");
-				_unit->PlaySoundToSet(9304);
-				break;
-			}
-
-			RandomYellTimer = (uint32)time(NULL) + RandomUInt(10)+35;
-		}
-	}
-
-	void OnCombatStop(Unit *mTarget)
-	{
-		sLog.outString("Attumen - stopping combat");
-		// If 1 player in raid stays out of combat and the raid is wiped, when they start over they can attack Attumen without attacking Midnight
-		if(/*_unit->GetMapMgr()->GetInterface()->GetPlayerCountInRadius(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 15) == 0 && */_unit->isAlive())
-		{
-			sLog.outString("Attumen - despawning");
-			_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-			_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-			_unit->Despawn(10000, 0);
-
-			RemoveAIUpdateEvent();
-		}
-
-		despawner = true;	// really needed?
-	}
-
-	void OnDied(Unit * mKiller)
-	{
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Always knew... someday I would become... the hunted.");
-		_unit->PlaySoundToSet(9165);
-
-		RemoveAIUpdateEvent();
-	}
-
-	void OnTargetDied(Unit* mTarget)
-	{
-		if(_unit->GetHealthPct() > 0)
-		{
-			switch(RandomUInt(1))
-			{
-			case 0:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "It was... inevitable.");
-				_unit->PlaySoundToSet(9169);
-				break;
-			case 1:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Another trophy to add to my collection!");
-				_unit->PlaySoundToSet(9300);
-				break;
-			}
-		}
+		ParentClass::OnTargetDied(pTarget);
 	}
 
 	void AIUpdate()
 	{
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
-		if(_unit->GetCurrentSpell() == NULL && despawner == false)	// wth?
-			TauntSpeech();
-		if(_unit->GetHealthPct() <= 25 && _unit->GetUInt32Value(UNIT_FIELD_DISPLAYID) != 16040)
-			Phase();
-	}
-
-	void Phase()
-	{
-		Creature *pMidnight = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 16151);
-		if(pMidnight && pMidnight->isAlive())
+		if( GetPhase() == 1 )
 		{
-			pMidnight->GetAIInterface()->MoveTo(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation());
-			if (!mount_yell)
+			if( !mAttumen && GetHealthPercent() <= 95 && !IsCasting() )
 			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Come Midnight, let's disperse this petty rabble!");
-				_unit->PlaySoundToSet(9168);
-
-				mount_yell = true;
+				Emote("Midnight calls for her master!", Text_Emote);
+				mAttumen = (MoonScriptBossAI*)SpawnCreature(CN_ATTUMEN);
 			}
-			if (_unit->GetDistance2dSq(pMidnight) < 64.0f)
+			else if( mAttumen && mAttumen->IsAlive() && GetHealthPercent() <= 25 && !IsCasting() )
 			{
-				_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 16040);
-				_unit->RegenerateHealth();
-				_unit->ClearHateList();
-				
-				pMidnight->Despawn(0, 0);
-				pMidnight = NULL;
+				SetPhase(2);
+				MoveTo(mAttumen);
+				SetAllowMelee(false);
+				mAttumen->SetPhase(2);
+				mAttumen->SetAllowMelee(false);
+				mAttumen->SetAllowSpell(false);
+				mAttumen->Emote("Come Midnight, let's disperse this petty rabble!", Text_Yell, 9168);
 			}
 		}
-	}
-
-	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		else if( GetPhase() == 2 )
 		{
-			float comulativeperc = 0;
-			Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
+			if( mAttumen && mAttumen->IsAlive() )
 			{
-				if(!spells[i].perctrigger) continue;
-
-				if (m_spellcheck[i])
+				if( GetRange(mAttumen) <= 15 )
 				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					case TARGET_RANDOM_SINGLE:
-					case TARGET_RANDOM_DESTINATION:
-						CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
-					}
-
-					m_spellcheck[i] = false;
-					return;
+					mAttumen->Regenerate();
+					mAttumen->SetDisplayId(16040);
+					mAttumen->ClearHateList();
+					mAttumen->SetAllowMelee(true);
+					mAttumen->SetAllowSpell(true);
+					mAttumen = NULL;
+					Despawn();
 				}
-			
-				uint32 t = (uint32)time(NULL);
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					spells[i].casttime = t + spells[i].cooldown;
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
+				else MoveTo(mAttumen);
 			}
 		}
+		ParentClass::AIUpdate();
 	}
 
-	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
-	{
-		if (!maxdist2cast) maxdist2cast = 100.0f;
-		if (!maxhp2cast) maxhp2cast = 100;
-
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
-			std::vector<Player *> TargetTable;
-			for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
-			{
-				if(isHostile(_unit, (*itr)) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
-				{
-					Player* RandomTarget = NULL;
-					RandomTarget = static_cast< Player* >(*itr);
-
-					if (RandomTarget && RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast)
-						TargetTable.push_back(RandomTarget);
-				}
-			}
-
-			if (!TargetTable.size())
-				return;
-
-			size_t RandTarget = rand()%TargetTable.size();
-
-			Unit * RTarget = TargetTable[RandTarget];
-
-			if (!RTarget)
-				return;
-
-			switch (spells[i].targettype)
-			{
-			case TARGET_RANDOM_SINGLE:
-				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
-			case TARGET_RANDOM_DESTINATION:
-				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
-			}
-
-			TargetTable.clear();
-		}
-	}
-
-protected:
-
-	uint32 RandomYellTimer;
-	uint32 o_timer;
-	bool mount_yell;
-	bool despawner;
-	int nrspells;
+	MoonScriptBossAI* mAttumen;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -447,18 +218,18 @@ class MoroesAI : public MoonScriptBossAI
 	MoroesAI(Creature* pCreature) : MoonScriptBossAI(pCreature)
 	{
 		//Initialize timers
-		mVanishTimer = mGarotteTimer = INVALIDATE_TIMER;
+		mVanishTimer = mGarroteTimer = INVALIDATE_TIMER;
 
 		//Phase 1 spells
 		AddPhaseSpell(1, AddSpell(MOROES_GOUGE, Target_Current, 20, 0, 10, 0, 5));
 		AddPhaseSpell(1, AddSpell(MOROES_BLIND, Target_ClosestPlayerNotCurrent, 20, 0, 10, 0, 10, true));
 		mVanish = AddSpell(MOROES_VANISH, Target_Self, 0, 12, 0);
+		mVanish->AddEmote("Now, where was I? Oh yes...", Text_Yell, 9215);
+		mVanish->AddEmote("You rang?", Text_Yell, 9316);
 		mEnrage = AddSpell(MOROES_ENRAGE, Target_Self, 0, 0, 0);
 
 		//Phase 2 spells
-		mGarotte = AddSpell(MOROES_GARROTE, Target_Self, 0, 0, 0);
-		mGarotte->AddEmote("Now, where was I? Oh yes...", Text_Yell, 9215);
-		mGarotte->AddEmote("You rang?", Text_Yell, 9316);
+		mGarrote = AddSpell(MOROES_GARROTE, Target_RandomPlayer, 0, 0, 0);
 
 		//Emotes
 		AddEmote(Event_OnCombatStart, "Hm, unannounced visitors. Preparations must be made...", Text_Yell, 9211);
@@ -493,26 +264,26 @@ class MoroesAI : public MoonScriptBossAI
 			else if( IsTimerFinished(mVanishTimer) && !IsCasting() )
 			{
 				SetPhase(2, mVanish);
-				mGarotteTimer = AddTimer(12000);
+				mGarroteTimer = AddTimer(12000);
 				ResetTimer(mVanishTimer, 35000);
 			}
 		}
 		else if( GetPhase() == 2 )
 		{
-			if( IsTimerFinished(mGarotteTimer) && !IsCasting() )
+			if( IsTimerFinished(mGarroteTimer) && !IsCasting() )
 			{
-				SetPhase(1, mGarotte);
+				SetPhase(1, mGarrote);
 				RemoveAura(MOROES_VANISH);
-				RemoveTimer(mGarotteTimer);
+				RemoveTimer(mGarroteTimer);
 			}
 		}
 		ParentClass::AIUpdate();
 	}
 
 	SpellDesc*	mVanish;
-	SpellDesc*	mGarotte;
+	SpellDesc*	mGarrote;
 	SpellDesc*	mEnrage;
-	int32		mVanishTimer, mGarotteTimer;
+	int32		mVanishTimer, mGarroteTimer;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4463,7 +4234,7 @@ public:
 		Creature* Roar		= _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-10891.115f, -1756.4898f, 90.476f, 17546);//Roar
 		Creature* Tinman	= _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(-10884.501f, -1757.3249f, 90.476f, 17547); //Tinman
 
-		if ((Dorothee == NULL || Dorothee->isDead()) && (Strawman == NULL || Strawman->isDead()) && (Roar == NULL || Roar->isDead()) && (Tinman == NULL || Tinman->isDead()))
+		if((Dorothee == NULL || Dorothee->isDead()) && (Strawman == NULL || Strawman->isDead()) && (Roar == NULL || Roar->isDead()) && (Tinman == NULL || Tinman->isDead()))
 		{
 			_unit->GetMapMgr()->GetInterface()->SpawnCreature(18168, -10884.501f, -1757.3249f, 90.476f, 0.0f, false, true, 0, 0);
 		}
@@ -5682,7 +5453,7 @@ void SetupKarazhan(ScriptMgr* pScriptMgr)
 	pScriptMgr->register_gossip_script(16153, KBerthold);
 
 	pScriptMgr->register_creature_script(CN_MIDNIGHT, &MidnightAI::Create);
-	pScriptMgr->register_creature_script(CN_ATTUMEN, &AttumenAI::Create);
+	pScriptMgr->register_creature_script(CN_ATTUMEN, &AttumenTheHuntsmanAI::Create);
 	pScriptMgr->register_creature_script(CN_MOROES, &MoroesAI::Create);
 	pScriptMgr->register_creature_script(CN_MAIDEN, &MAIDENOFVIRTUEAI::Create);
 
