@@ -1208,7 +1208,7 @@ public:
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = itr->first;
-			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
+			if ( temp != NULL && temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 				temp->CastSpell(temp, STONED, true);
 		}
 	}
@@ -1219,21 +1219,24 @@ public:
 			return;
 
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		if ( targets == NULL )
+			return;
+
 		for ( TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++ )
 		{
-			if (itr->first->GetTypeId() != TYPEID_PLAYER || itr->first->isDead() )
+			if ( itr->first == NULL || itr->first->GetTypeId() != TYPEID_PLAYER || itr->first->isDead() )
 				continue;
 
 			Player* _plr = (Player*)(itr->first);
 
 			for(set<Player*>::iterator itr2 = _plr->GetInRangePlayerSetBegin(); itr2 != _plr->GetInRangePlayerSetEnd(); ++itr2)
 			{
-				if ( (*itr2) != _plr && (*itr2)->isAlive() && _plr->GetDistance2dSq( *itr2 ) <= 400.0f )
+				if ( (*itr2) != NULL && (*itr2) != _plr && (*itr2)->isAlive() && _plr->GetDistance2dSq( *itr2 ) <= 400.0f )
 				{
-					int32 damage = (int32)(9000 - 21.5f * _plr->GetDistance2dSq(*itr2));
-					if ( damage > 0 )
+					int32 damage = int32(9000.0f - 21.5f * _plr->GetDistance2dSq(*itr2));
+					SpellEntry *tempspell = dbcSpell.LookupEntry( SHATTER );
+					if ( damage > 0 && tempspell != NULL)
 					{
-						SpellEntry *tempspell = dbcSpell.LookupEntry( SHATTER );
 						tempspell->c_is_flags |= 0x00000040;
 						tempspell->EffectBasePoints[0] = damage;
 						_plr->CastSpell( *itr2, tempspell, true );
@@ -1246,39 +1249,40 @@ public:
 
 	void hurtfulStrike()
 	{
-		if (_unit->GetAIInterface()->getAITargetsCount() == 0 || _unit->GetAIInterface()->GetMostHated() == NULL)
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
 			return;
-
-		uint32 highestAggro = _unit->GetAIInterface()->getThreatByPtr(_unit->GetAIInterface()->GetMostHated());
-		if (highestAggro < 1)
-			return;
-
-		Unit *currentTarget;
-		uint32 currentAggro = 0;
 
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
-		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+		Unit *mUnit = _unit->GetAIInterface()->GetMostHated();
+		if ( mUnit == NULL || targets == NULL )
+			return;
+
+		pair<Unit*, int32> currentTarget;
+		currentTarget.first = NULL;
+		currentTarget.second = -1;
+
+		TargetMap::iterator it2 = targets->begin();
+		TargetMap::iterator itr;
+		for( ; it2 != targets->end(); )
 		{
-			Unit *temp = itr->first;
-			if (temp->GetTypeId() != TYPEID_PLAYER)
+			itr = it2;
+			++it2;
+
+			if( itr->first == NULL || itr->first->GetTypeId() != TYPEID_PLAYER || !itr->first->isAlive() || _unit->GetDistance2dSq(itr->first) >= 100.0f )
 				continue;
 
-			if (_unit->GetDistance2dSq(temp) <= 100.0f)
+			if( (itr->second + itr->first->GetThreatModifyer()) > currentTarget.second && itr->first != mUnit )
 			{
-				if (_unit->GetAIInterface()->getThreatByPtr(temp) < highestAggro && _unit->GetAIInterface()->getThreatByPtr(temp) > currentAggro)
-				{
-					currentTarget = temp;
-					currentAggro = _unit->GetAIInterface()->getThreatByPtr(temp);
-				}
+				currentTarget.first = itr->first;
+				currentTarget.second = itr->second + itr->first->GetThreatModifyer();
 			}
 		}
 
-		if (currentTarget == NULL)
-			if (_unit->GetDistance2dSq(_unit->GetAIInterface()->GetMostHated()) <= 100)
-				currentTarget = _unit->GetAIInterface()->GetMostHated();
+		if ( currentTarget.first == NULL && mUnit != NULL && _unit->GetDistance2dSq( mUnit ) <= 100)
+			currentTarget.first = mUnit;
 
-		if (currentTarget != NULL)
-			_unit->CastSpell(currentTarget, HURTFUL_STRIKE, true);
+		if ( currentTarget.first != NULL )
+			_unit->CastSpell(currentTarget.first, HURTFUL_STRIKE, true);
 	}
 
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)

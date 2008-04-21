@@ -1598,7 +1598,7 @@ public:
 		{
 			tidalvessalive = false;
 			randomspeech();
-			firetotemcd = 5 + RandomUInt(100)%15;
+			firetotemcd = 15 + RandomUInt(100)%15;
 		}
 		if (!caribdisalive)
 		{
@@ -1624,7 +1624,7 @@ public:
 			if (!firetotemcd)
 			{
 				Creature *totem = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPITFIRE, _unit->GetPositionX() + 2, _unit->GetPositionY() + 2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
-				firetotemcd = 40 + RandomUInt(100)%15;
+				firetotemcd = 60 + RandomUInt(100)%15;
 			}
 		}
 	}
@@ -2229,7 +2229,7 @@ public:
 		if (!firetotemcd)
 		{
 			Creature *totem = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPITFIRE, _unit->GetPositionX() - 2, _unit->GetPositionY() - 2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, 0, 0);
-			firetotemcd = 40 + RandomUInt(100)%15;
+			firetotemcd = 60 + RandomUInt(100)%7;
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);

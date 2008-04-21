@@ -1873,7 +1873,10 @@ void Player::_LoadPet(QueryResult * result)
 		if(pet->active)
 		{
 			if(iActivePet)  // how the hell can this happen
-				printf("pet warning - >1 active pet.. weird..");
+			{
+				//printf("pet warning - >1 active pet.. weird..");
+
+			}
 			else
 				iActivePet = pet->number;
 		}	   
