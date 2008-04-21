@@ -76,6 +76,7 @@ MoonScriptCreatureAI::~MoonScriptCreatureAI()
 	DeleteArray(mOnDiedEmotes);
 	DeleteArray(mOnTargetDiedEmotes);
 	DeleteArray(mOnCombatStartEmotes);
+	DeleteArray(mOnTauntEmotes);
 	DeleteArray(mSpells);
 }
 
@@ -90,20 +91,25 @@ void MoonScriptCreatureAI::SetCanMove(bool pCanMove)
 	else _unit->Root();
 }
 
-void MoonScriptCreatureAI::MoveToUnit(Unit* pUnit)
+void MoonScriptCreatureAI::MoveTo(MoonScriptCreatureAI* pCreature)
 {
-	MoveTo(pUnit->GetPositionX(), pUnit->GetPositionY(), pUnit->GetPositionZ());
+	MoveTo(pCreature->_unit);
 }
 
-void MoonScriptCreatureAI::MoveToSpawnOrigin()
+void MoonScriptCreatureAI::MoveTo(Unit* pUnit)
 {
-	MoveTo(_unit->GetSpawnX(), _unit->GetSpawnY(), _unit->GetSpawnZ());
+	MoveTo(pUnit->GetPositionX(), pUnit->GetPositionY(), pUnit->GetPositionZ());
 }
 
 void MoonScriptCreatureAI::MoveTo(float pX, float pY, float pZ)
 {
 	_unit->GetAIInterface()->MoveTo(pX, pY, pZ, 0);
 	_unit->GetAIInterface()->m_moveRun = true;
+}
+
+void MoonScriptCreatureAI::MoveToSpawnOrigin()
+{
+	MoveTo(_unit->GetSpawnX(), _unit->GetSpawnY(), _unit->GetSpawnZ());
 }
 
 void MoonScriptCreatureAI::StopMovement()
@@ -225,9 +231,15 @@ int32 MoonScriptCreatureAI::GetManaPercent()
 	return _unit->GetManaPct();
 }
 
-bool MoonScriptCreatureAI::IsAlive(Unit* pUnit)
+void MoonScriptCreatureAI::Regenerate()
 {
-	return pUnit->isAlive();
+	_unit->RegenerateHealth();
+	_unit->RegeneratePower(false);
+}
+
+bool MoonScriptCreatureAI::IsAlive()
+{
+	return _unit->isAlive();
 }
 
 void MoonScriptCreatureAI::SetScale(float pScale)
@@ -240,6 +252,16 @@ float MoonScriptCreatureAI::GetScale()
 	return _unit->GetFloatValue(OBJECT_FIELD_SCALE_X);
 }
 
+void MoonScriptCreatureAI::SetDisplayId(uint32 pDisplayId)
+{
+	_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, pDisplayId);
+}
+
+float MoonScriptCreatureAI::GetRange(MoonScriptCreatureAI* pCreature)
+{
+	return ( _unit != pCreature->_unit ) ? _unit->CalcDistance(pCreature->_unit) : 0;
+}
+
 float MoonScriptCreatureAI::GetRangeToUnit(Unit* pUnit)
 {
 	return _unit->CalcDistance(pUnit);
@@ -250,20 +272,32 @@ GameObject* MoonScriptCreatureAI::GetNearestGameObject(uint32 pGameObjectId)
 	return _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), pGameObjectId);
 }
 
-Creature* MoonScriptCreatureAI::GetNearestCreature(uint32 pCreatureId)
+MoonScriptCreatureAI* MoonScriptCreatureAI::GetNearestCreature(uint32 pCreatureId)
 {
-	return _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), pCreatureId);
+	Creature* NearestCreature = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), pCreatureId);
+	return static_cast<MoonScriptCreatureAI*>(NearestCreature->GetScript());
 }
 
-Creature* MoonScriptCreatureAI::SpawnCreature(uint32 pCreatureId, float pX, float pY, float pZ, float pO, bool pForceSameFaction)
+MoonScriptCreatureAI* MoonScriptCreatureAI::SpawnCreature(uint32 pCreatureId, bool pForceSameFaction)
+{
+	return SpawnCreature(pCreatureId, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), _unit->GetOrientation(), pForceSameFaction);
+}
+
+MoonScriptCreatureAI* MoonScriptCreatureAI::SpawnCreature(uint32 pCreatureId, float pX, float pY, float pZ, float pO, bool pForceSameFaction)
 {
 	Creature* NewCreature = _unit->GetMapMgr()->GetInterface()->SpawnCreature(pCreatureId, pX, pY, pZ, pO, false, false, 0, 0);
+	MoonScriptCreatureAI* CreatureScriptAI = static_cast<MoonScriptCreatureAI*>(NewCreature->GetScript());
 	if( pForceSameFaction )
 	{
 		uint32 FactionTemplate = _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE);
 		NewCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, FactionTemplate);
 	}
-	return NewCreature;
+	return CreatureScriptAI;
+}
+
+void MoonScriptCreatureAI::Despawn(uint32 pDelay, uint32 pRespawnTime)
+{
+	_unit->Despawn(pDelay, pRespawnTime);
 }
 
 SpellDesc* MoonScriptCreatureAI::AddSpell(uint32 pSpellId, TargetType pTargetType, float pChance, float pCastTime, int32 pCooldown, float pMinRange, float pMaxRange, bool pStrictRange, char* pText, TextType pTextType, uint32 pSoundId)
@@ -375,6 +409,7 @@ EmoteDesc* MoonScriptCreatureAI::AddEmote(EventType pEventType, const char* pTex
 			case Event_OnCombatStart:	mOnCombatStartEmotes.push_back(NewEmote); break;
 			case Event_OnTargetDied:	mOnTargetDiedEmotes.push_back(NewEmote); break;
 			case Event_OnDied:			mOnDiedEmotes.push_back(NewEmote); break;
+			case Event_OnTaunt:			mOnTauntEmotes.push_back(NewEmote); break;
 			default:					sLog.outDebug("MoonScriptCreatureAI::AddEmote() : Invalid event type!\n"); break;
 		}
 	}
@@ -388,6 +423,7 @@ void MoonScriptCreatureAI::RemoveEmote(EventType pEventType, EmoteDesc* pEmote)
 		case Event_OnCombatStart:	DeleteItem(mOnCombatStartEmotes, pEmote); break;
 		case Event_OnTargetDied:	DeleteItem(mOnTargetDiedEmotes, pEmote); break;
 		case Event_OnDied:			DeleteItem(mOnDiedEmotes, pEmote); break;
+		case Event_OnTaunt:			DeleteItem(mOnTauntEmotes, pEmote); break;
 		default:					sLog.outDebug("MoonScriptCreatureAI::RemoveEmote() : Invalid event type!\n"); break;
 	}
 }
@@ -399,6 +435,7 @@ void MoonScriptCreatureAI::RemoveAllEmotes(EventType pEventType)
 		case Event_OnCombatStart:	DeleteArray(mOnCombatStartEmotes); break;
 		case Event_OnTargetDied:	DeleteArray(mOnTargetDiedEmotes); break;
 		case Event_OnDied:			DeleteArray(mOnDiedEmotes); break;
+		case Event_OnTaunt:			DeleteArray(mOnTauntEmotes); break;
 		default:					sLog.outDebug("MoonScriptCreatureAI::RemoveAllEmotes() : Invalid event type!\n"); break;
 	}
 }
@@ -487,6 +524,7 @@ uint32 MoonScriptCreatureAI::GetAIUpdateFreq()
 void MoonScriptCreatureAI::OnCombatStart(Unit* pTarget)
 {
 	RandomEmote(mOnCombatStartEmotes);
+	SetBehavior(Behavior_Melee);
     RegisterAIUpdateEvent(mAIUpdateFrequency);
 }
 
@@ -595,7 +633,10 @@ void MoonScriptCreatureAI::AIUpdate()
 
 		//Go back to default behavior since we didn't decide anything
 		SetCanMove(true);
-		SetBehavior(Behavior_Default);
+		SetBehavior(Behavior_Melee);
+
+		//Random taunts
+		if( ChanceRoll >= 95 ) RandomEmote(mOnTauntEmotes);
 	}
 }
 
@@ -649,7 +690,8 @@ bool MoonScriptCreatureAI::CastSpellInternal(SpellDesc* pSpell, uint32 pCurrentT
 
 	//If we get here, its because the RunToTarget changed type, so its no longer valid, clear it
 	PopRunToTargetCache();
-	return true;	//No targets possible? Consider spell casted nonetheless
+	DelayNextAttack(0);		//Cancel attack delay
+	return true;			//No targets possible? Consider spell casted nonetheless
 }
 
 void MoonScriptCreatureAI::CastSpellOnTarget(Unit* pTarget, TargetType pType, SpellEntry* pEntry, bool pInstant)
@@ -879,7 +921,7 @@ void MoonScriptCreatureAI::PushRunToTargetCache(Unit* pTarget, SpellDesc* pSpell
 		SetAllowRanged(false);
 		SetAllowSpell(false);
 	}
-	if( mRunToTargetCache ) MoveToUnit(mRunToTargetCache);
+	if( mRunToTargetCache ) MoveTo(mRunToTargetCache);
 }
 
 void MoonScriptCreatureAI::PopRunToTargetCache()
