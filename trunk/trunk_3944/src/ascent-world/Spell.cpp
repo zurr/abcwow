@@ -590,7 +590,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	/************************************************************************/
 	if( m_spellInfo->is_melee_spell || m_spellInfo->is_ranged_spell )
 	{
-		uint32 _type;
+		uint32 _type = MELEE;
 		if( GetType() == SPELL_DMG_TYPE_RANGED )
 			_type = RANGED;
 		else
@@ -638,7 +638,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	}
 
 	//check mechanical resistance
-	if( m_spellInfo->MechanicsType < 27)
+	if( m_spellInfo->MechanicsType && m_spellInfo->MechanicsType < 27 )
 	{
 		if(p_victim)
 			resistchance += p_victim->MechanicsResistancesPCT[m_spellInfo->MechanicsType];
@@ -647,13 +647,13 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	}
 
 	//rating bonus
-	if( p_caster != NULL )
+	if( p_caster != NULL && m_spellInfo->School != SCHOOL_NORMAL )
 	{
 		resistchance -= p_caster->CalcRating( PLAYER_RATING_MODIFIER_SPELL_HIT );
 		resistchance -= p_caster->GetHitFromSpell();
 	}
 
-	if(p_victim)
+	if( p_victim && m_spellInfo->School != SCHOOL_NORMAL )
 		resistchance += p_victim->m_resist_hit[2];
 
 	if( this->m_spellInfo->Effect[effindex] == SPELL_EFFECT_DISPEL && m_spellInfo->SpellGroupType && u_caster)
