@@ -588,7 +588,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	/************************************************************************/
 	/* Check if the spell is a melee attack and if it was missed/parried    */
 	/************************************************************************/
-	if( m_spellInfo->is_melee_spell )
+	if( m_spellInfo->is_melee_spell || m_spellInfo->is_ranged_spell )
 	{
 		uint32 _type;
 		if( GetType() == SPELL_DMG_TYPE_RANGED )
@@ -603,6 +603,11 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 
 		return uint8( u_caster->GetSpellDidHitResult( u_victim, _type, m_spellInfo ) );
 	}
+
+	/* this is wrong, if we got here with spell which is SCHOOL_NORMAL most chances it is stun
+	if( m_spellInfo->School == SCHOOL_NORMAL )
+		return SPELL_DID_HIT_SUCCESS;
+	*/
 
 	/************************************************************************/
 	/* Check if the spell is resisted.                                      */

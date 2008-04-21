@@ -478,7 +478,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode( WorldPacket & recv_data )
 		
 		if(aur) // If the player already have the aura, just extend it.
 		{
-			GetPlayer()->SetAurDuration(15007,aur->GetDuration());
+			GetPlayer()->SetAurDuration(15007,600000);
 		}
 		else // else add him one, that fucker, he think he will get away!?
 		{
@@ -487,6 +487,9 @@ void WorldSession::HandleSpiritHealerActivateOpcode( WorldPacket & recv_data )
 			targets.m_unitTarget = GetPlayer()->GetGUID();
 			Spell*sp=new Spell(_player,spellInfo,true,NULL);
 			sp->prepare(&targets);
+			Aura *aur1 = GetPlayer()->FindAura(15007);
+			if(aur1)
+				GetPlayer()->SetAurDuration(15007,600000);
 		}
 	}
 
