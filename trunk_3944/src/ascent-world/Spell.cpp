@@ -4071,16 +4071,18 @@ void Spell::Heal(int32 amount)
 		}
 		
 		//Downranking
-		/*if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
+		if( u_caster->IsPlayer() && m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 )
 		{
 			float downrank1 = 1.0f;
-			if (m_spellInfo->baseLevel < 20)
-				downrank1 = 1.0f - (20.0f - float (m_spellInfo->baseLevel) ) * 0.0375f;
+			if( m_spellInfo->baseLevel < 20 )
+				downrank1 = 1.0f - ( 20.0f - float( m_spellInfo->baseLevel ) ) * 0.0375f;
+
 			float downrank2 = ( float(m_spellInfo->maxLevel + 5.0f) / float(p_caster->getLevel()) );
-			if (downrank2 >= 1 || downrank2 < 0)
+			if( downrank2 >= 1 || downrank2 < 0 )
 				downrank2 = 1.0f;
-			healdoneaffectperc *= downrank1 * downrank2;
-		}*/
+
+			healdoneaffectperc *= downrank1*downrank2;
+		}
 
 		bonus += u_caster->HealDoneMod[m_spellInfo->School];
 
@@ -4102,7 +4104,7 @@ void Spell::Heal(int32 amount)
 #endif
 		}
 
-		bonus += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
+		bonus += unitTarget->HealTakenMod[m_spellInfo->School];
 
 		if (p_caster)
 		{
@@ -4110,7 +4112,7 @@ void Spell::Heal(int32 amount)
 				bonus += float2int32(p_caster->SpellHealDoneByAttribute[a][m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT0 + a));
 		}
  
-		amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
+		amount += float2int32( float( bonus ) * healdoneaffectperc );
 
 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
         SM_FFValue(u_caster->SM_CriticalChance, &spellCrit, m_spellInfo->SpellGroupType);
