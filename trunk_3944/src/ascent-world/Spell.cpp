@@ -609,6 +609,9 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 		return SPELL_DID_HIT_SUCCESS;
 	*/
 
+	if( m_spellInfo->MechanicsType == MECHANIC_DISORIENTED ) // hope its right
+		return SPELL_DID_HIT_SUCCESS;
+	
 	/************************************************************************/
 	/* Check if the spell is resisted.                                      */
 	/************************************************************************/
