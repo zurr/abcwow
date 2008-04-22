@@ -1830,7 +1830,6 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 		if (skill && skill->skilline == SKILL_ALCHEMY)
 		{
 			// potions learned by discovery variables
-			uint32 cast_spell = 0;
 			uint32 cast_chance = 5;
 			uint32 learn_spell = 0;
 
@@ -1841,27 +1840,32 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 					while (Rand(20) && item_count<10) item_count++;
 
 				// Super Rejuvenation Potion
-				cast_spell = 28600;
 				cast_chance = 2;
 				learn_spell = 28586;
 			}
-			//Elixir Master
+			//Elixirs
 			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
 			{
-				if(p_caster->HasSpell(28677))
+				if(p_caster->HasSpell(28677)) //Elixir Master
 					while (Rand(20) && item_count<10) item_count++;
 
-				//TODO: add chance of random discovery of flasks here
-				//http://www.wowhead.com/?spells&filter=cr=9;crs=7;crv=0
+				uint32 spList[] = {28590,28587,28588,28591,28589,0};
+				cast_chance = 2;
+				uint32 x = 0;
+				for ( ; spList[x]; x++)
+				learn_spell = spList[RandomUInt(100)%x];
 			}
-			//Transmutation Master
+			 //Transmutation
 			if (m_spellInfo->Category == 310)
 			{
-				if(p_caster->HasSpell(28672)) 
+				if(p_caster->HasSpell(28672))  //Transmutation Master
 					while (Rand(20) && item_count<10) item_count++;
 
-				//TODO: add chance of random discovery of transmutions here
-				//http://www.wowhead.com/?spells&filter=cr=9;crs=7;crv=0
+				uint32 spList[] = {28581,28585,28585,28584,28582,28580,0};
+				cast_chance = 5;
+				uint32 x = 0;
+				for ( ; spList[x]; x++)
+				learn_spell = spList[RandomUInt(100)%x];
 			}
 
 			//random discovery by crafter item id
@@ -1869,19 +1873,16 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			{
 			case 22845: //Major Arcane Protection Potion
 				{
-					cast_spell = 41460;
 					cast_chance = 20;
 					learn_spell = 41458;
 				}break;
 			case 22841: //Major Fire Protection Potion
 				{
-					cast_spell = 41504;
 					cast_chance = 20;
 					learn_spell = 41500;
 				}break;
 			case 22842: //Major Frost Protection Potion
 				{
-					cast_spell = 41505;
 					cast_chance = 20;
 					learn_spell = 41501;
 				}break;
@@ -1891,34 +1892,23 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 				}break;
 			case 22844: //Major Nature Protection Potion
 				{
-					cast_spell = 41506;
 					cast_chance = 20;
 					learn_spell = 41502;
 				}break;
 			case 22846: //Major Shadow Protection Potion
 				{
-					cast_spell = 41507;
 					cast_chance = 20;
 					learn_spell = 41503;
 				}break;
 			}
 
-			if ( cast_spell && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
+			if ( learn_spell && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
 			{
-				SpellEntry* spellproto = dbcSpell.LookupEntry( cast_spell );
-				if( spellproto != NULL )
+				SpellEntry* _spellproto = dbcSpell.LookupEntry( learn_spell );
+				if( _spellproto != NULL )
 				{
-					SpellEntry* learned_spellproto = dbcSpell.LookupEntry( learn_spell );
-					if( learned_spellproto != NULL )
-					{
-						std::string disco_msg;
-						disco_msg = "DISCOVERY! You discovered the ";
-						disco_msg += learned_spellproto->Name;
-						disco_msg += "! ";
-						sChatHandler.SystemMessage(p_caster->GetSession(), disco_msg.c_str());
-					}
-
-					p_caster->CastSpell(p_caster, spellproto, true);
+					p_caster->BroadcastMessage( "%sDISCOVERY! You discovered the %s !|r", MSG_COLOR_YELLOW, _spellproto->Name );
+					p_caster->addSpell( learn_spell );
 				}
 			}
 
