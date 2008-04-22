@@ -551,8 +551,8 @@ public:
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(REDRIDINGHOOD_DEBUFF);
-		spells[2].targettype = TARGET_RANDOM_SINGLE;
-		spells[2].perctrigger = 50.0f;
+		spells[2].targettype = TARGET_ATTACKING;
+		spells[2].perctrigger = 80.0f;
 		spells[2].instant = true;
 		spells[2].cooldown = 45;
 		spells[2].attackstoptimer = 1000;
