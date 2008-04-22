@@ -6544,6 +6544,16 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 0x40000000;
 
+	//Libram of Truth
+	sp = dbcSpell.LookupEntryForced( 27850 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64;
+
+	//Libram of the Eternal Rest
+	sp = dbcSpell.LookupEntryForced( 34252 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 32;
+
 	//Gladiator's Libram of Justice
 	sp = dbcSpell.LookupEntryForced( 34139 );
 	if( sp != NULL )
