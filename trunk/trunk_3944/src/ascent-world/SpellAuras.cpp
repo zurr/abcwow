@@ -2848,6 +2848,29 @@ void Aura::SpellAuraModStealth(bool apply)
 		// hack fix for vanish stuff
 		if( m_spellProto->NameHash == SPELL_HASH_VANISH && m_target->GetTypeId() == TYPEID_PLAYER )	 // Vanish
 		{
+
+			for( uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; x++ )
+			{
+				if( m_target->m_auras[x] != NULL )
+				{
+					if( m_target->m_auras[x]->GetSpellProto()->MechanicsType == 7 || m_target->m_auras[x]->GetSpellProto()->MechanicsType == 11 ) // Remove roots and slow spells
+					{
+						m_target->m_auras[x]->Remove();
+					}
+					else // if got immunity for slow, remove some that are not in the mechanics
+					{
+						for( int i = 0; i < 3; i++ )
+						{
+							if( m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED || m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
+							{
+								m_target->m_auras[x]->Remove();
+								break;
+							}
+						}
+					}
+			   }
+			}
+
 			// check for stealh spells
 			Player* p_caster = static_cast< Player* >( m_target );
 			uint32 stealth_id = 0;
@@ -2867,15 +2890,19 @@ void Aura::SpellAuraModStealth(bool apply)
 	}
 	else 
 	{
-		m_target->SetStealth(0);
 		m_target->m_stealthLevel -= mod->m_amount;
-		m_target->RemoveFlag(UNIT_FIELD_BYTES_1,0x02000000);
-		if( m_target->GetTypeId() == TYPEID_PLAYER )
+
+		if( m_spellProto->NameHash != SPELL_HASH_VANISH )	 //when vanish aure fades do not remove stealth
 		{
-			WorldPacket data(12);
-			data.SetOpcode(SMSG_COOLDOWN_EVENT);
-			data << (uint32)GetSpellProto()->Id << m_target->GetGUID();
-			static_cast< Player* >( m_target )->GetSession()->SendPacket (&data);
+			m_target->SetStealth(0);
+			m_target->RemoveFlag(UNIT_FIELD_BYTES_1,0x02000000);
+			if( m_target->GetTypeId() == TYPEID_PLAYER )
+			{
+				WorldPacket data(12);
+				data.SetOpcode(SMSG_COOLDOWN_EVENT);
+				data << (uint32)GetSpellProto()->Id << m_target->GetGUID();
+				static_cast< Player* >( m_target )->GetSession()->SendPacket (&data);
+			}
 		}
 	}
 

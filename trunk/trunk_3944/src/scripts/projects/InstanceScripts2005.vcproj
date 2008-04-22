@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="InstanceScripts"
 	ProjectGUID="{EE39B48B-C598-4AAF-9EF0-199402933EE5}"
 	RootNamespace="InstanceScripts"
@@ -367,6 +367,14 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\src\InstanceScripts\Base.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Base.h"
+				>
+			</File>
 			<File
 				RelativePath="..\src\InstanceScripts\Setup.cpp"
 				>
