@@ -1941,7 +1941,7 @@ public:
 #define CN_SPOT_LIGHT							15631
 #define SOLARIAN_WRATH_OF_THE_ASTROMANCER		42783	//Infuses an enemy with Arcane power, causing them to harm nearby allies for 5400 to 6600. Arcane damage after 6 sec.
 #define SOLARIAN_WRATH_OF_THE_ASTROMANCER_BOMB	42787	//The actual spell that triggers the explosion with arcane damage and slow fall
-#define SOLARIAN_ARCANE_MISSILES				33031	//Launches magical missiles at an enemy, inflicting Arcane damage each second for 3 sec. Trigger spell (3000 arcane damage)
+#define SOLARIAN_ARCANE_MISSILES				29955 //33031	//Launches magical missiles at an enemy, inflicting Arcane damage each second for 3 sec. Trigger spell (3000 arcane damage)
 #define SOLARIAN_BLINDING_LIGHT					33009	//Hits everyone in the raid for 2280 to 2520 arcane damage. 20sec cooldown.
 #define SOLARIAN_SOLARIANS_TRANSFORM			39117	//Transforms into void walker.
 #define SOLARIAN_VOID_BOLT						39329	//The Void Walker casts this every 10 seconds. It deals 4394 to 5106 shadow damage to the target with the highest aggro.
@@ -1975,7 +1975,7 @@ class HighAstromancerSolarianAI : public MoonScriptBossAI
 		//Phase 3 spells
 		AddPhaseSpell(3, AddSpell(SOLARIAN_VOID_BOLT, Target_Current, 100, 3, 10, 0, 100));
 		AddPhaseSpell(3, AddSpell(SOLARIAN_PSYCHIC_SCREAM, Target_Self, 10, 0, 0));
-		mVoidForm = AddSpell(SOLARIAN_SOLARIANS_TRANSFORM, Target_Self, 0, 0, 0);
+		mVoidForm = AddSpell(SOLARIAN_SOLARIANS_TRANSFORM, Target_Self, 100.0f, 0, 999999);
 		mVoidForm->AddEmote("Enough of this! Now I call upon the fury of the cosmos itself.");
 		mVoidForm->AddEmote("I become ONE... with the VOID!");
 
@@ -2061,13 +2061,18 @@ void SpellFunc_Solarian_Disappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreat
 	{
 		SpellFunc_Disappear(pThis, pCreatureAI, pTarget, pType);
 
-		//Spawn spot lights, and despawn them after 26sec X(400,460) Y(-340,-400)
-		Solarian->mSpawnPositions[0][0] = 400 + RandomFloat(60); Solarian->mSpawnPositions[0][1] = -400 + RandomFloat(60);
-		Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[0][0], Solarian->mSpawnPositions[0][1], 17)->Despawn(26000, 0);
-		Solarian->mSpawnPositions[1][0] = 400 + RandomFloat(60); Solarian->mSpawnPositions[1][1] = -400 + RandomFloat(60);
-		Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[1][0], Solarian->mSpawnPositions[1][1], 17)->Despawn(26000, 0);
-		Solarian->mSpawnPositions[2][0] = 400 + RandomFloat(60); Solarian->mSpawnPositions[2][1] = -400 + RandomFloat(60);
-		Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[2][0], Solarian->mSpawnPositions[2][1], 17)->Despawn(26000, 0);
+		Solarian->mSpawnPositions[0][0] = 400 + RandomFloat(60); 
+		Solarian->mSpawnPositions[0][1] = -400 + RandomFloat(60);
+		MoonScriptCreatureAI* swp1 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[0][0], Solarian->mSpawnPositions[0][1], 17);
+		if ( swp1 != NULL ) swp1->Despawn(26000, 0);
+		Solarian->mSpawnPositions[1][0] = 400 + RandomFloat(60); 
+		Solarian->mSpawnPositions[1][1] = -400 + RandomFloat(60);
+		MoonScriptCreatureAI* swp2 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[1][0], Solarian->mSpawnPositions[1][1], 17);
+		if ( swp2 != NULL ) swp2->Despawn(26000, 0);
+		Solarian->mSpawnPositions[2][0] = 400 + RandomFloat(60); 
+		Solarian->mSpawnPositions[2][1] = -400 + RandomFloat(60);
+		MoonScriptCreatureAI* swp3 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[2][0], Solarian->mSpawnPositions[2][1], 17);
+		if ( swp3 != NULL ) swp3->Despawn(26000, 0);
 	}
 }
 
@@ -3940,6 +3945,7 @@ public:
 		spells[8].mindist2cast = 0.0f;
 		spells[8].maxdist2cast = 60.0f;
 
+		_unit->GetAIInterface()->setOutOfCombatRange(400000);
 		_unit->SetFloatValue(OBJECT_FIELD_SCALE_X, 3);
 		X = Y = Z = 0.0f;
 		PhoenixTimer = 0;
@@ -4766,13 +4772,13 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "As you see, I have many weapons in my arsenal...");
 		_unit->PlaySoundToSet(11261);
 
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21268, _unit->GetPositionX() + 1.0f, _unit->GetPositionY() + 1.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21269, _unit->GetPositionX() + 2.0f, _unit->GetPositionY() + 2.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21270, _unit->GetPositionX() + 3.0f, _unit->GetPositionY() + 3.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21271, _unit->GetPositionX() + 4.0f, _unit->GetPositionY() + 4.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21272, _unit->GetPositionX() + 5.0f, _unit->GetPositionY() + 5.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21273, _unit->GetPositionX() + 6.0f, _unit->GetPositionY() + 6.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(21274, _unit->GetPositionX() + 7.0f, _unit->GetPositionY() + 7.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(NETHERSTRAND_LONGBOW, _unit->GetPositionX() + 1.0f, _unit->GetPositionY() + 1.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(DEVASTATION, _unit->GetPositionX() + 2.0f, _unit->GetPositionY() + 2.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(COSMIC_INFUSER, _unit->GetPositionX() + 3.0f, _unit->GetPositionY() + 3.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(INFINITY_BLADE, _unit->GetPositionX() + 4.0f, _unit->GetPositionY() + 4.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(WARP_SLICER, _unit->GetPositionX() + 5.0f, _unit->GetPositionY() + 5.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(PHASESHIFT_BULWARK, _unit->GetPositionX() + 6.0f, _unit->GetPositionY() + 6.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(STAFF_OF_DISINTEGRATION, _unit->GetPositionX() + 7.0f, _unit->GetPositionY() + 7.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
 
 		WeaponPhase = (uint32)time(NULL) + 95;
 	}
