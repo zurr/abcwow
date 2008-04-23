@@ -398,8 +398,10 @@ void StatDumper::DumpStats()
             fprintf(f, "      <gender>%u</gender>\n", (unsigned int)plr->getGender());
             fprintf(f, "      <pvprank>%u</pvprank>\n", (unsigned int)plr->GetPVPRank());
             fprintf(f, "      <level>%u</level>\n", (unsigned int)plr->GetUInt32Value(UNIT_FIELD_LEVEL));
-            fprintf(f, "      <map>%u</map>\n", (unsigned int)plr->GetMapId());
-            fprintf(f, "      <areaid>%u</areaid>\n", (unsigned int)plr->GetAreaID());
+			fprintf(f, "      <map> </map>\n");
+			fprintf(f, "      <areaid></areaid>\n");
+            //fprintf(f, "      <map>%u</map>\n", (unsigned int)plr->GetMapId());
+            //fprintf(f, "      <areaid>%u</areaid>\n", (unsigned int)plr->GetAreaID());
             fprintf(f, "      <ontime>%s</ontime>\n", otime);
             fprintf(f, "      <latency>%u</latency>\n", (unsigned int)plr->GetSession()->GetLatency());
             fprintf(f, "      <permissions>%s</permissions>\n", plr->GetSession()->GetPermissions());
@@ -418,7 +420,7 @@ void StatDumper::DumpStats()
         for (itr = objmgr._players.begin(); itr != objmgr._players.end(); itr++)
         {
             plr = itr->second;
-            if(itr->second->GetSession() && itr->second->IsInWorld())
+            if(itr->second->GetSession() && itr->second->IsInWorld() && !(itr->second->GetSession()->GetPermissionCount()))
             {
                 FillOnlineTime(t - plr->OnlineTime, otime);
 
