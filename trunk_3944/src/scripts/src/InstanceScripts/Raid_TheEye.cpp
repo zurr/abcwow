@@ -1831,7 +1831,7 @@ public:
 				//2) send the missile
 				_unit->CastSpellAoF(RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER), true);
 			}
-			ArcaneOrbTimer = 3; //3secs
+			ArcaneOrbTimer = 7;
 		}
 
 		float val = (float)RandomFloat(100.0f);
@@ -3878,7 +3878,7 @@ public:
 		spells[1].info = dbcSpell.LookupEntry(ARCANE_DISTURPTION);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
-		spells[1].perctrigger = 8.0f;
+		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 2000;
 		spells[1].cooldown = 10;
 
@@ -4041,8 +4041,10 @@ public:
 		}
 	}
 
-	/*void OnCombatStop(Unit *mTarget)
+	void OnCombatStop(Unit *mTarget)
 	{
+		if ( AddPhase <= 6 ) reset();
+
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 		_unit->GetAIInterface()->m_canMove = true;
 
@@ -4060,15 +4062,9 @@ public:
 		AddPhase = 1;
 		Speech = 0;
 
-		GameObject *GObj = NULL;
-		GObj = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(743.057f, 4.63443f, 137.796f, 184069);
-		if(GObj && GObj->GetUInt32Value(GAMEOBJECT_STATE) == 0)
-		{
-			GObj->SetUInt32Value(GAMEOBJECT_STATE, 1);
-		}
-
 		RemoveAIUpdateEvent();
 
+		/*
 		std::vector<Creature*> DespawnTable;
 												
 		for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
@@ -4097,15 +4093,9 @@ public:
 		}
 
 		DespawnTable.clear();
-	}*/
-	void OnCombatStop(Unit *mTarget)
-	{
-		reset();
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		RemoveAIUpdateEvent();
+		*/
 	}
-	
+
 	void sanityCheck()
 	{
 		Creature* Darkener = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(786.28f, 20.2825f, 48.7285f, 20064);
@@ -4375,6 +4365,9 @@ public:
 
 			else	// to rewrite to have cool animation and better gravity system :P
 			{	// not even halfway done =/ + some facing bugs
+
+				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
+
 				if (Scene > 0)
 				{
 					GameObject *GObj = NULL;
