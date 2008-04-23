@@ -946,7 +946,7 @@ void CBattleground::DistributePacketToAll(WorldPacket * packet)
 	for(int i = 0; i < 2; ++i)
 	{
 		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-			(*itr)->GetSession()->SendPacket(packet);
+			if ((*itr) && (*itr)->GetSession()) (*itr)->GetSession()->SendPacket(packet);
 	}
 	m_mainLock.Release();
 }
@@ -955,7 +955,7 @@ void CBattleground::DistributePacketToTeam(WorldPacket * packet, uint32 Team)
 {
 	m_mainLock.Acquire();
 	for(set<Player*>::iterator itr = m_players[Team].begin(); itr != m_players[Team].end(); ++itr)
-		(*itr)->GetSession()->SendPacket(packet);
+		if ((*itr) && (*itr)->GetSession()) (*itr)->GetSession()->SendPacket(packet);
 	m_mainLock.Release();
 }
 
