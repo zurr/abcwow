@@ -1849,11 +1849,11 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 				if(p_caster->HasSpell(28677)) //Elixir Master
 					while (Rand(20) && item_count<10) item_count++;
 
-				uint32 spList[] = {28590,28587,28588,28591,28589,0};
+				uint32 spList[] = {28590,28587,28588,28591,28589};
 				cast_chance = 2;
-				uint32 x = 0;
-				for ( ; spList[x]; x++)
-				learn_spell = spList[RandomUInt(100)%x];
+				//uint32 x = 1;
+				//for ( ; spList[x]; x++)
+				learn_spell = spList[RandomUInt(4)];
 			}
 			 //Transmutation
 			if (m_spellInfo->Category == 310)
@@ -1861,11 +1861,11 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 				if(p_caster->HasSpell(28672))  //Transmutation Master
 					while (Rand(20) && item_count<10) item_count++;
 
-				uint32 spList[] = {28581,28585,28585,28584,28582,28580,0};
+				uint32 spList[] = {28581,28585,28585,28584,28582,28580};
 				cast_chance = 5;
-				uint32 x = 0;
-				for ( ; spList[x]; x++)
-				learn_spell = spList[RandomUInt(100)%x];
+				//uint32 x = 1;
+				//for ( ; spList[x]; x++)
+				learn_spell = spList[RandomUInt(5)];
 			}
 
 			//random discovery by crafter item id
