@@ -1851,8 +1851,6 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 
 				uint32 spList[] = {28590,28587,28588,28591,28589};
 				cast_chance = 2;
-				//uint32 x = 1;
-				//for ( ; spList[x]; x++)
 				learn_spell = spList[RandomUInt(4)];
 			}
 			 //Transmutation
@@ -1863,8 +1861,6 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 
 				uint32 spList[] = {28581,28585,28585,28584,28582,28580};
 				cast_chance = 5;
-				//uint32 x = 1;
-				//for ( ; spList[x]; x++)
 				learn_spell = spList[RandomUInt(5)];
 			}
 
@@ -1902,7 +1898,7 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 				}break;
 			}
 
-			if ( learn_spell && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
+			if ( learn_spell && p_caster->getLevel() > 60 && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
 			{
 				SpellEntry* _spellproto = dbcSpell.LookupEntry( learn_spell );
 				if( _spellproto != NULL )

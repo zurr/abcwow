@@ -1874,7 +1874,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 					this->RemoveAllAuraByNameHash( SPELL_HASH_PRAYER_OF_MENDING );
 
 					if ( count <= 1 )
+					{
+						this->RemoveAllAuraByNameHash(SPELL_HASH_PRAYER_OF_MENDING);
 						continue;
+					}
 					--count;
 
 					//get new target
