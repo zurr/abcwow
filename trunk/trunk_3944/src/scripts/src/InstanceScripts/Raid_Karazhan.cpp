@@ -221,7 +221,7 @@ class MoroesAI : public MoonScriptBossAI
 		mVanishTimer = mGarroteTimer = INVALIDATE_TIMER;
 
 		//Phase 1 spells
-		AddPhaseSpell(1, AddSpell(MOROES_GOUGE, Target_Current, 20, 0, 10, 0, 5));
+		AddPhaseSpell(1, AddSpell(MOROES_GOUGE, Target_Current, 15, 0, 10, 0, 5));
 		AddPhaseSpell(1, AddSpell(MOROES_BLIND, Target_ClosestPlayerNotCurrent, 20, 0, 10, 0, 10, true));
 		mVanish = AddSpell(MOROES_VANISH, Target_Self, 0, 12, 0);
 		mVanish->AddEmote("Now, where was I? Oh yes...", Text_Yell, 9215);
