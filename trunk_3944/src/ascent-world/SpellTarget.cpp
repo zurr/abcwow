@@ -376,7 +376,6 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 		float range=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong
 		range*=range;
 
-		std::set< uint64 > tmpSet;
 		for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 		{
 			if((*itr)->GetGUID() == m_targets.m_unitTarget)
@@ -386,10 +385,8 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 
 			if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr),range))
 			{
-				if(isAttackable(u_caster,(Unit*)(*itr)) && ( tmpSet.find( ((Unit*)(*itr))->GetGUID()) == tmpSet.end() ) )
+				if(isAttackable(u_caster,(Unit*)(*itr)) )
 				{
-					tmpSet.insert( ((Unit*)(*itr))->GetGUID() );
-
 					did_hit_result = DidHit(i,((Unit*)*itr));
 					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
 						SafeAddTarget(tmpMap, (*itr)->GetGUID());
@@ -401,7 +398,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 				}
 			}
 		}
-		tmpSet.clear();
+
 	}
 }
 
