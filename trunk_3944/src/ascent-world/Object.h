@@ -288,6 +288,7 @@ public:
 
 	// Use it to Check if a object is in front of another one
 	bool isInFront(Object* target);
+	bool isInCone(Object* target);
 	bool isInBack(Object* target);
 	/* Calculates the angle between two Positions */
 	float calcAngle( float Position1X, float Position1Y, float Position2X, float Position2Y );
