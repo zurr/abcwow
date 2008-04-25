@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Setup.h"
+#define SKIP_ALLOCATOR_SHARING 1
 
 extern "C" SCRIPT_DECL uint32 _exp_get_version()
 {
@@ -13,7 +14,6 @@ extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
 
 extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 {
-	//SetupDJ(mgr);
 	SetupGameobjects(mgr);
 }
 
