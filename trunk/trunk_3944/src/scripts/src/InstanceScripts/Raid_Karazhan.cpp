@@ -552,7 +552,7 @@ public:
 
 		spells[2].info = dbcSpell.LookupEntry(REDRIDINGHOOD_DEBUFF);
 		spells[2].targettype = TARGET_ATTACKING;
-		spells[2].perctrigger = 80.0f;
+		spells[2].perctrigger = 85.0f;
 		spells[2].instant = true;
 		spells[2].cooldown = 45;
 		spells[2].attackstoptimer = 1000;
@@ -658,11 +658,9 @@ public:
 							for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); 
 								itr != _unit->GetInRangePlayerSetEnd(); ++itr)
 							{
-								Player *RandomTarget = NULL;
-								RandomTarget = static_cast< Player* >(*itr);
+								Player *RandomTarget = static_cast< Player* >(*itr);
 								if(RandomTarget && RandomTarget->isAlive())
 									TargetTable.push_back(RandomTarget);
-								RandomTarget = NULL;
 							}
 							
 							if (!TargetTable.size())
@@ -1803,19 +1801,23 @@ public:
 					_unit->WipeHateList();
 					_unit->PlaySoundToSet(9248);
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Surely you would not deny an old man a replenishing drink? No, no I thought not.");
-					m_time_pyroblast = 10;
+					m_time_pyroblast = 8;
 					_unit->CastSpell(_unit, info_mass_polymorph, true);
 					_unit->setAttackTimer(2000, false);
 				}
 				else if(_unit->GetStandState() != 1)
 				{
+					drinking = true;
 					_unit->setAttackTimer(3000, false);
 					_unit->CastSpell(_unit, info_conjure, false);
 					_unit->SetStandState(1);
 					_unit->setEmoteState(EMOTE_ONESHOT_EAT);
 				}
 				else
+				{
 					_unit->CastSpell(_unit, info_drink, true);
+					drinking = true;
+				}
 			}
 			else
 				SpellTrigger();
@@ -2286,7 +2288,7 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 
 		DemonChain = t + 45;
-		ImpTimer = t + 10;
+		ImpTimer = t + 5;
 		ReSummon = false;
 		
 		_unit->PlaySoundToSet(9260);
@@ -2347,13 +2349,13 @@ public:
 		SpellCast(val);
 
 		uint32 t = (uint32)time(NULL);
+		if(t > ImpTimer)
+		{
+			spawnSummoningPortals();
+			ImpTimer = -1;
+		}
 		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
 		{
-			if(t > ImpTimer)
-			{
-				spawnSummoningPortals();
-				ImpTimer = -1;
-			}
 			if(t > DemonChain)
 			{
 				DemonChain = t + 45;
@@ -2412,20 +2414,17 @@ public:
 		std::advance(itr, 1);
 		for(; itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 		{
-			if(isHostile(_unit, (*itr)) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
+			if((*itr) && (*itr)->isAlive() && isHostile(_unit, (*itr)) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
 			{
-				Player* RandomTarget = NULL;
-				RandomTarget = static_cast< Player* >(*itr);
-				if (RandomTarget && RandomTarget->isAlive() && isHostile(_unit, RandomTarget))
-					TargetTable.push_back(RandomTarget);
-				RandomTarget = NULL;
+				Player* RandomTarget = static_cast< Player* >(*itr);
+				if (RandomTarget) TargetTable.push_back(RandomTarget);
 			}
 		}
 		if (!TargetTable.size())
 			return;
 
 		size_t RandTarget = rand()%TargetTable.size();
-		Unit * RTarget = TargetTable[RandTarget];
+		Player* RTarget = TargetTable[RandTarget];
 
 		if (!RTarget) return;
 
@@ -2433,9 +2432,9 @@ public:
 
 		TargetTable.clear();
 
-		float dcX = -11234.7f;
-		float dcY = -1698.73f;
-		float dcZ = 179.24f;
+		float dcX = RTarget->GetPositionX(); //-11234.7f;
+		float dcY = RTarget->GetPositionY();//-1698.73f;
+		float dcZ = RTarget->GetPositionZ();//179.24f;
 		_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_DEMONCHAINS, dcX, dcY, dcZ, 0, true, false, 0, 0);
 	}
 
@@ -2512,7 +2511,7 @@ public:
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(BROKEN_PACT);
-		spells[1].targettype = TARGET_ATTACKING;
+		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 	}
 
@@ -2536,7 +2535,9 @@ public:
 
 		Unit *Illhoof = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 15688);
 		if(Illhoof != NULL && Illhoof->isAlive())
+		{
 			Illhoof->CastSpell(Illhoof, spells[1].info, spells[1].instant);
+		}
 	}
 
 	void AIUpdate()
@@ -2910,7 +2911,7 @@ public:
 		spells[1].info = dbcSpell.LookupEntry(ENFEEBLE);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
-		spells[1].cooldown = 25;
+		spells[1].cooldown = 35;
 		spells[1].perctrigger = 0.0f;
 		spells[1].attackstoptimer = 1000;
 
@@ -3020,7 +3021,8 @@ public:
 		for(int i = 0; i < 5; ++i)
 			Enfeeble_Targets[i] = 0;
 
-		InfernalDummy->Despawn(10000, 0);
+		if ( InfernalDummy != NULL )
+			InfernalDummy->Despawn(10000, 0);
 
 		// Open door
 		if(MDoor != NULL)
@@ -3248,33 +3250,30 @@ public:
 	void Enfeebler()
 	{
 		std::vector<Player*> Targets;
-		std::set<Player*>::iterator Itr = _unit->GetInRangePlayerSetBegin();
-		std::advance(Itr, 1);
-		for( ; Itr != _unit->GetInRangePlayerSetEnd(); ++Itr)
-		{
-			if(isHostile(_unit, (*Itr)) && (*Itr)->GetInstanceID() == _unit->GetInstanceID())
-			{
-				Player *RandomTarget = NULL;
-				RandomTarget = static_cast< Player* >(*Itr);
+		Unit* mainTank = _unit->GetAIInterface()->GetMostHated();
+		if ( mainTank == NULL )
+			return;
 
-				if(RandomTarget->isAlive() && isHostile(_unit, RandomTarget))
-					Targets.push_back(RandomTarget);
-			}
+		for( std::set<Player*>::iterator Itr = _unit->GetInRangePlayerSetBegin(); Itr != _unit->GetInRangePlayerSetEnd(); ++Itr)
+		{
+			if((*Itr) && (*Itr) != mainTank && (*Itr)->isAlive() && isHostile(_unit, (*Itr)) && (*Itr)->GetInstanceID() == _unit->GetInstanceID())
+				Targets.push_back((*Itr));
 		}
 
 		while(Targets.size() > 5)
 			Targets.erase(Targets.begin()+rand()%Targets.size());
 
-		int i = 0;
-		for(std::vector<Player*>::iterator E_Itr = Targets.begin(); E_Itr != Targets.end(); ++E_Itr)
+		uint32 i = 0;
+		for(std::vector<Player*>::iterator _Itr = Targets.begin(); _Itr != Targets.end(); _Itr++)
 		{
-			if(*E_Itr && (*E_Itr)->GetGUID() != _unit->GetAIInterface()->GetMostHated()->GetGUID())
+			if(*_Itr)
 			{
-				Enfeeble_Targets[i] = (*E_Itr)->GetGUID();
-				Enfeeble_Health[i] = (*E_Itr)->GetUInt32Value(UNIT_FIELD_HEALTH);
+				Enfeeble_Targets[i] = (*_Itr)->GetGUID();
+				Enfeeble_Health[i] = (*_Itr)->GetUInt32Value(UNIT_FIELD_HEALTH);
 
-				_unit->CastSpell((*E_Itr), spells[1].info, spells[1].instant);
-				(*E_Itr)->SetUInt32Value(UNIT_FIELD_HEALTH, 1);
+				_unit->CastSpell((*_Itr), spells[1].info, spells[1].instant);
+				(*_Itr)->SetUInt32Value(UNIT_FIELD_HEALTH, 1);
+				++i;
 			}
 		}
 	}
@@ -3283,9 +3282,9 @@ public:
 	{
 		for(int i = 0; i < 5; ++i)
 		{
-			Unit *ETarget = _unit->GetMapMgr()->GetUnit(Enfeeble_Targets[i]);
-			if(ETarget && ETarget->isAlive())
-				ETarget->SetUInt64Value(UNIT_FIELD_HEALTH, Enfeeble_Health[i]);
+			Unit *Target = _unit->GetMapMgr()->GetUnit(Enfeeble_Targets[i]);
+			if(Target && Target->isAlive())
+				Target->SetUInt64Value(UNIT_FIELD_HEALTH, Enfeeble_Health[i]);
 			Enfeeble_Targets[i] = 0;
 			Enfeeble_Health[i] = 0;
 		}
@@ -3401,7 +3400,7 @@ public:
 		_unit->GetAIInterface()->disable_melee = true;
 		_unit->GetAIInterface()->m_canMove = false;
 		_unit->m_noRespawn = true;
-		_unit->Despawn(175000, 0);
+		_unit->Despawn(120000, 0);
 		RegisterAIUpdateEvent(6000);
 		
 		spells[0].info = dbcSpell.LookupEntry(HELLFIRE);
@@ -3417,7 +3416,7 @@ public:
 		uint32 t = (uint32)time(NULL);
 		if(t > spells[0].casttime)
 		{
-			_unit->CastSpell(_unit, spells[0].casttime, spells[0].instant);
+			_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
 			spells[0].casttime = t + spells[0].cooldown;
 		}
 	}
@@ -3562,8 +3561,8 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(NETHERBREATH);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
-		spells[0].cooldown = RandomUInt(5)+30;
-		spells[0].perctrigger = 50.0f;
+		spells[0].cooldown = RandomUInt(5)+35;
+		spells[0].perctrigger = 20.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(N_BERSERK);
@@ -3627,10 +3626,9 @@ public:
 			std::vector<Unit *> TargetTable;
 			for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 			{ 
-				Unit* RandomTarget = NULL;
-				RandomTarget = static_cast< Unit* >(*itr);
+				Unit* RandomTarget = static_cast< Unit* >(*itr);
 
-				if (RandomTarget && RandomTarget->isAlive() && isHostile(_unit, (*itr)))
+				if (RandomTarget && RandomTarget->isAlive())
 					TargetTable.push_back(RandomTarget);
 			}
 
@@ -3833,7 +3831,8 @@ public:
 		
 		for (int i = 1; i < 5; i++)
 		{
-			_unit->GetAIInterface()->addWayPoint(CreateWaypoint(i, 0, FLY));
+			//_unit->GetAIInterface()->addWayPoint(CreateWaypoint(i, 0, FLY));
+			_unit->GetAIInterface()->addWayPoint(CreateWaypoint(i, 0, RUN));
 		}
 	}
 
@@ -3843,8 +3842,8 @@ public:
 		m_phase = 0;
 		m_currentWP = 4;
 		mTailSweepTimer = 25;
-		//not sure about this: _unit->PlaySoundToSet(9456);
-		//TODO emote: "An ancient being awakens in the distance..."
+		 _unit->PlaySoundToSet(9456);
+		 _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "An ancient being awakens in the distance...");
 		RegisterAIUpdateEvent(1000);
 	}
 

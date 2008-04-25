@@ -511,7 +511,7 @@ void Spell::SpellTargetInFrontOfCaster(uint32 i, uint32 j)
 		//is Creature in range
 		if(m_caster->isInRange((Unit*)(*itr),GetRadius(i)))
 		{
-			if(m_caster->isInFront((Unit*)(*itr)))
+			if(m_caster->isInCone((Unit*)(*itr)))
 			{
 				if(isAttackable(u_caster, (Unit*)(*itr)))
 				{
