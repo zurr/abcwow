@@ -1809,7 +1809,7 @@ public:
 			std::vector<Unit*> TargetTable;
 			for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 			{ 
-				if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->GetInstanceID() == _unit->GetInstanceID() && (*itr)->GetDistance2dSq(_unit) > 225) //15 yards
+				if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->GetInstanceID() == _unit->GetInstanceID() && (*itr)->GetDistance2dSq(_unit) > 400) //20 yards
 				{
 					RandomTarget = (Unit*)(*itr);
 
@@ -1831,7 +1831,7 @@ public:
 				//2) send the missile
 				_unit->CastSpellAoF(RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER), true);
 			}
-			ArcaneOrbTimer = 7;
+			ArcaneOrbTimer = 6;
 		}
 
 		float val = (float)RandomFloat(100.0f);
