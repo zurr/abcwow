@@ -3815,14 +3815,6 @@ public:
 
 #define SUMMON_WEAPONS 36976 //casting effect
 
-#define REMOVE_INFUSER 39498
-#define REMOVE_DEVASTATION 39499
-#define REMOVE_INFINITY 39500
-#define REMOVE_LONGBOW 39501
-#define REMOVE_BULWARK 39502
-#define REMOVE_STAFF 39503
-#define REMOVE_SLICER 39504
-
 struct Pos
 {
 	float x;
@@ -3846,6 +3838,17 @@ struct Pos WP[]=
 	{ 794.072998f,  0.214634f, 48.728500f },
 	{ 794.052998f,  0.214634f, 75.728500f },
 	{ 794.032998f,  0.214634f, 48.728500f }
+};
+
+float KaelthasWeapons[7][5] =
+{
+    {COSMIC_INFUSER, 794.38, 15, 48.72, 2.9},
+    {DEVASTATION, 785.47, 12.12, 48.72, 3.14},
+    {INFINITY_BLADE, 781.25, 4.39, 48.72, 3.14},
+    {PHASESHIFT_BULWARK, 777.38, -0.81, 48.72, 3.06},
+    {STAFF_OF_DISINTEGRATION, 781.48, -6.08, 48.72, 3.9},
+    {WARP_SLICER, 785.42, -13.59, 48.72, 3.4},
+    {NETHERSTRAND_LONGBOW, 793.06, -16.61, 48.72, 3.10}
 };
 
 class KaelThasAI : public CreatureAIScript
@@ -3876,9 +3879,10 @@ public:
 		spells[0].cooldown = 10;
 
 		spells[1].info = dbcSpell.LookupEntry(ARCANE_DISTURPTION);
+		spells[1].info->MechanicsType = 12;
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
-		spells[1].perctrigger = 3.0f;
+		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 2000;
 		spells[1].cooldown = 10;
 
@@ -4115,12 +4119,9 @@ public:
 	
 	void reset()
 	{
-		GameObject *GObj = NULL;
-		GObj = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(743.057f, 4.63443f, 137.796f, 184069);
+		GameObject *GObj = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(743.057f, 4.63443f, 137.796f, 184069);
 		if(GObj && GObj->GetUInt32Value(GAMEOBJECT_STATE) == 0)
-		{
 			GObj->SetUInt32Value(GAMEOBJECT_STATE, 1);
-		}
 		
 		Creature* Darkener = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(786.28f, 20.2825f, 48.7285f, 20064);
 		Creature* Sanguinar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(785.825f, -22.1231f, 48.7285f, 20060);
@@ -4209,6 +4210,9 @@ public:
 	
 	void AIUpdate()
 	{
+		if(_unit->GetHealthPct() < 90 && AddPhase != 6)
+			_unit->Despawn(1,10000);
+
 		if(Speech <= 20)
 		{
 			_unit->setAttackTimer(2000, false);
@@ -4333,6 +4337,7 @@ public:
 					spells[2].casttime = t + spells[2].cooldown;
 				}
 
+				/* disabled - since effect not working anyhow - its just helping the party
 				if (t > spells[5].casttime && _unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
 				{
 					_unit->setAttackTimer(spells[5].attackstoptimer, false);
@@ -4341,7 +4346,7 @@ public:
 
 					spells[5].casttime = t + spells[5].cooldown;
 				}
-
+*/
 				if (t > PhoenixTimer - 5 && _unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget() && !Phoenix)
 				{
 					_unit->setAttackTimer(spells[4].attackstoptimer, false);
@@ -4362,16 +4367,11 @@ public:
 				float val = RandomFloat(100.0f);
 				SpellCast(val);
 			}
-
-			else	// to rewrite to have cool animation and better gravity system :P
-			{	// not even halfway done =/ + some facing bugs
-
-				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-
+			else if (AddPhase == 8)
+			{
 				if (Scene > 0)
 				{
-					GameObject *GObj = NULL;
-					GObj = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(743.057f, 4.63443f, 137.796f, 184069);
+					GameObject *GObj = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(743.057f, 4.63443f, 137.796f, 184069);
 
 					switch(Scene)
 					{
@@ -4397,8 +4397,7 @@ public:
 					case 6:
 						for (int i = 0; i < 2; i++)
 						{
-							Unit *Trigger = NULL;
-							Trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(Triggers[i].x, Triggers[i].y, Triggers[i].z, 30000);
+							Unit *Trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(Triggers[i].x, Triggers[i].y, Triggers[i].z, 30000);
 							if (Trigger)
 							{
 								Trigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, _unit->GetGUID());
@@ -4414,8 +4413,7 @@ public:
 					case 10:
 						for (int i = 2; i < 4; i++)
 						{
-							Unit *Trigger = NULL;
-							Trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(Triggers[i].x, Triggers[i].y, Triggers[i].z, 30000);
+							Unit *Trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(Triggers[i].x, Triggers[i].y, Triggers[i].z, 30000);
 							if (Trigger)
 							{
 								Trigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, _unit->GetGUID());
@@ -4430,8 +4428,7 @@ public:
 					case 13:
 						for (int i = 4; i < 6; i++)
 						{
-							Unit *Trigger = NULL;
-							Trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(Triggers[i].x, Triggers[i].y, Triggers[i].z, 30000);
+							Unit *Trigger = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(Triggers[i].x, Triggers[i].y, Triggers[i].z, 30000);
 							if (Trigger)
 							{
 								Trigger->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, _unit->GetGUID());
@@ -4503,12 +4500,13 @@ public:
 					if (Scene >= 2 && _unit->GetOrientation() != 3.160250f)
 						_unit->SetFacing(3.160250f);
 
-					Scene++;
-					if (Scene > 35)
-						Scene = 0;
-					else return;
+					if (Scene == 35) AddPhase = 9;
+					else Scene++;
 				}
-
+			}
+			else if (AddPhase >= 9 )
+			{
+				_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 				_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 
 				uint32 t = (uint32)time(NULL);
@@ -4522,15 +4520,12 @@ public:
 					return;
 				}
 
-				// doesn't work yet
 				if (_unit->GetCurrentSpell() == NULL && t > spells[7].casttime)
 				{
 					_unit->setAttackTimer(spells[7].attackstoptimer, false);
 
 					//_unit->CastSpell(_unit, spells[7].info, spells[7].instant);
-					// hax!
-					std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-														/* If anyone wants to use this function, then leave this note!										 */
+					std::vector<Unit*> TargetTable;		
 					for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
 					{ 
 						if (isHostile(_unit, (*itr)) && (*itr) != _unit && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
@@ -4549,23 +4544,16 @@ public:
 					{
 						for (size_t i = 0; i < TargetTable.size(); i++)
 						{
-							Unit* Target = TargetTable[i];
-							if (Target)
+							Player *pPlayer = (Player*)TargetTable[i];
+							if (pPlayer)
 							{
-								Target->CastSpell(Target, 34480, spells[7].instant);
-								if (Target->GetTypeId() == TYPEID_PLAYER)
-								{
-									Player *pPlayer = NULL;
-									pPlayer = (Player*)Target;
-									if (pPlayer)
-									{
-										WorldPacket fly(835, 13);
-										pPlayer->m_setflycheat = true;
-										fly << pPlayer->GetNewGUID();
-										fly << uint32(2);
-										pPlayer->SendMessageToSet(&fly, true);
-									}
-								}
+								pPlayer->CastSpell(pPlayer, 34480, spells[7].instant);
+
+								WorldPacket fly(835, 13);
+								pPlayer->m_setflycheat = true;
+								fly << pPlayer->GetNewGUID();
+								fly << uint32(2);
+								pPlayer->SendMessageToSet(&fly, true);
 							}
 						}
 					}
@@ -4587,9 +4575,7 @@ public:
 					{
 						_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 
-						// hax!
-						std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-															/* If anyone wants to use this function, then leave this note!										 */
+						std::vector<Unit*> TargetTable;
 						for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
 						{ 
 							if (isHostile(_unit, (*itr)) && (*itr) != _unit && (*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->GetInstanceID() == _unit->GetInstanceID())
@@ -4597,7 +4583,7 @@ public:
 								Unit* Target = NULL;
 								Target = (Unit*)(*itr);
 
-								if (Target->isAlive())
+								if (Target->isAlive() && ((Player*)Target)->m_setflycheat == true)
 								{
 									TargetTable.push_back(Target);
 								} 
@@ -4608,11 +4594,9 @@ public:
 						{
 							for (size_t i = 0; i < TargetTable.size(); i++)
 							{
-								Unit* Target = TargetTable[i];
-								if (Target && Target->GetTypeId() == TYPEID_PLAYER)
+								if (TargetTable[i])
 								{
-									Player *pPlayer = NULL;
-									pPlayer = (Player*)Target;
+									Player *pPlayer = (Player*)TargetTable[i];
 									if (pPlayer)
 									{
 										WorldPacket fly(836, 13);
@@ -4640,6 +4624,26 @@ public:
 					}
 
 					spells[8].casttime = t + spells[8].cooldown;
+				}
+
+				if (t > spells[2].casttime && _unit->GetCurrentSpell() == NULL)
+				{
+					_unit->setAttackTimer(spells[2].attackstoptimer, false);
+
+					_unit->CastSpell(_unit, spells[2].info, spells[2].instant);
+
+					spells[2].casttime = t + spells[2].cooldown;
+				}
+
+				if (t > spells[3].casttime && _unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+				{
+					_unit->GetAIInterface()->StopMovement(1);
+					_unit->setAttackTimer(spells[3].attackstoptimer, false);
+
+					CastSpellOnRandomTarget(3, spells[3].mindist2cast, spells[3].maxdist2cast, 0, 100);
+
+					spells[3].casttime = t + spells[3].cooldown;
+					spells[2].casttime = t + spells[2].cooldown;
 				}
 
 				float val = RandomFloat(100.0f);
@@ -4765,13 +4769,8 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "As you see, I have many weapons in my arsenal...");
 		_unit->PlaySoundToSet(11261);
 
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(NETHERSTRAND_LONGBOW, _unit->GetPositionX() + 1.0f, _unit->GetPositionY() + 1.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(DEVASTATION, _unit->GetPositionX() + 2.0f, _unit->GetPositionY() + 2.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(COSMIC_INFUSER, _unit->GetPositionX() + 3.0f, _unit->GetPositionY() + 3.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(INFINITY_BLADE, _unit->GetPositionX() + 4.0f, _unit->GetPositionY() + 4.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(WARP_SLICER, _unit->GetPositionX() + 5.0f, _unit->GetPositionY() + 5.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(PHASESHIFT_BULWARK, _unit->GetPositionX() + 6.0f, _unit->GetPositionY() + 6.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(STAFF_OF_DISINTEGRATION, _unit->GetPositionX() + 7.0f, _unit->GetPositionY() + 7.0f, _unit->GetPositionZ(), 0.0f, false, true, 0, 0);
+		for (uint32 i = 0; i < 7; i++)
+			_unit->GetMapMgr()->GetInterface()->SpawnCreature((uint32)KaelthasWeapons[i][0], KaelthasWeapons[i][1],KaelthasWeapons[i][2],KaelthasWeapons[i][3], 0.0f, false, true, 0, 0);
 
 		WeaponPhase = (uint32)time(NULL) + 95;
 	}
@@ -4795,8 +4794,6 @@ public:
 			
 			if (Darkener && !Darkener->isAlive())
 			{
-				//Darkener->Despawn(0,0);
-				//Darkener = NULL;
 				_unit->CastSpell(Darkener, dbcSpell.LookupEntry(36450), true); //Spell Visual on kaelthas
 				Darkener->CastSpell(Darkener, dbcSpell.LookupEntry(36450), true);
 				Darkener->setDeathState(ALIVE);
@@ -4812,27 +4809,8 @@ public:
 				}				
 			}
 
-			/*if (!Darkener)
-			{
-				Darkener = _unit->GetMapMgr()->GetInterface()->SpawnCreature(20064, 786.28f, 20.2825f, 48.7285f, _unit->GetOrientation(), true, false, 0, 0);
-				if (Darkener)
-				{
-					Darkener->GetAIInterface()->SetAllowedToEnterCombat(true);
-					Darkener->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-					Darkener->m_noRespawn = true;
-
-					Unit *target = FindTargetForSpell();
-					if (target)
-					{
-						Darkener->GetAIInterface()->AttackReaction(target, 1, 0);
-					}
-				}
-			}*/
-
 			if (Sanguinar && !Sanguinar->isAlive())
 			{
-				//Sanguinar->Despawn(0,0);
-				//Sanguinar = NULL;
 				Sanguinar->CastSpell(Sanguinar, dbcSpell.LookupEntry(36450), true);
 				Sanguinar->setDeathState(ALIVE);
 				Sanguinar->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
@@ -4847,27 +4825,8 @@ public:
 				}
 			}
 
-			/*if (!Sanguinar)
-			{
-				Sanguinar = _unit->GetMapMgr()->GetInterface()->SpawnCreature(20060, 785.825f, -22.1231f, 48.7285f, _unit->GetOrientation(), true, false, 0, 0);
-				if (Sanguinar)
-				{
-					Sanguinar->GetAIInterface()->SetAllowedToEnterCombat(true);
-					Sanguinar->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-					Sanguinar->m_noRespawn = true;
-
-					Unit *target = FindTargetForSpell();
-					if (target)
-					{
-						Sanguinar->GetAIInterface()->AttackReaction(target, 1, 0);
-					}
-				}
-			}*/
-
 			if (Capernian && !Capernian->isAlive())
 			{
-				//Capernian->Despawn(0,0);
-				//Capernian = NULL;
 				Capernian->CastSpell(Capernian, dbcSpell.LookupEntry(36450), true);
 				Capernian->setDeathState(ALIVE);
 				Capernian->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
@@ -4882,27 +4841,8 @@ public:
 				}
 			}
 
-			/*if (!Capernian)
-			{
-				Capernian = _unit->GetMapMgr()->GetInterface()->SpawnCreature(20062, 791.128f, -12.6735f, 48.7285f, _unit->GetOrientation(), true, false, 0, 0);
-				if (Capernian)
-				{
-					Capernian->GetAIInterface()->SetAllowedToEnterCombat(true);
-					Capernian->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-					Capernian->m_noRespawn = true;
-
-					Unit *target = FindTargetForSpell();
-					if (target)
-					{
-						Capernian->GetAIInterface()->AttackReaction(target, 1, 0);
-					}
-				}
-			}*/
-
 			if (Telonicus && !Telonicus->isAlive())
 			{
-				//Telonicus->Despawn(0,0);
-				//Telonicus = NULL;
 				Telonicus->CastSpell(Telonicus, dbcSpell.LookupEntry(36450), true);
 				Telonicus->setDeathState(ALIVE);
 				Telonicus->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
@@ -4917,23 +4857,6 @@ public:
 				}
 			}
 
-			/*if (!Telonicus)
-			{
-				Telonicus = _unit->GetMapMgr()->GetInterface()->SpawnCreature(20063, 791.906f, 11.9183f, 48.7285f, _unit->GetOrientation(), true, false, 0, 0);
-				if (Telonicus)
-				{
-					Telonicus->GetAIInterface()->SetAllowedToEnterCombat(true);
-					Telonicus->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
-					Telonicus->m_noRespawn = true;
-
-					Unit *target = FindTargetForSpell();
-					if (target)
-					{
-						Telonicus->GetAIInterface()->AttackReaction(target, 1, 0);
-					}
-				}
-			}*/
-
 			AddActive = 6;
 			return;
 		}
@@ -4945,8 +4868,7 @@ public:
 
 		if(_unit->GetAIInterface()->GetNextTarget())
 		{
-			Unit *Phoenix = NULL;
-			Phoenix = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PHOENIX_EGG, X, Y, Z, _unit->GetOrientation(), false, false, 0, 0);
+			Unit *Phoenix = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_PHOENIX_EGG, X, Y, Z, _unit->GetOrientation(), false, false, 0, 0);
 			if (Phoenix)
 			{
 				Unit *PhoenixTarget = NULL;
@@ -5030,15 +4952,12 @@ public:
 
 		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
-			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-												/* If anyone wants to use this function, then leave this note!										 */
+			std::vector<Unit*> TargetTable;
 			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
 			{ 
 				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
 				{
-					Unit* RandomTarget = NULL;
-					RandomTarget = (Unit*)(*itr);
-
+					Unit* RandomTarget = (Unit*)(*itr);
 					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
 					{
 						TargetTable.push_back(RandomTarget);
@@ -5119,8 +5038,7 @@ public:
 
 	Unit *FindTarget()
 	{
-		std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-											/* If anyone wants to use this function, then leave this note!										 */
+		std::vector<Unit*> TargetTable;
 		for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
 		{ 
 			if (isHostile(_unit, (*itr)) && (*itr) != _unit && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
