@@ -1398,6 +1398,8 @@ Unit* AIInterface::FindTarget()
 		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			tmpPlr = (*itrPlr);
+			if (tmpPlr == NULL)
+				continue;
 			if (tmpPlr->GetTaxiState())
 				continue;
 			if (tmpPlr->bInvincible)
@@ -1413,7 +1415,7 @@ Unit* AIInterface::FindTarget()
 			else
 			{
 				Unit *pPTarget = GetUnit()->GetMapMgr()->GetUnit( tmpPlr->CombatStatus.GetPrimaryAttackTarget() );
-				if(!pPTarget->IsPlayer())
+				if( pPTarget != NULL && !pPTarget->IsPlayer() )
 					continue;
 				if (tmpPlr->DuelingWith == static_cast<Player*>(pPTarget))
 					continue;
