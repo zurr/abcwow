@@ -5113,28 +5113,28 @@ public:
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].cooldown = 12;
-		spells[0].perctrigger = 20.0f;
+		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(SP_DEADLY_SWATHE);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
 		spells[1].cooldown = 0;
-		spells[1].perctrigger = 20.0f;
+		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(SP_POISONED_THRUST);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = false;
 		spells[2].cooldown = 0;
-		spells[2].perctrigger = 20.0f;
+		spells[2].perctrigger = 10.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(SP_DARING);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = false;
-		spells[3].cooldown = 0;
-		spells[3].perctrigger = 20.0f;
+		spells[3].cooldown = 25;
+		spells[3].perctrigger = 10.0f;
 		spells[3].attackstoptimer = 1000;
 	}
 
@@ -5302,28 +5302,28 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(SP_ETERNAL_AFFECTION);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = false;
-		spells[0].cooldown = 12;
+		spells[0].cooldown = 35;
 		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(SP_POWERFUL_ATTRACTION);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
-		spells[1].cooldown = 0;
+		spells[1].cooldown = 15;
 		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(SP_BINDING_PASSION);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = false;
-		spells[2].cooldown = 0;
+		spells[2].cooldown = 15;
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(SP_DEVOTION);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = false;
-		spells[3].cooldown = 0;
+		spells[3].cooldown = 30;
 		spells[3].perctrigger = 5.0f;
 		spells[3].attackstoptimer = 1000;
 	}
