@@ -4879,7 +4879,7 @@ void Unit::RemoveAurasByInterruptFlag(uint32 flag)
 	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
 		//a = m_auras[x];
-		if( m_auras[x] == NULL )
+		if( m_auras[x] == NULL || m_auras[x]->m_spellProto == NULL )
 			continue;
 		
 		//some spells do not get removed all the time only at specific intervals

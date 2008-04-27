@@ -8383,7 +8383,7 @@ void Player::SaveAuras(stringstream &ss)
 	//for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		if( m_auras[x] != NULL )
+		if( m_auras[x] != NULL && m_auras[x]->m_spellProto != NULL )
 		{
 			Aura* aur = m_auras[x];
 			bool skip = false;
