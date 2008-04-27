@@ -2818,7 +2818,8 @@ public:
 		spells[0].attackstoptimer = 1000;
 		//spells[0].speech = "Physic blow";
 		
-		spells[1].info = dbcSpell.LookupEntry(SILENCE); 
+		spells[1].info = dbcSpell.LookupEntry(SILENCE);
+		spells[1].info->MechanicsType = 9;
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
@@ -3024,6 +3025,7 @@ public:
 	SanguinarAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
 		spells[0].info = dbcSpell.LookupEntry(BELLOWING);
+		spells[1].info->MechanicsType = 12;
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].cooldown = 30;
@@ -3292,7 +3294,7 @@ protected:
 #define CN_TELONICUS 20063
 
 #define BOMB 37036
-#define REMOTE_TOY 37027	// doesn't seems to work like it should
+#define REMOTE_TOY 37027
 
 class TelonicusAI : public CreatureAIScript
 {
@@ -3319,6 +3321,8 @@ public:
 		spells[0].maxdist2cast = 30.0f;
 
 		spells[1].info = dbcSpell.LookupEntry(REMOTE_TOY);
+		spells[1].info->MechanicsType = 9;
+		spells[1].info->EffectTriggerSpell[0] = 37029; // little fix for dbc issue
 		spells[1].targettype = TARGET_RANDOM_SINGLE;
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
@@ -3361,7 +3365,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "");
 		_unit->PlaySoundToSet(11158);
 	}
 	
@@ -3421,8 +3424,7 @@ public:
 
 		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
-			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-												/* If anyone wants to use this function, then leave this note!										 */
+			std::vector<Unit*> TargetTable;
 			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
 			{ 
 				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
