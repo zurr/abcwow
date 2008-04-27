@@ -1392,58 +1392,57 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(SHADOW_VOLLEY);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
-		spells[0].cooldown = -1;
-		spells[0].perctrigger = 8.0f;
+		spells[0].cooldown = 5;
+		spells[0].perctrigger = 6.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(CLEAVE);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
-		spells[1].cooldown = -1;
+		spells[1].cooldown = 10;
 		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(THUNDER_CLAP);
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
-		spells[2].cooldown = -1;
+		spells[2].cooldown = 10;
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 1000;
 
 		spells[3].info = dbcSpell.LookupEntry(TWISTED_REFLECTION);
 		spells[3].targettype = TARGET_RANDOM_SINGLE;
 		spells[3].instant = true;
-		spells[3].cooldown = -1;
+		spells[3].cooldown = 25;
 		spells[3].perctrigger = 5.0f;
 		spells[3].attackstoptimer = 1000;
+		spells[3].speech = "Your own strength feeds me. $N!";
 
 		spells[4].info = dbcSpell.LookupEntry(VOID_BOLT);
 		spells[4].targettype = TARGET_RANDOM_SINGLE;
 		spells[4].instant = false;
-		spells[4].cooldown = -1;
+		spells[4].cooldown = 5;
 		spells[4].perctrigger = 3.0f;
 		spells[4].attackstoptimer = 1000;
 
 		spells[5].info = dbcSpell.LookupEntry(MARK_OF_KAZZAK);
 		spells[5].targettype = TARGET_RANDOM_SINGLE;
 		spells[5].instant = false;
-		spells[5].cooldown = -1;
+		spells[5].cooldown = 25;
 		spells[5].perctrigger = 5.0f;
 		spells[5].attackstoptimer = 1000;
 
 		RegisterAIUpdateEvent(1000);
-		//Spawn intro.
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I remember well the sting of defeat at the conclusion of the Third War. I have waited far too long for my revenge. Now the shadow of the Legion falls over this world. It is only a matter of time until all of your failed creation... is undone.");
-		_unit->PlaySoundToSet(11332);
 		timer_speech = 20;
-
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
 		enrage = 0;
-		int RandomSpeach=rand()%2;
-		switch (RandomSpeach)
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I remember well the sting of defeat at the conclusion of the Third War. I have waited far too long for my revenge. Now the shadow of the Legion falls over this world. It is only a matter of time until all of your failed creation... is undone.");
+		_unit->PlaySoundToSet(11332);
+
+		switch (rand()%2)
 		{
 		case 0:
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "All mortals will perish!");
@@ -1461,16 +1460,20 @@ public:
 	{
 		if(_unit->GetHealthPct() > 0)
 		{
-			int RandomSpeach;
-			RandomSpeach=rand()%2;
-			switch (RandomSpeach)
+			switch (rand()%2)
 			{
 			case 0:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your own strength feeds me, $N!");
+				if (mTarget != NULL && mTarget->IsPlayer())
+				{
+					Player *pPlayer = (Player*)mTarget;
+					char msg[256];
+					snprintf((char*)msg, 256, "Your own strength feeds me %s", pPlayer->GetName());
+					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, msg);
+
+				}
 				_unit->PlaySoundToSet(11337);
 				break;
 			case 1:
-				//    _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "");
 				_unit->PlaySoundToSet(11338);
 				break;
 			}
@@ -1507,10 +1510,8 @@ public:
 	{
 		if (!timer_speech)
 		{
-			timer_speech = 120;
-			int RandomSpeach;
-			RandomSpeach=rand()%50;
-			switch (RandomSpeach)
+			timer_speech = 60;
+			switch (rand()%50)
 			{
 			case 0:
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Invaders, you dangle upon the precipice of oblivion! The Burning Legion comes and with it comes your end.");
@@ -1551,58 +1552,47 @@ public:
 	}
 
 	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
+    {
+        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
 			float comulativeperc = 0;
-			Unit *target = NULL;
+		    Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
 				if(!spells[i].perctrigger) continue;
-
+				
 				if(m_spellcheck[i])
 				{
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					case TARGET_RANDOM_DESTINATION:
-						target = RandomTarget(false, true, 10000);
-						if (target)
+						case TARGET_SELF:
+						case TARGET_VARIOUS:
+							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+						case TARGET_ATTACKING:
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
-		}
-	}
+        }
+    }
 
 	void rageRemove()
 	{
-		Aura *aur = _unit->FindAura(RAGE);
-		if (aur)
-			aur->Remove();
+		_unit->RemoveAura(RAGE);
 	}
 
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
@@ -1627,9 +1617,7 @@ public:
 		if (!targetTable.size())
 			return NULL;
 
-		uint32 randt = RandomUInt(100)%targetTable.size();
-		Unit * randomtarget = targetTable[randt];
-		return randomtarget;
+		return targetTable[RandomUInt(100)%targetTable.size()];
 	}
 
 protected:
@@ -1811,12 +1799,11 @@ protected:
 };
 
 // Doomwalker
-
 #define CN_DOOMWALKER				17711
 
 #define EARTHQUAKE					32686
 #define MARK_OF_DEATH				37128
-#define CHAIN_LIGHTNING				33665
+#define CHAIN_LIGHTNING				28167
 #define OVERRUN						32636
 #define ENRAGE						34624
 #define AURA_OF_DEATH				37131
@@ -1830,24 +1817,21 @@ public:
 
 	DoomwalkerAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		//nrspells = 1;
-		nrspells = 0;
+		nrspells = 1;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
 
-		/*
 		spells[0].info = dbcSpell.LookupEntry(CHAIN_LIGHTNING);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
-		spells[0].cooldown = -1;
+		spells[0].cooldown = 15;
 		spells[0].perctrigger = 4.0f;
 		spells[0].attackstoptimer = 1000;
-*/
+
 		earthquakecd = 50;
 		overruncd = 35;
-
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -1882,8 +1866,11 @@ public:
 				_unit->PlaySoundToSet(11351);
 				break;
 			}
-			Aura *aur = new Aura(dbcSpell.LookupEntry(MARK_OF_DEATH), 900000, _unit, mTarget);
-			mTarget->AddAura(aur);
+			if (mTarget != NULL)
+			{
+				Aura *aur = new Aura(dbcSpell.LookupEntry(MARK_OF_DEATH), 900000, _unit, mTarget);
+				mTarget->AddAura(aur);
+			}
 		}
 	}
 	void OnCombatStop(Unit *mTarget)
@@ -1908,7 +1895,6 @@ public:
 			spells[i].casttime = spells[i].cooldown;
 	}
 
-
 	void AIUpdate()
 	{
 		auraOfDeath();
@@ -1922,8 +1908,7 @@ public:
 		if (!earthquakecd)
 		{
 			_unit->CastSpell(_unit, EARTHQUAKE, true);
-			int RandomSpeach = RandomUInt(100)%2;
-			switch (RandomSpeach)
+			switch (RandomUInt(100)%2)
 			{
 			case 0:
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Tectonic disruption commencing.");
@@ -1939,9 +1924,8 @@ public:
 		if (!overruncd)
 		{
 			_unit->CastSpell(_unit, OVERRUN, true);
-			int RandomSpeach = RandomUInt(100)%2;
 			_unit->ClearHateList();
-			switch (RandomSpeach)
+			switch (RandomUInt(100)%2)
 			{
 			case 0:
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Trajectory locked.");
@@ -1952,7 +1936,7 @@ public:
 				_unit->PlaySoundToSet(11348);
 				break;
 			}
-			sEventMgr.AddEvent(this, &DoomwalkerAI::overrunRemove, EVENT_SCRIPT_UPDATE_EVENT, 10000, 1, 0);
+			sEventMgr.AddEvent(this, &DoomwalkerAI::overrunRemove, EVENT_SCRIPT_UPDATE_EVENT, 5000, 1, 0);
 			overruncd = 45;
 		}
 
@@ -1961,56 +1945,50 @@ public:
 	}
 
 	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
+    {
+        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
 			float comulativeperc = 0;
-			Unit *target = NULL;
+		    Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
-				spells[i].casttime--;
-
-				if (m_spellcheck[i])
+				if(!spells[i].perctrigger) continue;
+				
+				if(m_spellcheck[i])
 				{
-					spells[i].casttime = spells[i].cooldown;
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_SELF:
+						case TARGET_VARIOUS:
+							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+						case TARGET_ATTACKING:
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+						case TARGET_DESTINATION:
+							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
-
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid);
-					}
-
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if ((val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger)) || !spells[i].casttime)
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
-		}
-	}
+        }
+    }
 
 	void auraOfDeath()
 	{
 		for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 		{
 			Player *currentTarget = (*itr);
-			if (currentTarget->isAlive() && _unit->GetDistance2dSq(currentTarget) <= 1600)
+			if (currentTarget && currentTarget->isAlive() && _unit->GetDistance2dSq(currentTarget) <= 1600)
 			{
 				if (currentTarget->HasAura(MARK_OF_DEATH))
 					currentTarget->CastSpell(currentTarget, AURA_OF_DEATH, true);
@@ -2020,10 +1998,9 @@ public:
 
 	void overrunRemove()
 	{
-		Aura *aur = _unit->FindAura(OVERRUN);
-		if (aur)
-			aur->Remove();
+		_unit->RemoveAura(OVERRUN);
 	}
+
 protected:
 
 	bool enraged;
@@ -2165,7 +2142,7 @@ protected:
 
 void SetupWorldBosses(ScriptMgr * mgr)
 {
-	/*mgr->register_creature_script(CN_EMERISS, &EmerissAI::Create);
+	mgr->register_creature_script(CN_EMERISS, &EmerissAI::Create);
 	mgr->register_creature_script(CN_TAERAR, &TaerarAI::Create);
 	mgr->register_creature_script(CN_SHADEOFTAERAR, &ShadeofTaerarAI::Create);
 	mgr->register_creature_script(CN_YSONDRE, &YsondreAI::Create);
@@ -2174,8 +2151,8 @@ void SetupWorldBosses(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_LSHADE, &ShadeofLethonAI::Create);
 	mgr->register_creature_script(CN_KRUUL, &KruulAI::Create);
 	mgr->register_creature_script(CN_AZUREGOS, &AzuregosAI::Create);
-	*/
+
 	mgr->register_creature_script(CN_KAZZAK, &KazzakAI::Create);
 	mgr->register_creature_script(CN_DOOMWALKER, &DoomwalkerAI::Create);
-	//mgr->register_creature_script(CN_TEREMUS, &TeremusAI::Create);
+	mgr->register_creature_script(CN_TEREMUS, &TeremusAI::Create);
 }
