@@ -2878,7 +2878,6 @@ public:
 		RemoveAIUpdateEvent();
 
 		CurrentTarget = NULL;
-		//_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "");
 		_unit->PlaySoundToSet(11204);
 	}
 
@@ -2959,7 +2958,7 @@ public:
 				_unit->SendChatMessageAlternateEntry(CN_DARKENER, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
 				CurrentTarget = target;
 			}
-	}
+		}
 	}
 	
 	

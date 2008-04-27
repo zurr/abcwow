@@ -44,13 +44,8 @@ public:
 
 	HYDROSSAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		_unit->DamageDoneModPCT[0] = 0;
-		_unit->DamageDoneModPCT[1] = 0;
-		_unit->DamageDoneModPCT[2] = 0;
-		_unit->DamageDoneModPCT[3] = 0;
-		_unit->DamageDoneModPCT[4] = 0;
-		_unit->DamageDoneModPCT[5] = 0;
-		_unit->DamageDoneModPCT[6] = 0;
+		for(uint32 x = 0; x < 7; x++)
+			_unit->DamageDoneModPCT[x] = 0;
 
 		m_phase = 1;
 		m_markcd = 15;
@@ -73,7 +68,19 @@ public:
 	void OnCombatStop(Unit *mTarget)
 	{
 		if (_unit->isAlive())
+		{
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20162);
+			_unit->Despawn(100, 2500);
+		}
+
+		if (summon1 != NULL)
+			summon1->Despawn(100, 0);
+		if (summon2 != NULL)
+			summon2->Despawn(100, 0);
+		if (summon3 != NULL)
+			summon3->Despawn(100, 0);
+		if (summon4 != NULL)
+			summon4->Despawn(100, 0);
 
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
@@ -145,13 +152,8 @@ public:
 		if (!m_enrage && !enraged)
 		{
 			enraged = 1;
-			_unit->DamageDoneModPCT[0] = 5;
-			_unit->DamageDoneModPCT[1] = 5;
-			_unit->DamageDoneModPCT[2] = 5;
-			_unit->DamageDoneModPCT[3] = 5;
-			_unit->DamageDoneModPCT[4] = 5;
-			_unit->DamageDoneModPCT[5] = 5;
-			_unit->DamageDoneModPCT[6] = 5;
+			for(uint32 x = 0; x < 7; x++)
+				_unit->DamageDoneModPCT[x] = 5;
 		}
 		uint32 dist = FL2UINT(_unit->GetAIInterface()->_CalcDistanceFromHome());
 		if (dist > 700)
@@ -440,7 +442,7 @@ public:
 		spells[0].perctrigger = 6.0f;
 		spells[0].attackstoptimer = 1000;
 
-		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 0, FLY));
+		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 0, RUN));
 
 		_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
@@ -2403,13 +2405,8 @@ public:
 
 	LEOTHERASAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		_unit->DamageDoneModPCT[0] = 0;
-		_unit->DamageDoneModPCT[1] = 0;
-		_unit->DamageDoneModPCT[2] = 0;
-		_unit->DamageDoneModPCT[3] = 0;
-		_unit->DamageDoneModPCT[4] = 0;
-		_unit->DamageDoneModPCT[5] = 0;
-		_unit->DamageDoneModPCT[6] = 0;
+		for(uint32 x = 0; x < 7; x++)
+			_unit->DamageDoneModPCT[x] = 0;
 
 		m_phase = 0;
 		whirlwindcd = 18;
@@ -2541,13 +2538,9 @@ public:
 			m_enrage--;
 			if (!m_enrage && !enraged)
 			{
-				_unit->DamageDoneModPCT[0] = 5;
-				_unit->DamageDoneModPCT[1] = 5;
-				_unit->DamageDoneModPCT[2] = 5;
-				_unit->DamageDoneModPCT[3] = 5;
-				_unit->DamageDoneModPCT[4] = 5;
-				_unit->DamageDoneModPCT[5] = 5;
-				_unit->DamageDoneModPCT[6] = 5;
+				for(uint32 x = 0; x < 7; x++)
+					_unit->DamageDoneModPCT[x] = 5;
+
 				enraged = 1;
 			}
 			if (_unit->GetHealthPct() <= 15 && m_phase < 3)
@@ -3193,13 +3186,9 @@ public:
 
 		}
 
-		_unit->DamageDoneModPCT[0] = 0;
-		_unit->DamageDoneModPCT[1] = 0;
-		_unit->DamageDoneModPCT[2] = 0;
-		_unit->DamageDoneModPCT[3] = 0;
-		_unit->DamageDoneModPCT[4] = 0;
-		_unit->DamageDoneModPCT[5] = 0;
-		_unit->DamageDoneModPCT[6] = 0;
+		for(uint32 x =0; x<7; x++)
+			_unit->DamageDoneModPCT[x] = 0;
+
 		m_phase = 1;
 		multishootcd = 5;
 		entanglecd = 30 + RandomUInt(100)%15;
@@ -3213,20 +3202,12 @@ public:
 		if (_unit->isAlive())
 		{
 			_unit->RemoveAuraVisual(VASHJ_SHIELD, 1);
-			_unit->SchoolImmunityList[0] = 0;
-			_unit->SchoolImmunityList[1] = 0;
-			_unit->SchoolImmunityList[2] = 0;
-			_unit->SchoolImmunityList[3] = 0;
-			_unit->SchoolImmunityList[4] = 0;
-			_unit->SchoolImmunityList[5] = 0;
-			_unit->SchoolImmunityList[6] = 0;
-			_unit->DamageDoneModPCT[0] = 0;
-			_unit->DamageDoneModPCT[1] = 0;
-			_unit->DamageDoneModPCT[2] = 0;
-			_unit->DamageDoneModPCT[3] = 0;
-			_unit->DamageDoneModPCT[4] = 0;
-			_unit->DamageDoneModPCT[5] = 0;
-			_unit->DamageDoneModPCT[6] = 0;
+			for(uint32 x =0; x<7; x++)
+			{
+				_unit->SchoolImmunityList[x] = 0;
+				_unit->DamageDoneModPCT[x] = 0;
+			}
+
 			_unit->GetAIInterface()->disable_melee = false;
 		}
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
@@ -3264,13 +3245,10 @@ public:
 			_unit->PlaySoundToSet(11539);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The time is now! Leave none standing!");
 			_unit->AddAuraVisual(VASHJ_SHIELD, 1, true);
-			_unit->SchoolImmunityList[0] = 1;
-			_unit->SchoolImmunityList[1] = 1;
-			_unit->SchoolImmunityList[2] = 1;
-			_unit->SchoolImmunityList[3] = 1;
-			_unit->SchoolImmunityList[4] = 1;
-			_unit->SchoolImmunityList[5] = 1;
-			_unit->SchoolImmunityList[6] = 1;
+
+			for(uint32 x =0; x<7; x++)
+				_unit->SchoolImmunityList[x] = 1;
+
 			_unit->GetAIInterface()->MoveTo(_unit->GetSpawnX(), _unit->GetSpawnY(), _unit->GetSpawnZ(), 0.0f);
 			_unit->GetAIInterface()->disable_melee = true;
 			coilfangelitecd = 48;
@@ -3286,13 +3264,10 @@ public:
 			_unit->PlaySoundToSet(11540);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You may want to take cover.");
 			_unit->RemoveAuraVisual(VASHJ_SHIELD, 1);
-			_unit->SchoolImmunityList[0] = 0;
-			_unit->SchoolImmunityList[1] = 0;
-			_unit->SchoolImmunityList[2] = 0;
-			_unit->SchoolImmunityList[3] = 0;
-			_unit->SchoolImmunityList[4] = 0;
-			_unit->SchoolImmunityList[5] = 0;
-			_unit->SchoolImmunityList[6] = 0;
+
+			for(uint32 x =0; x<7; x++)
+				_unit->SchoolImmunityList[x] = 0;
+
 			_unit->GetAIInterface()->ClearHateList();
 			_unit->GetAIInterface()->disable_melee = false;
 			multishootcd = 5;
@@ -4459,6 +4434,7 @@ public:
 			spells[0].info = dbcSpell.LookupEntry(FRENZY);
 			spells[0].targettype = TARGET_SELF;
 			spells[0].instant = true;
+
 			spells[0].cooldown = 20;
 			spells[0].perctrigger = 3.0f;
 			spells[0].attackstoptimer = 1000;
