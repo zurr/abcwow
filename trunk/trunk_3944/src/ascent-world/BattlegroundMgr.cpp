@@ -1041,13 +1041,15 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	data << plr->GetGUID();
 
 	m_mainLock.Acquire();
-	if(plr->m_bgTeam > 1) plr->m_bgTeam = plr->GetTeam();
+	if( plr->m_bgTeam > 1 )
+		plr->m_bgTeam = ( plr->GetTeam() > 1 )?1:plr->GetTeam();
+
 	m_players[plr->m_bgTeam].erase(plr);
 	DistributePacketToAll(&data);
 
 	memset(&plr->m_bgScore, 0, sizeof(BGScore));
 	OnRemovePlayer(plr);
-	plr->m_bg = 0;
+	plr->m_bg = NULL;
 
 	/* are we in the group? */
 	if(plr->GetGroup() == m_groups[plr->m_bgTeam])

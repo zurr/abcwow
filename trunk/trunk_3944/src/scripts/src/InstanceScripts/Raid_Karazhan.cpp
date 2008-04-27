@@ -3562,7 +3562,7 @@ public:
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].cooldown = RandomUInt(5)+35;
-		spells[0].perctrigger = 20.0f;
+		spells[0].perctrigger = 40.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(N_BERSERK);
