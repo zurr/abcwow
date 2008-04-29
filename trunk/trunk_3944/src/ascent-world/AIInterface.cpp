@@ -328,10 +328,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				if( pUnit == NULL ) return;
 
 				CALL_SCRIPT_EVENT(m_Unit, OnDamageTaken)(pUnit, float(misc1));
-				if(!modThreatByPtr(pUnit, misc1))
-				{
-					m_aiTargets.insert(TargetMap::value_type(pUnit, misc1));
-				}
+				modThreatByPtr(pUnit, misc1);
 				m_Unit->CombatStatus.OnDamageDealt(pUnit);
 			}break;
 		case EVENT_FOLLOWOWNER:
@@ -1278,7 +1275,6 @@ bool AIInterface::HealReaction(Unit* caster, Unit* victim, uint32 amount)
 {
 	if(!caster || !victim)
 	{
-		printf("!!!BAD POINTER IN AIInterface::HealReaction!!!\n");
 		return false;
 	}
 
@@ -1290,21 +1286,6 @@ bool AIInterface::HealReaction(Unit* caster, Unit* victim, uint32 amount)
 	if(m_aiTargets.find(victim) != m_aiTargets.end())
 		victimInList = 1;
 
-	/*for(i = m_aiTargets.begin(); i != m_aiTargets.end(); i++)
-	{
-		if(casterInList && victimInList)
-		{ // no need to check the rest, just break that
-			break;
-		}
-		if(i->target == victim)
-		{
-			victimInList = true;
-		}
-		if(i->target == caster)
-		{
-			casterInList = true;
-		}
-	}*/
 	if(!victimInList && !casterInList) // none of the Casters is in the Creatures Threat list
 	{
 		return false;
@@ -1314,10 +1295,6 @@ bool AIInterface::HealReaction(Unit* caster, Unit* victim, uint32 amount)
 		// get caster into combat if he's hostile
 		if(isHostile(m_Unit, caster))
 		{
-			//AI_Target trgt;
-			//trgt.target = caster;
-			//trgt.threat = amount;
-			//m_aiTargets.push_back(trgt);
 			m_aiTargets.insert(TargetMap::value_type(caster, amount));
 			return true;
 		}

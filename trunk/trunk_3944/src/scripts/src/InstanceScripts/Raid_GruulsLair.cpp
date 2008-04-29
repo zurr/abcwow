@@ -1042,6 +1042,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		sEventMgr.RemoveEvents(this);
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		GrowthCooldown = 30;
@@ -1054,6 +1055,7 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
+		sEventMgr.RemoveEvents(this);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Wraaaa!");
 		_unit->PlaySoundToSet(11363);
 		RemoveAIUpdateEvent();
@@ -1075,10 +1077,9 @@ public:
 			_unit->CastSpell(_unit, GROWTH, true);
 			GrowthCooldown=30;
 		}
-		if (!groundSlamcd)
+		if ( groundSlamcd == 0 )
 		{
-			int RandomSpeech = RandomUInt(1000)%2;
-			switch (RandomSpeech)
+			switch (RandomUInt(1000)%2)
 			{
 			case 0:
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL,"Scurry!");
@@ -1091,6 +1092,7 @@ public:
 			}
 			_unit->setAttackTimer(12000, false);
 			_unit->GetAIInterface()->StopMovement(12000);
+			sEventMgr.RemoveEvents(this);
 			groundSlam();
 			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::stoned, EVENT_SCRIPT_UPDATE_EVENT, 7000, 1, 0);
 			sEventMgr.AddEvent(this, &GruulsTheDragonkillerAI::shatter, EVENT_SCRIPT_UPDATE_EVENT, 9000, 1, 0);
@@ -1215,8 +1217,6 @@ public:
 
 	void shatter()
 	{
-		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
-			return;
 
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
 		if ( targets == NULL )
