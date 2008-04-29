@@ -1409,7 +1409,7 @@ bool Object::isInFront(Object* target)
 
 bool Object::isInCone(Object* target)
 {
-	// check if we facing something ( is the object within a 70 degree slice of our positive y axis )
+	// check if we facing something within a 90 degree slice of our positive y axis
 
     double x = target->GetPositionX() - m_position.x;
     double y = target->GetPositionY() - m_position.y;
@@ -1424,8 +1424,8 @@ bool Object::isInCone(Object* target)
     while(angle < -M_PI)
         angle += 2.0 * M_PI;
 
-    double left = -1.0 * ( M_PI / 6.0 );
-    double right = ( M_PI / 6.0 );
+    double left = -1.0 * ( M_PI / 4.0 );
+    double right = ( M_PI / 4.0 );
 
     return( ( angle >= left ) && ( angle <= right ) );
 }

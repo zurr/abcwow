@@ -73,15 +73,6 @@ public:
 			_unit->Despawn(100, 2500);
 		}
 
-		if (summon1 != NULL)
-			summon1->Despawn(100, 0);
-		if (summon2 != NULL)
-			summon2->Despawn(100, 0);
-		if (summon3 != NULL)
-			summon3->Despawn(100, 0);
-		if (summon4 != NULL)
-			summon4->Despawn(100, 0);
-
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -100,15 +91,6 @@ public:
 			break;
 		}
 		RemoveAIUpdateEvent();
-
-		if (summon1 != NULL)
-			summon1->Despawn(100, 0);
-		if (summon2 != NULL)
-			summon2->Despawn(100, 0);
-		if (summon3 != NULL)
-			summon3->Despawn(100, 0);
-		if (summon4 != NULL)
-			summon4->Despawn(100, 0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -1494,13 +1476,8 @@ public:
 
 	KARATHRESSAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		_unit->DamageDoneModPCT[0] = 0;
-		_unit->DamageDoneModPCT[1] = 0;
-		_unit->DamageDoneModPCT[2] = 0;
-		_unit->DamageDoneModPCT[3] = 0;
-		_unit->DamageDoneModPCT[4] = 0;
-		_unit->DamageDoneModPCT[5] = 0;
-		_unit->DamageDoneModPCT[6] = 0;
+		for(uint32 x = 0; x<7;x++)
+			_unit->DamageDoneModPCT[x] = 0;
 
 		m_eventstarted = false;
 		sharkkisalive = true;
@@ -1559,13 +1536,9 @@ public:
 		m_enrage--;
 		if (!m_enrage && !enraged)
 		{
-			_unit->DamageDoneModPCT[0] = 5;
-			_unit->DamageDoneModPCT[1] = 5;
-			_unit->DamageDoneModPCT[2] = 5;
-			_unit->DamageDoneModPCT[3] = 5;
-			_unit->DamageDoneModPCT[4] = 5;
-			_unit->DamageDoneModPCT[5] = 5;
-			_unit->DamageDoneModPCT[6] = 5;
+			for(uint32 x = 0; x<7;x++)
+				_unit->DamageDoneModPCT[x] = 5;
+
 			enraged = 1;
 		}
 		cataclymboltcd--;
