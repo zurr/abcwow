@@ -5143,41 +5143,14 @@ void Aura::SpellAuraAddFarSight(bool apply)
 
 void Aura::SpellAuraMechanicImmunity(bool apply)
 {
-//sLog.outString( "Aura::SpellAuraMechanicImmunity begun." );
 	if( apply )
 	{
-		//sLog.outString( "mod->m_miscValue = %u" , (uint32) mod->m_miscValue );
-		//sLog.outString( "Incrementing MechanicsDispels (current value: %u, new val: %u)" , m_target->MechanicsDispels[mod->m_miscValue] , m_target->MechanicsDispels[mod->m_miscValue] + 1 );
 		assert(mod->m_miscValue < 27);
 		m_target->MechanicsDispels[mod->m_miscValue]++;
 
+
 		if( mod->m_miscValue != 16 && mod->m_miscValue != 25 && mod->m_miscValue != 19 ) // dont remove bandages, Power Word and protection effect
 		{
-			/*
-			sLog.outString( "Removing values because we're not a bandage, PW:S or forbearance" );
-			for(uint32 x=MAX_POSITIVE_AURAS;x<MAX_AURAS;x++)
-				if(m_target->m_auras[x])
-				{
-					sLog.outString( "Found aura in %u" , x );
-					if(m_target->m_auras[x]->GetSpellProto()->MechanicsType == (uint32)mod->m_miscValue)
-					{
-						sLog.outString( "Removing aura: %u, ID %u" , x , m_target->m_auras[x]->GetSpellId() );
-						m_target->m_auras[x]->Remove();
-					}
-					else if(mod->m_miscValue == 11) // if got immunity for slow, remove some that are not in the mechanics
-					{
-						sLog.outString( "Removing roots" );
-						for( int i = 0; i <3 ; i++ )
-							if( m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED )
-							{
-								sLog.outString( "Removed snare aura in slot %u, spellid %u" , x , m_target->m_auras[x]->GetSpellId() );
-								m_target->m_auras[x]->Remove();
-								break;
-							}
-					}
-				}
-			*/
-			/* Supa's test run of Unit::RemoveAllAurasByMechanic */
 			if( m_target != NULL ) // just to be sure?
 			{
 				m_target->RemoveAllAurasByMechanic( (uint32)mod->m_miscValue , -1 , false );

@@ -3266,50 +3266,52 @@ public:
 	}
 
 	void SpellCast(float val)
-	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-		{
+    {
+        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+        {
 			float comulativeperc = 0;
-			Unit *target = NULL;
-			for(int i=0; i<nrspells; i++)
+		    Unit *target = NULL;
+			for(int i=0;i<nrspells;i++)
 			{
 				if(!spells[i].perctrigger) continue;
-
+				
 				if(m_spellcheck[i])
 				{
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant);
-						break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					case TARGET_RANDOM_SINGLE:
-						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
-						if (target)
-						{
-							_unit->GetAIInterface()->SetNextTarget(target);
-							_unit->CastSpell(target, spells[i].info, spells[i].instant);
-						}
+						case TARGET_SELF:
+						case TARGET_VARIOUS:
+							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+						case TARGET_ATTACKING:
+							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+						case TARGET_DESTINATION:
+							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+
+						case TARGET_RANDOM_SINGLE:
+							target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
+							if (target)
+							{
+								_unit->GetAIInterface()->SetNextTarget(target);
+								_unit->CastSpell(target, spells[i].info, spells[i].instant);
+							}
 						break;
 					}
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
-		}
-	}
+        }
+    }
 
 	void CastTime()
 	{
