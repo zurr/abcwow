@@ -3024,7 +3024,7 @@ public:
 	SanguinarAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
 		spells[0].info = dbcSpell.LookupEntry(BELLOWING);
-		spells[1].info->MechanicsType = 12;
+		spells[0].info->MechanicsType = 12;
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].cooldown = 30;
