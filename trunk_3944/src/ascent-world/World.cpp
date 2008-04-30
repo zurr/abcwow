@@ -4454,8 +4454,9 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 12042 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[1] = 1 | 8192 | 4194304 | 8388608 | 262144 | 131072 | 536870912 | 524352 | 4 | 4096 | 2 | 2048 | 16;
-		sp->EffectSpellGroupRelation[2] = 1 | 8192 | 4194304 | 8388608 | 262144 | 131072 | 536870912 | 524352 | 4 | 4096 | 2 | 2048 | 16;
+		sp->EffectSpellGroupRelation[0] = 1 | 8192 | 4194304 | 8388608 | 262144 | 131072 | 536870912 | 524352 | 4 | 4096 | 2 | 2048 | 16;
+		sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF;
+		sp->EffectSpellGroupRelation[2] = 0xFFFFFFFF;
 	}
 
 	//mage : Improved Blink
@@ -7906,7 +7907,7 @@ void World::SaveAllPlayers()
 			{
 				mt = getMSTime();
 				itr->second->SaveToDB(false);
-				sLog.outString("Saved player `%s` (level %u) in %ums.", itr->second->GetName(), itr->second->GetUInt32Value(UNIT_FIELD_LEVEL), getMSTime() - mt);
+				//sLog.outString("Saved player `%s` (level %u) in %ums.", itr->second->GetName(), itr->second->GetUInt32Value(UNIT_FIELD_LEVEL), getMSTime() - mt);
 				++count;
 			}
 		}

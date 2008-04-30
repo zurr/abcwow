@@ -1941,7 +1941,7 @@ public:
 #define CN_SPOT_LIGHT							15631
 #define SOLARIAN_WRATH_OF_THE_ASTROMANCER		42783	//Infuses an enemy with Arcane power, causing them to harm nearby allies for 5400 to 6600. Arcane damage after 6 sec.
 #define SOLARIAN_WRATH_OF_THE_ASTROMANCER_BOMB	42787	//The actual spell that triggers the explosion with arcane damage and slow fall
-#define SOLARIAN_ARCANE_MISSILES				33031	//Launches magical missiles at an enemy, inflicting Arcane damage each second for 3 sec. Trigger spell (3000 arcane damage)
+#define SOLARIAN_ARCANE_MISSILES				29955//33031	//Launches magical missiles at an enemy, inflicting Arcane damage each second for 3 sec. Trigger spell (3000 arcane damage)
 #define SOLARIAN_BLINDING_LIGHT					33009	//Hits everyone in the raid for 2280 to 2520 arcane damage. 20sec cooldown.
 #define SOLARIAN_SOLARIANS_TRANSFORM			39117	//Transforms into void walker.
 #define SOLARIAN_VOID_BOLT						39329	//The Void Walker casts this every 10 seconds. It deals 4394 to 5106 shadow damage to the target with the highest aggro.
@@ -3961,8 +3961,8 @@ public:
 		Scene = 0;
 	}
 
-    void OnCombatStart(Unit* mTarget)
-    {
+	void sanityCheck()
+	{
 		Creature* Darkener = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(786.28f, 20.2825f, 48.7285f, 20064);
 		Creature* Sanguinar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(785.825f, -22.1231f, 48.7285f, 20060);
 		Creature* Capernian = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.128f, -12.6735f, 48.7285f, 20062);
@@ -3976,8 +3976,12 @@ public:
 			spawnCreature(CN_CAPERNIAN);
 		if(Telonicus == NULL)
 			spawnCreature(CN_TELONICUS);
+	}
 
-
+    void OnCombatStart(Unit* mTarget)
+    {
+		sanityCheck();
+	
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
 
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
@@ -3996,10 +4000,10 @@ public:
 		Speech = 0;
 		Scene = 0;
 
-		Darkener = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(786.28f, 20.2825f, 48.7285f, 20064);
-		Capernian = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.128f, -12.6735f, 48.7285f, 20062);
-		Telonicus = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.906f, 11.9183f, 48.7285f, 20063);
-		Sanguinar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(785.825f, -22.1231f, 48.7285f, 20060);
+		Unit *Darkener = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(786.28f, 20.2825f, 48.7285f, 20064);
+		Unit *Sanguinar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(785.825f, -22.1231f, 48.7285f, 20060);
+		Unit *Capernian = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.128f, -12.6735f, 48.7285f, 20062);
+		Unit *Telonicus = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(791.906f, 11.9183f, 48.7285f, 20063);
 
 		// Very strange way to do that
 		if (Darkener == NULL || !Darkener->isAlive())
