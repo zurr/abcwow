@@ -3438,7 +3438,7 @@ uint8 Spell::CanCast(bool tolerate)
 						break;
 
 						{
-							if( u_caster->m_special_state & ( UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP | UNIT_STATE_ROOT | UNIT_STATE_STUN | UNIT_STATE_CONFUSE | UNIT_STATE_SNARE ) )
+							if( u_caster->m_special_state & ( UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP | UNIT_STATE_ROOT | UNIT_STATE_STUN | UNIT_STATE_CONFUSE | UNIT_STATE_SNARE | UNIT_STATE_SILENCE ) )
 								break;
 						}
 							break;
@@ -3456,7 +3456,18 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 
 		if( u_caster->m_silenced && m_spellInfo->School != NORMAL_DAMAGE )// can only silence non-physical
-			return SPELL_FAILED_SILENCED;
+		{
+			// HACK FIX
+			switch( m_spellInfo->NameHash )
+			{
+				case SPELL_HASH_ICE_BLOCK: //Ice Block
+				case 0x9840A1A6: //Divine Shield
+						break;
+
+				default:
+					return SPELL_FAILED_SILENCED;
+			}
+		}
 
 		if( target != NULL ) /* -Supalosa- Shouldn't this be handled on Spell Apply? */
 		{
@@ -3487,6 +3498,8 @@ uint8 Spell::CanCast(bool tolerate)
 			{
 				case SPELL_HASH_ICE_BLOCK: //Ice Block
 				case 0x9840A1A6: //Divine Shield
+						break;
+
 				case 0x3DFA70E5: //Will of the Forsaken
 				{
 					if( u_caster->m_special_state & (UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP))
@@ -4434,6 +4447,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_CELESTIAL_FOCUS:		// Celestial Focus
 	case SPELL_HASH_IMPACT:					// Impact
 	case SPELL_HASH_BLACKOUT:				// Blackout
+	case SPELL_HASH_SHADOWFURY:				// Shadowfury
 		{
 			grp = 1;
 			pve = true;
