@@ -34,14 +34,14 @@ public:
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
-		spells[0].perctrigger = 50.0f;
+		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(A_STAR_ARCANE_EXPLOSION);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].cooldown = 5;
-		spells[1].perctrigger = 50.0f;
+		spells[1].perctrigger = 8.0f;
 		spells[1].attackstoptimer = 1000;
 
     }
@@ -201,7 +201,7 @@ public:
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
 		spells[0].cooldown = 12;
-		spells[0].perctrigger = 50.0f;
+		spells[0].perctrigger = 15.0f;
 		spells[0].attackstoptimer = 1000;
 
     }
@@ -363,14 +363,14 @@ public:
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
-		spells[0].perctrigger = 50.0f;
+		spells[0].perctrigger = 20.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(ASTROMANCER_BLAST_WAVE);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].cooldown = 7;
-		spells[1].perctrigger = 60.0f;
+		spells[1].perctrigger = 30.0f;
 		spells[1].attackstoptimer = 1000;
 
     }
@@ -532,7 +532,7 @@ public:
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].cooldown = 15;
-		spells[0].perctrigger = 50.0f;
+		spells[0].perctrigger = 20.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(BLAST_WEAVE);
@@ -546,7 +546,7 @@ public:
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].cooldown = 10;
-		spells[2].perctrigger = 50.0f;
+		spells[2].perctrigger = 10.0f;
 		spells[2].attackstoptimer = 1000;
 
     }
@@ -1043,14 +1043,14 @@ public:
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
-		spells[0].perctrigger = 50.0f;
+		spells[0].perctrigger = 30.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(UPPERCUT);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].cooldown = 20;
-		spells[1].perctrigger = 50.0f;
+		spells[1].perctrigger = 20.0f;
 		spells[1].attackstoptimer = 1000;
 
     }
@@ -1141,8 +1141,7 @@ public:
 
 		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
-			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-												/* If anyone wants to use this function, then leave this note!										 */
+			std::vector<Unit*> TargetTable;
 			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
 			{ 
 				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
@@ -1211,14 +1210,14 @@ public:
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
-		spells[0].perctrigger = 50.0f;
+		spells[0].perctrigger = 40.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(HAWK_CHARGE);
 		spells[1].targettype = TARGET_RANDOM_SINGLE;
 		spells[1].instant = true;
 		spells[1].cooldown = 12;
-		spells[1].perctrigger = 50.0f;
+		spells[1].perctrigger = 30.0f;
 		spells[1].attackstoptimer = 1000;
 		spells[1].mindist2cast = 15;
 		spells[1].maxdist2cast = 45;
@@ -1381,14 +1380,14 @@ public:
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;
-		spells[0].perctrigger = 50.0f;
+		spells[0].perctrigger = 30.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(CHARGET_ARCANE_EXPLOSION);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = false;
 		spells[1].cooldown = 20;
-		spells[1].perctrigger = 50.0f;
+		spells[1].perctrigger = 20.0f;
 		spells[1].attackstoptimer = 1000;
 
     }
