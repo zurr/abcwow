@@ -8389,8 +8389,7 @@ void Player::SaveAuras(stringstream &ss)
 			bool skip = false;
 			for( uint32 i = 0; i < 3; ++i )
 			{
-				if( aur->m_spellProto->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA ||
-					aur->m_spellProto->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT )
+				if( aur->m_spellProto->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA || aur->m_spellProto->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT )
 				{
 					skip = true;
 					break;

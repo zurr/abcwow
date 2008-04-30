@@ -1042,7 +1042,7 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 
 	m_mainLock.Acquire();
 	if( plr->m_bgTeam > 1 )
-		plr->m_bgTeam = ( plr->GetTeam() > 1 )?1:plr->GetTeam();
+		plr->m_bgTeam = plr->GetTeam();
 
 	m_players[plr->m_bgTeam].erase(plr);
 	DistributePacketToAll(&data);
@@ -1052,9 +1052,10 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	plr->m_bg = NULL;
 
 	/* are we in the group? */
+	/* crashes us too often - no idea why plr->m_bgTeam is checked
 	if(plr->GetGroup() == m_groups[plr->m_bgTeam])
 		plr->GetGroup()->RemovePlayer( plr->m_playerInfo );
-
+	*/
 	// reset team
 	plr->m_bgTeam=plr->GetTeam();
 
