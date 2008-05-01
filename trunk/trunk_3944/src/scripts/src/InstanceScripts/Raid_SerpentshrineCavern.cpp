@@ -90,6 +90,11 @@ public:
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You are the disease, not I");
 			break;
 		}
+
+		GameObject* _gate = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(47.7567f, -581.829f, 4.65559f, 184568);
+		if( _gate != NULL)
+			_gate->SetUInt32Value(GAMEOBJECT_STATE, 0);
+
 		RemoveAIUpdateEvent();
 	}
 
@@ -331,7 +336,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -373,7 +377,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -761,7 +764,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void AIUpdate()
@@ -907,7 +909,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void AIUpdate()
@@ -2295,7 +2296,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -2344,7 +2344,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -3415,14 +3414,13 @@ public:
 		{
 			forgedlightningcd--;
 		}
-		int val;
+
 		if (taintedelemtalcd)
 		{
 			if (!enchantedelemtalcd)
 			{
-				val = RandomUInt(100)%9;
 				Creature *summon;
-				switch (val)
+				switch (RandomUInt(100)%9)
 				{
 				case 0:
 					summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, 95.416428f, -858.470093f, 20.874939f, 3.928170f, true, false, 0, 0);
@@ -3462,9 +3460,8 @@ public:
 		}
 		else
 		{
-			val = RandomUInt(100)%9;
 			Creature *summon;
-			switch (val)
+			switch (RandomUInt(100)%9)
 			{
 			case 0:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 95.416428f, -858.470093f, 20.874939f, 3.928170f, true, false, 0, 0);
@@ -3704,7 +3701,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(5000, 0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -3911,7 +3907,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(5000, 0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -4109,13 +4104,8 @@ public:
 		switch (iWaypointId)
 		{
 		case 10:
-			vashj->DamageDoneModPCT[0] += 0.05f;
-			vashj->DamageDoneModPCT[1] += 0.05f;
-			vashj->DamageDoneModPCT[2] += 0.05f;
-			vashj->DamageDoneModPCT[3] += 0.05f;
-			vashj->DamageDoneModPCT[4] += 0.05f;
-			vashj->DamageDoneModPCT[5] += 0.05f;
-			vashj->DamageDoneModPCT[6] += 0.05f;
+			for (uint32 x = 0; x<7; x++)
+				vashj->DamageDoneModPCT[x] += 0.05f;
 			_unit->Despawn(100, 0);
 			break;
 		default:
@@ -4182,7 +4172,6 @@ public:
 		if (vashj && vashj->isAlive())
 			vashj->SetUInt32Value(UNIT_FIELD_HEALTH, vashj->GetUInt32Value(UNIT_FIELD_HEALTH) - (vashj->GetUInt32Value(UNIT_FIELD_MAXHEALTH) / 20));
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -4257,7 +4246,6 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void AIUpdate()
