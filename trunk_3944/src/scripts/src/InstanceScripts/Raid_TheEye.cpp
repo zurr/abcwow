@@ -3859,8 +3859,8 @@ public:
 	KaelThasAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 0, RUN));
-		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(2, 0, FLY));
-		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(3, 0, FLY));
+		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(2, 0, RUN));
+		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(3, 0, RUN));
 		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_DONTMOVEWP);
 
 		nrspells = 2;
