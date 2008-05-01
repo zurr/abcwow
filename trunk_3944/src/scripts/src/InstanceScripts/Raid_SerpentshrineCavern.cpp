@@ -3496,9 +3496,8 @@ public:
 		}
 		if (!coilfangelitecd)
 		{
-			val = RandomUInt(100)%9;
 			Creature *summon;
-			switch (val)
+			switch (RandomUInt(100)%9)
 			{
 			case 0:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, 95.416428f, -858.470093f, 20.874939f, 3.928170f, true, false, 0, 0);
@@ -3536,15 +3535,13 @@ public:
 		}
 		if (!coilfangstridercd)
 		{
-			val = RandomUInt(100)%2;
-			Creature *summon;
-			switch (val)
+			switch (RandomUInt(100)%2)
 			{
 			case 0:
-				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.615667f, -1017.765625f, 21.570890f, 1.557591f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.615667f, -1017.765625f, 21.570890f, 1.557591f, true, false, 0, 0);
 				break;
 			case 1:
-				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.688040f, -827.500061f, 20.697882f, 4.703711f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.688040f, -827.500061f, 20.697882f, 4.703711f, true, false, 0, 0);
 				break;
 			}
 			coilfangstridercd = 62;

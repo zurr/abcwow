@@ -2822,10 +2822,11 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		Unit *uIllhoof = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), 
-			_unit->GetPositionZ(), CN_ILLHOOF);
-		if(uIllhoof != NULL && uIllhoof->isAlive())
-			uIllhoof->RemoveAura(SACRIFICE);
+		for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
+		{ //this is faster than checking if aura exists first
+			if ((*itr) && (*itr)->isAlive())
+				(*itr)->RemoveAura(SACRIFICE);
+		}
 
 		_unit->Despawn(10000, 0);
 	}
@@ -2902,7 +2903,7 @@ public:
 		}
 
 		spells[0].info = dbcSpell.LookupEntry(SW_PAIN);
-		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
 		spells[0].cooldown = 15;	
 		spells[0].perctrigger = 50.0f;
@@ -3381,7 +3382,7 @@ protected:
 	uint32 m_enfeebleoff;
 	uint32 m_spawn_infernal;
 	uint64 Enfeeble_Targets[5];
-	uint64 Enfeeble_Health[5];
+	uint32 Enfeeble_Health[5];
 	Creature *InfernalDummy;
 	GameObject *MDoor;
 };
@@ -3932,8 +3933,6 @@ public:
 		if(m_FlyPhaseTimer > 15)
 			return;
 
-		Unit *target = NULL;
-
 		//first cast
 		if(m_FlyPhaseTimer == 15)
 		{
@@ -3947,25 +3946,24 @@ public:
 		//Shoots powerful Smoking Blast every second for approximately 15 seconds.
 		if (_unit->GetAIInterface()->GetNextTarget() != NULL)
 		{
-			target = _unit->GetAIInterface()->GetNextTarget();
+			Unit *target = _unit->GetAIInterface()->GetNextTarget();
 			_unit->CastSpell(target, dbcSpell.LookupEntry(SMOKING_BLAST), true);
 		}
 
-		target = NULL;
 		//fireball barrage check
-		for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
+		/* this is silly
+		for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 		{
-			if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->GetInstanceID() == _unit->GetInstanceID())
+			if ((*itr) && (*itr)->isAlive() && (*itr)->GetInstanceID() == _unit->GetInstanceID())
 			{
-				target = static_cast< Unit* >(*itr);
-
 				if(_unit->GetDistance2dSq(target) > 2025) //45 yards
 				{
 					_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), dbcSpell.LookupEntry(FIREBALL_BARRAGE), true);
-					break; //stop
+					break;
 				}
 			}
 		}
+		*/
 	}
 
 	void GroundPhase()
@@ -4111,8 +4109,7 @@ public:
 
 		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
-			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-												/* If anyone wants to use this function, then leave this note!										 */
+			std::vector<Unit*> TargetTable;
 			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
 			{
 				if (((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID())
