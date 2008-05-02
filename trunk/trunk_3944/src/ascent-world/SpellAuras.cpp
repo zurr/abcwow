@@ -427,12 +427,25 @@ void Aura::Remove()
 	
 	// trigger spells on aura removal
 	uint32 triggerSpell = 0;
-	Unit *newTarget, *newCaster = GetUnitCaster();
+	Unit *newTarget = GetUnitCaster();
+	Unit *newCaster = newTarget;
 
 	switch (m_spellProto->Id)
 	{
 	case 19386: //Wyvern Sting r1
-		triggerSpell = 24336;
+		triggerSpell = 24131;
+		newTarget = m_target;
+	break;
+	case 24132: //Wyvern Sting r2
+		triggerSpell = 24134;
+		newTarget = m_target;
+	break;
+	case 24133: //Wyvern Sting r3
+		triggerSpell = 24135;
+		newTarget = m_target;
+	break;
+	case 27068: //Wyvern Sting r4
+		triggerSpell = 27069;
 		newTarget = m_target;
 	break;
 	case 66: //Invisibility
