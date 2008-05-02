@@ -463,7 +463,7 @@ void Aura::Remove()
 			spe->prepare(&tgt);
 		}
 	}
-
+/*
 	for( uint32 x = 0; x < 3; x++ )
 	{
 		if( !m_spellProto->Effect[x] )
@@ -479,7 +479,7 @@ void Aura::Remove()
 			RemoveAA();
 		}
 	}
-
+*/
 	if( m_spellProto->procCharges > 0 && m_spellProto->proc_interval == 0 )
 	{
 		if( m_target->m_chargeSpellsInUse )
