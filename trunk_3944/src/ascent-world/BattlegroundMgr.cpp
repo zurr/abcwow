@@ -18,9 +18,6 @@
  */
 
 #include "StdAfx.h"
-
-#define ENABLE_AB
-#define ENABLE_EOTS
 //#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
 
 initialiseSingleton(CBattlegroundManager);
@@ -41,19 +38,11 @@ const static CreateBattlegroundFunc BGCFuncs[BATTLEGROUND_NUM_TYPES] = {
 	NULL,						// 0
 	NULL,						// AV
 	&WarsongGulch::Create,		// WSG
-#ifdef ENABLE_AB
 	&ArathiBasin::Create,		// AB
-#else
-	NULL,						// AB
-#endif
 	NULL,						// 2v2
 	NULL,						// 3v3
 	NULL,						// 5v5
-#ifdef ENABLE_EOTS
 	&EyeOfTheStorm::Create,		// Netherstorm
-#else
-	NULL,						// Netherstorm
-#endif
 };
 
 CBattlegroundManager::CBattlegroundManager() : EventableObject()
@@ -113,7 +102,7 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, Worl
 	uint32 instance;
 
 	pck >> guid >> bgtype >> instance;
-	if(bgtype >= BATTLEGROUND_NUM_TYPES)
+	if(bgtype >= BATTLEGROUND_NUM_TYPES || guid == 0 )
 		return;		// cheater!
 
 	/* Check the instance id */
@@ -271,11 +260,25 @@ void CBattlegroundManager::EventQueueUpdate()
 					}
 				}
 			}
+			
+			uint32 pInTeam = 1;
+			switch(i)
+			{
+			case BATTLEGROUND_ARENA_2V2:
+				pInTeam = 1;
+			break;
+			case BATTLEGROUND_ARENA_3V3:
+				pInTeam = 3;
+			break;
+			case BATTLEGROUND_ARENA_5V5:
+				pInTeam = 5;
+			break;
+			}
 
 			if(IS_ARENA(i))
 			{
 				// enough players to start a round?
-				if(tempPlayerVec[0].size() < 2)
+				if(tempPlayerVec[0].size() < 2*pInTeam )
 					continue;
 
 				if(CanCreateInstance(i,j))
