@@ -425,6 +425,32 @@ void Aura::Remove()
 	// reset diminishing return timer if needed
 	::UnapplyDiminishingReturnTimer( m_target, m_spellProto );
 	
+	// trigger spells on aura removal
+	uint32 triggerSpell = 0;
+	Unit *newTarget, *newCaster = GetUnitCaster();
+
+	switch (m_spellProto->Id)
+	{
+	case 19386: //Wyvern Sting r1
+		triggerSpell = 24336;
+		newTarget = m_target;
+	break;
+	case 66: //Invisibility
+		triggerSpell = 32612;
+	break;
+	}
+
+	if ( triggerSpell && newTarget != NULL && newCaster != NULL )
+	{
+		SpellEntry* sp = dbcSpell.LookupEntryForced( triggerSpell );
+		if ( sp != NULL  )
+		{
+			Spell* spe = new Spell( newCaster, sp, true, NULL );
+			SpellCastTargets tgt( newTarget->GetGUID() );
+			spe->prepare(&tgt);
+		}
+	}
+
 	for( uint32 x = 0; x < 3; x++ )
 	{
 		if( !m_spellProto->Effect[x] )
