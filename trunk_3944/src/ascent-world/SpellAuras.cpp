@@ -425,52 +425,22 @@ void Aura::Remove()
 	// reset diminishing return timer if needed
 	::UnapplyDiminishingReturnTimer( m_target, m_spellProto );
 	
-	// trigger spells on aura removal
-	uint32 triggerSpell = 0;
-	Unit *newTarget = GetUnitCaster();
-	Unit *newCaster = newTarget;
-
-	switch (m_spellProto->Id)
-	{
-	case 19386: //Wyvern Sting r1
-		triggerSpell = 24131;
-		newTarget = m_target;
-	break;
-	case 24132: //Wyvern Sting r2
-		triggerSpell = 24134;
-		newTarget = m_target;
-	break;
-	case 24133: //Wyvern Sting r3
-		triggerSpell = 24135;
-		newTarget = m_target;
-	break;
-	case 27068: //Wyvern Sting r4
-		triggerSpell = 27069;
-		newTarget = m_target;
-	break;
-	case 66: //Invisibility
-		triggerSpell = 32612;
-	break;
-	}
-
-	if ( triggerSpell && newTarget != NULL && newCaster != NULL )
-	{
-		SpellEntry* sp = dbcSpell.LookupEntryForced( triggerSpell );
-		if ( sp != NULL  )
-		{
-			Spell* spe = new Spell( newCaster, sp, true, NULL );
-			SpellCastTargets tgt( newTarget->GetGUID() );
-			spe->prepare(&tgt);
-		}
-	}
-/*
+	//remove triggered spells by this spell
 	for( uint32 x = 0; x < 3; x++ )
 	{
 		if( !m_spellProto->Effect[x] )
-			break;
+			continue;
 
 		if( m_spellProto->Effect[x] == SPELL_EFFECT_TRIGGER_SPELL )
 		{
+			SpellEntry* sp = dbcSpell.LookupEntryForced( GetSpellProto()->EffectTriggerSpell[x] );
+			if ( sp != NULL  )
+			{
+				SpellDuration *dur = dbcSpellDuration.LookupEntry( sp->DurationIndex );
+				if ( dur == NULL || dur->Duration1 > 0 )
+					continue;
+			}
+
 			//if(GetSpellProto()->EffectTriggerSpell[x]!=GetSpellId())
 			m_target->RemoveAura( GetSpellProto()->EffectTriggerSpell[x] );
 		}
@@ -479,7 +449,7 @@ void Aura::Remove()
 			RemoveAA();
 		}
 	}
-*/
+
 	if( m_spellProto->procCharges > 0 && m_spellProto->proc_interval == 0 )
 	{
 		if( m_target->m_chargeSpellsInUse )
@@ -497,6 +467,48 @@ void Aura::Remove()
 				else
 					m_target->m_chargeSpells.erase(iter);
 			}
+		}
+	}
+
+		// trigger spells on aura removal
+	uint32 triggerSpell = 0;
+	Unit *newTarget = GetUnitCaster();
+	Unit *newCaster = newTarget;
+
+	if ( m_spellProto != NULL )
+	{
+		switch (m_spellProto->Id)
+		{
+		case 19386: //Wyvern Sting r1
+			triggerSpell = 24131;
+			newTarget = m_target;
+		break;
+		case 24132: //Wyvern Sting r2
+			triggerSpell = 24134;
+			newTarget = m_target;
+		break;
+		case 24133: //Wyvern Sting r3
+			triggerSpell = 24135;
+			newTarget = m_target;
+		break;
+		case 27068: //Wyvern Sting r4
+			triggerSpell = 27069;
+			newTarget = m_target;
+		break;
+		case 66: //Invisibility
+			triggerSpell = 32612;
+		break;
+		}
+	}
+
+	if ( triggerSpell && newTarget != NULL && newCaster != NULL )
+	{
+		SpellEntry* sp = dbcSpell.LookupEntryForced( triggerSpell );
+		if ( sp != NULL  )
+		{
+			Spell* spe = new Spell( newCaster, sp, true, NULL );
+			SpellCastTargets tgt( newTarget->GetGUID() );
+			spe->prepare(&tgt);
 		}
 	}
 
