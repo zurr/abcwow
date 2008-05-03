@@ -3510,7 +3510,7 @@ void Unit::AddAura(Aura *aur)
 		bool deleteAur = false;
 
 		//check if we already have this aura by this caster -> update duration
-		uint32 aCount = 0;
+		uint32 f = 0;
 		for( uint32 x = 0; x < MAX_AURAS; x++ )
 		{
 			if( m_auras[x] )
@@ -3519,7 +3519,9 @@ void Unit::AddAura(Aura *aur)
 				if( info->NameHash == SPELL_HASH_BLOOD_FURY )
 					continue;
 
-				if(	m_auras[x]->GetSpellProto()->Id != aur->GetSpellId() && ( aur->pSpellId != m_auras[x]->GetSpellProto()->Id ))
+				if(	m_auras[x]->GetSpellProto()->Id != aur->GetSpellId() && 
+					( aur->pSpellId != m_auras[x]->GetSpellProto()->Id ) //if this is a proc spell then it should not remove it's mother : test with combustion later
+					)
 				{
 					// Check for auras by specific type.
 					// Check for auras with the same name and a different rank.
@@ -3541,13 +3543,11 @@ void Unit::AddAura(Aura *aur)
 						}
 					}					   
 				}
-				else if( m_auras[x]->GetSpellId() == aur->GetSpellId() && m_auras[x]->m_casterGuid == aur->m_casterGuid )
+				else if( m_auras[x]->GetSpellId() == aur->GetSpellId() ) // not the best formula to test this I know, but it works until we find a solution
 				{
-					/*
 					if( !aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid )
 						continue;
-						*/
-					aCount++;
+					f++;
 					//if(maxStack > 1)
 					{
 						//update duration,the same aura (update the whole stack whenever we cast a new one)
@@ -3567,24 +3567,12 @@ void Unit::AddAura(Aura *aur)
 							SendMessageToSet(&data,false);
  						}
 					}
-					if(maxStack <= aCount)
+					if(maxStack <= f)
 					{
-						//m_auras[x]->Remove();
 						deleteAur = true;
 						break;
 					}
 				}
-				else if( m_auras[x]->GetSpellId() == aur->GetSpellId() && m_auras[x]->m_casterGuid != aur->m_casterGuid && maxStack > 1)
-				{
-					aCount++;
-					if(maxStack <= aCount)
-					{
-						m_auras[x]->Remove();
-						//deleteAur = true;
-						break;
-					}
-				}
-
 			}
 		}
 		if(deleteAur)
