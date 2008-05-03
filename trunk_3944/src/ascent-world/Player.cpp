@@ -3297,7 +3297,7 @@ void Player::OnPushToWorld()
 	sEventMgr.AddEvent(this, &Player::EventDumpCompressedMovement, EVENT_PLAYER_FLUSH_MOVEMENT, World::m_movementCompressInterval, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 #endif
 
-	if( m_mapMgr->m_battleground != NULL && m_bg != m_mapMgr->m_battleground )
+	if( m_mapMgr != NULL && m_mapMgr->m_battleground != NULL && m_bg != m_mapMgr->m_battleground )
 	{
 		m_bg = m_mapMgr->m_battleground;
 		m_bg->PortPlayer( this, true );
