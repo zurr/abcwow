@@ -1264,19 +1264,13 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		{
 			if(m_target->VampEmbCaster.find(m_casterGuid) != m_target->VampEmbCaster.end())
 			{
-				if(GetUnitCaster() && GetUnitCaster()->isAlive())
-				{
-					if(c)
-						c->VampiricEmbrace(float2int32(res), m_target);
-				}
+				if( c != NULL && c->isAlive() )
+					c->VampiricEmbrace(float2int32(res), m_target);
 			}
 			if(m_target->VampTchCaster.find(m_casterGuid) != m_target->VampTchCaster.end())
 			{
-				if(GetUnitCaster() && GetUnitCaster()->isAlive())
-				{
-					if(c)
-						c->VampiricTouch(float2int32(res), m_target);
-				}
+				if( c != NULL && c->isAlive() )
+					c->VampiricTouch(float2int32(res), m_target);
 			}
 		}
 	}
@@ -1797,12 +1791,13 @@ void Aura::SpellAuraDummy(bool apply)
 			if( apply )
 			{
 				SetNegative();
-				Unit * caster =this->GetUnitCaster();
-				if(caster) m_target->VampEmbCaster.insert(caster->GetGUID());
+				Unit * caster = this->GetUnitCaster();
+				if( caster && m_target->VampEmbCaster.find( caster->GetGUID() ) == m_target->VampEmbCaster.end() )
+					m_target->VampEmbCaster.insert(caster->GetGUID());
 			}
 			else
 			{
-				Unit * caster =this->GetUnitCaster();
+				Unit * caster = this->GetUnitCaster();
 				if(caster)
 				{
 					std::set<uint64>::iterator itr = m_target->VampEmbCaster.find(caster->GetGUID());
@@ -1819,11 +1814,12 @@ void Aura::SpellAuraDummy(bool apply)
 			{
 				SetNegative();
 				Unit * caster = this->GetUnitCaster();
-				if(caster) m_target->VampTchCaster.insert(caster->GetGUID());
+				if( caster && m_target->VampTchCaster.find( caster->GetGUID() ) == m_target->VampTchCaster.end() )
+					m_target->VampTchCaster.insert( caster->GetGUID() );
 			}
 			else
 			{
-				Unit * caster =this->GetUnitCaster();
+				Unit * caster = this->GetUnitCaster();
 				if(caster)
 				{
 					std::set<uint64>::iterator itr = m_target->VampTchCaster.find(caster->GetGUID());
