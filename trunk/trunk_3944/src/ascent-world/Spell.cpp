@@ -978,7 +978,11 @@ void Spell::prepare( SpellCastTargets * targets )
 		m_castTime = 0;
 	else
 	{
-		m_castTime = GetCastTime( dbcSpellCastTime.LookupEntry( m_spellInfo->CastingTimeIndex ) );
+		SpellCastTime *time = dbcSpellCastTime.LookupEntry( m_spellInfo->CastingTimeIndex );
+		if ( time == NULL )
+			m_castTime = 0;
+		else
+			m_castTime = GetCastTime( time );
 
 		if( m_castTime && m_spellInfo->SpellGroupType && u_caster != NULL )
 		{
