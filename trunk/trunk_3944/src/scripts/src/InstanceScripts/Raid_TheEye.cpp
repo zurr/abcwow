@@ -973,8 +973,7 @@ public:
 
 		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
-			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-												/* If anyone wants to use this function, then leave this note!										 */
+			std::vector<Unit*> TargetTable;
 			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
 			{ 
 				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
@@ -1546,8 +1545,8 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(SAW_BLADE);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
-		spells[0].cooldown = 6;
-		spells[0].perctrigger = 100.0f;
+		spells[0].cooldown = 10;
+		spells[0].perctrigger = 20.0f;
 		spells[0].attackstoptimer = 1000;
 		spells[0].mindist2cast = 0.0f;
 		spells[0].maxdist2cast = 40.0f;

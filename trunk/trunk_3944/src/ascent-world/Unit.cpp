@@ -3159,7 +3159,7 @@ else
 		{
 			Player* owner = GetMapMgr()->GetPlayer((uint32)GetUInt64Value(UNIT_FIELD_SUMMONEDBY));
 			if ( owner != NULL )
-				this->Energize(owner, 34433, 2*realdamage, POWER_TYPE_MANA );
+				this->Energize(owner, 34433, uint32(2.5f*realdamage + 0.5f), POWER_TYPE_MANA );
 		}
 
 	}
@@ -5299,7 +5299,7 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 			continue;
 
 		//some spells do not get removed all the time only at specific intervals
-		if( ( a->m_spellProto->AuraInterruptFlags & flag ) && ( a->m_spellProto->Id != skip ) && a->m_spellProto->proc_interval == 0 )
+		if( a->m_spellProto && ( a->m_spellProto->AuraInterruptFlags & flag ) && ( a->m_spellProto->Id != skip ) && a->m_spellProto->proc_interval == 0 )
 		{
 			//the black sheeps of sociaty
 			if( a->m_spellProto->AuraInterruptFlags & AURA_INTERRUPT_ON_CAST_SPELL )
