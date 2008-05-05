@@ -5,8 +5,8 @@
 
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\
 
-static const char * REVISION_TEXT	= "$Rev: 3850 $";
-static const char * BUILD_TAG		= "3.8-TRUNK";
+static const char * REVISION_TEXT	= "$Rev: 3944 $";
+static const char * BUILD_TAG		= "3.8-TRUNK-ABC";
 
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\
 

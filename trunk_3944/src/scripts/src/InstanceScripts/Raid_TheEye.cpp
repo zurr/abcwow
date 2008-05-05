@@ -686,8 +686,8 @@ protected:
 // BLOODWARDER VINDICATOR
 #define CN_BLOOD_VINDICATOR	20032
 
-#define HAMMER_OF_JUSTICE 32416
-#define FLASH_HEAL 38588
+#define HAMMER_OF_JUSTICE 13005
+#define FLASH_OF_LIGHT 37249
 
 class BloodVindicatorAI : public CreatureAIScript
 {
@@ -710,12 +710,12 @@ public:
 		spells[0].perctrigger = 50.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(FLASH_HEAL);
+		spells[1].info = dbcSpell.LookupEntry(FLASH_OF_LIGHT);
 		spells[1].targettype = TARGET_SELF;
 		spells[1].instant = false;
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 50.0f;
-		spells[1].attackstoptimer = 1000;
+		spells[1].attackstoptimer = 1500;
 
     }
     
