@@ -1040,26 +1040,29 @@ void CBattlegroundManager::SendBattlefieldStatus(Player * plr, uint32 Status, ui
 
 void CBattleground::RemovePlayer(Player * plr, bool logout)
 {
+
 	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_LEFT, 30);
 	data << plr->GetGUID();
-
+	if ( plr->m_isGmInvisible == false )
+	{
+		//Dont show invisble gm's leaving the game.
+		DistributePacketToAll(&data);
+	}
 	m_mainLock.Acquire();
 	if( plr->m_bgTeam > 1 )
 		plr->m_bgTeam = plr->GetTeam();
-
 	m_players[plr->m_bgTeam].erase(plr);
-	DistributePacketToAll(&data);
 
 	memset(&plr->m_bgScore, 0, sizeof(BGScore));
 	OnRemovePlayer(plr);
-	plr->m_bg = NULL;
+	plr->m_bg = 0;
 
 	/* are we in the group? */
-	if(plr->GetGroup() != NULL /*== m_groups[plr->m_bgTeam]*/)
+	if( plr->GetGroup() != NULL && plr->GetGroup() == m_groups[plr->m_bgTeam])
 		plr->GetGroup()->RemovePlayer( plr->m_playerInfo );
-	
+
 	// reset team
-	plr->m_bgTeam=plr->GetTeam();
+	plr->ResetTeam();
 
 	/* revive the player if he is dead */
 	if(!plr->isAlive())

@@ -614,6 +614,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 	bool can_delete = !bProcInUse; //if this is a nested proc then we should have this set to TRUE by the father proc
 	bProcInUse = true; //locking the proc list
 
+	if ( m_procSpells.size() == 0 || m_procSpells.begin() == m_procSpells.end() )
+		return; // 2 of those should be the same but i've still added the 2nd in case
+
 	std::list< struct ProcTriggerSpell >::iterator itr,itr2;
 	for( itr = m_procSpells.begin(); itr != m_procSpells.end(); )  // Proc Trigger Spells for Victim
 	{
@@ -4391,6 +4394,9 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 		}break;
 	case CHAT_MSG_MONSTER_YELL:
 		{
+			if ( m_mapMgr == NULL )
+				return;
+
 			uint32 cell_radius = 2;
 			uint32 cellX = m_mapMgr->GetPosX(GetPositionX());
 			uint32 cellY = m_mapMgr->GetPosY(GetPositionY());
