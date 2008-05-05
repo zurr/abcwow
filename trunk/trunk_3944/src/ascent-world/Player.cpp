@@ -4477,7 +4477,11 @@ void Player::UpdateChances()
 	defence_contribution += CalcRating( PLAYER_RATING_MODIFIER_DEFENCE ) * 0.04f;
 
 	// dodge
-	tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[69][pClass] );
+	if( dodgeRatio[pLevel - 1][pClass] != 0.0f ) {
+		tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pLevel - 1][pClass] );
+	} else {
+		tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[69][pClass] );
+	}
 	tmp += CalcRating( PLAYER_RATING_MODIFIER_DODGE ) + this->GetDodgeFromSpell();
 	tmp += defence_contribution;
 	if( tmp < 0.0f )tmp = 0.0f;
