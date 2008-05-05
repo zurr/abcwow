@@ -913,8 +913,8 @@ public:
 		return false;
 	}
 	ASCENT_INLINE int          HasBeenInvited() { return m_GroupInviter != 0; }
-	ASCENT_INLINE Group*       GetGroup() { return m_playerInfo->m_Group; }
-	ASCENT_INLINE int8		   GetSubGroup() { return m_playerInfo->subGroup; }
+	ASCENT_INLINE Group*       GetGroup() { return (m_playerInfo != NULL) ? m_playerInfo->m_Group : NULL; }
+	ASCENT_INLINE int8		   GetSubGroup() { return (m_playerInfo != NULL) ? m_playerInfo->subGroup : NULL; }
     bool                IsGroupMember(Player *plyr);
 	ASCENT_INLINE bool         IsBanned()
 	{
