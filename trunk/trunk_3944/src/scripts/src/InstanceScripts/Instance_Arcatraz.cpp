@@ -5005,7 +5005,7 @@ public:
 			RandomTarget = NULL;
 		}
 
-		if (!TargetTable.size())
+		if (TargetTable.empty())
 			return;
 
 		size_t RandTarget = rand()%TargetTable.size();
@@ -5111,7 +5111,7 @@ public:
 				RandomTarget = NULL;
 			}
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();

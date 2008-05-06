@@ -1142,7 +1142,7 @@ public:
 		pPitCommander = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords( -249.119995f, 1169.209961f, 41.552101f, PIT_COMMANDER );
 
 		// We run through whole Infernal list
-		if ( InfernalTable.size() )
+		if ( !InfernalTable.empty() )
 		{
 			// We create backup list to recreate our default list later and check all infernals
 			Creature* pInfernal;
@@ -1590,7 +1590,7 @@ public:
 			if (_unit->GetHealthPct() <= health && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -2013,7 +2013,7 @@ public:
 			if (_unit->GetHealthPct() <= health && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -2662,7 +2662,7 @@ public:
 			if (_unit->GetHealthPct() <= health && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -3081,7 +3081,7 @@ public:
 			if (_unit->GetHealthPct() <= health && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();

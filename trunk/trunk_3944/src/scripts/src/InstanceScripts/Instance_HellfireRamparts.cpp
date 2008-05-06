@@ -1574,7 +1574,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -1890,7 +1890,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();

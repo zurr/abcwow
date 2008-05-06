@@ -472,7 +472,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -663,7 +663,7 @@ public:
 									TargetTable.push_back(RandomTarget);
 							}
 							
-							if (!TargetTable.size())
+							if (TargetTable.empty())
 								return;
 							
 							size_t RandTarget = rand()%TargetTable.size();
@@ -2069,7 +2069,7 @@ public:
 					TargetTable.push_back(RandomTarget);
 			}
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -2420,7 +2420,7 @@ public:
 				if (RandomTarget) TargetTable.push_back(RandomTarget);
 			}
 		}
-		if (!TargetTable.size())
+		if (TargetTable.empty())
 			return;
 
 		size_t RandTarget = rand()%TargetTable.size();
@@ -2610,7 +2610,7 @@ public:
 				}
 			}
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -3351,7 +3351,7 @@ public:
 					TargetTable.push_back(RandomTarget);
 			}
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -3497,7 +3497,7 @@ public:
 			}
 		}
 
-		if (!TargetTable.size())
+		if (TargetTable.empty())
 			return;
 
 		size_t RandTarget = rand()%TargetTable.size();
@@ -3633,7 +3633,7 @@ public:
 					TargetTable.push_back(RandomTarget);
 			}
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -4124,7 +4124,7 @@ public:
 				} 
 			}
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			Unit * RTarget = *(TargetTable.begin()+rand()%TargetTable.size());
@@ -4320,7 +4320,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
