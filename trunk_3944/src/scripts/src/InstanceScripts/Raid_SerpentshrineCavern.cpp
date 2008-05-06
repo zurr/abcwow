@@ -284,7 +284,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -629,7 +629,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -653,7 +653,7 @@ public:
 				targetTable.push_back(temp);
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return 0;
 
 		return (int)targetTable.size();
@@ -1331,7 +1331,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -1355,7 +1355,7 @@ public:
 				targetTable.push_back(temp);
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return 0;
 
 		return (int)targetTable.size();
@@ -1624,7 +1624,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -2053,7 +2053,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -2775,7 +2775,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -2799,7 +2799,7 @@ public:
 				targetTable.push_back(temp);
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return 0;
 
 		return (int)targetTable.size();
@@ -2818,7 +2818,7 @@ public:
 			if (temp->isAlive())
 				targetTable.push_back(temp);
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -3083,7 +3083,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -3337,7 +3337,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -4291,7 +4291,7 @@ public:
 			if (temp->isAlive())
 				targetTable.push_back(temp);
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -4598,7 +4598,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();
@@ -4834,7 +4834,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();

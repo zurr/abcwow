@@ -1303,7 +1303,7 @@ public:
 				}
 			}
 		}
-		if (!targetTable.size())
+		if (targetTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%targetTable.size();

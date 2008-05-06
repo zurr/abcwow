@@ -288,7 +288,7 @@ public:
 
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
-			if (!TargetTable.size())
+			if (TargetTable.empty())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -2452,7 +2452,7 @@ protected:
 void SetupZulAman(ScriptMgr * mgr)
 {
 	mgr->register_creature_script(CN_NALORAKK, &NalorakkAI::Create);
-	/*mgr->register_creature_script(AKILZON, &AKILZONAI::Create);
+	mgr->register_creature_script(AKILZON, &AKILZONAI::Create);
 	mgr->register_creature_script(HALAZZI, &HALAZZIAI::Create);
 	mgr->register_creature_script(JANALAI, &JANALAIAI::Create);
 	mgr->register_creature_script(HEX_LORD_MALACRASS, &HEXLORDMALACRASSAI::Create);
@@ -2468,5 +2468,5 @@ void SetupZulAman(ScriptMgr * mgr)
 	mgr->register_creature_script(FENSTALKER, &FENSTALKERAI::Create);
 	mgr->register_creature_script(ALYSON_ANTILLE, &ALYSONANTILLEAI::Create);
 	mgr->register_creature_script(KORAGG, &KORAGGAI::Create);
-	mgr->register_creature_script(FEATHER_VORTEX, &FEATHERVORTEXAI::Create);*/
+	mgr->register_creature_script(FEATHER_VORTEX, &FEATHERVORTEXAI::Create);
 }
