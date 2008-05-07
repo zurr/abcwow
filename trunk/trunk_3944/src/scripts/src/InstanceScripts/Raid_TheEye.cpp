@@ -1721,15 +1721,15 @@ public:
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].cooldown = 12;
-		spells[0].perctrigger = 0.0f;
+		spells[0].perctrigger = 20.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(KNOCK_AWAY);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
-		spells[1].cooldown = 20;
-		spells[1].perctrigger = 0.0f;
-		spells[1].attackstoptimer = 1000;
+		spells[1].cooldown = 30;
+		spells[1].perctrigger = 20.0f;
+		spells[1].attackstoptimer = 2000;
 	} 
 
     void OnCombatStart(Unit* mTarget)
@@ -1827,7 +1827,7 @@ public:
 				//2) send the missile
 				_unit->CastSpellAoF(RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER), true);
 			}
-			ArcaneOrbTimer = 5;
+			ArcaneOrbTimer = 6;
 		}
 
 		float val = (float)RandomFloat(100.0f);
@@ -1880,6 +1880,12 @@ public:
 
 						//case 2: doesn't yell
 						}
+					}
+					if(i == 1) //KNOCK_AWAY threat removal from MT
+					{
+						Unit *tgt = _unit->GetAIInterface()->GetMostHated();
+						if ( tgt != NULL )
+							_unit->GetAIInterface()->RemoveThreatByPtr(tgt);
 					}
 
 					m_spellcheck[i] = false;

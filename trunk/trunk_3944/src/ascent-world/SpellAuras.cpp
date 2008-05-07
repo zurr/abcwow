@@ -558,7 +558,8 @@ void Aura::Remove()
 		caster->SendMessageToSet( &data, true );
 	}
 
-	delete this;
+	if ( this != NULL ) // no idea how it can happen, it still does
+		delete this;
 }
 
 void Aura::AddMod( uint32 t, int32 a, uint32 miscValue, uint32 i )
