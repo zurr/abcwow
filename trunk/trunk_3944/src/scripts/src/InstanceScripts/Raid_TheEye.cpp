@@ -2225,9 +2225,9 @@ public:
 
 		spells[4].info = dbcSpell.LookupEntry(METEOR);
 		spells[4].targettype = TARGET_ATTACKING;
-		spells[4].instant = true;	// =(
+		spells[4].instant = true;
 		spells[4].cooldown = 30;
-		spells[4].perctrigger = 0.0f;
+		spells[4].perctrigger = 8.0f;
 		spells[4].attackstoptimer = 1000;
 
 		spells[5].info = dbcSpell.LookupEntry(MELT_ARMOR);
@@ -2845,21 +2845,27 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Prepare yourselves!");
 		_unit->PlaySoundToSet(11203);
 
-		CurrentTarget = mTarget;
-		if (CurrentTarget)
-		{
-			_unit->GetAIInterface()->modThreatByPtr(CurrentTarget, 1000000);
-			if (CurrentTarget->IsPlayer())
-			{
-				Player *pPlayer = (Player*)CurrentTarget;
-				char msg[256];
-				snprintf((char*)msg, 256, " sets his gaze on %s", pPlayer->GetName());
-				_unit->SendChatMessageAlternateEntry(CN_DARKENER, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
-			}
-		}
-
 		for (int i = 0; i < nrspells; i++)
 			spells[i].casttime = spells[i].cooldown;
+
+		std::vector<Player*> TargetTable;					
+		for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
+		{ 
+			if ( (*itr)->isAlive() && (*itr)->GetInstanceID() == _unit->GetInstanceID())
+				TargetTable.push_back((*itr));
+		}
+
+		if (TargetTable.empty())
+			return;
+
+		Player *RTarget = TargetTable[rand()%TargetTable.size()];
+		if ( RTarget == NULL )
+			return;
+
+		_unit->GetAIInterface()->modThreatByPtr(RTarget, 10000000);
+		char msg[256];
+		snprintf((char*)msg, 256, " sets his gaze on %s", RTarget->GetName());
+		_unit->SendChatMessageAlternateEntry(CN_DARKENER, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
     }
 
 	void OnCombatStop(Unit *mTarget)
@@ -2888,18 +2894,24 @@ public:
 
 	void OnTargetDied(Unit *mTarget)
 	{
-		CurrentTarget = _unit->GetAIInterface()->GetMostHated();
-		if (CurrentTarget)
-		{
-			_unit->GetAIInterface()->modThreatByPtr(CurrentTarget, 1000000);
-			if (CurrentTarget->IsPlayer())
-			{
-				Player *pPlayer = (Player*)CurrentTarget;
-				char msg[256];
-				snprintf((char*)msg, 256, " sets his gaze on %s", pPlayer->GetName());
-				_unit->SendChatMessageAlternateEntry(CN_DARKENER, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
-			}
+		std::vector<Player*> TargetTable;					
+		for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
+		{ 
+			if ( (*itr)->isAlive() && (*itr)->GetInstanceID() == _unit->GetInstanceID())
+				TargetTable.push_back((*itr));
 		}
+
+		if (TargetTable.empty())
+			return;
+
+		Player *RTarget = TargetTable[rand()%TargetTable.size()];
+		if ( RTarget == NULL )
+			return;
+
+		_unit->GetAIInterface()->modThreatByPtr(RTarget, 10000000);
+		char msg[256];
+		snprintf((char*)msg, 256, " sets his gaze on %s", RTarget->GetName());
+		_unit->SendChatMessageAlternateEntry(CN_DARKENER, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, msg);
 	}
 	
 	void AIUpdate()
@@ -3309,31 +3321,31 @@ public:
 	
 	TelonicusAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		nrspells = 2; 
+		nrspells = 1; 
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
-		
-		spells[0].info = dbcSpell.LookupEntry(BOMB);
-		spells[0].targettype = TARGET_RANDOM_DESTINATION;
-		spells[0].instant = false;
-		spells[0].cooldown = 15;
-		spells[0].perctrigger = 10.0f;
-		spells[0].attackstoptimer = 2000;
-		spells[0].mindist2cast = 0.0f;
-		spells[0].maxdist2cast = 30.0f;
-
-		spells[1].info = dbcSpell.LookupEntry(REMOTE_TOY);
-		spells[1].info->MechanicsType = 9;
-		spells[1].info->EffectTriggerSpell[0] = 37029; // little fix for dbc issue
-		spells[1].targettype = TARGET_RANDOM_SINGLE;
-		spells[1].instant = true;
+		/*
+		spells[1].info = dbcSpell.LookupEntry(BOMB);
+		spells[1].targettype = TARGET_RANDOM_DESTINATION;
+		spells[1].instant = false;
 		spells[1].cooldown = 15;
 		spells[1].perctrigger = 10.0f;
-		spells[1].attackstoptimer = 1000;
+		spells[1].attackstoptimer = 2000;
 		spells[1].mindist2cast = 0.0f;
 		spells[1].maxdist2cast = 30.0f;
+*/
+		spells[0].info = dbcSpell.LookupEntry(REMOTE_TOY);
+		spells[0].info->MechanicsType = 9;
+		spells[0].info->EffectTriggerSpell[0] = 37029; // little fix for dbc issue
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
+		spells[0].instant = true;
+		spells[0].cooldown = 15;
+		spells[0].perctrigger = 10.0f;
+		spells[0].attackstoptimer = 1000;
+		spells[0].mindist2cast = 0.0f;
+		spells[0].maxdist2cast = 30.0f;
 
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
@@ -4063,7 +4075,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
-		if ( AddPhase <= 6 ) reset();
+		if ( AddPhase < 4 ) reset();
 
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 		_unit->GetAIInterface()->m_canMove = true;
