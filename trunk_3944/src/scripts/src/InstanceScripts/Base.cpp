@@ -275,7 +275,10 @@ GameObject* MoonScriptCreatureAI::GetNearestGameObject(uint32 pGameObjectId)
 MoonScriptCreatureAI* MoonScriptCreatureAI::GetNearestCreature(uint32 pCreatureId)
 {
 	Creature* NearestCreature = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), pCreatureId);
-	return static_cast<MoonScriptCreatureAI*>(NearestCreature->GetScript());
+	if ( NearestCreature != NULL )
+		return static_cast<MoonScriptCreatureAI*>(NearestCreature->GetScript());
+	else
+		return NULL;
 }
 
 MoonScriptCreatureAI* MoonScriptCreatureAI::SpawnCreature(uint32 pCreatureId, bool pForceSameFaction)
@@ -286,6 +289,9 @@ MoonScriptCreatureAI* MoonScriptCreatureAI::SpawnCreature(uint32 pCreatureId, bo
 MoonScriptCreatureAI* MoonScriptCreatureAI::SpawnCreature(uint32 pCreatureId, float pX, float pY, float pZ, float pO, bool pForceSameFaction)
 {
 	Creature* NewCreature = _unit->GetMapMgr()->GetInterface()->SpawnCreature(pCreatureId, pX, pY, pZ, pO, false, false, 0, 0);
+	if ( NewCreature == NULL )
+		return NULL;
+
 	MoonScriptCreatureAI* CreatureScriptAI = static_cast<MoonScriptCreatureAI*>(NewCreature->GetScript());
 	if( pForceSameFaction )
 	{

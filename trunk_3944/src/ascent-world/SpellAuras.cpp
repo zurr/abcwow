@@ -1956,11 +1956,9 @@ void Aura::SpellAuraDummy(bool apply)
 				return;
 
 			Player* pCaster = static_cast< Player* >( Caster );
-			Unit* target_pet;
+			Unit* target_pet = pCaster->GetSummon();
 
-			if( pCaster->GetSummon() ) 
-				target_pet = pCaster->GetSummon();
-			else
+			if( target_pet == NULL ) 
 				return;
 
 			if( apply )
@@ -1987,7 +1985,9 @@ void Aura::SpellAuraDummy(bool apply)
 			}
 			else
 			{
-				Unit* pTarget = pCaster->m_CurrentCharm; 
+				Unit* pTarget = pCaster->m_CurrentCharm;
+				if ( pTarget == NULL )
+					return;
 				pCaster->m_CurrentCharm = 0;
 
 				pTarget->EnableAI();

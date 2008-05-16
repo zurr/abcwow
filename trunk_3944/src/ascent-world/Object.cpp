@@ -364,7 +364,8 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			{
 				//flags2 |= 0x800; //in 2.3 this is some state that i was not able to decode yet
 				//Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
-				flags2 |= MOVEFLAG_NO_COLLISION;
+				//flags2 |= MOVEFLAG_NO_COLLISION;
+				flags2 |= MOVEFLAG_TAXI;
 			}
 
 			if( static_cast< Creature* >(this)->proto && static_cast< Creature* >( this )->proto->extra_a9_flags )

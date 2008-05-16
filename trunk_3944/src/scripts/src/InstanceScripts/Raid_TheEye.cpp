@@ -1885,7 +1885,7 @@ public:
 					{
 						Unit *tgt = _unit->GetAIInterface()->GetMostHated();
 						if ( tgt != NULL )
-							_unit->GetAIInterface()->RemoveThreatByPtr(tgt);
+							_unit->GetAIInterface()->modThreatByPtr(tgt, -int32(_unit->GetAIInterface()->getThreatByPtr(tgt)*0.8f) );
 					}
 
 					m_spellcheck[i] = false;

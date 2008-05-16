@@ -702,6 +702,9 @@ void CBattleground::AddPlayer(Player * plr, uint32 team)
 void CBattleground::RemovePendingPlayer(Player * plr)
 {
 	m_mainLock.Acquire();
+
+	if( plr->m_bgTeam > 1 )
+		plr->m_bgTeam = plr->GetTeam();
 	m_pendPlayers[plr->m_bgTeam].erase(plr->GetGUIDLow());
 
 	/* send a null bg update (so they don't join) */
@@ -732,6 +735,9 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		m_mainLock.Release();
 		return;
 	}
+
+	if( plr->m_bgTeam > 1 )
+		plr->m_bgTeam = plr->GetTeam();
 
 	m_pendPlayers[plr->m_bgTeam].erase(plr->GetGUIDLow());
 	if(m_players[plr->m_bgTeam].find(plr) != m_players[plr->m_bgTeam].end())
@@ -1040,14 +1046,13 @@ void CBattlegroundManager::SendBattlefieldStatus(Player * plr, uint32 Status, ui
 
 void CBattleground::RemovePlayer(Player * plr, bool logout)
 {
-
 	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_LEFT, 30);
-	data << plr->GetGUID();
 	if ( plr->m_isGmInvisible == false )
-	{
-		//Dont show invisble gm's leaving the game.
+	{ //Dont show invisble gm's leaving the game.
+		data << plr->GetGUID();
 		DistributePacketToAll(&data);
 	}
+
 	m_mainLock.Acquire();
 	if( plr->m_bgTeam > 1 )
 		plr->m_bgTeam = plr->GetTeam();
