@@ -1259,9 +1259,6 @@ bool World::SetInitialWorldSettings()
 		else if( strstr( nametext, "Shadow Weaving"))
 		{
 			sp->School = 5;
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			sp->procChance = sp->EffectBasePoints[0] + 1;
-			sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
 		}
 		//Improved Aspect of the Hawk
 		else if( strstr( nametext, "Improved Aspect of the Hawk"))
@@ -2314,26 +2311,6 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 16208 ); 
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = group_relation_shaman_restorative_totems;
-	
-	//shaman - Healing Way
-	sp = dbcSpell.LookupEntryForced( 29202 ); 
-	if( sp != NULL )
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	}
-	sp = dbcSpell.LookupEntryForced( 29205 ); 
-	if( sp != NULL )
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	}
-	sp = dbcSpell.LookupEntryForced( 29206 ); 
-	if( sp != NULL )
-	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-	}
 
 	//shaman - Elemental Devastation
 	sp = dbcSpell.LookupEntryForced( 29179 ); 
@@ -5558,29 +5535,6 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[1] = 18093; //trigger spell was wrong :P
 		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
 		sp->procChance = 26; //god, save us from fixed values !
-	}
-
-	//Mage - Improved Scorch
-	sp = dbcSpell.LookupEntryForced( 11095 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance =33;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = dbcSpell.LookupEntryForced( 12872 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL; 
-		sp->procChance =66;
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-	sp = dbcSpell.LookupEntryForced( 12873 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->procChance =100;
-		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 
 	//Nature's Grasp

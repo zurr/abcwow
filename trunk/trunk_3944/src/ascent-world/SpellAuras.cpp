@@ -1618,7 +1618,32 @@ void Aura::SpellAuraDummy(bool apply)
 				_ptarget->Kick(5000);
 			}
 		}break;
+	//improved sprint effect
+	case 30918:
+		{
+			for( uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; x++ )
+			{
+				if( m_target->m_auras[x] != NULL )
+				{
+					if( m_target->m_auras[x]->GetSpellProto()->MechanicsType == 7 || m_target->m_auras[x]->GetSpellProto()->MechanicsType == 11 ) // Remove roots and slow spells
+					{
+						m_target->m_auras[x]->Remove();
+					}
+					else
+					{
+						for( int i = 0; i < 3; i++ )
+						{
+							if( m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED || m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
+							{
+								m_target->m_auras[x]->Remove();
+								break;
+							}
+						}
+					}
+			   }
+			}
 
+		}break;
 	//paladin - Blessing of Light.
 	case 19977:
 	case 19978:
@@ -6110,32 +6135,47 @@ void Aura::SendDummyModifierLog( std::map< SpellEntry*, uint32 >* m, SpellEntry*
 
 void Aura::SpellAuraAddTargetTrigger(bool apply)
 {
-//	uint32 spellid = GetSpellId();
-//	int32 val = mod->m_amount;
+	SpellEntry *spellInfo = GetSpellProto();
+	if ( spellInfo == NULL || m_casterGuid == NULL )
+		return;
 
-	/*
-	spellid: 11071
-	amount: 5
-	type = 109
-	misc valye 0
+	if( apply )
+	{
+		uint32 trigger_spell_id = spellInfo->EffectTriggerSpell[mod->i];
+		for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
+			if(itr->origId == spellInfo->Id && itr->caster == m_casterGuid && itr->spellId == trigger_spell_id)
+				return;
 
-	spellid = 11095
-	amount 33
-	type 109
-	misc = 0
+		ProcTriggerSpell pts;
+		pts.origId = spellInfo->Id;
+		pts.caster = m_casterGuid;
+		if( trigger_spell_id ) 
+			pts.spellId = trigger_spell_id;
+		else 
+			return;
+		pts.procChance = spellInfo->EffectBasePoints[mod->i] + 1;
+		if ( spellInfo->procFlags == 0 ) 
+			pts.procFlags = PROC_ON_CAST_SPELL;
+		else
+			pts.procFlags = spellInfo->procFlags;
+		pts.procCharges = spellInfo->procCharges;
+		pts.LastTrigger = 0;
+		pts.deleted = false;
+		pts.ProcType = 0;
 
-	spellid = 12499
-	amount 15
-	type 109
-	misc = 0
-
-	spellid = 14179
-	amount 0
-	type 109
-	misc = 0
-
-	*/
-
+		m_target->m_procSpells.push_front(pts);
+	}
+	else
+	{
+		for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
+		{
+			if(itr->origId == spellInfo->Id && itr->caster == m_casterGuid && !itr->deleted)
+			{
+				itr->deleted = true;
+				break;
+			}
+		}
+	}
 }
 
 void Aura::SpellAuraModPowerRegPerc(bool apply)
