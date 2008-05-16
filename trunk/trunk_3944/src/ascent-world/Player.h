@@ -793,7 +793,7 @@ public:
     void EventPortToGM(Player *p);
 	ASCENT_INLINE uint32 GetTeam() { return m_team; }
 	ASCENT_INLINE void SetTeam(uint32 t) { m_team = t; m_bgTeam=t; }
-	ASCENT_INLINE void ResetTeam() { m_team = myRace->team_id==7 ? 0 : 1; m_bgTeam=m_team; }
+	ASCENT_INLINE void ResetTeam() { if( myRace == NULL ) return; m_team = myRace->team_id==7 ? 0 : 1; m_bgTeam=m_team; }
 
 	ASCENT_INLINE bool IsInFeralForm()
 	{
