@@ -1564,16 +1564,26 @@ bool World::SetInitialWorldSettings()
 	//Warlock: Backlash
 	sp = dbcSpell.LookupEntryForced( 34935 );
 	if (sp != NULL)
+	{
+		sp->proc_interval = 8000;
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+	}
 	sp = dbcSpell.LookupEntryForced( 34938 );
 	if (sp != NULL)
+	{
+		sp->proc_interval = 8000;
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+	}
 	sp = dbcSpell.LookupEntryForced( 34939 );
 	if (sp != NULL)
+	{
+		sp->proc_interval = 8000;
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+	}
 	sp = dbcSpell.LookupEntryForced( 34936 );
 	if (sp != NULL)
 	{
+		sp->proc_interval = 8000;
 		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 		sp->EffectSpellGroupRelation[0] = 1 ;
 		sp->EffectSpellGroupRelation_high[0] = 64;
@@ -5814,14 +5824,6 @@ bool World::SetInitialWorldSettings()
     if( sp != NULL )
         sp->rangeIndex = 4;
 
-	//Relentless Strikes
-	sp = dbcSpell.LookupEntryForced( 14179 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;//proc spell
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		sp->EffectBasePoints[1] = 20; //client showes 20% chance but whe do not have it ? :O
-	}
 	//priest - surge of light
 	sp = dbcSpell.LookupEntryForced( 33150 );
 	if( sp != NULL )
