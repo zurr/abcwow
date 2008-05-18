@@ -96,6 +96,9 @@ void Object::_Create( uint32 mapid, float x, float y, float z, float ang )
 
 uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 {
+	if ( target == NULL )
+		return 0;
+
 	uint8 flags = 0;
 	uint32 flags2 = 0;
 
