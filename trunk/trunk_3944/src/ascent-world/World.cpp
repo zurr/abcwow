@@ -4018,20 +4018,20 @@ bool World::SetInitialWorldSettings()
 	//Mage - Arcane Concentration
 	sp = dbcSpell.LookupEntryForced( 11213 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntryForced( 12574 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntryForced( 12575 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntryForced( 12576 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntryForced( 12577 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 		//sp->procChance = 100;
 	}
 
@@ -4039,6 +4039,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 12536 );
 	if( sp != NULL )
 	{
+		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;		//!!!this will set value multiple times but we do not care since it is 100%
 		sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF;	//!!!this will set value multiple times but we do not care since it is 100%
 	}	
