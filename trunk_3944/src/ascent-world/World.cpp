@@ -4263,6 +4263,11 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 4;
 	}
+	sp = dbcSpell.LookupEntryForced( 17941 );
+	if( sp != NULL )
+	{
+		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
+	}
 
 	//warlock: Contagion
 	sp = dbcSpell.LookupEntryForced( 30060 );
@@ -6406,6 +6411,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 16886 );
 	if( sp != NULL )
 	{
+		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all spells, too bad not all spells have grouping flags :S
 		sp->procCharges = 0;
 	}
