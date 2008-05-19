@@ -4123,6 +4123,13 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 100;
 	}
 
+	// Deadly Throw Interrupt
+	sp = dbcSpell.LookupEntryForced( 32748 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_ON_CAST_SPELL;
+	}
+
 	//druid Savage Fury
 	sp = dbcSpell.LookupEntryForced( 16998 );
 	if( sp != NULL ) 

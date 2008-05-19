@@ -806,7 +806,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_ )
 								continue;
 						}break;
-
+						case 32747: //Deadly Throw Interrupt (rogue arena gloves set)
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_DEADLY_THROW )
+								continue;
+							printf("gothere!!\n");
+						}break;
 						case 43855: //XXX Libram of Vengeance triggered proc
                         {
 							if( CastingSpell == NULL )
