@@ -131,7 +131,8 @@ public:
 
 	void AIUpdate()
 	{
-		if (!_unit->GetAIInterface()->GetNextTarget()->isInRange(_unit->GetAIInterface()->GetNextTarget(), 20.0))
+		Unit *temp = _unit->GetAIInterface()->GetNextTarget();
+		if ( temp != NULL && !_unit->GetAIInterface()->GetNextTarget()->isInRange(temp, 20.0) )
 			_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(),TELEPORT,true);
 
 		if (_unit->GetHealthPct() == 25 || _unit->GetHealthPct() == 50 || _unit->GetHealthPct() == 75)
@@ -318,13 +319,17 @@ public:
 
 	void SummonShades(Unit* mTarget)
 	{
+		if ( mTarget == NULL )
+			return;
 		Summoned = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SHADESTAERAR, mTarget->GetPositionX(), mTarget->GetPositionY(), mTarget->GetPositionZ(), 0,true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 50);
-		Summoned->GetAIInterface()->SetNextTarget(mTarget);
+		if ( Summoned != NULL )
+			Summoned->GetAIInterface()->SetNextTarget(mTarget);
 	}
 
 	void AIUpdate()
 	{
-		if (!_unit->GetAIInterface()->GetNextTarget()->isInRange(_unit->GetAIInterface()->GetNextTarget(), 20.0))
+		Unit *temp = _unit->GetAIInterface()->GetNextTarget();
+		if ( temp != NULL && !_unit->GetAIInterface()->GetNextTarget()->isInRange(temp, 20.0) )
 			_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(),TELEPORT,true);
 
 		if (Shades && Shade_timer == 0)
@@ -651,7 +656,8 @@ public:
 
 	void AIUpdate()
 	{
-		if (!_unit->GetAIInterface()->GetNextTarget()->isInRange(_unit->GetAIInterface()->GetNextTarget(), 20.0))
+		Unit *temp = _unit->GetAIInterface()->GetNextTarget();
+		if ( temp != NULL && !_unit->GetAIInterface()->GetNextTarget()->isInRange(temp, 20.0) )
 			_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(),TELEPORT,true);
 
 		if (_unit->GetHealthPct() == 25 || _unit->GetHealthPct() == 50 || _unit->GetHealthPct() == 75)
@@ -955,7 +961,8 @@ public:
 	void AIUpdate()
 	{
 		std::list<Player*> mTargets;
-		if (!_unit->GetAIInterface()->GetNextTarget()->isInRange(_unit->GetAIInterface()->GetNextTarget(), 20.0))
+		Unit *temp = _unit->GetAIInterface()->GetNextTarget();
+		if ( temp != NULL && !_unit->GetAIInterface()->GetNextTarget()->isInRange(temp, 20.0) )
 			_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(),TELEPORT,true);
 
 		if ((_unit->GetHealthPct() == 25 && Shade3 == false) || (_unit->GetHealthPct() == 50 && Shade2 == false) || (_unit->GetHealthPct() == 75 && Shade1 == false))
@@ -1274,7 +1281,8 @@ public:
 		}
 		Rand = 0;
 		Summoned = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_HOUNDS, (float)RandX, (float)RandY, 0, 0,true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 50);
-		Summoned->GetAIInterface()->SetNextTarget(mTarget);
+		if ( Summoned != NULL )
+			Summoned->GetAIInterface()->SetNextTarget(mTarget);
 	}
 
 	void AIUpdate()

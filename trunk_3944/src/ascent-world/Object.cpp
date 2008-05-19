@@ -1390,6 +1390,9 @@ bool Object::isInFront(Object* target)
 {
 	// check if we facing something ( is the object within a 180 degree slice of our positive y axis )
 
+	if ( target == NULL )
+		return false;
+
     double x = target->GetPositionX() - m_position.x;
     double y = target->GetPositionY() - m_position.y;
 
@@ -1415,6 +1418,9 @@ bool Object::isInCone(Object* target)
 {
 	// check if we facing something within a 90 degree slice of our positive y axis
 
+	if ( target == NULL )
+		return false;
+
     double x = target->GetPositionX() - m_position.x;
     double y = target->GetPositionY() - m_position.y;
 
@@ -1437,6 +1443,9 @@ bool Object::isInCone(Object* target)
 bool Object::isInBack(Object* target)
 {
 	// check if we are behind something ( is the object within a 180 degree slice of our negative y axis )
+
+	if ( target == NULL )
+		return false;
 
     double x = m_position.x - target->GetPositionX();
     double y = m_position.y - target->GetPositionY();
@@ -1469,6 +1478,9 @@ bool Object::isInBack(Object* target)
 
 bool Object::isInRange(Object* target, float range)
 {
+	if ( target == NULL )
+		return false;
+
 	float dist = CalcDistance( target );
 	return( dist <= range );
 }
