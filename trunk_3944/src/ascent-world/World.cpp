@@ -1565,19 +1565,16 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 34935 );
 	if (sp != NULL)
 	{
-		sp->proc_interval = 8000;
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
 	}
 	sp = dbcSpell.LookupEntryForced( 34938 );
 	if (sp != NULL)
 	{
-		sp->proc_interval = 8000;
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
 	}
 	sp = dbcSpell.LookupEntryForced( 34939 );
 	if (sp != NULL)
 	{
-		sp->proc_interval = 8000;
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
 	}
 	sp = dbcSpell.LookupEntryForced( 34936 );
