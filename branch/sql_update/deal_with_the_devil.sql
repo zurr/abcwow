@@ -1,0 +1,14 @@
+﻿INSERT INTO items VALUES (66666, 0, 0, -1, 'Deal with the Devil', '', '', '', 1096, 5, 0, 0, 0, 0, -1, -1, 120, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32052, 0, -1, 1000, 0, -1, 0, 0, 0, -1, 0, -1, 0, 0, 0, -1, 0, -1, 0, 0, 0, -1, 0, -1, 0, 0, 0, -1, 0, -1, 0, 'By using this item you agree to sell your soul to the devil, in return becoming the member of opposite faction. This is one way ticket.', 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0);
+INSERT INTO creature_names VALUES (66666, 'The Evil One', '','', 0, 7, 0, 3, 0, 0, 11873, 0, 0, 0, 1, 1, 0, 0);
+INSERT INTO creature_proto VALUES (66666, 255, 255, 35, 6666666, 6666666, 0, 0.9, 3, 1500, 1500, 4000, 1000, 0, 0, 0, 7456, 33492482, 13, 0, 0, 0, 0, 0, 0, 60, 10000, 200, 200, 200, 200, 200, 200, 1.5, 1, '', 1, 0, 0, 0, 2.5, 8, 14, 0);
+INSERT INTO npc_gossip_textid VALUES (66666, 66666);
+INSERT INTO npc_text VALUES (66666, 100, 'Spirits told me you are about to arive, come closer $N.', 'Spirits told me you are about to arive, come closer $N.', 0, 0, 0, 0, 0, 0, 0, 100, 'Spirits told me you are about to arive, come closer $N.', 'Spirits told me you are about to arive, come closer $N.', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '' , '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO creature_quest_starter VALUES (66666, 66666);
+INSERT INTO creature_quest_finisher VALUES (66666, 66666);
+INSERT INTO quests VALUES (66666, 0, 0, 8, 70, 70, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 'The Deal with The devil', " You look rather surpriced. Why? Did you expect big bad demon standing in my place? Didn't they told you evil comes in all shapes and sizes?$b
+ I know why you are here, let's talk busness. You want something from me, as I from you. You want to become a member of opposite faction, isn't that right?
+And I want ... <The evil One handles you the list> ...
+To gather those you will need help from your friends, Yesss, friends you about to betray.
+Oh, did I mention, I want your soul? Add it to the list.$b
+Come back when you are done.", 'Haste, go gather the required.', 'So you done ... Deal is deal, you keept your word, I must keep mine. Here it is.
+... Oh, right for your effort <The Evil One drops a 1 cooper coin on the ground> Buy yourself something nice ... Meheheee', 'You changed your mind?', '', '', '', '', '', 23573, 23793, 23571, 23572, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66666, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66666, 0, 0, 0, 1, 0, 0, 0, 0);
