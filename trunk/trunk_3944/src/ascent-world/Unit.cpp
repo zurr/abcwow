@@ -806,6 +806,16 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_ )
 								continue;
 						}break;
+						case 43839: //XXX Totem of Indomitability/Totem of Survival
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_STORMSTRIKE && 
+								CastingSpell->NameHash != SPELL_HASH_FLAME_SHOCK && 
+								CastingSpell->NameHash != SPELL_HASH_EARTH_SHOCK && 
+								CastingSpell->NameHash != SPELL_HASH_FROST_SHOCK)
+								continue;
+						}break;
 						case 37563: //Renewal ( T4 priest healing set 2 items bonus )
 						{
 							if( CastingSpell == NULL )
@@ -2950,10 +2960,10 @@ else
 					//sLog.outString( "DEBUG: Critical Strike! Full_damage: %u" , dmg.full_damage );
 					if(ability && ability->SpellGroupType)
 					{
-						SM_FIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
+						SM_PIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 						int spell_flat_modifers=0;
-						SM_FIValue(SM_PCriticalDamage,&spell_flat_modifers,ability->SpellGroupType);
+						SM_PIValue(SM_PCriticalDamage,&spell_flat_modifers,ability->SpellGroupType);
 						if(spell_flat_modifers!=0)
 							printf("!!!!!spell crit dmg bonus mod flat %d , spell crit dmg bonus %d, spell group %u\n",spell_flat_modifers,dmgbonus,ability->SpellGroupType);
 #endif
