@@ -346,8 +346,6 @@ bool World::SetInitialWorldSettings()
 	uint32 group_relation_rogue_elusiveness = 0;
 	uint32 group_relation_rogue_poisons = 0;
 	uint32 group_relation_rogue_find_weakness = 0;
-	uint32 group_relation_rogue_shadow_step = 0;
-	uint32 group_relation_rogue_lethality = 0;
 
 	// Start
 
@@ -1526,6 +1524,38 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[0] = 64;
 	}
 
+	sp = dbcSpell.LookupEntry( 33333 ); //Weakened Soul Reduction ( arena set bonus )
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x20000000;
+
+	//Impale
+	sp = dbcSpell.LookupEntry( 16494 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+	sp = dbcSpell.LookupEntry( 16493 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+	//Mortal Shots
+	sp = dbcSpell.LookupEntry( 19485 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+	sp = dbcSpell.LookupEntry( 19487 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+	sp = dbcSpell.LookupEntry( 19488 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+	sp = dbcSpell.LookupEntry( 19489 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+	sp = dbcSpell.LookupEntry( 19490 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+	sp = dbcSpell.LookupEntry( 36413 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+
+
 	//Crusader Strike
 	sp = dbcSpell.LookupEntryForced( 35395 );
 	if( sp != NULL && sp->Id == 35395 )
@@ -2643,46 +2673,27 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1024 | 256; // Cheap Shot + Garrote
 
-
-	//rogue ( grouping ) Shadowstep
-	group_relation_rogue_shadow_step |= 512;//rogue - ambush (only a part of the whole group since it would affect other spells too)
-	group_relation_rogue_shadow_step |= 4;//rogue - Backstab (only a part of the whole group since it would affect other spells too)
-	group_relation_rogue_shadow_step |= 256;//Garrote
-	group_relation_rogue_shadow_step |= 536870912 | 16 | 8 | 8389120 | 41943040 | 33554432 | 32 | 67108864 | 64 | 128 ;
-
 	//rogue - Shadowstep
 	sp = dbcSpell.LookupEntryForced( 36563 ); 
 	if( sp != NULL )
-	{
-		sp->EffectSpellGroupRelation[1] = group_relation_rogue_shadow_step;
-		sp->EffectSpellGroupRelation_high[1] = 256 | 128 ;
-		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-	}
-
-	//rogue ( grouping ) Lethality
-	group_relation_rogue_lethality |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)
-	group_relation_rogue_lethality |= 4;//rogue - backstab (only a part of the whole group since it would affect other spells too)
-	group_relation_rogue_lethality |= 8;//rogue - Gouge (only a part of the whole group since it would affect other spells too)
-	group_relation_rogue_lethality |= 33554432UL;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
-	group_relation_rogue_lethality |= 536870912UL;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
-	group_relation_rogue_lethality |= 1073741824UL;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
+		sp->EffectSpellGroupRelation[1] = 0x800000;
 
 	//rogue Lethality
 	sp = dbcSpell.LookupEntryForced( 14128 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 	sp = dbcSpell.LookupEntryForced( 14132 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 	sp = dbcSpell.LookupEntryForced( 14135 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 	sp = dbcSpell.LookupEntryForced( 14136 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 	sp = dbcSpell.LookupEntryForced( 14137 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 
 	//rogue - Endurance 
 	sp = dbcSpell.LookupEntryForced( 13742 ); 
