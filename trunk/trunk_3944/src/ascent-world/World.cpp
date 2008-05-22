@@ -950,7 +950,7 @@ bool World::SetInitialWorldSettings()
 					if( strstr( desc,"your harmful spells land"))
 						pr|=PROC_ON_CAST_SPELL;
 					if( strstr( desc,"Nature spell have a chance"))
-						pr|=PROC_ON_CAST_SPELL;e
+						pr|=PROC_ON_CAST_SPELL;
 					if( strstr( desc,"Mangle ability has a chance"))
 						pr|=PROC_ON_CAST_SPELL;
 					if( strstr( desc,"Chance on spell cast"))

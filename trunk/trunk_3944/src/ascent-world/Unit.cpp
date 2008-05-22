@@ -734,10 +734,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 			{
 				case 42084:
 				case 33649:
-					proc_Chance = 10.0f;
+					proc_Chance = 10;
 					break;
 				case 37174:
-					proc_Chance = 25.0f;
+					proc_Chance = 25;
 					break;
 			}
 
@@ -870,14 +870,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								continue;
 						}break;
 
-						case 37193: // T5 paladin set(4) bonus
-						{
-							if( CastingSpell == NULL )
-								continue;
-							if( CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD )
-								continue;
-						}break;
-
 						case 41043: // Tome of the Lightbringer
 						case 23590: // T2 paladin set(8) bonus
 						{
@@ -920,14 +912,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								continue;
 						}break;
 
-						case 40461: // Ashtongue Talisman of Lethality
-						{
-							if( CastingSpell == NULL )
-								continue;
-							if( CastingSpell->NameHash != SPELL_HASH_ENVENOM && CastingSpell->NameHash != SPELL_HASH_RUPTURE && CastingSpell->NameHash != SPELL_HASH_EXPOSE_ARMOR && CastingSpell->NameHash != SPELL_HASH_EVISCERATE && CastingSpell->NameHash != SPELL_HASH_DEADLY_THROW && CastingSpell->NameHash != SPELL_HASH_KIDNEY_SHOT && CastingSpell->NameHash != SPELL_HASH_SLICE_AND_DICE )
-								continue;
-						}break;
-
 						case 37523: // T3 warrior set(8) bonus
 						{
 							if( CastingSpell == NULL )
@@ -940,7 +924,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						{
 							if( CastingSpell == NULL )
 								continue;
-							if( CastingSpell->NameHash != SPELL_HASH_SHADOWBOLT )
+							if( CastingSpell->NameHash != SPELL_HASH_SHADOW_BOLT )
 								continue;
 						}break;
 
