@@ -729,6 +729,18 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 				}
 			}
 
+			// some percentage chances for procs
+			switch( spellId )
+			{
+				case 42084:
+				case 33649:
+					proc_Chance = 10.0f;
+					break;
+				case 37174:
+					proc_Chance = 25.0f;
+					break;
+			}
+
 			SM_FIValue( SM_FChanceOfSuccess, (int32*)&proc_Chance, ospinfo->SpellGroupType );
 			if( spellId && Rand( proc_Chance ) )
 			{
@@ -795,6 +807,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 
 					switch( spellId )
 					{
+						case 37243: // Fathom-Brooch of the Tidewalker
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->School != SCHOOL_NATURE )
+								continue;
+						}break;
+
 						case 14189: //Seal Fate
 						case 16953: //Blood Frenzy
 						{
@@ -868,6 +888,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						}break;
 
 						case 41038: // Mark of the White Stag
+						case 43738: // Idol of Terror
 						{
 							if( CastingSpell == NULL )
 								continue;

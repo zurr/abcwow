@@ -947,14 +947,20 @@ bool World::SetInitialWorldSettings()
 						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
 					if( strstr( desc,"target casts a spell"))
 						pr|=PROC_ON_CAST_SPELL;
-                    if( strstr( desc,"your harmful spells land"))
-                        pr|=PROC_ON_CAST_SPELL;
-                    if( strstr( desc,"on spell critical hit"))
-                        pr|=PROC_ON_SPELL_CRIT_HIT;
-                    if( strstr( desc,"spell critical strikes"))
-                        pr|=PROC_ON_SPELL_CRIT_HIT;
-                    if( strstr( desc,"being able to resurrect"))
-                        pr|=PROC_ON_DIE;
+					if( strstr( desc,"your harmful spells land"))
+						pr|=PROC_ON_CAST_SPELL;
+					if( strstr( desc,"Nature spell have a chance"))
+						pr|=PROC_ON_CAST_SPELL;e
+					if( strstr( desc,"Mangle ability has a chance"))
+						pr|=PROC_ON_CAST_SPELL;
+					if( strstr( desc,"Chance on spell cast"))
+						pr|=PROC_ON_CAST_SPELL;
+					if( strstr( desc,"on spell critical hit"))
+						pr|=PROC_ON_SPELL_CRIT_HIT;
+					if( strstr( desc,"spell critical strikes"))
+						pr|=PROC_ON_SPELL_CRIT_HIT;
+					if( strstr( desc,"being able to resurrect"))
+						pr|=PROC_ON_DIE;
 					if( strstr( desc,"any damage caused"))
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
 					if( strstr( desc,"the next melee attack against the caster"))
@@ -1093,7 +1099,7 @@ bool World::SetInitialWorldSettings()
 					if( strstr( nametext, "Bloodthirst"))
 						pr|=PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 					if( strstr( desc, "experience or honor"))
-						pr|=PROC_ON_GAIN_EXPIERIENCE;
+						pr|=PROC_ON_TARGET_DIE;
 					if( strstr( desc,"your next offensive ability"))
 						pr|=PROC_ON_CAST_SPELL;
 					if( strstr( desc,"hit by a melee or ranged attack"))
@@ -1528,6 +1534,41 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 0x20000000;
 
+
+	// Warp-Spring Coil
+	sp = dbcSpell.LookupEntry( 37173 );
+	if( sp != NULL )
+		sp->proc_interval = 30000;
+
+	// Hourglass of the Unraveler
+	sp = dbcSpell.LookupEntry( 33648 );
+	if( sp != NULL )
+		sp->proc_interval = 45000;
+
+	// Tsunami Talisman
+	sp = dbcSpell.LookupEntry( 42083 );
+	if( sp != NULL )
+		sp->proc_interval = 45000;
+	
+	// Dragonspine Trophy
+	sp = dbcSpell.LookupEntry( 34774 );
+	if( sp != NULL )
+		sp->proc_interval = 20000;
+
+	// Band of the Eternal ...
+	sp = dbcSpell.LookupEntry( 35080 );
+	if( sp != NULL )
+		sp->proc_interval = 60000;
+	sp = dbcSpell.LookupEntry( 35077 );
+	if( sp != NULL )
+		sp->proc_interval = 60000;
+	sp = dbcSpell.LookupEntry( 35086 );
+	if( sp != NULL )
+		sp->proc_interval = 60000;
+	sp = dbcSpell.LookupEntry( 35083 );
+	if( sp != NULL )
+		sp->proc_interval = 60000;
+
 	//Impale
 	sp = dbcSpell.LookupEntry( 16494 );
 	if( sp != NULL )
@@ -1596,21 +1637,23 @@ bool World::SetInitialWorldSettings()
 	if (sp != NULL)
 	{
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+		sp->proc_interval = 8000;
 	}
 	sp = dbcSpell.LookupEntryForced( 34938 );
 	if (sp != NULL)
 	{
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+		sp->proc_interval = 8000;
 	}
 	sp = dbcSpell.LookupEntryForced( 34939 );
 	if (sp != NULL)
 	{
 		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+		sp->proc_interval = 8000;
 	}
 	sp = dbcSpell.LookupEntryForced( 34936 );
 	if (sp != NULL)
 	{
-		sp->proc_interval = 8000;
 		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 		sp->EffectSpellGroupRelation[0] = 1 ;
 		sp->EffectSpellGroupRelation_high[0] = 64;
