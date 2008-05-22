@@ -806,35 +806,144 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_ )
 								continue;
 						}break;
-						case 43839: //XXX Totem of Indomitability/Totem of Survival
+
+						case 43839: // S1 relics
+						case 43848: // S2 relics
+						case 43849: // S3 relics
+						case 46089: // S4 relics
 						{
 							if( CastingSpell == NULL )
 								continue;
 							if( CastingSpell->NameHash != SPELL_HASH_STORMSTRIKE && 
 								CastingSpell->NameHash != SPELL_HASH_FLAME_SHOCK && 
 								CastingSpell->NameHash != SPELL_HASH_EARTH_SHOCK && 
-								CastingSpell->NameHash != SPELL_HASH_FROST_SHOCK)
+								CastingSpell->NameHash != SPELL_HASH_FROST_SHOCK &&
+								CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD &&
+								CastingSpell->NameHash != SPELL_HASH_JUDGEMENT &&
+								CastingSpell->NameHash != SPELL_HASH_MOONFIRE &&
+								CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_ &&
+								CastingSpell->NameHash != SPELL_HASH_MANGLE__BEAR_ )
 								continue;
 						}break;
-						case 37563: //Renewal ( T4 priest healing set 2 items bonus )
+
+						case 37563: // Renewal ( T4 priest healing set 2 items bonus )
 						{
 							if( CastingSpell == NULL )
 								continue;
 							if( CastingSpell->NameHash != SPELL_HASH_PRAYER_OF_HEALING )
 								continue;
 						}break;
-						case 32747: //Deadly Throw Interrupt (rogue arena gloves set)
+
+						case 22009: // Greater Heal Renew ( T2 priest healing set 2 items bonus )
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_GREATER_HEAL )
+								continue;
+						}break;
+
+						case 32747: // Deadly Throw Interrupt (rogue arena gloves set)
 						{
 							if( CastingSpell == NULL )
 								continue;
 							if( CastingSpell->NameHash != SPELL_HASH_DEADLY_THROW )
 								continue;
 						}break;
-						case 43855: //XXX Libram of Vengeance triggered proc
-                        {
+
+						case 37193: // T5 paladin set(4) bonus
+						{
 							if( CastingSpell == NULL )
 								continue;
 							if( CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD )
+								continue;
+						}break;
+
+						case 41043: // Tome of the Lightbringer
+						case 23590: // T2 paladin set(8) bonus
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_JUDGEMENT )
+								continue;
+						}break;
+
+						case 41038: // Mark of the White Stag
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_ && CastingSpell->NameHash != SPELL_HASH_MANGLE__BEAR_ )
+								continue;
+						}break;
+
+						case 28788: // T3 paladin set(8) bonus
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_CLEANSE )
+								continue;
+						}break;
+
+						case 28820: // T3 shaman set(8) bonus
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_LIGHTNING_SHIELD )
+								continue;
+						}break;
+
+						case 28815: // T3 rogue set(8) bonus
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_EVISCERATE )
+								continue;
+						}break;
+
+						case 40461: // Ashtongue Talisman of Lethality
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_ENVENOM && CastingSpell->NameHash != SPELL_HASH_RUPTURE && CastingSpell->NameHash != SPELL_HASH_EXPOSE_ARMOR && CastingSpell->NameHash != SPELL_HASH_EVISCERATE && CastingSpell->NameHash != SPELL_HASH_DEADLY_THROW && CastingSpell->NameHash != SPELL_HASH_KIDNEY_SHOT && CastingSpell->NameHash != SPELL_HASH_SLICE_AND_DICE )
+								continue;
+						}break;
+
+						case 37523: // T3 warrior set(8) bonus
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_SHIELD_BLOCK )
+								continue;
+						}break;
+
+						case 28839: // T3 warlock set(8) bonus
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_SHADOWBOLT )
+								continue;
+						}break;
+
+						case 37508: // Talon of Al'ar
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_ARCANE_SHOT )
+								continue;
+						}break;
+
+						case 34324: // Idol of the Claw
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_FEROCIOUS_BITE && CastingSpell->NameHash != SPELL_HASH_RIP && CastingSpell->NameHash != SPELL_HASH_MAIM )
+								continue;
+						}break;
+
+						case 24405: // Glacial Spike
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->NameHash != SPELL_HASH_FROSTBOLT )
 								continue;
 						}break;
 
@@ -851,19 +960,24 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							if( GetHealthPct() > 30 )
 								continue;
 						}break;
-						case 37309:
+
+						case 37309: // Bloodlust
+						case 17769: // Wolfshead Helm
 						{
 							if( static_cast< Player* >( this )->GetShapeShift() != FORM_BEAR ||
 								static_cast< Player* >( this )->GetShapeShift() != FORM_DIREBEAR )
 								continue;
 						}break;
-						case 37310:
+
+						case 37310: // Bloodlust
+						case 17770: // Wolfshead Helm
 						{
 							if( static_cast< Player* >( this )->GetShapeShift() != FORM_CAT )
 								continue;
 						}break;
-                        case 34754: //holy concentration
-                        {
+
+						case 34754: //holy concentration
+						{
 							if( CastingSpell == NULL )
 								continue;
 							if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL &&
