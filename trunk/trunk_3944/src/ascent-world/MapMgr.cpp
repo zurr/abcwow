@@ -778,7 +778,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 		curObj = *iter;
 		++iter;
 
-		if( curObj == NULL || plObj == NULL )
+		if( curObj == NULL )
 			continue;
 
 		if( curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID )
@@ -800,7 +800,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 				{
 					plObj2 = static_cast< Player* >( curObj );
 
-					if( plObj2->CanSee( obj ) && !plObj2->IsVisible( obj ) )
+					if( plObj2 != NULL && plObj2->CanSee( obj ) && !plObj2->IsVisible( obj ) )
 					{
 						CHECK_BUF;
 						count = obj->BuildCreateUpdateBlockForPlayer(*buf, plObj2);
