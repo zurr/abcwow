@@ -729,36 +729,39 @@ bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 		m_mainLock.Acquire();
 		for(uint32 i = 0; i < 2; ++i)
 		{
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
-				(*itr)->Root();
-				
-				uint32 reward_count;
-
-				if( i != m_winningteam )
-					reward_count = 3;
-				else
-					reward_count = 1;
-
-				ItemPrototype* it = ItemPrototypeStorage.LookupEntry(29024);
-				if( it != NULL )
+				Player *plr = objmgr.GetPlayer(*itr);
+				if( plr != NULL )
 				{
-					Item *item = objmgr.CreateItem( 29024, (*itr) );
-					item->SetUInt32Value(ITEM_FIELD_STACK_COUNT, reward_count );
-					item->SoulBind();
+					plr->Root();
+				
+					uint32 reward_count;
 
-					if( (*itr)->GetItemInterface()->AddItemToFreeSlot(item) )
-					{
-						SlotResult *lr = (*itr)->GetItemInterface()->LastSearchResult();
-						(*itr)->GetSession()->SendItemPushResult(item, false, true, false, true, lr->ContainerSlot, lr->Slot, reward_count);
-					}
+					if( i != m_winningteam )
+						reward_count = 3;
 					else
+						reward_count = 1;
+
+					ItemPrototype* it = ItemPrototypeStorage.LookupEntry(29024);
+					if( it != NULL )
 					{
-						delete item;
+						Item *item = objmgr.CreateItem( 29024, plr );
+						item->SetUInt32Value(ITEM_FIELD_STACK_COUNT, reward_count );
+						item->SoulBind();
+
+						if( plr->GetItemInterface()->AddItemToFreeSlot(item) )
+						{
+							SlotResult *lr = plr->GetItemInterface()->LastSearchResult();
+							plr->GetSession()->SendItemPushResult(item, false, true, false, true, lr->ContainerSlot, lr->Slot, reward_count);
+						}
+						else
+						{
+							delete item;
+						}
+
 					}
-
 				}
-
 			}
 		}
 		m_mainLock.Release();
@@ -830,8 +833,11 @@ void EyeOfTheStorm::OnStart()
 	m_started = true;
 
 	for(uint32 i = 0; i < 2; ++i) {
-		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
-			(*itr)->RemoveAura(BG_PREPARATION);
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+		{
+			Player *plr = objmgr.GetPlayer(*itr);
+			if( plr != NULL )
+				plr->RemoveAura(BG_PREPARATION);
 		}
 	}
 

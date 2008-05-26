@@ -193,7 +193,8 @@ protected:
 
 public:
 	/* Team->Player Map */
-	set<Player*> m_players[2];
+	//set<Player*> m_players[2];
+	set<uint32> m_players[2];
 	void Lock() { m_mainLock.Acquire(); }
 	void Unlock() { m_mainLock.Release(); }
 

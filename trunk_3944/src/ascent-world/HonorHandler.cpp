@@ -125,12 +125,13 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 			uint32 t = pPlayer->m_bgTeam;
 			toadd.reserve(15);		// shouldnt have more than this
 			pPlayer->m_bg->Lock();
-			set<Player*> * s = &pPlayer->m_bg->m_players[t];
+			set<uint32> * s = &pPlayer->m_bg->m_players[t];
 
-			for(set<Player*>::iterator itr = s->begin(); itr != s->end(); ++itr)
+			for(set<uint32>::iterator itr = s->begin(); itr != s->end(); ++itr)
 			{
-				if((*itr) == pPlayer || (*itr)->isInRange(pPlayer,100.0f))
-					toadd.push_back(*itr);
+				Player *plr = objmgr.GetPlayer(*itr);
+				if( plr != NULL && (plr == pPlayer || plr->isInRange(pPlayer,100.0f)) )
+					toadd.push_back(plr);
 			}
 
 			uint32 pts = Points / (uint32)toadd.size();
