@@ -3130,7 +3130,7 @@ public:
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
 		spells[0].cooldown = 20;
-		spells[0].perctrigger = 10.0f;
+		spells[0].perctrigger = 40.0f;
 		spells[0].attackstoptimer = 1000;
 	}
 
@@ -3670,6 +3670,7 @@ public:
 			_unit->GetAIInterface()->setWaypointToMove(2);
 		}
 
+
 		spells[0].info = dbcSpell.LookupEntry(COILFANGSTRIDER_MINDBLAST);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
@@ -3678,13 +3679,14 @@ public:
 		spells[0].attackstoptimer = 1000;
 
 		m_fear = 2;
+
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
 		RegisterAIUpdateEvent(1000);
-		CastTime();
+		//CastTime();
 	}
 
 	void OnCombatStop(Unit *mTarget)
@@ -3705,6 +3707,7 @@ public:
 	}
 	void AIUpdate()
 	{
+
 		if (!m_fear)
 		{
 			_unit->CastSpell(_unit, COILFANGSTRIDER_PANIC, true);
@@ -3716,6 +3719,7 @@ public:
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
+
 	}
 
 	void SpellCast(float val)
@@ -4883,7 +4887,7 @@ void SetupSerpentshrineCavern(ScriptMgr * mgr)
 
 	//Lady Vashj
 	mgr->register_creature_script(CN_VASHJ, &VASHJAI::Create);
-	mgr->register_creature_script(CN_COILFANGSTRIDER, &COILFANGSTRIDERAI::Create);
+	//mgr->register_creature_script(CN_COILFANGSTRIDER, &COILFANGSTRIDERAI::Create);
 	mgr->register_creature_script(CN_COILFANGELITE, &COILFANGELITEAI::Create);
 	mgr->register_creature_script(CN_ENCHANTEDELEMTAL, &ENCHANTEDELEMENTALAI::Create);
 	mgr->register_creature_script(CN_TAINTEDELEMTAL, &TAINTEDELEMTALAI::Create);

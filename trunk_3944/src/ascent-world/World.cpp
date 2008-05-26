@@ -4069,21 +4069,21 @@ bool World::SetInitialWorldSettings()
 	//Mage - Arcane Concentration
 	sp = dbcSpell.LookupEntryForced( 11213 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL  | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntryForced( 12574 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL  | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntryForced( 12575 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL  | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntryForced( 12576 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL  | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntryForced( 12577 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
-		//sp->procChance = 100;
+		sp->procFlags = PROC_ON_CAST_SPELL  | PROC_TARGET_SELF;
+		sp->procChance = 10;
 	}
 
 	//Mage - ClearCasting Effect
