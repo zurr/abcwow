@@ -1189,19 +1189,27 @@ void CBattleground::Close()
 	m_ended = true;
 	for(uint32 i = 0; i < 2; ++i)
 	{
-		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); itr++)
+		set<Player*>::iterator itr;
+		set<uint32>::iterator it2;
+		uint32 guid;
+		Player * plr;
+		for(itr = m_players[i].begin(); itr != m_players[i].end();)
 		{
-			if ( (*itr) != NULL && (*itr)->IsPlayer() ) // this is silly but im really out of ideas 
-				RemovePlayer(*itr, false);
+			plr = *itr;
+			++itr;
+			RemovePlayer(plr, false);
 		}
-
-		for(set<uint32>::iterator it2 = m_pendPlayers[i].begin(); it2 != m_pendPlayers[i].end(); it2++)
+        
+		for(it2 = m_pendPlayers[i].begin(); it2 != m_pendPlayers[i].end();)
 		{
-			Player *plr = objmgr.GetPlayer(*it2);
-			if( plr != NULL )
+			guid = *it2;
+			++it2;
+			plr = objmgr.GetPlayer(guid);
+
+			if(plr)
 				RemovePendingPlayer(plr);
 			else
-				m_pendPlayers[i].erase(*it2);
+				m_pendPlayers[i].erase(guid);
 		}
 	}
 
