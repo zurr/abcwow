@@ -778,7 +778,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 		curObj = *iter;
 		++iter;
 
-		if( curObj == NULL )
+		if( curObj == NULL || plObj == NULL )
 			continue;
 
 		if( curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID )
