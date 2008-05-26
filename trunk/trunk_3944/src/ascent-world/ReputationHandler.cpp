@@ -252,9 +252,6 @@ Standing Player::GetStandingRank(uint32 Faction)
 
 bool Player::IsHostileBasedOnReputation(FactionDBC * dbc)
 {
-	if ( dbc == NULL )
-		return false;
-
 	assert(dbc->RepListId < 128 && dbc->RepListId >= 0);
 	FactionReputation * rep = reputationByListId[dbc->RepListId];
 	if(!rep) return false;
@@ -402,7 +399,7 @@ void Player::UpdateInrangeSetsBasedOnReputation()
 			continue;
 
 		pUnit = static_cast< Unit* >( *itr );
-		if( pUnit->m_factionDBC == NULL || pUnit->m_factionDBC->RepListId < 0 )
+		if( pUnit->m_factionDBC != NULL && pUnit->m_factionDBC->RepListId < 0 )
 			continue;
 
 		rep_value = IsHostileBasedOnReputation( pUnit->m_factionDBC );

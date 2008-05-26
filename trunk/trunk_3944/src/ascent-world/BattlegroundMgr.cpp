@@ -597,11 +597,15 @@ void CBattleground::BuildPvPUpdateDataPacket(WorldPacket * data)
 			ArenaTeam * teams[2] = {NULL,NULL};
 			for(uint32 i = 0; i < 2; ++i)
 			{
-				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+				for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 				{
-					teams[i] = (*itr)->m_arenaTeams[ ((Arena*)this)->GetArenaTeamType() ];
-					if(teams[i])
-						break;
+					Player *plr = objmgr.GetPlayer(*itr);
+					if( plr != NULL )
+					{
+						teams[i] = plr->m_arenaTeams[ ((Arena*)this)->GetArenaTeamType() ];
+						if( teams[i] != NULL )
+							break;
+					}
 				}
 			}
 
@@ -634,16 +638,20 @@ void CBattleground::BuildPvPUpdateDataPacket(WorldPacket * data)
 		*data << uint32(m_players[0].size() + m_players[1].size());
 		for(uint32 i = 0; i < 2; ++i)
 		{
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
-				*data << (*itr)->GetGUID();
-				bs = &(*itr)->m_bgScore;
-				*data << bs->KillingBlows;
-				*data << uint8((*itr)->m_bgTeam);
-				*data << bs->DamageDone;
-				*data << bs->HealingDone;
-				*data << bs->Misc1;	/* rating change */
-				//(*itr)->Root();
+				Player *plr = objmgr.GetPlayer(*itr);
+				if( plr != NULL )
+				{
+					*data << plr->GetGUID();
+					bs = &plr->m_bgScore;
+					*data << bs->KillingBlows;
+					*data << uint8(plr->m_bgTeam);
+					*data << bs->DamageDone;
+					*data << bs->HealingDone;
+					*data << bs->Misc1;	/* rating change */
+					//(*itr)->Root();
+				}
 			}
 		}
 	}
@@ -661,20 +669,24 @@ void CBattleground::BuildPvPUpdateDataPacket(WorldPacket * data)
 		*data << uint32(m_players[0].size() + m_players[1].size());
 		for(uint32 i = 0; i < 2; ++i)
 		{
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
-				*data << (*itr)->GetGUID();
-				bs = &(*itr)->m_bgScore;
+				Player *plr = objmgr.GetPlayer(*itr);
+				if( plr != NULL )
+				{
+					*data << plr->GetGUID();
+					bs = &plr->m_bgScore;
 
-				*data << bs->KillingBlows;
-				*data << bs->HonorableKills;
-				*data << bs->Deaths;
-				*data << bs->BonusHonor;
-				*data << bs->DamageDone;
-				*data << bs->HealingDone;
-				*data << uint32(0x2);
-				*data << bs->Misc1;
-				*data << bs->Misc2;
+					*data << bs->KillingBlows;
+					*data << bs->HonorableKills;
+					*data << bs->Deaths;
+					*data << bs->BonusHonor;
+					*data << bs->DamageDone;
+					*data << bs->HealingDone;
+					*data << uint32(0x2);
+					*data << bs->Misc1;
+					*data << bs->Misc2;
+				}
 			}
 		}
 	}
@@ -740,7 +752,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		plr->m_bgTeam = plr->GetTeam();
 
 	m_pendPlayers[plr->m_bgTeam].erase(plr->GetGUIDLow());
-	if(m_players[plr->m_bgTeam].find(plr) != m_players[plr->m_bgTeam].end())
+	if(m_players[plr->m_bgTeam].find(plr->GetGUIDLow()) != m_players[plr->m_bgTeam].end())
 	{
 		m_mainLock.Release();
 		return;
@@ -750,7 +762,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	data << plr->GetGUID();
 	DistributePacketToAll(&data);
 
-	m_players[plr->m_bgTeam].insert(plr);
+	m_players[plr->m_bgTeam].insert(plr->GetGUIDLow());
 
 	/* remove from any auto queue remove events */
 	sEventMgr.RemoveEvents(plr, EVENT_BATTLEGROUND_QUEUE_UPDATE);
@@ -954,8 +966,12 @@ void CBattleground::DistributePacketToAll(WorldPacket * packet)
 	m_mainLock.Acquire();
 	for(int i = 0; i < 2; ++i)
 	{
-		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-			if ((*itr) && (*itr)->GetSession()) (*itr)->GetSession()->SendPacket(packet);
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+		{
+			Player *plr = objmgr.GetPlayer(*itr);
+			if( plr != NULL && plr->GetSession())
+				plr->GetSession()->SendPacket(packet);
+		}
 	}
 	m_mainLock.Release();
 }
@@ -963,8 +979,12 @@ void CBattleground::DistributePacketToAll(WorldPacket * packet)
 void CBattleground::DistributePacketToTeam(WorldPacket * packet, uint32 Team)
 {
 	m_mainLock.Acquire();
-	for(set<Player*>::iterator itr = m_players[Team].begin(); itr != m_players[Team].end(); ++itr)
-		if ((*itr) && (*itr)->GetSession()) (*itr)->GetSession()->SendPacket(packet);
+	for(set<uint32>::iterator itr = m_players[Team].begin(); itr != m_players[Team].end(); ++itr)
+	{
+		Player *plr = objmgr.GetPlayer(*itr);
+		if( plr != NULL && plr->GetSession())
+			plr->GetSession()->SendPacket(packet);
+	}
 	m_mainLock.Release();
 }
 
@@ -1056,7 +1076,7 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	m_mainLock.Acquire();
 	if( plr->m_bgTeam > 1 )
 		plr->m_bgTeam = plr->GetTeam();
-	m_players[plr->m_bgTeam].erase(plr);
+	m_players[plr->m_bgTeam].erase(plr->GetGUIDLow());
 
 	memset(&plr->m_bgScore, 0, sizeof(BGScore));
 	OnRemovePlayer(plr);
@@ -1189,22 +1209,22 @@ void CBattleground::Close()
 	m_ended = true;
 	for(uint32 i = 0; i < 2; ++i)
 	{
-		set<Player*>::iterator itr;
+		set<uint32>::iterator itr;
 		set<uint32>::iterator it2;
-		uint32 guid;
-		Player * plr;
 		for(itr = m_players[i].begin(); itr != m_players[i].end();)
 		{
-			plr = *itr;
+			uint32 guid = *itr;
 			++itr;
-			RemovePlayer(plr, false);
+			Player *plr = objmgr.GetPlayer(guid);
+			if ( plr != NULL )
+				RemovePlayer(plr, false);
 		}
         
 		for(it2 = m_pendPlayers[i].begin(); it2 != m_pendPlayers[i].end();)
 		{
-			guid = *it2;
+			uint32 guid = *it2;
 			++it2;
-			plr = objmgr.GetPlayer(guid);
+			Player *plr = objmgr.GetPlayer(guid);
 
 			if(plr)
 				RemovePendingPlayer(plr);

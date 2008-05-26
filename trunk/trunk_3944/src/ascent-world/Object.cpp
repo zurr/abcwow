@@ -96,9 +96,6 @@ void Object::_Create( uint32 mapid, float x, float y, float z, float ang )
 
 uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 {
-	if ( target == NULL )
-		return 0;
-
 	uint8 flags = 0;
 	uint32 flags2 = 0;
 
@@ -1478,9 +1475,6 @@ bool Object::isInBack(Object* target)
 
 bool Object::isInRange(Object* target, float range)
 {
-	if ( target == NULL )
-		return false;
-
 	float dist = CalcDistance( target );
 	return( dist <= range );
 }

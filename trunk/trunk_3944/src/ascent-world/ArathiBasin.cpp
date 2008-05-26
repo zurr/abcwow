@@ -409,8 +409,10 @@ void ArathiBasin::OnStart()
 	m_started = true;
 
 	for(uint32 i = 0; i < 2; ++i) {
-		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
-			(*itr)->RemoveAura(BG_PREPARATION);
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
+			Player *plr = objmgr.GetPlayer(*itr);
+			if ( plr != NULL )
+				plr->RemoveAura(BG_PREPARATION);
 		}
 	}
 
@@ -490,9 +492,12 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 	if((current_resources - m_lastHonorGainResources[Team]) >= RESOURCES_TO_GAIN_BH)
 	{
 		m_mainLock.Acquire();
-		for(set<Player*>::iterator itr = m_players[Team].begin(); itr != m_players[Team].end(); ++itr)
-			(*itr)->m_bgScore.BonusHonor += BASE_BH_GAIN;
-
+		for(set<uint32>::iterator itr = m_players[Team].begin(); itr != m_players[Team].end(); ++itr)
+		{
+			Player *plr = objmgr.GetPlayer(*itr);
+			if ( plr != NULL )
+				plr->m_bgScore.BonusHonor += BASE_BH_GAIN;
+		}
 		UpdatePvPData();
 		m_mainLock.Release();
 	}
@@ -517,13 +522,17 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 		SpellEntry * loser_spell = dbcSpell.LookupEntry(24952);
 		for(uint32 i = 0; i < 2; ++i)
 		{
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
-				(*itr)->Root();
-				if(i == m_winningteam)
-					(*itr)->CastSpell((*itr), winner_spell, true);
-				else
-					(*itr)->CastSpell((*itr), loser_spell, true);
+				Player *plr = objmgr.GetPlayer(*itr);
+				if ( plr != NULL )
+				{
+					plr->Root();
+					if(i == m_winningteam)
+						plr->CastSpell(plr, winner_spell, true);
+					else
+						plr->CastSpell(plr, loser_spell, true);
+				}
 			}
 		}
 		m_mainLock.Release();

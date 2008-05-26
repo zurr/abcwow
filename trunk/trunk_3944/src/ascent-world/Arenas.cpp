@@ -245,8 +245,10 @@ void Arena::OnStart()
 {
 	/* remove arena readyness buff */
 	for(uint32 i = 0; i < 2; ++i) {
-		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
-			(*itr)->RemoveAura(ARENA_PREPARATION);
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
+			Player *plr = objmgr.GetPlayer(*itr);
+			if ( plr != NULL )
+				plr->RemoveAura(ARENA_PREPARATION);
 		}
 	}
 
@@ -270,8 +272,9 @@ void Arena::UpdatePlayerCounts()
 
 	uint32 players[2] = {0,0};
 	for(uint32 i = 0; i < 2; ++i) {
-		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
-			if((*itr)->isAlive())
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
+			Player *plr = objmgr.GetPlayer(*itr);
+			if ( plr != NULL && plr->isAlive())
 				players[i]++;
 		}
 	}
@@ -336,9 +339,9 @@ void Arena::Finish()
 
 			inscribe_teams[i]->SaveToDB();
 
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
-				Player * plr = *itr;
+				Player *plr = objmgr.GetPlayer(*itr);
 				if( plr != NULL && plr->m_arenaTeams[m_arenateamtype] != NULL )
 				{
 					ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];

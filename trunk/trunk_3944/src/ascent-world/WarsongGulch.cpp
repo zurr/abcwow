@@ -144,10 +144,14 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 		m_homeFlags[plr->GetTeam()]->PushToWorld( m_mapMgr );
 
 		/* give each player on that team a bonus 82 honor - burlex: is this correct amount? */
-		for(set<Player*>::iterator itr = m_players[plr->GetTeam()].begin(); itr != m_players[plr->GetTeam()].end(); ++itr)
+		for(set<uint32>::iterator itr = m_players[plr->GetTeam()].begin(); itr != m_players[plr->GetTeam()].end(); ++itr)
 		{
-			plr->m_bgScore.BonusHonor += 82;
-			HonorHandler::AddHonorPointsToPlayer(plr, 82);
+			Player *plr = objmgr.GetPlayer(*itr);
+			if ( plr != NULL )
+			{
+				plr->m_bgScore.BonusHonor += 82;
+				HonorHandler::AddHonorPointsToPlayer(plr, 82);
+			}
 		}
 
 		m_scores[plr->GetTeam()]++;
@@ -167,13 +171,17 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 			SpellEntry * loser_spell = dbcSpell.LookupEntry(24951);
 			for(uint32 i = 0; i < 2; ++i)
 			{
-				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+				for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 				{
-					(*itr)->Root();
-					if(i == m_winningteam)
-						(*itr)->CastSpell((*itr), winner_spell, true);
-					else
-						(*itr)->CastSpell((*itr), loser_spell, true);
+					Player *plr = objmgr.GetPlayer(*itr);
+					if ( plr != NULL )
+					{
+						plr->Root();
+						if(i == m_winningteam)
+							plr->CastSpell(plr, winner_spell, true);
+						else
+							plr->CastSpell(plr, loser_spell, true);
+					}
 				}
 			}
 			m_mainLock.Release();
@@ -491,8 +499,11 @@ void WarsongGulch::OnStart()
 	m_started = true;
 
 	for(uint32 i = 0; i < 2; ++i) {
-		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
-			(*itr)->RemoveAura(BG_PREPARATION);
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+		{
+			Player *plr = objmgr.GetPlayer(*itr);
+			if ( plr != NULL )
+				plr->RemoveAura(BG_PREPARATION);
 		}
 	}
 
