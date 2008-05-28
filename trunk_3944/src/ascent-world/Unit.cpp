@@ -3050,13 +3050,14 @@ else
 							blocked_damage = 0;
 						}
 
-						if(dmg.full_damage <= (int32)blocked_damage)
-						{
-							CALL_SCRIPT_EVENT(pVictim, OnTargetBlocked)(this, blocked_damage);
-							CALL_SCRIPT_EVENT(this, OnBlocked)(pVictim, blocked_damage);
-							vstate = BLOCK;
-							vproc |= PROC_ON_BLOCK_VICTIM;
-						}
+						// should always be procing block victim
+						vproc |= PROC_ON_BLOCK_VICTIM;
+						CALL_SCRIPT_EVENT(pVictim, OnTargetBlocked)(this, blocked_damage);
+						CALL_SCRIPT_EVENT(this, OnBlocked)(pVictim, blocked_damage);
+
+						if(dmg.full_damage <= (int32)blocked_damage)   
+							vstate = BLOCK;   // BLOCK is actually full block, a partially blocked hit is registered as a normal hit
+          
 						if( pVictim->IsPlayer() )//not necessary now but we'll have blocking mobs in future
 						{            
 							pVictim->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_DODGE_BLOCK);	//SB@L: Enables spells requiring dodge
@@ -3221,7 +3222,7 @@ else
 		pVictim->HandleProc(vproc,this, ability,realdamage,abs);
 		pVictim->m_procCounter = 0;
 
-		if(realdamage > 0)
+		if(realdamage > 0 || vproc & PROC_ON_BLOCK_VICTIM)
 		{
 			pVictim->HandleProcDmgShield(vproc,this);
 			HandleProcDmgShield(aproc,pVictim);
