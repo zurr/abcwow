@@ -164,19 +164,38 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 	if(objA->IsPet())
 	{
 		if(objB->IsPlayer())
+		{
 			if(
 				static_cast<Pet *>(objA)->GetPetOwner() &&
 				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast< Player* >(objB) && 
 				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
 				)
 				return true;
+
+			if(
+				static_cast<Pet *>(objA)->GetPetOwner() &&
+				static_cast<Pet *>(objA)->GetPetOwner()->m_bg &&
+				static_cast<Pet *>(objA)->GetPetOwner()->m_bgTeam != static_cast< Player* >(objB)->m_bgTeam
+				)
+				return true;
+		}
 		if(objB->IsPet())
+		{
 			if(static_cast<Pet *>(objA)->GetPetOwner() &&
 				static_cast<Pet *>(objB)->GetPetOwner() &&
 				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast<Pet *>(objB)->GetPetOwner() && 
 				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
 				)
 				return true;
+
+			if(
+				static_cast<Pet *>(objA)->GetPetOwner() && static_cast<Pet *>(objB)->GetPetOwner() &&
+				static_cast<Pet *>(objA)->GetPetOwner()->m_bg &&
+				static_cast<Pet *>(objA)->GetPetOwner()->m_bgTeam != static_cast<Pet *>(objB)->GetPetOwner()->m_bgTeam
+				)
+				return true;
+
+		}
 	}
 	if(objB->IsPet())
 	{
@@ -202,11 +221,22 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 		if(static_cast<Creature *>(objA)->IsTotem())
 		{
 			if(objB->IsPlayer())
+			{
+
+				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
+					static_cast<Creature *>(objA)->GetTotemOwner()->m_bg &&
+					static_cast<Creature *>(objA)->GetTotemOwner()->m_bgTeam != static_cast< Player* >(objB)->m_bgTeam
+					)
+					return true;
+
 				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
 					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast< Player* >(objB) && 
 					static_cast<Creature *>(objA)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
 					)
 					return true;
+
+
+			}
 			if(objB->IsPet())
 				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
 					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast<Pet *>(objB)->GetPetOwner() && 
