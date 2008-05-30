@@ -3638,7 +3638,7 @@ public:
 
     SoulDevourerAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 4;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -3650,7 +3650,7 @@ public:
 		spells[0].cooldown = -1;
 		spells[0].perctrigger = 7.0f;
 		spells[0].attackstoptimer = 1000;
-
+/*
 		spells[1].info = dbcSpell.LookupEntry(LAVA_BREATH);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
@@ -3664,13 +3664,13 @@ public:
 		spells[2].cooldown = -1;
 		spells[2].perctrigger = 8.0f;
 		spells[2].attackstoptimer = 1000;
-
-		spells[3].info = dbcSpell.LookupEntry(FRENZY);
-		spells[3].targettype = TARGET_SELF;
-		spells[3].instant = true;
-		spells[3].cooldown = -1;
-		spells[3].perctrigger = 8.0f;
-		spells[3].attackstoptimer = 1000;
+*/
+		spells[1].info = dbcSpell.LookupEntry(FRENZY);
+		spells[1].targettype = TARGET_SELF;
+		spells[1].instant = true;
+		spells[1].cooldown = -1;
+		spells[1].perctrigger = 8.0f;
+		spells[1].attackstoptimer = 1000;
 
     }
     
