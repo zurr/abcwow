@@ -50,7 +50,7 @@ Arena::Arena(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t, uint32 players_pe
 	rated_match=false;
 
 	for (uint32 i = 0; i < 2; ++i)
-		inscribe_teams[i] = NULL;
+		inscribe_teams[i] = 0;
 }
 
 Arena::~Arena()
@@ -102,11 +102,11 @@ void Arena::OnAddPlayer(Player * plr)
 	if(rated_match && plr->m_arenaTeams[m_arenateamtype] != NULL)
 	{
 		ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
-		if ( t != NULL && inscribe_teams[plr->m_bgTeam] == NULL )
+		if ( t != NULL && inscribe_teams[plr->m_bgTeam] == 0 )
 		{
 			t->m_stat_gamesplayedseason++;
 			t->m_stat_gamesplayedweek++;
-			inscribe_teams[plr->m_bgTeam] = t;
+			inscribe_teams[plr->m_bgTeam] = t->m_id;
 		}
 
 		ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
@@ -271,10 +271,12 @@ void Arena::UpdatePlayerCounts()
 		return;
 
 	uint32 players[2] = {0,0};
-	for(uint32 i = 0; i < 2; ++i) {
-		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
+	for(uint32 i = 0; i < 2; ++i)
+	{
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+		{
 			Player *plr = objmgr.GetPlayer(*itr);
-			if ( plr != NULL && plr->isAlive())
+			if ( plr != NULL && plr->isAlive() )
 				players[i]++;
 		}
 	}
@@ -308,7 +310,11 @@ void Arena::Finish()
 	/* update arena team stats */
 	if(rated_match)
 	{
-		if (inscribe_teams[0] == NULL || inscribe_teams[1] == NULL )
+		ArenaTeam *teams[2];
+		teams[0] = objmgr.GetArenaTeamById(inscribe_teams[0]);
+		teams[1] = objmgr.GetArenaTeamById(inscribe_teams[1]);
+
+		if ( teams[0] == NULL || teams[1] == NULL )
 			return;
 
 		for (uint32 i = 0; i < 2; ++i)
@@ -318,26 +324,26 @@ void Arena::Finish()
 
 			outcome = (i == m_winningteam);
 
-			double power = (int)( inscribe_teams[j]->m_stat_rating - inscribe_teams[i]->m_stat_rating ) / 400.0f;
+			double power = (int)( teams[j]->m_stat_rating - teams[i]->m_stat_rating ) / 400.0f;
 			double divisor = pow(((double)(10.0)), power);
 			divisor += 1.0;
 			double winChance = 1.0 / divisor;
 
 			if (outcome)
 			{
-				inscribe_teams[i]->m_stat_gameswonseason++;
-				inscribe_teams[i]->m_stat_gameswonweek++;
+				teams[i]->m_stat_gameswonseason++;
+				teams[i]->m_stat_gameswonweek++;
 			}
 
 			double multiplier = (outcome ? 1.0 : 0.0) - winChance;
 			double deltaRating = 32.0 * multiplier;
-			if ( deltaRating < 0 && (-1.0 * deltaRating) > inscribe_teams[i]->m_stat_rating )
-				inscribe_teams[i]->m_stat_rating = 0;
+			if ( deltaRating < 0 && (-1.0 * deltaRating) > teams[i]->m_stat_rating )
+				teams[i]->m_stat_rating = 0;
 			else
-				inscribe_teams[i]->m_stat_rating += long2int32(deltaRating);
+				teams[i]->m_stat_rating += long2int32(deltaRating);
 			objmgr.UpdateArenaTeamRankings();
 
-			inscribe_teams[i]->SaveToDB();
+			teams[i]->SaveToDB();
 
 			for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
