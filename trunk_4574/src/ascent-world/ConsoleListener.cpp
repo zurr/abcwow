@@ -187,7 +187,7 @@ void TestConsoleLogin(string& username, string& password, uint32 requestid);
 
 void ConsoleSocket::OnRead()
 {
-	uint32 readlen = GetReadBuffer().GetSize();
+	uint32 readlen = uint32(GetReadBuffer().GetSize());
 	uint32 len;
 	char * p;
 	if( ( readlen + m_pBufferPos ) >= m_pBufferLen )
