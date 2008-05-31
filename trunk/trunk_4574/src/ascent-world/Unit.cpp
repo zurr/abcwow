@@ -2970,7 +2970,7 @@ else
 		{
 			std::list< DamageSplitTarget >::iterator itr;
 			Unit * splittarget;
-			uint32 splitdamage, tmpsplit;
+			int32 splitdamage, tmpsplit;
 			for( itr = pVictim->m_damageSplitTargets.begin() ; itr != pVictim->m_damageSplitTargets.end() ; itr ++ )
 			{
 				// TODO: Separate damage based on school.
@@ -2983,7 +2983,7 @@ else
 						tmpsplit = dmg.full_damage; // prevent < 0 damage
 					splitdamage = tmpsplit;
 					dmg.full_damage -= tmpsplit;
-					tmpsplit = itr->m_pctDamageSplit * dmg.full_damage;
+					tmpsplit = int32(itr->m_pctDamageSplit * dmg.full_damage);
 					if( tmpsplit > dmg.full_damage )
 						tmpsplit = dmg.full_damage;
 					splitdamage += tmpsplit;

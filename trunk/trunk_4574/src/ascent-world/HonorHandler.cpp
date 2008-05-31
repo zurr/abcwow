@@ -219,7 +219,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 				if(pAffectedPlayer->m_bg)
 					pAffectedPlayer->m_bg->HookOnHK(pAffectedPlayer);
 
-				int32 contributorpts = Points / contributors.size();
+				int32 contributorpts = int32(Points / contributors.size());
 				AddHonorPointsToPlayer(pAffectedPlayer, contributorpts);
 				if(pVictim->IsPlayer())
 				{

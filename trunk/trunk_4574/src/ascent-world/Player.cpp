@@ -10045,14 +10045,14 @@ void Player::Cooldown_AddStart(SpellEntry * pSpell)
 		return;
 
 	uint32 mstime = getMSTime();
-	int32 atime = float2int32( float(pSpell->StartRecoveryTime) * m_floatValues[UNIT_MOD_CAST_SPEED] );
+	float atime = float(pSpell->StartRecoveryTime) * m_floatValues[UNIT_MOD_CAST_SPEED];
 	if( atime <= 0 )
 		return;
 	if( atime >= 1.5 )
 		atime = 1.5; // global cooldown is decreased by spell haste, but it's not INCREASED by spell slow.
 
 	if( pSpell->StartRecoveryCategory )		// if we have a different cool category to the actual spell category - only used by few spells
-		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->StartRecoveryCategory, mstime + atime, pSpell->Id, 0 );
+		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->StartRecoveryCategory, uint32(mstime + atime), pSpell->Id, 0 );
 	/*else if( pSpell->Category )				// cooldowns are grouped
 		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->Category, mstime + pSpell->StartRecoveryTime, pSpell->Id, 0 );*/
 	else									// no category, so it's a gcd
@@ -10060,7 +10060,7 @@ void Player::Cooldown_AddStart(SpellEntry * pSpell)
 #ifdef _DEBUG
 		Log.Debug("Cooldown", "Global cooldown adding: %u ms", atime );
 #endif
-		m_globalCooldown = mstime + atime;
+		m_globalCooldown = uint32(mstime + atime);
 	}
 }
 
