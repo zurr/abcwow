@@ -3,15 +3,11 @@
 #define SKIP_ALLOCATOR_SHARING 1
 #include <ScriptSetup.h>
 
-extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
-{
-	return SCRIPT_TYPE_MISC;
-}
-
 extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 {
     SetupInnkeepers(mgr);
     SetupGuardGossip(mgr);
+    SetupTokenVendor(mgr);
 }
 
 #ifdef WIN32

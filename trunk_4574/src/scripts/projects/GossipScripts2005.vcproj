@@ -392,6 +392,10 @@
 				RelativePath="..\src\GossipScripts\GuardGossip.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\GossipScripts\Token_Vendor.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
