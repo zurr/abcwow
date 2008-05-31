@@ -382,11 +382,143 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\src\InstanceScripts\Event_DarkPortal.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_Arcatraz.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_AuchenaiCrypts.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_BlackMorass.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_BlackrockDepths.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_BlackrockSpire.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_BloodFurnace.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_Botanica.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\InstanceScripts\Instance_Deadmines.cpp"
 				>
 			</File>
 			<File
+				RelativePath="..\src\InstanceScripts\Instance_DireMaul.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_HellfireRamparts.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_ManaTombs.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_Mauradon.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_OldHillsbradFoothills.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_RagefireChasm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_RazorfenDowns.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_ScarletMonastery.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_Scholomance.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_SethekkHalls.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_ShadowfangKeep.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_ShadowLabyrinth.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_TheMechanar.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_TheShatteredHalls.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_TheSlavePens.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_TheSteamvault.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_TheStockade.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_TheUnderbog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_Uldaman.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Instance_ZulFarrak.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_BlackTemple.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\InstanceScripts\Raid_BlackwingLair.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_CoT_BattleOfMountHyjal.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_GruulsLair.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_Karazhan.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_Magtheridons_Lair.cpp"
 				>
 			</File>
 			<File
@@ -399,6 +531,22 @@
 			</File>
 			<File
 				RelativePath="..\src\InstanceScripts\Raid_OnyxiasLair.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_SerpentshrineCavern.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_TheEye.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_WorldBosses.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\InstanceScripts\Raid_ZulAman.cpp"
 				>
 			</File>
 			<File

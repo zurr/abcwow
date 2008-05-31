@@ -3,5 +3,6 @@
 
 void SetupInnkeepers(ScriptMgr * mgr);
 void SetupGuardGossip(ScriptMgr * mgr);
+void SetupTokenVendor(ScriptMgr * mgr);
 
 #endif

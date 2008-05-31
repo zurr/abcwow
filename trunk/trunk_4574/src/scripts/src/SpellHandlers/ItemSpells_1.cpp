@@ -381,8 +381,85 @@ bool WinterWondervoltAura(uint32 i, Aura* pAura, bool apply)
 
 // -----------------------------------------------------------------------------
 
+bool ScryingCrystal(uint32 i, Spell *pSpell)
+{
+	QuestLogEntry *en = pSpell->p_caster->GetQuestLogForEntry(9824);
+	if(pSpell->p_caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(pSpell->p_caster->GetPositionX(), 
+		pSpell->p_caster->GetPositionY(), pSpell->p_caster->GetPositionZ(), 300078) && en)
+	{
+		
+		if(en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
+		{
+			en->SetMobCount(0, 1);
+			en->SendUpdateAddKill(0);
+			en->UpdatePlayerFields();
+			return false;
+		}
+	}
+	else if(pSpell->p_caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(pSpell->p_caster->GetPositionX(), 
+		pSpell->p_caster->GetPositionY(), pSpell->p_caster->GetPositionZ(), 300142) && en)
+	{
+		if(en->GetMobCount(1) < en->GetQuest()->required_mobcount[1])
+		{
+			en->SetMobCount(1, 1);
+			en->SendUpdateAddKill(1);
+			en->UpdatePlayerFields();
+			return false;
+		}
+	}
+	return true;
+}
 
+bool MinionsOfGurok(uint32 i, Spell *pSpell)
+{
+	Unit* target = pSpell->GetUnitTarget();
+	if(!pSpell->p_caster || !target || target->GetTypeId() != TYPEID_UNIT || target->GetEntry() != 17157) return true;
 
+	((Creature*)target)->Despawn(500, 360000);
+
+	float SSX = target->GetPositionX();
+	float SSY = target->GetPositionY();
+	float SSZ = target->GetPositionZ();
+	float SSO = target->GetOrientation();
+
+	pSpell->p_caster->GetMapMgr()->GetInterface()->SpawnCreature(18181, SSX+rand()%8-4, SSY+rand()%8-4, SSZ, SSO, true, false, 0, 0);
+	pSpell->p_caster->GetMapMgr()->GetInterface()->SpawnCreature(18181, SSX+rand()%8-4, SSY+rand()%8-4, SSZ, SSO, true, false, 0, 0);
+	pSpell->p_caster->GetMapMgr()->GetInterface()->SpawnCreature(18181, SSX+rand()%8-4, SSY+rand()%8-4, SSZ, SSO, true, false, 0, 0);
+
+	return true;
+}
+
+bool PurifyBoarMeat(uint32 i, Spell *pSpell)
+{
+	uint32 bormeat = RandomUInt(2);
+	switch(bormeat)
+	{
+	case 0:
+		{
+			pSpell->p_caster->CastSpell(pSpell->p_caster, 29277, true);
+		}break;
+	case 1:
+		{
+			pSpell->p_caster->CastSpell(pSpell->p_caster, 29278, true);
+		}break;
+	}
+	
+	return true;
+}
+
+bool WarpRiftGenerator(uint32 i, Spell * pSpell)
+{
+	if(!pSpell->p_caster) return true;
+
+	float SSX = pSpell->p_caster->GetPositionX();
+	float SSY = pSpell->p_caster->GetPositionY();
+	float SSZ = pSpell->p_caster->GetPositionZ();
+	float SSO = pSpell->p_caster->GetOrientation();
+
+	pSpell->p_caster->GetMapMgr()->GetInterface()->SpawnCreature(16939,SSX,SSY,SSZ,SSO,true,false,0,0);
+
+	return true;
+}
 
 // ADD NEW FUNCTIONS ABOVE THIS LINE
 // *****************************************************************************
@@ -410,8 +487,10 @@ void SetupItemSpells_1(ScriptMgr * mgr)
 	mgr->register_dummy_spell(26541, &SummonCritterDummy);      // Red Helper Box
 	mgr->register_dummy_spell(26275, &WinterWondervolt);        // PX-238 Winter Wondervolt Trap
 	mgr->register_dummy_aura( 26274, &WinterWondervoltAura);    // PX-238 Winter Wondervolt Transform Aura
-
-
+	mgr->register_dummy_spell(32042, &ScryingCrystal);			// Violet Scrying Crystal (Quest)
+	mgr->register_dummy_spell(32001, &MinionsOfGurok);			// Minions of gurok
+	mgr->register_dummy_spell(29200, &PurifyBoarMeat);			// Purify Boar meat spell
+	mgr->register_dummy_spell(35036, &WarpRiftGenerator);       // Summon a Warp Rift in Void Ridge
 
 // REGISTER NEW DUMMY SPELLS ABOVE THIS LINE
 // *****************************************************************************
