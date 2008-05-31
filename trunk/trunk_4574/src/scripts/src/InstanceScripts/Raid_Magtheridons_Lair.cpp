@@ -237,7 +237,7 @@ public:
 					EventStop(NULL);
 			}
 			else if (timer_banish == 60)
-				_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " is nearly free of his bounds!");
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, " is nearly free of his bounds!");
 		}
 		else
 		{
@@ -404,7 +404,7 @@ public:
 	{
 		if (!m_eventstarted)
 		{
-			_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, "'s bonds begin to weaken!");
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, "'s bonds begin to weaken!");
 			m_eventstarted = true;
 			if (door == NULL)
 				door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-69.500000f, 2.000000f, -0.000000f, 183847);

@@ -1212,7 +1212,7 @@ public:
 				break;
 				}
 				*/
-				_unit->SendChatMessage(CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, " summons watery globules!");
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, " summons watery globules!");
 				wateryGlobules();
 			}
 			waterglobulecd = 25 + RandomUInt(100)%10;

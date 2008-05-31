@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="QuestScripts"
 	ProjectGUID="{60406704-5136-447C-B34B-C5AD16A094FD}"
 	RootNamespace="QuestScripts"
@@ -123,7 +123,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\ascent-shared;..\..\ascent-world;..\..\..\dep\include;..\..\..\dep\src"
+				AdditionalIncludeDirectories="&quot;..\..\ascent-shared&quot;;&quot;..\..\ascent-world&quot;;..\..\..\dep\include;..\..\..\dep\Sources\zlib;..\..\..\dep\VC\include;..\..\..\dep\Sources;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTLIB"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
