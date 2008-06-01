@@ -1924,8 +1924,8 @@ public:
 
 		//explode in some seconds
 		//TODO: On official servers it explodes exactly when arcane orb trigger reaches it
-		sEventMgr.AddEvent(((Unit*)_unit), &Unit::EventCastSpell, ((Unit*)_unit), dbcSpell.LookupEntry(ARCANE_ORB), EVENT_UNK, 4500, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-		_unit->Despawn(3200, 0);
+		sEventMgr.AddEvent(((Unit*)_unit), &Unit::EventCastSpell, ((Unit*)_unit), dbcSpell.LookupEntry(ARCANE_ORB), EVENT_UNK, 3200, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+		_unit->Despawn(4000, 0);
 	}
 };
 
@@ -1967,7 +1967,7 @@ class HighAstromancerSolarianAI : public MoonScriptBossAI
 
 		//Phase 1 spells
 		AddPhaseSpell(1, AddSpell(SOLARIAN_ARCANE_MISSILES, Target_RandomUnit, 60, 3, 0, 0, 45));
-		AddPhaseSpell(1, AddSpell(SOLARIAN_WRATH_OF_THE_ASTROMANCER, Target_RandomPlayerNotCurrent, 20, 0, 6, 0, 50000));
+		AddPhaseSpell(1, AddSpell(SOLARIAN_WRATH_OF_THE_ASTROMANCER, Target_RandomPlayerNotCurrent, 20, 0, 8, 0, 5000));
 		AddPhaseSpell(1, AddSpell(SOLARIAN_BLINDING_LIGHT, Target_Self, 20, 0, 20, 0, 50));
 		mDisappear = AddSpellFunc(&SpellFunc_Solarian_Disappear, Target_Self, 0, 22, 0);
 		mDisappear->AddEmote("You are hopelessly outmatched!", Text_Yell, 11139);
@@ -1979,7 +1979,7 @@ class HighAstromancerSolarianAI : public MoonScriptBossAI
 		//Phase 3 spells
 		AddPhaseSpell(3, AddSpell(SOLARIAN_VOID_BOLT, Target_Current, 100, 3, 10, 0, 100));
 		AddPhaseSpell(3, AddSpell(SOLARIAN_PSYCHIC_SCREAM, Target_Self, 10, 0, 0));
-		mVoidForm = AddSpell(SOLARIAN_SOLARIANS_TRANSFORM, Target_Self, 100.0f, 0, 999999);
+		mVoidForm = AddSpell(SOLARIAN_SOLARIANS_TRANSFORM, Target_Self, 100.0f, 0, 350000);
 		mVoidForm->AddEmote("Enough of this! Now I call upon the fury of the cosmos itself.");
 		mVoidForm->AddEmote("I become ONE... with the VOID!");
 
@@ -2025,9 +2025,15 @@ class HighAstromancerSolarianAI : public MoonScriptBossAI
 			{
 				for( int SpawnIter = 0; SpawnIter < 4; SpawnIter++ )
 				{
-					SpawnCreature(CN_SOLARIUMAGENT, mSpawnPositions[0][0], mSpawnPositions[0][1], 17, 0, true);
-					SpawnCreature(CN_SOLARIUMAGENT, mSpawnPositions[1][0], mSpawnPositions[1][1], 17, 0, true);
-					SpawnCreature(CN_SOLARIUMAGENT, mSpawnPositions[2][0], mSpawnPositions[2][1], 17, 0, true);
+	
+					MoonScriptCreatureAI* swp1 = this->SpawnCreature(CN_SOLARIUMAGENT,this->GetUnit()->GetPositionX()+15+ RandomUInt(5), this->GetUnit()->GetPositionY() + 15 + RandomUInt(5), this->GetUnit()->GetPositionZ(), 0, true);
+					if ( swp1 != NULL ) swp1->Despawn(240000, 0);
+
+					MoonScriptCreatureAI* swp2 = this->SpawnCreature(CN_SOLARIUMAGENT,this->GetUnit()->GetPositionX()-15+ RandomUInt(5), this->GetUnit()->GetPositionY() + 15 + RandomUInt(5), this->GetUnit()->GetPositionZ(), 0, true);
+					if ( swp2 != NULL ) swp2->Despawn(240000, 0);
+
+					MoonScriptCreatureAI* swp3 = this->SpawnCreature(CN_SOLARIUMAGENT,this->GetUnit()->GetPositionX()-15+ RandomUInt(5), this->GetUnit()->GetPositionY() - 15 + RandomUInt(5), this->GetUnit()->GetPositionZ(), 0, true);
+					if ( swp3 != NULL ) swp2->Despawn(240000, 0);
 				}
 				RemoveTimer(mAgentsTimer);
 			}
@@ -2039,7 +2045,6 @@ class HighAstromancerSolarianAI : public MoonScriptBossAI
 	SpellDesc*	mDisappear;
 	SpellDesc*	mReappear;
 	int32		mSplitTimer, mAgentsTimer, mSolarianTimer;
-	float		mSpawnPositions[3][2];
 };
 
 bool Dummy_Solarian_WrathOfTheAstromancer(uint32 pEffectIndex, Spell* pSpell)
@@ -2065,18 +2070,14 @@ void SpellFunc_Solarian_Disappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreat
 	{
 		SpellFunc_Disappear(pThis, pCreatureAI, pTarget, pType);
 
-		Solarian->mSpawnPositions[0][0] = 400 + RandomFloat(60); 
-		Solarian->mSpawnPositions[0][1] = -400 + RandomFloat(60);
-		MoonScriptCreatureAI* swp1 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[0][0], Solarian->mSpawnPositions[0][1], 17);
-		if ( swp1 != NULL ) swp1->Despawn(26000, 0);
-		Solarian->mSpawnPositions[1][0] = 400 + RandomFloat(60); 
-		Solarian->mSpawnPositions[1][1] = -400 + RandomFloat(60);
-		MoonScriptCreatureAI* swp2 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[1][0], Solarian->mSpawnPositions[1][1], 17);
-		if ( swp2 != NULL ) swp2->Despawn(26000, 0);
-		Solarian->mSpawnPositions[2][0] = 400 + RandomFloat(60); 
-		Solarian->mSpawnPositions[2][1] = -400 + RandomFloat(60);
-		MoonScriptCreatureAI* swp3 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->mSpawnPositions[2][0], Solarian->mSpawnPositions[2][1], 17);
-		if ( swp3 != NULL ) swp3->Despawn(26000, 0);
+		MoonScriptCreatureAI* swp1 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->GetUnit()->GetPositionX() + 15, Solarian->GetUnit()->GetPositionY() + 15, Solarian->GetUnit()->GetPositionZ());
+		if ( swp1 != NULL ) swp1->Despawn(22000, 0);
+
+		MoonScriptCreatureAI* swp2 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->GetUnit()->GetPositionX() - 15, Solarian->GetUnit()->GetPositionY() + 15, Solarian->GetUnit()->GetPositionZ());
+		if ( swp2 != NULL ) swp2->Despawn(22000, 0);
+
+		MoonScriptCreatureAI* swp3 = Solarian->SpawnCreature(CN_SPOT_LIGHT,Solarian->GetUnit()->GetPositionX() - 15, Solarian->GetUnit()->GetPositionY() - 15, Solarian->GetUnit()->GetPositionZ());
+		if ( swp3 != NULL ) swp3->Despawn(22000, 0);
 	}
 }
 
@@ -2086,8 +2087,8 @@ void SpellFunc_Solarian_Reappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatu
 	if( Solarian )
 	{
 		//Spawn two priest friend to help Solarian
-		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->mSpawnPositions[0][0], Solarian->mSpawnPositions[0][1], 17);
-		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->mSpawnPositions[1][0], Solarian->mSpawnPositions[1][1], 17);
+		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->GetUnit()->GetPositionX() + 5, Solarian->GetUnit()->GetPositionY() - 5, Solarian->GetUnit()->GetPositionZ(), 0, true);
+		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->GetUnit()->GetPositionX() - 5, Solarian->GetUnit()->GetPositionY() + 5, Solarian->GetUnit()->GetPositionZ(), 0, true);
 		//Solarian->MoveTo(Solarian->mSpawnPositions[2][0], Solarian->mSpawnPositions[2][1], 17);	//Doesn't work quite right yet
 
 		SpellFunc_Reappear(pThis, pCreatureAI, pTarget, pType);
