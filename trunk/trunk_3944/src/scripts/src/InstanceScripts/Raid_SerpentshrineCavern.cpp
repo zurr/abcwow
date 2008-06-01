@@ -3129,7 +3129,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(VASHJ_STATICCHARGE);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
-		spells[0].cooldown = 20;
+		spells[0].cooldown = 15;
 		spells[0].perctrigger = 40.0f;
 		spells[0].attackstoptimer = 1000;
 	}

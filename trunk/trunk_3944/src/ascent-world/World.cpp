@@ -933,6 +933,8 @@ bool World::SetInitialWorldSettings()
 					//dirty code for procs, if any1 got any better idea-> u are welcome
 					//139944 --- some magic number, it will trigger on all hits etc
 						//for seems to be smth like custom check
+					if( strstr( desc,"Friendly targets of the caster's heals gain"))
+						pr|=PROC_ON_CAST_SPELL;
 					if( strstr( desc,"your ranged criticals"))
 						pr|=PROC_ON_RANGED_CRIT_ATTACK;
 					if( strstr( desc,"chance on hit"))
@@ -6673,6 +6675,19 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 40482 );
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+
+	//Mental Protection Field - Staff of Disintegration
+	sp = dbcSpell.LookupEntryForced( 36480 );
+	if( sp != NULL )
+	{
+		sp->Targets = 256;
+		sp->rangeIndex = 5;
+		for (uint32 x=0; x<3; x++)
+		{
+			sp->EffectImplicitTargetA[i] = 37;
+			sp->EffectRadiusIndex[i] = 12;
+		}
+	}
 
 	//Ashtongue Talisman of Equilibrium
 	sp = dbcSpell.LookupEntryForced( 40442 );
