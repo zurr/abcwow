@@ -496,7 +496,7 @@ void Aura::Remove()
 			newTarget = m_target;
 		break;
 		case 66: //Invisibility
-			triggerSpell = 32612;
+			//triggerSpell = 32612;
 		break;
 		}
 	}
