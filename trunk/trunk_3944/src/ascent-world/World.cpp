@@ -1536,6 +1536,21 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 0x20000000;
 
+	sp = dbcSpell.LookupEntry( 23025 ); //Blink Reduction ( arena set bonus )
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x010000;
+
+	sp = dbcSpell.LookupEntry( 44302 ); //Improved Polymorph -cast time ( arena set bonus )
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x1000000;
+
+	sp = dbcSpell.LookupEntry( 44301 ); //Improved Polymorph interruption avoidance ( arena set bonus )
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x1000000;
+
+	sp = dbcSpell.LookupEntry( 33066 ); //Mage Fire Blast Range Bonus ( arena gloves bonus )
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000002;
 
 	// Warp-Spring Coil
 	sp = dbcSpell.LookupEntry( 37173 );
