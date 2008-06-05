@@ -2089,7 +2089,6 @@ void SpellFunc_Solarian_Reappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatu
 		//Spawn two priest friend to help Solarian
 		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->GetUnit()->GetPositionX() + 5, Solarian->GetUnit()->GetPositionY() - 5, Solarian->GetUnit()->GetPositionZ(), 0, true);
 		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->GetUnit()->GetPositionX() - 5, Solarian->GetUnit()->GetPositionY() + 5, Solarian->GetUnit()->GetPositionZ(), 0, true);
-		//Solarian->MoveTo(Solarian->mSpawnPositions[2][0], Solarian->mSpawnPositions[2][1], 17);	//Doesn't work quite right yet
 
 		SpellFunc_Reappear(pThis, pCreatureAI, pTarget, pType);
 	}
