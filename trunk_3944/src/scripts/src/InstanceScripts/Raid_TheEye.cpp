@@ -1822,10 +1822,16 @@ public:
 			if( RandomTarget != NULL )
 			{
 				//1) spawn a trigger
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ARCANEORBTARGET, RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), 0, false, false, 0, 0);
+				Creature* orbTarget = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ARCANEORBTARGET, RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), 0, false, false, 0, 0);
 
 				//2) send the missile
 				_unit->CastSpellAoF(RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER), true);
+
+				//3) Add the damage event
+				uint32 time = (uint32)(_unit->CalcDistance(orbTarget) * 1000.0f) / dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER)->speed;
+
+				sEventMgr.AddEvent(((Unit*)orbTarget), &Unit::EventCastSpell, ((Unit*)orbTarget), dbcSpell.LookupEntry(ARCANE_ORB), EVENT_UNK, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+				orbTarget->Despawn(time + 1000, 0);
 			}
 			ArcaneOrbTimer = 6;
 		}
@@ -1921,11 +1927,6 @@ public:
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		_unit->GetAIInterface()->m_canMove = false;
-
-		//explode in some seconds
-		//TODO: On official servers it explodes exactly when arcane orb trigger reaches it
-		sEventMgr.AddEvent(((Unit*)_unit), &Unit::EventCastSpell, ((Unit*)_unit), dbcSpell.LookupEntry(ARCANE_ORB), EVENT_UNK, 3200, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-		_unit->Despawn(4000, 0);
 	}
 };
 
