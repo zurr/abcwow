@@ -996,8 +996,9 @@ public:
 
 		spells[1].info = dbcSpell.LookupEntry(REVERBERATION);
 		spells[1].targettype = TARGET_VARIOUS;
+		spells[1].cooldown = 38;
 		spells[1].instant = true;
-		spells[1].perctrigger = 3.0f;
+		spells[1].perctrigger = 50.0f;
 		spells[1].attackstoptimer = 1000;
 
 	}
