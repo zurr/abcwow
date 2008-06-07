@@ -3870,23 +3870,6 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->SpellGroupType = 4;
 
-	//Hunter : Mortal Shots
-	sp = dbcSpell.LookupEntryForced( 19485 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
-	sp = dbcSpell.LookupEntryForced( 19487 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
-	sp = dbcSpell.LookupEntryForced( 19488 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
-	sp = dbcSpell.LookupEntryForced( 19489 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
-	sp = dbcSpell.LookupEntryForced( 19490 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
-
 	//Hunter : Improved Barrage
 	sp = dbcSpell.LookupEntryForced( 35104 );
 	if( sp != NULL )
