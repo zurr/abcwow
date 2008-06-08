@@ -2467,12 +2467,9 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 	if( c != NULL && m_spellProto->SpellGroupType )
 	{
-		int penalty_pct = 0;
-		int penalty_flt = 0;
-		SM_FIValue( c->SM_PPenalty, &penalty_pct, GetSpellProto()->SpellGroupType );
-		bonus += bonus * ( penalty_pct / 100 );
-		SM_FIValue( c->SM_FPenalty, &penalty_flt, GetSpellProto()->SpellGroupType );
-		bonus += penalty_flt;
+		//int penalty_flt = 0;
+		SM_PIValue( c->SM_PPenalty, &bonus, m_spellProto->SpellGroupType );
+		//SM_FIValue( c->SM_FPenalty, &penalty_flt, m_spellProto->SpellGroupType );
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		int spell_flat_modifers=0;
 		int spell_pct_modifers=0;
@@ -2524,6 +2521,12 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	if( c != NULL )
 		add += float2int32( add * ( m_target->HealTakenPctMod[m_spellProto->School]+ c->HealDonePctMod[GetSpellProto()->School] / 100.0f));
 	
+	if( c != NULL && m_spellProto->SpellGroupType )
+	{
+		SM_FIValue(c->SM_FDOT, (int32*)&add, m_spellProto->SpellGroupType);
+		SM_PIValue(c->SM_PDOT, (int32*)&add, m_spellProto->SpellGroupType);
+	}
+
 	uint32 newHealth = m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) + (uint32)add;
 	
 	if( newHealth <= m_target->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) )
