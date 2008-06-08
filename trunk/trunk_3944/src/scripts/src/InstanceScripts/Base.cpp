@@ -1050,7 +1050,7 @@ void SpellFunc_Disappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Un
 	if ( pCreatureAI != NULL && pCreatureAI->GetUnit() != NULL )
 	{
 		Aura * pAura;
-		for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_PASSIVE_AURAS; ++i)
+		for(uint32 i = 0; i < MAX_PASSIVE_AURAS; ++i)
 		{
 			pAura = pCreatureAI->GetUnit()->m_auras[i];
 			if( pAura != NULL && !pAura->IsPassive() && !pAura->IsPositive() )

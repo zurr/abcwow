@@ -1828,10 +1828,10 @@ public:
 				_unit->CastSpellAoF(RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER), true);
 
 				//3) Add the damage event
-				uint32 time = (uint32)(_unit->CalcDistance(orbTarget) * 1000.0f) / dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER)->speed;
-
+				uint32 time = uint32(_unit->CalcDistance(orbTarget) * 100.0f);
 				sEventMgr.AddEvent(((Unit*)orbTarget), &Unit::EventCastSpell, ((Unit*)orbTarget), dbcSpell.LookupEntry(ARCANE_ORB), EVENT_UNK, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-				orbTarget->Despawn(time + 1000, 0);
+				if ( orbTarget != NULL )
+					orbTarget->Despawn(time + 1000, 0);
 			}
 			ArcaneOrbTimer = 6;
 		}
@@ -1998,6 +1998,13 @@ class HighAstromancerSolarianAI : public MoonScriptBossAI
 		ParentClass::OnCombatStart(pTarget);
 	}
    
+	void OnCombatStop(Unit* pTarget)
+	{
+		SpellFunc_Reappear(NULL, this, pTarget, TargetType(0));
+		this->Despawn(10000,10);
+		ParentClass::OnCombatStop(pTarget);
+	}
+
 	void AIUpdate()
 	{
 		if( GetPhase() == 1 )
@@ -2069,16 +2076,16 @@ void SpellFunc_Solarian_Disappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreat
 	HighAstromancerSolarianAI* Solarian = ( pCreatureAI ) ? (HighAstromancerSolarianAI*)pCreatureAI : NULL;
 	if( Solarian )
 	{
-		SpellFunc_Disappear(pThis, pCreatureAI, pTarget, pType);
-
 		MoonScriptCreatureAI* swp1 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->GetUnit()->GetPositionX() + 15, Solarian->GetUnit()->GetPositionY() + 15, Solarian->GetUnit()->GetPositionZ());
-		if ( swp1 != NULL ) swp1->Despawn(22000, 0);
+		if ( swp1 != NULL ) swp1->Despawn(10000, 0);
 
 		MoonScriptCreatureAI* swp2 = Solarian->SpawnCreature(CN_SPOT_LIGHT, Solarian->GetUnit()->GetPositionX() - 15, Solarian->GetUnit()->GetPositionY() + 15, Solarian->GetUnit()->GetPositionZ());
-		if ( swp2 != NULL ) swp2->Despawn(22000, 0);
+		if ( swp2 != NULL ) swp2->Despawn(10000, 0);
 
 		MoonScriptCreatureAI* swp3 = Solarian->SpawnCreature(CN_SPOT_LIGHT,Solarian->GetUnit()->GetPositionX() - 15, Solarian->GetUnit()->GetPositionY() - 15, Solarian->GetUnit()->GetPositionZ());
-		if ( swp3 != NULL ) swp3->Despawn(22000, 0);
+		if ( swp3 != NULL ) swp3->Despawn(10000, 0);
+
+		SpellFunc_Disappear(pThis, pCreatureAI, pTarget, pType);
 	}
 }
 
@@ -2088,8 +2095,11 @@ void SpellFunc_Solarian_Reappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatu
 	if( Solarian )
 	{
 		//Spawn two priest friend to help Solarian
-		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->GetUnit()->GetPositionX() + 5, Solarian->GetUnit()->GetPositionY() - 5, Solarian->GetUnit()->GetPositionZ(), 0, true);
-		Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->GetUnit()->GetPositionX() - 5, Solarian->GetUnit()->GetPositionY() + 5, Solarian->GetUnit()->GetPositionZ(), 0, true);
+		MoonScriptCreatureAI* swp1 = Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->GetUnit()->GetPositionX() + 5, Solarian->GetUnit()->GetPositionY() - 5, Solarian->GetUnit()->GetPositionZ(), 0, true);
+		if ( swp1 != NULL ) swp1->Despawn(240000, 0);
+
+		MoonScriptCreatureAI* swp2 = Solarian->SpawnCreature(CN_SOLARIUMPRIEST, Solarian->GetUnit()->GetPositionX() - 5, Solarian->GetUnit()->GetPositionY() + 5, Solarian->GetUnit()->GetPositionZ(), 0, true);
+		if ( swp2 != NULL ) swp2->Despawn(240000, 0);
 
 		SpellFunc_Reappear(pThis, pCreatureAI, pTarget, pType);
 	}
@@ -4076,7 +4086,7 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
-		if ( AddPhase < 4 ) reset();
+		reset();
 
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 		_unit->GetAIInterface()->m_canMove = true;

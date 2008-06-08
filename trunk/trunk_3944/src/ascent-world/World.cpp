@@ -6678,13 +6678,9 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 36480 );
 	if( sp != NULL )
 	{
-		sp->Targets = 256;
-		sp->rangeIndex = 5;
-		for (uint32 x=0; x<3; x++)
-		{
-			sp->EffectImplicitTargetA[i] = 37;
-			sp->EffectRadiusIndex[i] = 12;
-		}
+		sp->Attributes = 151257088;
+		sp->AuraInterruptFlags = 0;
+		sp->unkflags = 133;
 	}
 
 	//Ashtongue Talisman of Equilibrium
