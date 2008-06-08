@@ -490,14 +490,13 @@ public:
 				submergetimer = 60;
 				submerged = 1;
 
-				Creature *summon;
-				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 12.239388f, -454.372284f, -19.793467f, 1.132437f, true, false, 0, 0);
-				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 48.335369f, -458.581665f, -19.793333f, 1.807879f, true, false, 0, 0);
-				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 62.277702f, -380.135712f, -19.721540f, 4.036446f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 12.239388f, -454.372284f, -19.793467f, 1.132437f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 48.335369f, -458.581665f, -19.793333f, 1.807879f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 62.277702f, -380.135712f, -19.721540f, 4.036446f, true, false, 0, 0);
 
-				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGGUARDIAN, 38.281582f, -392.905212f, -18.703152f, 5.200795f, true, false, 0, 0);
-				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGGUARDIAN, 19.376112f, -425.276642f, -19.497267f, 5.764311f, true, false, 0, 0);
-				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGGUARDIAN, 50.974178f, -436.504120f, -19.012314f, 1.949248f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGGUARDIAN, 38.281582f, -392.905212f, -18.703152f, 5.200795f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGGUARDIAN, 19.376112f, -425.276642f, -19.497267f, 5.764311f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGGUARDIAN, 50.974178f, -436.504120f, -19.012314f, 1.949248f, true, false, 0, 0);
 			}
 			else
 			{
@@ -1112,12 +1111,12 @@ public:
 				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 445.17f, -719.20f, -7.14f, 0, true, false, 0, 0);
 				if ( murloc == NULL )
 					continue;
-				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
+				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5.0f);
 				murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 				murloc = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_MURLOC, 314.42f, -729.91f, -13.15f, 0, true, false, 0, 0);
 				if ( murloc == NULL )
 					continue;
-				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
+				murloc->GetAIInterface()->_CalcDestinationAndMove(_unit, 5.0f);
 				murloc->GetAIInterface()->AttackReaction(tank, 200, 0);
 			}
 			earthquakecd = 50 + RandomUInt(100)%10;
@@ -1389,6 +1388,7 @@ public:
 		_unit->SchoolImmunityList[5] = 1;
 		_unit->SchoolImmunityList[6] = 1;
 		_unit->Despawn(15000, 0);
+		RegisterAIUpdateEvent(1000);
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -1401,7 +1401,6 @@ public:
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
-		_unit->Despawn(100, 0);
 	}
 
 	void OnDied(Unit * mKiller)
@@ -1414,6 +1413,16 @@ public:
 	}
 	void AIUpdate()
 	{
+		Unit *target = _unit->GetAIInterface()->getTauntedBy();
+		if (target == NULL)
+			return;
+
+		_unit->GetAIInterface()->_CalcDestinationAndMove(target, 1.0f);
+		if (_unit->CalcDistance(target) <= 5.0f)
+		{
+			_unit->Strike(target, 0, NULL, 0, 0, 0, true, true);
+			_unit->Despawn(100, 0);
+		}
 	}
 protected:
 };
