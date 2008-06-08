@@ -1361,7 +1361,6 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 			Creature * c = (Creature*)( unitTarget );
 			if (c)
  			{
-
 				/*
 				Charm (Mind Control, enslave demon): 1
 				Confuse (Blind etc): 2

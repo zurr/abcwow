@@ -4062,7 +4062,7 @@ void Spell::SendHealManaSpellOnPlayer(Object * caster, Object * target, uint32 d
 
 void Spell::Heal(int32 amount)
 {
-	if( unitTarget == NULL || !unitTarget->isAlive())
+	if( unitTarget == NULL || !unitTarget->isAlive() || m_spellInfo == NULL )
 		return;
 	
 	if( p_caster != NULL )
@@ -4117,12 +4117,8 @@ void Spell::Heal(int32 amount)
 
 		if(m_spellInfo->SpellGroupType)
 		{
-			int penalty_pct = 0;
-			int penalty_flt = 0;
-			SM_FIValue( u_caster->SM_PPenalty, &penalty_pct, m_spellInfo->SpellGroupType );
-			bonus += bonus * ( penalty_pct / 100 );
-			SM_FIValue( u_caster->SM_FPenalty, &penalty_flt, m_spellInfo->SpellGroupType );
-			bonus += penalty_flt;
+			SM_PIValue( u_caster->SM_PPenalty, &bonus, m_spellInfo->SpellGroupType );
+			//SM_FIValue( u_caster->SM_FPenalty, &penalty_flt, m_spellInfo->SpellGroupType );
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 			int spell_flat_modifers=0;
 			int spell_pct_modifers=0;
@@ -4144,13 +4140,16 @@ void Spell::Heal(int32 amount)
 		amount += float2int32( float( bonus ) * healdoneaffectperc );
 
 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
-        SM_FFValue(u_caster->SM_CriticalChance, &spellCrit, m_spellInfo->SpellGroupType);
+		if( m_spellInfo->SpellGroupType )
+		{
+			SM_FFValue(u_caster->SM_CriticalChance, &spellCrit, m_spellInfo->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
         float spell_flat_modifers=0;
         SM_FFValue(u_caster->SM_CriticalChance,&spell_flat_modifers,m_spellInfo->SpellGroupType);
         if(spell_flat_modifers!=0)
             printf("!!!!spell critchance mod flat %f ,and critchance is %f spell group %u\n",spell_flat_modifers,spellCrit,m_spellInfo->SpellGroupType);
 #endif
+		}
 
 		if( critical = Rand( spellCrit ) )
 		{

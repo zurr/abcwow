@@ -4254,10 +4254,8 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	//bonus_damage +=pVictim->DamageTakenMod[school]; Bad copy-past i guess :P
 	if(spellInfo->SpellGroupType)
 	{
-		int penalty_pct=0;
-		SM_FIValue(caster->SM_PPenalty, &penalty_pct, spellInfo->SpellGroupType);
-		bonus_damage += bonus_damage*penalty_pct/100;
-		SM_FIValue(caster->SM_FPenalty, &bonus_damage, spellInfo->SpellGroupType);
+		SM_PIValue(caster->SM_PPenalty, &bonus_damage, spellInfo->SpellGroupType);
+		//SM_FIValue(caster->SM_FPenalty, &bonus_damage, spellInfo->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		int spell_flat_modifers=0;
 		int spell_pct_modifers=0;

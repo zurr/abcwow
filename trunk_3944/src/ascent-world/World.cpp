@@ -1572,6 +1572,91 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->proc_interval = 20000;
 
+	// Inner Focus
+	sp = dbcSpell.LookupEntry( 14751 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+		sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF;
+	}
+
+	// Improved Renew
+	sp = dbcSpell.LookupEntry( 14908 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000040;
+	sp = dbcSpell.LookupEntry( 15020 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000040;
+	sp = dbcSpell.LookupEntry( 17191 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000040;
+
+	// Improved Rejuvenation
+	sp = dbcSpell.LookupEntry( 17111 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000010 ;
+	sp = dbcSpell.LookupEntry( 17112 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000010 ;
+	sp = dbcSpell.LookupEntry( 17113 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000010 ;
+	sp = dbcSpell.LookupEntry( 17114 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000010 ;
+	sp = dbcSpell.LookupEntry( 17115 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000010 ;
+
+	// Empowered Rejuvenation
+	sp = dbcSpell.LookupEntry( 33886 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000040 | 0x000010 | 0x000080;
+	sp = dbcSpell.LookupEntry( 33887 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000040 | 0x000010 | 0x000080;
+	sp = dbcSpell.LookupEntry( 33888 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000040 | 0x000010 | 0x000080;
+	sp = dbcSpell.LookupEntry( 33889 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000040 | 0x000010 | 0x000080;
+	sp = dbcSpell.LookupEntry( 33890 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000040 | 0x000010 | 0x000080;
+
+	//Empowered Healing
+	sp = dbcSpell.LookupEntry( 33158 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x001000;
+		sp->EffectSpellGroupRelation[1] = 0x000800;
+	}
+	sp = dbcSpell.LookupEntry( 33159 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x001000;
+		sp->EffectSpellGroupRelation[1] = 0x000800;
+	}
+	sp = dbcSpell.LookupEntry( 33160 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x001000;
+		sp->EffectSpellGroupRelation[1] = 0x000800;
+	}
+	sp = dbcSpell.LookupEntry( 33161 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x001000;
+		sp->EffectSpellGroupRelation[1] = 0x000800;
+	}
+	sp = dbcSpell.LookupEntry( 33162 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x001000;
+		sp->EffectSpellGroupRelation[1] = 0x000800;
+	}
+
 	// Band of the Eternal ...
 	sp = dbcSpell.LookupEntry( 35080 );
 	if( sp != NULL )
@@ -6412,23 +6497,6 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 33880 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 32;
-
-	// druid - Empowered Rejuvenation
-	sp = dbcSpell.LookupEntryForced( 33886 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
-	sp = dbcSpell.LookupEntryForced( 33887 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
-	sp = dbcSpell.LookupEntryForced( 33888 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
-	sp = dbcSpell.LookupEntryForced( 33889 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
-	sp = dbcSpell.LookupEntryForced( 33890 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
 
 	// druid - Wrath of cenarius
 	sp = dbcSpell.LookupEntryForced( 33603 );
