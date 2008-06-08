@@ -1266,7 +1266,23 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				}
 			}
 		}break;
-	}										 
+	case 29858: //Soulshatter
+		{
+			if( unitTarget == NULL || !unitTarget->isAlive() )
+				return;
+
+			std::set< Object* >::iterator itr;
+
+			for( itr = unitTarget->GetInRangeSetBegin(); itr != unitTarget->GetInRangeSetEnd(); itr++ )
+			{
+				if( (*itr) == NULL || (*itr)->GetTypeId() != TYPEID_UNIT || !static_cast< Unit* >( *itr )->IsCreature() || unitTarget->CalcDistance( (*itr) ) > 50.0f )
+					continue;
+
+				Creature *tCreature = static_cast< Creature* >( *itr );
+				tCreature->GetAIInterface()->modThreatByPtr( unitTarget, tCreature->GetAIInterface()->getThreatByPtr( unitTarget )/2 );
+			}
+		}break;
+	}
 }
 
 void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
