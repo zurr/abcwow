@@ -1268,14 +1268,14 @@ public:
 			if( itr->first == NULL || itr->first->GetTypeId() != TYPEID_PLAYER || !itr->first->isAlive() || _unit->GetDistance2dSq(itr->first) >= 100.0f )
 				continue;
 
-			if( (itr->second + itr->first->GetThreatModifyer()) > currentTarget.second && itr->first != mUnit )
+			if( itr->second > currentTarget.second && itr->first != mUnit )
 			{
 				currentTarget.first = itr->first;
-				currentTarget.second = itr->second + itr->first->GetThreatModifyer();
+				currentTarget.second = itr->second;
 			}
 		}
 
-		if ( currentTarget.first == NULL && mUnit != NULL && _unit->GetDistance2dSq( mUnit ) <= 100)
+		if ( currentTarget.first == NULL && mUnit != NULL && _unit->GetDistance2dSq( mUnit ) <= 100.0f)
 			currentTarget.first = mUnit;
 
 		if ( currentTarget.first != NULL )
