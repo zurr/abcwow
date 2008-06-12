@@ -58,8 +58,8 @@ int main(int argc, char* argv[])
     VMAP::TileAssembler* ta = new VMAP::TileAssembler(std::string(src), std::string(dest));
     ta->setModelNameFilterMethod(modelNameFilter);
 
-	static uint32 maps[999] = { 509, 469, 189, 30, 37, 33, 533, 209, 309, 560, 534, 532, 543, 568, 564, 0, 1, 530 };
-	for(uint32 i = 0; maps[i] != 0; ++i)
+	static uint32 maps[999] = { 509, 469, 189, 30, 37, 33, 533, 209, 309, 560, 534, 532, 543, 568, 564, 0, 1, 530, 999 };
+	for(uint32 i = 0; maps[i] != 999; ++i)
 		ta->addWorldAreaMapId( maps[i] );
 
     if(ok) { ok = ta->convertWorld(); }

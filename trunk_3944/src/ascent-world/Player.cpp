@@ -907,6 +907,8 @@ void Player::Update( uint32 p_time )
 	}
 
 #ifdef COLLISION
+	if (CollideInterface.isCollitionMap(m_mapId))
+	{
 	if(m_MountSpellId != 0)
 	{
 		if( mstime >= m_mountCheckTimer )
@@ -921,6 +923,7 @@ void Player::Update( uint32 p_time )
 				m_mountCheckTimer = mstime + COLLISION_MOUNT_CHECK_INTERVAL;
 			}
 		}
+	}
 	}
 #endif
 }
@@ -5619,14 +5622,6 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 	{
 		SM_FFValue( this->SM_FRange, &maxr, spellinfo->SpellGroupType );
 		SM_PFValue( this->SM_PRange, &maxr, spellinfo->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		float spell_flat_modifers=0;
-		float spell_pct_modifers=0;
-		SM_FFValue(this->SM_FRange,&spell_flat_modifers,spellinfo->SpellGroupType);
-		SM_FFValue(this->SM_PRange,&spell_pct_modifers,spellinfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell range bonus mod flat %f , spell range bonus pct %f , spell range %f, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxr,spellinfo->SpellGroupType);
-#endif
 	}
 
 	//float bonusRange = 0;
@@ -9112,12 +9107,6 @@ void Player::EventStunOrImmobilize( Unit* proc_target, bool is_victim )
 			return;
 
 		SM_FIValue( SM_FChanceOfSuccess, &t_trigger_on_stun_chance, spellInfo->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		SM_FIValue(SM_FChanceOfSuccess,&spell_flat_modifers,spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0)
-			printf("!!!!! spell hitchance mod flat %d , spell hitchance bonus %d, spell group %u\n",spell_flat_modifers,bonus,spellInfo->SpellGroupType);
-#endif
 
 		if( t_trigger_on_stun_chance < 100 && !Rand( t_trigger_on_stun_chance ) )
 			return;

@@ -2807,10 +2807,18 @@ bool ChatHandler::HandleCollisionTestIndoor(const char * args, WorldSession * m_
 {
 #ifdef COLLISION
 	Player * plr = m_session->GetPlayer();
+	if (plr != NULL && CollideInterface.isCollitionMap(plr->GetMapId()))
+	{
 	const LocationVector & loc = plr->GetPosition();
 	bool res = CollideInterface.IsIndoor(plr->GetMapId(), loc.x, loc.y, loc.z + 2.0f);
 	SystemMessage(m_session, "Result was: %s.", res ? "indoors" : "outside");
 	return true;
+	}
+	else
+	{
+		SystemMessage(m_session, "Ascent was not compiled with collision support.");
+	return true;
+	}
 #else
 	SystemMessage(m_session, "Ascent was not compiled with collision support.");
 	return true;
@@ -2834,6 +2842,8 @@ bool ChatHandler::HandleCollisionTestLOS(const char * args, WorldSession * m_ses
 		return true;
 	}
 
+	if (CollideInterface.isCollitionMap(pObj->GetMapId()))
+	{
 	const LocationVector & loc2 = pObj->GetPosition();
 	const LocationVector & loc1 = m_session->GetPlayer()->GetPosition();
 	bool res = CollideInterface.CheckLOS(pObj->GetMapId(), loc1.x, loc1.y, loc1.z, loc2.x, loc2.y, loc2.z);
@@ -2841,6 +2851,12 @@ bool ChatHandler::HandleCollisionTestLOS(const char * args, WorldSession * m_ses
 	bool res3 = CollideInterface.CheckLOS(pObj->GetMapId(), loc1.x, loc1.y, loc1.z+5.0f, loc2.x, loc2.y, loc2.z+5.0f);
 	SystemMessage(m_session, "Result was: %s %s %s.", res ? "in LOS" : "not in LOS", res2 ? "in LOS" : "not in LOS", res3 ? "in LOS" : "not in LOS");
 	return true;
+	}
+	else
+	{
+		SystemMessage(m_session, "Ascent was not compiled with collision support.");
+		return true;
+	}
 #else
 	SystemMessage(m_session, "Ascent was not compiled with collision support.");
 	return true;
@@ -2851,12 +2867,20 @@ bool ChatHandler::HandleCollisionGetHeight(const char * args, WorldSession * m_s
 {
 #ifdef COLLISION
 	Player * plr = m_session->GetPlayer();
+	if ( plr != NULL && CollideInterface.isCollitionMap(plr->GetMapId()))
+	{
 	float z = CollideInterface.GetHeight(plr->GetMapId(), plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ() + 2.0f);
 	float z2 = CollideInterface.GetHeight(plr->GetMapId(), plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ() + 5.0f);
 	float z3 = CollideInterface.GetHeight(plr->GetMapId(), plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ());
 
 	SystemMessage(m_session, "Results were: %f %f %f", z, z2, z3);
 	return true;
+	}
+	else
+	{
+		SystemMessage(m_session, "Ascent was not compiled with collision support.");
+		return true;
+	}
 #else
 	SystemMessage(m_session, "Ascent was not compiled with collision support.");
 	return true;

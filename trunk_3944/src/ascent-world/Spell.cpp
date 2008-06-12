@@ -672,14 +672,6 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	{
 		SM_FFValue(u_caster->SM_FRezist_dispell,&resistchance,m_spellInfo->SpellGroupType);
 		SM_PFValue(u_caster->SM_PRezist_dispell,&resistchance,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(u_caster->SM_FRezist_dispell,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PRezist_dispell,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell dipell resist mod flat %d , spell dipell resist mod pct %d , spell dipell resist %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,resistchance,m_spellInfo->SpellGroupType);
-#endif
 	}
 
 	if(m_spellInfo->SpellGroupType && u_caster)
@@ -687,12 +679,6 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 		float hitchance=0;
 		SM_FFValue(u_caster->SM_FHitchance,&hitchance,m_spellInfo->SpellGroupType);
 		resistchance -= hitchance;
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		float spell_flat_modifers=0;
-		SM_FFValue(u_caster->SM_FHitchance,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 )
-			printf("!!!!!spell to hit mod flat %f, spell resist chance %f, spell group %u\n",spell_flat_modifers,resistchance,m_spellInfo->SpellGroupType);
-#endif
 	}
 
 	uint32 res;
@@ -988,14 +974,6 @@ void Spell::prepare( SpellCastTargets * targets )
 		{
 			SM_FIValue( u_caster->SM_FCastTime, (int32*)&m_castTime, m_spellInfo->SpellGroupType );
 			SM_PIValue( u_caster->SM_PCastTime, (int32*)&m_castTime, m_spellInfo->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			int spell_flat_modifers=0;
-			int spell_pct_modifers=0;
-			SM_FIValue(u_caster->SM_FCastTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_FIValue(u_caster->SM_PCastTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-				printf("!!!!!spell casttime mod flat %d , spell casttime mod pct %d , spell casttime %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,m_castTime,m_spellInfo->SpellGroupType);
-#endif
 		}
 
 		// handle MOD_CAST_TIME
@@ -1167,14 +1145,6 @@ void Spell::AddCooldown()
 		{
 			SM_FIValue(u_caster->SM_FCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
 			SM_PIValue(u_caster->SM_PCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			int spell_flat_modifers=0;
-			int spell_pct_modifers=0;
-			SM_FIValue(u_caster->SM_FCooldownTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_FIValue(u_caster->SM_PCooldownTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-				printf("!!!!!spell cooldown mod flat %d , spell cooldown mod pct %d , spell cooldown %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cooltime,m_spellInfo->SpellGroupType);
-#endif
 		}
 
 		if(cooltime > 0)
@@ -1203,14 +1173,6 @@ void Spell::AddStartCooldown()
 		{
 			SM_FIValue(u_caster->SM_FCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
 			SM_PIValue(u_caster->SM_PCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			int spell_flat_modifers=0;
-			int spell_pct_modifers=0;
-			SM_FIValue(u_caster->SM_FCooldownTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_FIValue(u_caster->SM_PCooldownTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-				printf("!!!!!spell cooldown mod flat %d , spell cooldown mod pct %d , spell cooldown %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cooltime,m_spellInfo->SpellGroupType);
-#endif
 		}
 
 		if(cooltime > 0)
@@ -1569,12 +1531,6 @@ void Spell::AddTime(uint32 type)
 		{
 			float ch=0;
 			SM_FFValue(u_caster->SM_PNonInterrupt,&ch,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			float spell_pct_modifers=0;
-			SM_FFValue(u_caster->SM_PNonInterrupt,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_pct_modifers!=0)
-				printf("!!!!!spell interrupt chance mod pct %f , uninterrupt chance %f, spell group %u\n",spell_pct_modifers,ch,m_spellInfo->SpellGroupType);
-#endif
 			if(Rand(ch))
 				return;
 		}
@@ -2390,15 +2346,6 @@ bool Spell::TakePower()
 		  SM_FIValue(u_caster->SM_FCost,&cost,m_spellInfo->SpellGroupType);
 		  SM_PIValue(u_caster->SM_PCost,&cost,m_spellInfo->SpellGroupType);
 	}
-		 
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-	int spell_flat_modifers=0;
-	int spell_pct_modifers=0;
-	SM_FIValue(u_caster->SM_FCost,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-	SM_FIValue(u_caster->SM_PCost,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-	if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-		printf("!!!!!spell cost mod flat %d , spell cost mod pct %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cost,m_spellInfo->SpellGroupType);
-#endif
 
 	if (cost <=0)
 		return true;
@@ -2669,6 +2616,8 @@ uint8 Spell::CanCast(bool tolerate)
 	if( p_caster != NULL )
 	{
 #ifdef COLLISION
+		if (CollideInterface.isCollitionMap(p_caster->GetMapId()))
+		{
 		if (m_spellInfo->MechanicsType == MECHANIC_MOUNTED)
 		{
 			if (CollideInterface.IsIndoor( p_caster->GetMapId(), p_caster->GetPositionNC() ))
@@ -2678,6 +2627,7 @@ uint8 Spell::CanCast(bool tolerate)
 		{
 			if( !CollideInterface.IsOutdoor( p_caster->GetMapId(), p_caster->GetPositionNC() ) )
 				return SPELL_FAILED_ONLY_OUTDOORS;
+		}
 		}
 #endif
 		// check for cooldowns
@@ -3056,14 +3006,6 @@ uint8 Spell::CanCast(bool tolerate)
 	{
 		SM_FFValue( u_caster->SM_FRange, &maxRange, m_spellInfo->SpellGroupType );
 		SM_PFValue( u_caster->SM_PRange, &maxRange, m_spellInfo->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		float spell_flat_modifers=0;
-		float spell_pct_modifers=0;
-		SM_FFValue(u_caster->SM_FRange,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FFValue(u_caster->SM_PRange,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell range bonus mod flat %f , spell range bonus pct %f , spell range %f, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxRange,m_spellInfo->SpellGroupType);
-#endif
 	}
 
 	// Targeted Location Checks (AoE spells)
@@ -3105,8 +3047,9 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_NO_AMMO;
 				}
 #ifdef COLLISION
-				if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
-					return SPELL_FAILED_LINE_OF_SIGHT;
+				if (CollideInterface.isCollitionMap(p_caster->GetMapId()))
+					if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
+						return SPELL_FAILED_LINE_OF_SIGHT;
 #endif
 
 				if( target->IsPlayer() )
@@ -3854,11 +3797,6 @@ exit:
 				spell_pct_modifers += itr->second;
 		}
 
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0 || spell_pct_modifers2!=0)
-			printf("!!!!spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
-#endif
-
 		value = value + value * (spell_pct_modifers + spell_pct_modifers2 ) / 100 + spell_flat_modifers;
 
 	}
@@ -3877,11 +3815,6 @@ exit:
 
 			SM_FIValue( item_creator->SM_FEffectBonus, &spell_flat_modifers, m_spellInfo->SpellGroupType );
 			SM_FIValue( item_creator->SM_PEffectBonus, &spell_pct_modifers, m_spellInfo->SpellGroupType );
-
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0 || spell_pct_modifers2!=0)
-				printf("!!!!ITEMCASTER ! : spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
-#endif
 
 			value = value + value * ( spell_pct_modifers + spell_pct_modifers2 ) / 100 + spell_flat_modifers;
 		}
@@ -4118,15 +4051,7 @@ void Spell::Heal(int32 amount)
 		if(m_spellInfo->SpellGroupType)
 		{
 			SM_PIValue( u_caster->SM_PPenalty, &bonus, m_spellInfo->SpellGroupType );
-			//SM_FIValue( u_caster->SM_FPenalty, &penalty_flt, m_spellInfo->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			int spell_flat_modifers=0;
-			int spell_pct_modifers=0;
-			SM_FIValue(u_caster->SM_FPenalty,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_FIValue(u_caster->SM_PPenalty,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-				printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,m_spellInfo->SpellGroupType);
-#endif
+			SM_FIValue( u_caster->SM_FPenalty, &bonus, m_spellInfo->SpellGroupType );
 		}
 
 		bonus += unitTarget->HealTakenMod[m_spellInfo->School];
@@ -4143,12 +4068,6 @@ void Spell::Heal(int32 amount)
 		if( m_spellInfo->SpellGroupType )
 		{
 			SM_FFValue(u_caster->SM_CriticalChance, &spellCrit, m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-        float spell_flat_modifers=0;
-        SM_FFValue(u_caster->SM_CriticalChance,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-        if(spell_flat_modifers!=0)
-            printf("!!!!spell critchance mod flat %f ,and critchance is %f spell group %u\n",spell_flat_modifers,spellCrit,m_spellInfo->SpellGroupType);
-#endif
 		}
 
 		if( critical = Rand( spellCrit ) )
