@@ -2483,12 +2483,6 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 	if( ability && ability->SpellGroupType )
 	{
 		SM_FFValue( SM_FHitchance, &hitchance, ability->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		float spell_flat_modifers=0;
-		SM_FFValue(SM_FHitchance,&spell_flat_modifers,ability->SpellGroupType);
-		if(spell_flat_modifers!=0 )
-			printf("!!!!!spell resist mod flat %f,  spell resist bonus %f, spell group %u\n",spell_flat_modifers,hitchance,ability->SpellGroupType);
-#endif
 	}
 	//==========================================================================================
 	//==============================One Roll Processing=========================================
@@ -2747,12 +2741,6 @@ else
 	{
 		SM_FFValue(SM_CriticalChance,&crit,ability->SpellGroupType);
 		SM_FFValue(SM_FHitchance,&hitchance,ability->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		float spell_flat_modifers=0;
-		SM_FFValue(SM_CriticalChance,&spell_flat_modifers,ability->SpellGroupType);
-		if(spell_flat_modifers!=0)
-			printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,ability->SpellGroupType);
-#endif
 	}
 //--------------------------------by ratings------------------------------------------------
 	crit -= pVictim->IsPlayer() ? static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) : 0.0f;
@@ -2943,14 +2931,6 @@ else
 			{	
 				SM_FIValue(((Unit*)this)->SM_FDamageBonus,&dmg.full_damage,ability->SpellGroupType);
 				SM_PIValue(((Unit*)this)->SM_PDamageBonus,&dmg.full_damage,ability->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-				int spell_flat_modifers=0;
-				int spell_pct_modifers=0;
-				SM_FIValue(((Unit*)this)->SM_FDamageBonus,&spell_flat_modifers,ability->SpellGroupType);
-				SM_FIValue(((Unit*)this)->SM_PDamageBonus,&spell_pct_modifers,ability->SpellGroupType);
-				if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-					printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg.full_damage,ability->SpellGroupType);
-#endif
 			}
 			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type] + add_damage;
 			if( weapon_damage_type == RANGED )
@@ -3080,12 +3060,6 @@ else
 					if(ability && ability->SpellGroupType)
 					{
 						SM_PIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-						int spell_flat_modifers=0;
-						SM_PIValue(SM_PCriticalDamage,&spell_flat_modifers,ability->SpellGroupType);
-						if(spell_flat_modifers!=0)
-							printf("!!!!!spell crit dmg bonus mod flat %d , spell crit dmg bonus %d, spell group %u\n",spell_flat_modifers,dmgbonus,ability->SpellGroupType);
-#endif
 					}
 					
 					//sLog.outString( "DEBUG: After CritMeleeDamageTakenPctMod: %u" , dmg.full_damage );
@@ -4255,27 +4229,9 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	if(spellInfo->SpellGroupType)
 	{
 		SM_PIValue(caster->SM_PPenalty, &bonus_damage, spellInfo->SpellGroupType);
-		//SM_FIValue(caster->SM_FPenalty, &bonus_damage, spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(caster->SM_FPenalty,&spell_flat_modifers,spellInfo->SpellGroupType);
-		SM_FIValue(caster->SM_PPenalty,&spell_pct_modifers,spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
-#endif
+		SM_FIValue(caster->SM_FPenalty, &bonus_damage, spellInfo->SpellGroupType);
 		SM_FIValue(caster->SM_FDamageBonus, &bonus_damage, spellInfo->SpellGroupType);
-		int dmg_bonus_pct=0;
-		SM_FIValue(caster->SM_PDamageBonus,&dmg_bonus_pct,spellInfo->SpellGroupType);
-		bonus_damage += base_dmg*dmg_bonus_pct/100;
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		spell_flat_modifers=0;
-		spell_pct_modifers=0;
-		SM_FIValue(caster->SM_FDamageBonus,&spell_flat_modifers,spellInfo->SpellGroupType);
-		SM_FIValue(caster->SM_PDamageBonus,&spell_pct_modifers,spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
-#endif
+		SM_PIValue(caster->SM_PDamageBonus, &bonus_damage, spellInfo->SpellGroupType);
 	}
 //------------------------------by school----------------------------------------------
 	float summaryPCTmod = caster->GetDamageDonePctMod(school)-1; //value is initialized with 1

@@ -176,7 +176,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib"
-				AdditionalLibraryDirectories="..\..\dep\lib32"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Release;..\..\dep\lib32"
 				GenerateDebugInformation="true"
 			/>
 			<Tool

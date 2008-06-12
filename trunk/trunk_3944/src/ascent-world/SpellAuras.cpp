@@ -1126,14 +1126,6 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 			{
 				SM_FIValue(c->SM_FDOT,(int32*)&dmg,gr);
 				SM_PIValue(c->SM_PDOT,(int32*)&dmg,gr);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-				int spell_flat_modifers=0;
-				int spell_pct_modifers=0;
-				SM_FIValue(c->SM_FDOT,&spell_flat_modifers,gr);
-				SM_FIValue(c->SM_PDOT,&spell_pct_modifers,gr);
-				if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-					printf("!!!!!spell periodic dmg mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg,gr);
-#endif
 			}
 		}
 
@@ -2467,17 +2459,8 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 	if( c != NULL && m_spellProto->SpellGroupType )
 	{
-		//int penalty_flt = 0;
 		SM_PIValue( c->SM_PPenalty, &bonus, m_spellProto->SpellGroupType );
-		//SM_FIValue( c->SM_FPenalty, &penalty_flt, m_spellProto->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(c->SM_FPenalty,&spell_flat_modifers,GetSpellProto()->SpellGroupType);
-		SM_FIValue(c->SM_PPenalty,&spell_pct_modifers,GetSpellProto()->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,GetSpellProto()->SpellGroupType);
-#endif
+		SM_FIValue( c->SM_FPenalty, &bonus, m_spellProto->SpellGroupType );
 	}
 
 	int amp = m_spellProto->EffectAmplitude[mod->i];

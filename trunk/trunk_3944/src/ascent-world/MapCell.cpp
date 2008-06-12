@@ -69,7 +69,8 @@ void MapCell::SetActivity(bool state)
 			CancelPendingUnload();
 
 #ifdef COLLISION
-		CollideInterface.ActivateTile(_mapmgr->GetMapId(), _x/8, _y/8);
+		if (CollideInterface.isCollitionMap(_mapmgr->GetMapId()))
+			CollideInterface.ActivateTile(_mapmgr->GetMapId(), _x/8, _y/8);
 #endif
 
 	} else if(_active && !state)
@@ -85,7 +86,8 @@ void MapCell::SetActivity(bool state)
 			QueueUnloadPending();
 
 #ifdef COLLISION
-		CollideInterface.DeactivateTile(_mapmgr->GetMapId(), _x/8, _y/8);
+		if (CollideInterface.isCollitionMap(_mapmgr->GetMapId()))
+			CollideInterface.DeactivateTile(_mapmgr->GetMapId(), _x/8, _y/8);
 #endif
 	}
 
