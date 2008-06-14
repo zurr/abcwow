@@ -1344,6 +1344,7 @@ void Creature::Despawn(uint32 delay, uint32 respawntime)
 	
 		ASSERT(pCell);
 		pCell->_respawnObjects.insert(((Object*)this));
+		RemoveAllAuras();
 		sEventMgr.RemoveEvents(this);
 		sEventMgr.AddEvent(m_mapMgr, &MapMgr::EventRespawnCreature, this, pCell, EVENT_CREATURE_RESPAWN, respawntime, 1, 0);
 		Unit::RemoveFromWorld(false);
