@@ -683,6 +683,14 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			uint32 gain = (uint32)(count * (2.17*p_caster->getLevel()+9.136));
 			p_caster->Energize(unitTarget,28730,gain,POWER_TYPE_MANA);
 		}break;
+	case 28734://Mana Tap
+		{
+			if( !unitTarget || !u_caster) 
+				return;
+
+			if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1) > 0)
+				unitTarget->GetAIInterface()->AttackReaction(u_caster, 1, m_spellInfo->Id);
+		}break;
 	case 39610://Mana Tide
 		{
 			if(unitTarget == NULL || unitTarget->isDead() || unitTarget->getClass()==WARRIOR || unitTarget->getClass() == ROGUE)

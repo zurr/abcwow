@@ -1529,9 +1529,10 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		_unit->GetMapMgr()->GetInterface()->SpawnCreature(22820, 450.574066f, -546.205322f, -7.546521f, 0.352241f, true, false, 0, 0);
+		
 		_unit->PlaySoundToSet(11285);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Her ... excellency ... awaits!");
+		_unit->GetMapMgr()->GetInterface()->SpawnCreature(22820, 450.574066f, -546.205322f, -7.546521f, 0.352241f, true, false, 0, 0);
 		RemoveAIUpdateEvent();
 	}
 
@@ -1543,6 +1544,21 @@ public:
 
 	void AIUpdate()
 	{
+		if (_unit->GetHealthPct() <= 75 && !enraged && (caribdisalive || sharkkisalive || tidalvessalive))
+		{
+			enraged = true;
+			for(uint32 x = 0; x<4;x++)
+				_unit->CastSpell(_unit, 38449, true);
+			if (caribdis != NULL && caribdisalive)
+				for(uint32 x = 0; x<4;x++)
+					caribdis->CastSpell(caribdis, 38449, true);
+			if (sharkkis != NULL && sharkkisalive)
+				for(uint32 x = 0; x<4;x++)
+					sharkkis->CastSpell(sharkkis, 38449, true);
+			if (tidalvess != NULL && tidalvessalive)
+				for(uint32 x = 0; x<4;x++)
+					tidalvess->CastSpell(tidalvess, 38449, true);
+		}
 		m_enrage--;
 		if (!m_enrage && !enraged)
 		{
@@ -1688,7 +1704,6 @@ public:
 					sharkkis->Despawn(100, 0);
 				if (tidalvess != NULL)
 					tidalvess->Despawn(100, 0);
-				RemoveAIUpdateEvent();
 				_unit->Despawn(100, 2500);
 			}
 		}
