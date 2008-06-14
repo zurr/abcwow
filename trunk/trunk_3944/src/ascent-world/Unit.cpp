@@ -3363,7 +3363,7 @@ else
 		static_cast< Player* >( this )->m_casted_amount[dmg.school_type]=(uint32)(realdamage+abs);
 	if(realdamage)
 	{
-		DealDamage(pVictim, realdamage, 0, targetEvent, 0);
+		DealDamage(pVictim, realdamage, 0, targetEvent, ability ? ability->Id : 0);
 		//pVictim->HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,this);
 //		HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,pVictim);
 

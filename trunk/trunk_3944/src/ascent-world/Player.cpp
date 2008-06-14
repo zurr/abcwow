@@ -45,6 +45,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	bFeatherFall		   = false;
 	SoulStone			   = 0;
 	SoulStoneReceiver		= 0;
+	misdirectionTarget		= 0;
 	bReincarnation			= false;
 	m_furorChance			= 0;
 	Seal					= 0;
