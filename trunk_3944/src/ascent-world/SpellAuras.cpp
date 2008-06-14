@@ -2215,6 +2215,29 @@ void Aura::SpellAuraDummy(bool apply)
 			if(pTarget->isDead())
 				pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
 		}break;
+	case 34477: // Misdirection
+		{
+			//hack till the spelleffect works
+			Unit *m_caster = GetUnitCaster();
+			if (!m_caster || m_caster->GetTypeId() != TYPEID_PLAYER)
+				return;
+
+			if (apply)
+			{
+				Unit *unitTarget = m_caster->GetMapMgr()->GetUnit(static_cast<Player *>(m_caster)->GetSelection());
+				if (unitTarget != NULL && isFriendly(m_caster, unitTarget))
+				{
+					if ((unitTarget->GetTypeId() == TYPEID_PLAYER && static_cast<Player *>(m_caster)->GetGroup() != static_cast<Player *>(unitTarget)->GetGroup()) || (unitTarget->GetTypeId() == TYPEID_UNIT && !unitTarget->IsPet()))
+						return;
+
+					static_cast<Player *>(m_caster)->SetMisdirectionTarget(static_cast<Player *>(m_caster)->GetSelection());
+				}
+			}
+			else
+			{
+				static_cast<Player *>(GetUnitCaster())->SetMisdirectionTarget(0);
+			}
+		}break;
 
 	}
 }
@@ -2510,14 +2533,17 @@ void Aura::EventPeriodicHeal( uint32 amount )
 		SM_PIValue(c->SM_PDOT, (int32*)&add, m_spellProto->SpellGroupType);
 	}
 
-	uint32 newHealth = m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) + (uint32)add;
-	
-	if( newHealth <= m_target->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) )
-		m_target->SetUInt32Value( UNIT_FIELD_HEALTH, newHealth );
-	else
-		m_target->SetUInt32Value( UNIT_FIELD_HEALTH, m_target->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) );
-
 	SendPeriodicHealAuraLog( add );
+
+	uint32 curHealth = m_target->GetUInt32Value(UNIT_FIELD_HEALTH);
+	uint32 maxHealth = m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+	if((curHealth + add) >= maxHealth)
+	{
+		add = maxHealth - curHealth;
+		m_target->SetUInt32Value(UNIT_FIELD_HEALTH, maxHealth);
+	}
+	else
+		m_target->ModUInt32Value(UNIT_FIELD_HEALTH, add);
 
 	if( GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP )
 	{
@@ -2525,10 +2551,30 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	}
 
 	// add threat
-	SpellEntry* spe = m_spellProto;
+	//SpellEntry* spe = m_spellProto;
 	Unit* u_caster = this->GetUnitCaster();
 	if( u_caster != NULL )
 	{
+		std::vector<Unit*> target_threat;
+		int count = 0;
+		for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
+		{
+			if((*itr)->GetTypeId() != TYPEID_UNIT || !static_cast<Unit *>(*itr)->CombatStatus.IsInCombat() || (static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(u_caster) == 0 && static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(m_target) == 0))
+				continue;
+
+			target_threat.push_back(static_cast<Unit *>(*itr));
+			count++;
+		}
+		if (count == 0)
+			return;
+
+		add = add / count;
+
+		for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
+		{
+			static_cast<Unit *>(*itr)->GetAIInterface()->HealReaction(u_caster, m_target, add);
+		}
+		/*
 		Spell* spell = new Spell( u_caster, spe, false, NULL );
 
 		uint32 base_threat=spell->GetBaseThreat(add);
@@ -2552,12 +2598,12 @@ void Aura::EventPeriodicHeal( uint32 amount )
 			}
 			if(count == 0)
 				count = 1;  // division against 0 protection
-			/* 
+
 			When a tank hold multiple mobs, the threat of a heal on the tank will be split between all the mobs.
 			The exact formula is not yet known, but it is more than the Threat/number of mobs.
 			So if a tank holds 5 mobs and receives a heal, the threat on each mob will be less than Threat(heal)/5.
 			Current speculation is Threat(heal)/(num of mobs *2)
-			*/
+
 			uint32 threat = base_threat / (count * 2);
 
 			for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
@@ -2566,6 +2612,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 				((Unit*)(*itr))->GetAIInterface()->HealReaction(u_caster, m_target, threat);
 			}
 		}
+		*/
 
 		if(m_target->IsInWorld() && u_caster->IsInWorld())
 			u_caster->CombatStatus.WeHealed(m_target);
@@ -2619,6 +2666,14 @@ void Aura::SpellAuraModThreatGenerated(bool apply)
 	if(!m_target)
 		return;
 
+	mod->m_amount < 0 ? SetPositive() : SetNegative();
+	if ( apply )
+		m_target->ModGeneratedThreatModifyer(m_target->GetGeneratedThreatModifyer() + mod->m_amount);
+	else
+		m_target->ModGeneratedThreatModifyer(m_target->GetGeneratedThreatModifyer() - mod->m_amount);
+
+	/*
+
 	//shaman spell 30672 needs to be based on spell schools
 	if(m_target->GetGeneratedThreatModifyer() == mod->m_amount)
 	{
@@ -2637,6 +2692,7 @@ void Aura::SpellAuraModThreatGenerated(bool apply)
 			}
 		}
 	}
+	*/
 }
 
 void Aura::SpellAuraModTaunt(bool apply)
@@ -3094,7 +3150,11 @@ void Aura::SpellAuraModResistance(bool apply)
 		amt = -mod->m_amount;  
 
 	if( this->GetSpellProto() && ( this->GetSpellProto()->NameHash == SPELL_HASH_FAERIE_FIRE || this->GetSpellProto()->NameHash == SPELL_HASH_FAERIE_FIRE__FERAL_ ) )
+	{
 		m_target->m_can_stealth = !apply;
+		if (GetUnitCaster() != NULL && m_target->GetTypeId() == TYPEID_UNIT)
+			m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, GetSpellId());
+	}
 	
 	if( m_target->IsPlayer() )
 	{
@@ -4689,6 +4749,9 @@ void Aura::SpellAuraTransform(bool apply)
 
 				if( apply )
 				{
+					if (GetUnitCaster() != NULL && m_target->GetTypeId() == TYPEID_UNIT)
+						m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, GetSpellId());
+
 					m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, displayId);
 
 					// remove the current spell (for channelers)
@@ -5852,19 +5915,10 @@ void Aura::SpellAuraModTotalThreat( bool apply )
 		else
 			SetNegative();
 
-		if( m_target->GetThreatModifyer() > mod->m_amount ) // replace old mod
-		{
-			m_target->ModThreatModifyer( 0 );
-			m_target->ModThreatModifyer( mod->m_amount );
-		}
+		m_target->ModThreatModifyer( mod->m_amount );
 	}
 	else
-	{
-		if( m_target->GetThreatModifyer() == mod->m_amount ) // only remove it if it hasn't been replaced yet
-		{
-			m_target->ModThreatModifyer(-(mod->m_amount));
-		}
-	}
+		m_target->ModThreatModifyer(-(mod->m_amount));
 }
 
 void Aura::SpellAuraWaterWalk( bool apply )

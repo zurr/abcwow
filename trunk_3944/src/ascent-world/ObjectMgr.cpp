@@ -1106,7 +1106,10 @@ void ObjectMgr::LoadAIThreatToSpellId()
 		Field *fields = result->Fetch();
 		sp = dbcSpell.LookupEntryForced( fields[0].GetUInt32() );
 		if( sp != NULL )
+		{
 			sp->ThreatForSpell = fields[1].GetUInt32();
+			sp->ThreatForSpellCoef = fields[2].GetFloat();
+		}
 
 	} while( result->NextRow() );
 

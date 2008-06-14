@@ -356,6 +356,7 @@ struct SpellEntry
 	bool is_ranged_spell;					//!!! CUSTOM,
     uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
 	uint32 ThreatForSpell;
+	float ThreatForSpellCoef;
 	bool can_be_dispelled;					//!!! CUSTOM
 	uint32 dmg_bonus;						//!!! CUSTOM, spell co-efficiency ( dmg/healing % taken from gear )
 };

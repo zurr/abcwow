@@ -4101,18 +4101,41 @@ void Spell::Heal(int32 amount)
 	uint32 curHealth = unitTarget->GetUInt32Value(UNIT_FIELD_HEALTH);
 	uint32 maxHealth = unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
 	if((curHealth + amount) >= maxHealth)
+	{
+		amount = maxHealth - curHealth;
 		unitTarget->SetUInt32Value(UNIT_FIELD_HEALTH, maxHealth);
+	}
 	else
 		unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH, amount);
 
 	if (p_caster)
 		p_caster->m_casted_amount[m_spellInfo->School]=amount;
 
-	int doneTarget = 0;
+	//int doneTarget = 0;
 
 	// add threat
 	if( u_caster != NULL )
 	{
+		std::vector<Unit*> target_threat;
+		int count = 0;
+		for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
+		{
+			if((*itr)->GetTypeId() != TYPEID_UNIT || !static_cast<Unit *>(*itr)->CombatStatus.IsInCombat() || (static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(u_caster) == 0 && static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(unitTarget) == 0))
+				continue;
+
+			target_threat.push_back(static_cast<Unit *>(*itr));
+			count++;
+		}
+		if (count == 0)
+			return;
+
+		amount = amount / count;
+
+		for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
+		{
+			static_cast<Unit *>(*itr)->GetAIInterface()->HealReaction(u_caster, unitTarget, amount);
+		}
+		/*
 		uint32 base_threat=GetBaseThreat(amount);
 		int count = 0;
 		Unit *unit;
@@ -4134,12 +4157,12 @@ void Spell::Heal(int32 amount)
 			}
 			if(count == 0)
 				count = 1;  // division against 0 protection
-			/* 
+
 			When a tank hold multiple mobs, the threat of a heal on the tank will be split between all the mobs.
 			The exact formula is not yet known, but it is more than the Threat/number of mobs.
 			So if a tank holds 5 mobs and receives a heal, the threat on each mob will be less than Threat(heal)/5.
 			Current speculation is Threat(heal)/(num of mobs *2)
-			*/
+
 			uint32 threat = base_threat / (count * 2);
 				
 			for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
@@ -4151,6 +4174,7 @@ void Spell::Heal(int32 amount)
 					doneTarget = 1;
 			}
 		}
+		*/
 
 		if(unitTarget->IsInWorld() && u_caster->IsInWorld())
 			u_caster->CombatStatus.WeHealed(unitTarget);

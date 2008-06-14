@@ -2206,17 +2206,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	{
 		if(pVictim != this /* && updateskill */)
 		{
-			// Send AI Reaction UNIT vs UNIT
-			if( GetTypeId() ==TYPEID_UNIT )
+			if( pVictim->GetTypeId() == TYPEID_UNIT )
 			{
-				static_cast< Unit* >( this )->GetAIInterface()->AttackReaction( pVictim, damage, spellId );
-			}
-			
-			// Send AI Victim Reaction
-			if( this->IsPlayer() || this->GetTypeId()==TYPEID_UNIT )
-			if( pVictim->GetTypeId() != TYPEID_PLAYER )
-			{
-				static_cast< Creature* >( pVictim )->GetAIInterface()->AttackReaction( static_cast< Unit* >( this ), damage, spellId );
+				pVictim->GetAIInterface()->AttackReaction(static_cast< Unit* >( this ), damage, spellId);
 			}
 		}
 		
