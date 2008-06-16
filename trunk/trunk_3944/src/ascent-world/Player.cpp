@@ -408,15 +408,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 
 void Player::OnLogin()
 {
-	/*
-	if (this->getClass() == DRUID)
-	{
-		SSAura* aura = new SSAura();
-		aura->spellid = 24907;
-		aura->forms = FORM_MOONKIN;
-		this->m_ssAuras.insert(aura);
-	}
-	*/
+
 }
 
 
@@ -495,9 +487,6 @@ Player::~Player ( )
 
 	if(m_playerInfo)
 		m_playerInfo->m_loggedInPlayer=NULL;
-
-	for(set<SSAura*>::iterator itr = m_ssAuras.begin(); itr != m_ssAuras.end(); ++itr)
-		delete (*itr);
 
 	if(m_Summon)
 	{
@@ -8458,7 +8447,8 @@ void Player::SetShapeShift(uint8 ss)
 		if( m_auras[x] != NULL )
 		{
 			uint32 reqss = m_auras[x]->GetSpellProto()->RequiredShapeShift;
-			if( reqss != 0 && m_auras[x]->IsPositive() )
+			// for some odd reason priest's buffs got shadowform in RequiredShapeShift field
+			if( reqss != 0 && m_auras[x]->IsPositive() && getClass() != PRIEST )
 			{
 				if( old_ss > 0 )
 				{
@@ -8471,27 +8461,6 @@ void Player::SetShapeShift(uint8 ss)
 				}
 			}
 
-			if( this->getClass() == DRUID )
-			{
-				for( uint32 y = 0; y < 3; ++y )
-				{
-					switch( m_auras[x]->GetSpellProto()->EffectApplyAuraName[y] )
-					{
-					case SPELL_AURA_MOD_ROOT: //Root
-					case SPELL_AURA_MOD_DECREASE_SPEED: //Movement speed
-					case SPELL_AURA_MOD_CONFUSE:  //Confuse (polymorph)
-						{
-							m_auras[x]->Remove();
-						}
-						break;
-					default:
-						break;
-					}
-
-					if( m_auras[x] == NULL )
-						break;
-				}
-			}
 		} 
 	}
 
@@ -8512,28 +8481,23 @@ void Player::SetShapeShift(uint8 ss)
 	}
 
 	//Add some specific forms auras
-	if (m_ssAuras.size() && ss)
+	if ( !m_ssAuras.empty() && ss )
 	{
-		std::set<SSAura*>::iterator i;
-		for(i=m_ssAuras.begin();i!=m_ssAuras.end();i++)
+		for( std::map<uint32, uint32>::iterator i = m_ssAuras.begin(); i != m_ssAuras.end(); i++)
 		{
-			SSAura* aura = *i;
-			if(aura)
+			if (!(ss &= i->second )) // Not in required form
 			{
-				if (!(ss &= aura->forms )) // Not in required form
-				{
-					this->RemoveAura(aura->spellid);
-				}
-				else //in required form
-				{
-					SpellEntry* spe = dbcSpell.LookupEntry(aura->spellid);
-					if (!spe)
+				this->RemoveAura(i->first);
+			}
+			else //in required form
+			{
+				SpellEntry* spe = dbcSpell.LookupEntry(i->first);
+				if (!spe)
 					return;
-					Spell *spell = new Spell(this, spe ,true,NULL);
-					SpellCastTargets targets;
-					targets.m_unitTarget = this->GetGUID();
-					spell->prepare(&targets);	
-				}
+				Spell *spell = new Spell(this, spe ,true,NULL);
+				SpellCastTargets targets;
+				targets.m_unitTarget = this->GetGUID();
+				spell->prepare(&targets);	
 			}
 		}
 		UpdateStats();
