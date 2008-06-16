@@ -717,9 +717,9 @@ bool World::SetInitialWorldSettings()
         else if( strstr( nametext, "Sting") || strstr( nametext, "sting"))
             type |= SPELL_TYPE_STING;
         // don't break armor items!
-        else if(strcmp(nametext, "Armor") && strstr( nametext, "Armor") || strstr( nametext, "Demon Skin"))
+        else if(strstr( nametext, "Fel Armor") || strstr( nametext, "Frost Armor") || strstr( nametext, "Ice Armor") || strstr( nametext, "Mage Armor") || strstr( nametext, "Molten Armor") || strstr( nametext, "Demon Skin"))
             type |= SPELL_TYPE_ARMOR;
-        else if( strstr( nametext, "Aura"))
+        else if( strstr( nametext, "Aura") && !strstr( nametext, "Trueshot") && !strstr( nametext, "Moonkin"))
             type |= SPELL_TYPE_AURA;
 		else if( strstr( nametext, "Track")==nametext)
             type |= SPELL_TYPE_TRACK;
