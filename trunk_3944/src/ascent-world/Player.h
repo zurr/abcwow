@@ -559,12 +559,6 @@ struct PlayerSkill
 	void Reset(uint32 Id);
 };
 
-struct SSAura
-{
-	uint32 spellid;
-	uint32 forms;
-};
-
 #define PLAYER_RATING_MODIFIER_RANGED_SKILL						PLAYER_FIELD_COMBAT_RATING_1
 #define PLAYER_RATING_MODIFIER_DEFENCE							PLAYER_FIELD_COMBAT_RATING_01
 #define PLAYER_RATING_MODIFIER_DODGE							PLAYER_FIELD_COMBAT_RATING_02
@@ -600,13 +594,13 @@ class ArenaTeam;
 typedef std::set<uint32>	                        SpellSet;
 typedef std::set<ItemCooldown*>                     ItemCooldownSet;
 typedef std::list<classScriptOverride*>             ScriptOverrideList;
-typedef std::set<uint32>                            SaveSet;
+//typedef std::set<uint32>                            SaveSet;
 typedef std::map<uint32, uint32>                    SpellCooldownHolderMap;
 typedef std::map<uint64, ByteBuffer*>               SplineMap;
 typedef std::map<uint32, ScriptOverrideList* >      SpellOverrideMap;
-typedef std::map<uint32, uint32>                    SpellOverrideExtraAuraMap;
+//typedef std::map<uint32, uint32>                    SpellOverrideExtraAuraMap;
 typedef std::map<uint32, FactionReputation*>        ReputationMap;
-typedef std::map<uint32, uint64>                    SoloSpells;
+//typedef std::map<uint32, uint64>                    SoloSpells;
 typedef std::map<SpellEntry*, pair<uint32, uint32> >StrikeSpellMap;
 typedef std::map<uint32, OnHitSpell >               StrikeSpellDmgMap;
 typedef std::map<uint32, PlayerSkill>				SkillMap;
@@ -851,8 +845,8 @@ public:
     SpellSet            m_SSSPecificSpells;
     SpellSet            mSpells;
     SpellSet            mDeletedSpells;
-	std::set<SSAura*>    m_ssAuras;
-
+	std::map<uint32, uint32>    m_ssAuras;
+	
 
     /************************************************************************/
     /* Actionbar                                                            */

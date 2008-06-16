@@ -2137,13 +2137,13 @@ void Aura::SpellAuraDummy(bool apply)
 			if( !m_target->IsPlayer() )
 				return;
 			Player* pTarget = static_cast< Player* >( m_target );
-			SSAura* aura = new SSAura();
-			aura->spellid = 24932;
-			aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
-			if (apply)
-				static_cast< Player* >(pTarget)->m_ssAuras.insert(aura);
-			else 
-				static_cast< Player* >(pTarget)->m_ssAuras.erase(aura);
+
+			std::map<uint32, uint32>::iterator itr = pTarget->m_ssAuras.find(24932);
+			if(itr == pTarget->m_ssAuras.end() && apply )
+				pTarget->m_ssAuras.insert(make_pair(24932, (FORM_BEAR | FORM_DIREBEAR | FORM_CAT)));
+			else if(itr != pTarget->m_ssAuras.end())
+				pTarget->m_ssAuras.erase(itr);
+
 		}break;
 	case 740:
 	case 8918:
@@ -2154,8 +2154,6 @@ void Aura::SpellAuraDummy(bool apply)
 	case 26983:
 	case 34550:		// Tranquility
 		{
-			//uint32 duration = GetDuration();
-			//printf("moo\n");
 			if( apply )
 				sEventMgr.AddEvent(this, &Aura::EventPeriodicHeal1, (uint32)mod->m_amount, EVENT_AURA_PERIODIC_HEAL, 2000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 			else
@@ -3605,13 +3603,13 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 		}
 		else
 		{
-			SSAura* aura = new SSAura();
-			aura->forms = FORM_BEAR | FORM_CAT | FORM_DIREBEAR;
-			aura->spellid = 24864;
-			if( apply )
-				static_cast< Player* >( m_target )->m_ssAuras.insert( aura );
-			else 
-				static_cast< Player* >( m_target )->m_ssAuras.erase( aura );
+			Player* pTarget = static_cast< Player* >( m_target );
+
+			std::map<uint32, uint32>::iterator itr = pTarget->m_ssAuras.find(24864);
+			if(itr == pTarget->m_ssAuras.end() && apply )
+				pTarget->m_ssAuras.insert(make_pair(24864, (FORM_BEAR | FORM_DIREBEAR | FORM_CAT)));
+			else if(itr != pTarget->m_ssAuras.end())
+				pTarget->m_ssAuras.erase(itr);
 		}
 		break;
 	case 17002: //Feral Swiftness
@@ -3621,13 +3619,12 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 		}
 		else
 		{
-			SSAura* aura = new SSAura();
-			aura->forms = FORM_BEAR | FORM_CAT | FORM_DIREBEAR;
-			aura->spellid = 24867;
-			if( apply )
-				static_cast< Player* >( m_target )->m_ssAuras.insert( aura );
-			else 
-				static_cast< Player* >( m_target )->m_ssAuras.erase( aura );
+			Player* pTarget = static_cast< Player* >( m_target );
+			std::map<uint32, uint32>::iterator itr = pTarget->m_ssAuras.find(24867);
+			if(itr == pTarget->m_ssAuras.end() && apply )
+				pTarget->m_ssAuras.insert(make_pair(24867, (FORM_BEAR | FORM_DIREBEAR | FORM_CAT)));
+			else if(itr != pTarget->m_ssAuras.end())
+				pTarget->m_ssAuras.erase(itr);
 		}
 		break;
 
@@ -4045,7 +4042,9 @@ void Aura::SpellAuraModShapeshift(bool apply)
 			{
 				if( m_target->m_auras[x] != NULL )
 				{
-					if( m_target->m_auras[x]->GetSpellProto()->MechanicsType == 7 || m_target->m_auras[x]->GetSpellProto()->MechanicsType == 11 ) // Remove roots and slow spells
+					SpellEntry *proto = m_target->m_auras[x]->GetSpellProto();
+
+					if( proto->MechanicsType == 7 || proto->MechanicsType == 11 ) // Remove roots and slow spells
 					{
 						m_target->m_auras[x]->Remove();
 					}
@@ -4053,7 +4052,9 @@ void Aura::SpellAuraModShapeshift(bool apply)
 					{
 						for( int i = 0; i < 3; i++ )
 						{
-							if( m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED || m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
+							if( proto->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED ||
+								proto->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT ||
+								proto->EffectApplyAuraName[i] == SPELL_AURA_MOD_CONFUSE )
 							{
 								m_target->m_auras[x]->Remove();
 								break;

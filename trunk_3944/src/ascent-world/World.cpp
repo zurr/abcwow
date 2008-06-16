@@ -7591,27 +7591,6 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->can_be_dispelled = false;
 
-	//Flurry
-	sp = dbcSpell.LookupEntryForced( 16257 );
-	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_HIT_VICTIM;
-
-	sp = dbcSpell.LookupEntryForced( 16277 );
-	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_HIT_VICTIM;
-
-	sp = dbcSpell.LookupEntryForced( 16278 );
-	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_HIT_VICTIM;
-
-	sp = dbcSpell.LookupEntryForced( 16279 );
-	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_HIT_VICTIM;
-
-	sp = dbcSpell.LookupEntryForced( 16280 );
-	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_HIT_VICTIM;
-
 // ------------------------------------------------------------------------------------------------
 
 	Log.Notice("World","Starting Transport System...");
