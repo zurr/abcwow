@@ -814,7 +814,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 				{
 					plObj2 = static_cast< Player* >( curObj );
 
-					if( plObj2->CanSee( obj ) && !plObj2->IsVisible( obj ) )
+					if( plObj2 != NULL && plObj2->CanSee( obj ) && !plObj2->IsVisible( obj ) )
 					{
 						CHECK_BUF;
 						count = obj->BuildCreateUpdateBlockForPlayer(*buf, plObj2);
@@ -1821,18 +1821,19 @@ void MapMgr::HookOnAreaTrigger(Player * plr, uint32 id)
 	switch (id)
 	{
 	case 4591:
-		//Only opens when the first one steps in, if 669 if you find a way, put it in :P (else was used to increase the time the door stays opened when another one steps on it)
 		GameObject *door = GetInterface()->GetGameObjectNearestCoords(803.827f, 6869.38f, -38.5434f, 184212);
-		if (door && (door->GetUInt32Value(GAMEOBJECT_STATE) == 1))
+		if (!door)
+			return;
+		if (door->GetUInt32Value(GAMEOBJECT_STATE) == 1)
 		{
 			door->SetUInt32Value(GAMEOBJECT_STATE, 0);
-			//sEventMgr.AddEvent(door, &GameObject::SetUInt32Value, GAMEOBJECT_STATE, 1, EVENT_SCRIPT_UPDATE_EVENT, 10000, 1, 0);
+			sEventMgr.AddEvent(door, &GameObject::EventCloseDoor, EVENT_GAMEOBJECT_DOOR_CLOSE, 20000, 1, 0);
 		}
-		//else
-		//{
-			//sEventMgr.RemoveEvents(door);
-			//sEventMgr.AddEvent(door, &GameObject::SetUInt32Value,GAMEOBJECT_STATE, 0, EVENT_SCRIPT_UPDATE_EVENT, 10000, 1, 0);
-		//}
+		else
+		{
+			if (sEventMgr.HasEvent(door, EVENT_GAMEOBJECT_DOOR_CLOSE))
+				sEventMgr.ModifyEventTime(door, EVENT_GAMEOBJECT_DOOR_CLOSE, 20000);
+		}
 		break;
 	}
 }

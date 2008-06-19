@@ -202,6 +202,7 @@ void Creature::OnRespawn(MapMgr * m)
 	sLog.outDetail("Respawning "I64FMT"...", GetGUID());
 	SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 	SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0); // not tagging shiat
+	SetUInt32Value(UNIT_FIELD_DISPLAYID, GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
 	if(proto && m_spawn)
 	{
 		SetUInt32Value(UNIT_NPC_FLAGS, proto->NPCFLags);
@@ -1047,6 +1048,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	has_combat_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_ENTER_COMBAT);
 	has_waypoint_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_RANDOM_WAYPOINT);
 	m_aiInterface->m_isGuard = isGuard(GetEntry());
+	m_aiInterface->m_isNeutralGuard = isNeutralGuard(GetEntry());
 
 	m_aiInterface->getMoveFlags();
 
@@ -1322,6 +1324,15 @@ void Creature::Despawn(uint32 delay, uint32 respawntime)
 
 	if(!IsInWorld())
 		return;
+
+	if(GetMapMgr() && GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
+	{
+		if(GetTypeId() == TYPEID_UNIT)
+		{
+			if(GetCreatureName() && GetCreatureName()->Rank == ELITE_WORLDBOSS)
+				GetMapMgr()->RemoveCombatInProgress(GetGUID());
+		}
+	}
 
 	if(respawntime)
 	{

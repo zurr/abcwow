@@ -11045,13 +11045,13 @@ void Apply112SpellFixes()
 	// Spell 16493 Group Relation (Impale Rank 1)
 	sp = dbcSpell.LookupEntryForced(16493);
 	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 3999288558UL;
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 	}
 
 	// Spell 16494 Group Relation (Impale Rank 2)
 	sp = dbcSpell.LookupEntryForced(16494);
 	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 3999288558UL;
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 	}
 
 	// Spell 16578 Group Relation (Lightning Mastery Rank 1)
@@ -11574,6 +11574,7 @@ void Apply112SpellFixes()
 	sp = dbcSpell.LookupEntryForced(17941);
 	if(sp != NULL) {
 		sp->EffectSpellGroupRelation[0] = 1;
+		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 	}
 
 	// Spell 17954 Group Relation (Emberstorm Rank 1)
@@ -12074,31 +12075,31 @@ void Apply112SpellFixes()
 	// Spell 19485 Group Relation (Mortal Shots Rank 1)
 	sp = dbcSpell.LookupEntryForced(19485);
 	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 408065;
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 	}
 
 	// Spell 19487 Group Relation (Mortal Shots Rank 2)
 	sp = dbcSpell.LookupEntryForced(19487);
 	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 408065;
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 	}
 
 	// Spell 19488 Group Relation (Mortal Shots Rank 3)
 	sp = dbcSpell.LookupEntryForced(19488);
 	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 408065;
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 	}
 
 	// Spell 19489 Group Relation (Mortal Shots Rank 4)
 	sp = dbcSpell.LookupEntryForced(19489);
 	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 408065;
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 	}
 
 	// Spell 19490 Group Relation (Mortal Shots Rank 5)
 	sp = dbcSpell.LookupEntryForced(19490);
 	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 408065;
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 	}
 
 	// Spell 19498 Group Relation (Hawk Eye Rank 1)
@@ -12815,8 +12816,6 @@ void ApplyNormalFixes()
 	uint32 group_relation_rogue_elusiveness = 0;
 	uint32 group_relation_rogue_poisons = 0;
 	uint32 group_relation_rogue_find_weakness = 0;
-	uint32 group_relation_rogue_shadow_step = 0;
-	uint32 group_relation_rogue_lethality = 0;
 
 	map<uint32, uint32> talentSpells;
 	map<uint32,uint32>::iterator talentSpellIterator;
@@ -13292,59 +13291,6 @@ void ApplyNormalFixes()
 
 		// find diminishing status
 		sp->DiminishStatus = GetDiminishingGroup(namehash);
-		sp->buffIndexType=0;
-		switch(namehash)
-		{
-		case SPELL_HASH_HUNTER_S_MARK:		// Hunter's mark
-			sp->buffIndexType = SPELL_TYPE_INDEX_MARK;
-			break;
-
-		case SPELL_HASH_POLYMORPH:			// Polymorph
-		case SPELL_HASH_POLYMORPH__CHICKEN:	// Polymorph: Chicken
-		case SPELL_HASH_POLYMORPH__PIG:		// Polymorph: Pig
-		case SPELL_HASH_POLYMORPH__SHEEP:	// Polymorph: Sheep
-		case SPELL_HASH_POLYMORPH__TURTLE:	// Polymorph: Turtle
-			sp->buffIndexType = SPELL_TYPE_INDEX_POLYMORPH;
-			break;
-
-		case SPELL_HASH_FEAR:				// Fear
-			sp->buffIndexType = SPELL_TYPE_INDEX_FEAR;
-			break;
-
-		case SPELL_HASH_SAP:				// Sap
-			sp->buffIndexType = SPELL_TYPE_INDEX_SAP;
-			break;
-
-		case SPELL_HASH_SCARE_BEAST:		// Scare Beast
-			sp->buffIndexType = SPELL_TYPE_INDEX_SCARE_BEAST;
-			break;
-
-		case SPELL_HASH_HIBERNATE:			// Hibernate
-			sp->buffIndexType = SPELL_TYPE_INDEX_HIBERNATE;
-			break;
-
-//		removed by Zack Earth shield stacks 10 times. Current code does not support it
-//		case SPELL_HASH_EARTH_SHIELD:		// Earth Shield
-//			sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
-//			break;
-
-		case SPELL_HASH_CYCLONE:			// Cyclone
-			sp->buffIndexType = SPELL_TYPE_INDEX_CYCLONE;
-			break;
-
-		case SPELL_HASH_BANISH:				// Banish
-			sp->buffIndexType = SPELL_TYPE_INDEX_BANISH;
-			break;
-
-		//case SPELL_HASH_JUDGEMENT_OF_VENGEANCE:
-		case SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER:
-		case SPELL_HASH_JUDGEMENT_OF_LIGHT:
-		case SPELL_HASH_JUDGEMENT_OF_WISDOM:
-		case SPELL_HASH_JUDGEMENT_OF_JUSTICE:
-			sp->buffIndexType = SPELL_TYPE_INDEX_JUDGEMENT;
-			break;
-		}
-
 		// HACK FIX: Break roots/fear on damage.. this needs to be fixed properly!
 		if(!(sp->AuraInterruptFlags & AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN))
 		{
@@ -13485,14 +13431,20 @@ void ApplyNormalFixes()
 						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
 					if( strstr( desc,"target casts a spell"))
 						pr|=PROC_ON_CAST_SPELL;
-                    if( strstr( desc,"your harmful spells land"))
-                        pr|=PROC_ON_CAST_SPELL;
-                    if( strstr( desc,"on spell critical hit"))
-                        pr|=PROC_ON_SPELL_CRIT_HIT;
-                    if( strstr( desc,"spell critical strikes"))
-                        pr|=PROC_ON_SPELL_CRIT_HIT;
-                    if( strstr( desc,"being able to resurrect"))
-                        pr|=PROC_ON_DIE;
+					if( strstr( desc,"your harmful spells land"))
+						pr|=PROC_ON_CAST_SPELL;
+					if( strstr( desc,"Nature spell have a chance"))
+						pr|=PROC_ON_CAST_SPELL;
+					if( strstr( desc,"Mangle ability has a chance"))
+						pr|=PROC_ON_CAST_SPELL;
+					if( strstr( desc,"Chance on spell cast"))
+						pr|=PROC_ON_CAST_SPELL;
+					if( strstr( desc,"on spell critical hit"))
+						pr|=PROC_ON_SPELL_CRIT_HIT;
+					if( strstr( desc,"spell critical strikes"))
+						pr|=PROC_ON_SPELL_CRIT_HIT;
+					if( strstr( desc,"being able to resurrect"))
+						pr|=PROC_ON_DIE;
 					if( strstr( desc,"any damage caused"))
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
 					if( strstr( desc,"the next melee attack against the caster"))
@@ -13798,9 +13750,6 @@ void ApplyNormalFixes()
 		else if( strstr( nametext, "Shadow Weaving"))
 		{
 			sp->School = 5;
-			sp->EffectApplyAuraName[0] = 42;
-			sp->procChance = sp->EffectBasePoints[0] + 1;
-			sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
 		}
 #endif
 		//Improved Aspect of the Hawk
@@ -13893,7 +13842,7 @@ void ApplyNormalFixes()
 			sp->SpellGroupType |= 16384; //some of them do have the flags but i's hard to write down those some from 130 spells
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
 		}
-		else if( strstr( nametext, "Mind-Numbing Poison"))
+		else if( strstr( nametext, "Mind-numbing Poison"))
 		{
 			sp->SpellGroupType |= 32768; //some of them do have the flags but i's hard to write down those some from 130 spells
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
@@ -13918,6 +13867,23 @@ void ApplyNormalFixes()
 			// groups?
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
 		}
+		else if( strstr( nametext, "Anesthetic Poison"))
+		{
+			//sp->SpellGroupType |= 268435456;
+			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
+ 
+		switch( namehash )
+		{
+		//case SPELL_HASH_JUDGEMENT_OF_VENGEANCE:
+		case SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER:
+		case SPELL_HASH_JUDGEMENT_OF_LIGHT:
+		case SPELL_HASH_JUDGEMENT_OF_WISDOM:
+		case SPELL_HASH_JUDGEMENT_OF_JUSTICE:
+			sp->c_is_flags = SPELL_FLAG_IS_JUDGEMENT;
+			break;
+		}
+
 
 		//warlock - shadow bolt
 		if( sp->NameHash == SPELL_HASH_SHADOW_BOLT )
@@ -13969,6 +13935,7 @@ void ApplyNormalFixes()
 			sp->procChance = 25;
 			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
 			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
+			sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
 		}
 
 		//Seal of Jusice - Proc Chance
@@ -14518,6 +14485,7 @@ void ApplyNormalFixes()
 	sp = dbcSpell.LookupEntryForced( 12536 );
 	if( sp != NULL )
 	{
+		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
 		sp->EffectMiscValue[0] = SMT_COST;
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all possible spells we can affect
@@ -14763,16 +14731,6 @@ void ApplyNormalFixes()
 			sp->EffectSpellGroupRelation_high[1] = 8;
 		}
 
-		//warrior - berserker rage is missing 1 effect = regenerate rage
-		sp = dbcSpell.LookupEntryForced( 18499 );
-		if( sp != NULL )
-		{
-			sp->Effect[2] = 6;
-			sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			sp->EffectTriggerSpell[2] = 37521; //not sure if this is the one. In my time this adds 30 rage
-			sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
-		}
-
 		//warrior - improved berserker rage
 		sp = dbcSpell.LookupEntryForced( 20500 );
 		if( sp != NULL )
@@ -14787,7 +14745,7 @@ void ApplyNormalFixes()
 		{
 			sp->Effect[2] = 6;
 			sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			sp->EffectTriggerSpell[2] = 9174; //not sure if this is the one. In my time this adds 30 rage
+			sp->EffectTriggerSpell[2] = 23691;
 			sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 		}
 
@@ -14989,10 +14947,12 @@ void ApplyNormalFixes()
 		//warrior - impale
 		sp = dbcSpell.LookupEntryForced( 16493 );
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+//			sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+			sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 		sp = dbcSpell.LookupEntryForced( 16494 );
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+//			sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+			sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 
 		//warrior - Improved Whirlwind
 		sp = dbcSpell.LookupEntryForced( 29721 );
@@ -15233,6 +15193,7 @@ void ApplyNormalFixes()
 		{
 			sp->procFlags = PROC_ON_MELEE_ATTACK;
 			sp->EffectTriggerSpell[0] = 31803;
+			sp->procChance = 25;
 			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		}
 
@@ -15465,6 +15426,16 @@ void ApplyNormalFixes()
 			sp->procFlags = PROC_ON_BLOCK_VICTIM;
 			sp->procChance = 100;
 		}
+		//Crusader Strike
+		sp = dbcSpell.LookupEntryForced( 35395 );
+		if( sp != NULL && sp->Id == 35395 )
+			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MELEE;
+
+		//Avenging Wrath
+		sp = dbcSpell.LookupEntryForced( 31884 );
+		if( sp != NULL && sp->Id == 31884 )
+			sp->MechanicsType = 25;
+
 		//Paladin: Seal of Wisdom
 		uint32 procchance = 0;
 		sp = dbcSpell.LookupEntryForced( 27116 );
@@ -16286,6 +16257,13 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 
+		// Deadly Throw Interrupt
+		sp = dbcSpell.LookupEntryForced( 32748 );
+		if( sp != NULL )
+		{
+			sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_ON_CAST_SPELL;
+		}
+
 		//rogue - Find Weakness.
 		sp = dbcSpell.LookupEntryForced( 31233 ); 
 		if( sp != NULL )
@@ -16414,21 +16392,11 @@ void ApplyNormalFixes()
 			sp->EffectSpellGroupRelation[0] = 1024 | 256; // Cheap Shot + Garrote
 
 
-		//rogue ( grouping ) Shadowstep
-		group_relation_rogue_shadow_step |= 512;//rogue - ambush (only a part of the whole group since it would affect other spells too)
-		group_relation_rogue_shadow_step |= 4;//rogue - Backstab (only a part of the whole group since it would affect other spells too)
-		group_relation_rogue_shadow_step |= 256;//Garrote
-		group_relation_rogue_shadow_step |= 536870912 | 16 | 8 | 8389120 | 41943040 | 33554432 | 32 | 67108864 | 64 | 128 ;
-
 		//rogue - Shadowstep
 		sp = dbcSpell.LookupEntryForced( 36563 ); 
 		if( sp != NULL )
-		{
-			// Effect goes from 0-2, not 1-3... -.-
-			sp->EffectSpellGroupRelation[2] = group_relation_rogue_shadow_step;
-			sp->EffectSpellGroupRelation_high[2] = 256 | 128 ;
-			sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-		}
+		sp->EffectSpellGroupRelation[1] = 0x800000;
+
 		// Still related to shadowstep - prevent the trigger spells from breaking stealth.
 		sp = dbcSpell.LookupEntryForced( 44373 );
 		if( sp )
@@ -16440,30 +16408,22 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
 
-		//rogue ( grouping ) Lethality
-		group_relation_rogue_lethality |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)
-		group_relation_rogue_lethality |= 4;//rogue - backstab (only a part of the whole group since it would affect other spells too)
-		group_relation_rogue_lethality |= 8;//rogue - Gouge (only a part of the whole group since it would affect other spells too)
-		group_relation_rogue_lethality |= 33554432UL;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
-		group_relation_rogue_lethality |= 536870912UL;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
-		group_relation_rogue_lethality |= 1073741824UL;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
-
 		//rogue Lethality
 		sp = dbcSpell.LookupEntryForced( 14128 ); 
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+			sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 		sp = dbcSpell.LookupEntryForced( 14132 ); 
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+			sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 		sp = dbcSpell.LookupEntryForced( 14135 ); 
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+			sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 		sp = dbcSpell.LookupEntryForced( 14136 ); 
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+			sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 		sp = dbcSpell.LookupEntryForced( 14137 ); 
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+			sp->EffectSpellGroupRelation[0] = 0x000002 | 0x000008 | 0x000004 | 0x4000000 | 0x20000000 | 0x800000 ;
 
 		//rogue - Endurance 
 		sp = dbcSpell.LookupEntryForced( 13742 ); 
@@ -16536,10 +16496,6 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->EffectSpellGroupRelation[0]=64;
 	#endif
-		//rogue-shiv -> add 1 combo point
-		sp = dbcSpell.LookupEntryForced( 5938 );
-		if( sp != NULL )
-			sp->Effect[1]=80;
 		//garrot
 		sp = dbcSpell.LookupEntryForced( 703 );
 		if( sp != NULL )
@@ -16593,8 +16549,6 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 14179 );
 		if( sp != NULL )
 		{
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;//proc spell
-			sp->procFlags = PROC_ON_CAST_SPELL;
 			sp->EffectBasePoints[1] = 20; //client showes 20% chance but whe do not have it ? :O
 		}
 	#else
@@ -16687,22 +16641,31 @@ void ApplyNormalFixes()
 			sp->Effect[1] = 64;
 			sp->EffectTriggerSpell[1] = 25329;
 		}
-		 //priest - Holy Concentration
-		 sp = dbcSpell.LookupEntryForced( 34753 );
-		 if (sp != NULL)
-			  sp->procFlags = PROC_ON_CAST_SPELL;
-		 sp = dbcSpell.LookupEntryForced( 34859 );
-		 if (sp != NULL)
-			 sp->procFlags = PROC_ON_CAST_SPELL;
-		 sp = dbcSpell.LookupEntryForced( 34860 );
-		 if (sp != NULL)
-			  sp->procFlags = PROC_ON_CAST_SPELL;
-		 sp = dbcSpell.LookupEntryForced( 34754 );
-		 if (sp != NULL)
-		 {
+
+		//Prayer of Mending
+		sp = dbcSpell.LookupEntry(33076);
+		if(sp != NULL)
+		{
+			sp->Effect[0] = 64;
+		}
+
+		//priest - Holy Concentration
+		sp = dbcSpell.LookupEntryForced( 34753 );
+		if (sp != NULL)
+			sp->procFlags = PROC_ON_CAST_SPELL;
+		sp = dbcSpell.LookupEntryForced( 34859 );
+		if (sp != NULL)
+			sp->procFlags = PROC_ON_CAST_SPELL;
+		sp = dbcSpell.LookupEntryForced( 34860 );
+		f (sp != NULL)
+			sp->procFlags = PROC_ON_CAST_SPELL;
+		sp = dbcSpell.LookupEntryForced( 34754 );
+		if (sp != NULL)
+		{
 			  //sp->EffectSpellGroupRelation[0] = 2048 | 4096;
-			  sp->EffectSpellGroupRelation_high[0] = 4;
-		 }
+			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
+			sp->EffectSpellGroupRelation_high[0] = 4;
+		}
 
 		//priest - Focused Mind 
 		sp = dbcSpell.LookupEntryForced( 33213 ); 
@@ -17433,25 +17396,6 @@ void ApplyNormalFixes()
 			sp->EffectSpellGroupRelation[0] = group_relation_shaman_restorative_totems;
 
 		/**********************************************************
-		 *	Healing Way
-		 **********************************************************/
-		sp = dbcSpell.LookupEntryForced( 29202 ); 
-		if( sp != NULL )
-		{
-			sp->procFlags = PROC_ON_CAST_SPELL;
-		}
-		sp = dbcSpell.LookupEntryForced( 29205 ); 
-		if( sp != NULL )
-		{
-			sp->procFlags = PROC_ON_CAST_SPELL;
-		}
-		sp = dbcSpell.LookupEntryForced( 29206 ); 
-		if( sp != NULL )
-		{
-			sp->procFlags = PROC_ON_CAST_SPELL;
-		}
-
-		/**********************************************************
 		 *	Elemental Devastation
 		 **********************************************************/
 		sp = dbcSpell.LookupEntryForced( 29179 ); 
@@ -17663,6 +17607,20 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 12577 );
 		if( sp != NULL )
 			sp->procFlags = PROC_ON_SPELL_HIT | PROC_TARGET_SELF;
+
+		// Conjure Refreshment Table (Ritual of Refreshment)
+		sp = dbcSpell.LookupEntryForced( 43985 );
+		if( sp != NULL )
+		{
+			sp->EffectImplicitTargetA[0] = 47;
+		}
+
+		// Create Soulwell ( Ritual of Souls )
+		sp = dbcSpell.LookupEntryForced( 29886 );
+		if( sp != NULL )
+		{
+			sp->EffectImplicitTargetA[0] = 47;
+		}
 
 		//Mage - Icy Veins
 		sp = dbcSpell.LookupEntryForced( 12472 );
@@ -18061,28 +18019,6 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 12497 );
 		if( sp != NULL )
 			sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-		//Mage - Improved Scorch
-		sp = dbcSpell.LookupEntryForced( 11095 );
-		if( sp != NULL )
-		{
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			sp->procChance =33;
-			sp->procFlags = PROC_ON_CAST_SPELL;
-		}
-		sp = dbcSpell.LookupEntryForced( 12872 );
-		if( sp != NULL )
-		{
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL; 
-			sp->procChance =66;
-			sp->procFlags = PROC_ON_CAST_SPELL;
-		}
-		sp = dbcSpell.LookupEntryForced( 12873 );
-		if( sp != NULL )
-		{
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			sp->procChance =100;
-			sp->procFlags = PROC_ON_CAST_SPELL;
-		}
 		//mage - Presence of Mind
 		sp = dbcSpell.LookupEntryForced(12043);
 		if (sp!= NULL)
@@ -19657,12 +19593,26 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 16835 );
 		if( sp != NULL )
 			sp->DurationIndex = 0;
+		// druid - Force of Nature
+		sp = dbcSpell.LookupEntryForced( 33831 );
+		if( sp != NULL )
+		{
+			sp->EffectRadiusIndex[1] = 13;
+		}
+
 		// druid - Tree of Life
 		sp = dbcSpell.LookupEntryForced( 5420 );
 		if( sp != NULL )
 		{
 			sp->EffectSpellGroupRelation[2] = 32 | 64 | 16; //for the mana cost tweak
 			sp->EffectSpellGroupRelation_high[2] = 2 | 4096 | 128 | 524288 ;
+		}
+
+		// druid - Moonkin aura
+		sp = dbcSpell.LookupEntryForced( 24907 );
+		if( sp != NULL )
+		{
+			sp->RequiredShapeShift = 0;
 		}
 
 		// druid - Shredding Attacks
@@ -19818,6 +19768,7 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 16886 );
 		if( sp != NULL )
 		{
+			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 			sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all spells, too bad not all spells have grouping flags :S
 			sp->procCharges = 1;
 		}
@@ -19898,6 +19849,36 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 43856 );
 		if (sp != NULL)
 			sp->EffectSpellGroupRelation_high[0]=64;
+		//Gladiator's Libram of Justice
+		sp = dbcSpell.LookupEntryForced( 34139 );
+		if( sp != NULL )
+		{
+			sp->EffectSpellGroupRelation[0] = 0x40000000;
+			sp->procFlags = PROC_ON_CAST_SPELL;
+		}
+
+		//Merciless Gladiator's Libram of Justice
+		sp = dbcSpell.LookupEntryForced( 42368 );
+		if( sp != NULL )
+		{
+			sp->EffectSpellGroupRelation[0] = 0x40000000;
+			sp->procFlags = PROC_ON_CAST_SPELL;
+		}
+
+		//Vengeful Gladiator's Libram of Justice
+		sp = dbcSpell.LookupEntryForced( 43726 );
+		if( sp != NULL )
+		{
+			sp->EffectSpellGroupRelation[0] = 0x40000000;
+			sp->procFlags = PROC_ON_CAST_SPELL;
+		}
+		//Libram of Mending
+		sp = dbcSpell.LookupEntryForced( 43741 );
+		if( sp != NULL )
+		{
+			sp->EffectSpellGroupRelation[0] = 0x80000000;
+			sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+		}
 		//The Earthshatterer
 		sp = dbcSpell.LookupEntryForced( 28821 );
 		if (sp != NULL)
@@ -19990,6 +19971,27 @@ void ApplyNormalFixes()
 			sp->EffectSpellGroupRelation_high[0]=128;
 		}
 	#endif
+		// Tsunami Talisman
+		sp = dbcSpell.LookupEntry( 42083 );
+		if( sp != NULL )
+		{
+			sp->proc_interval = 45000;
+			sp->procChance = 10.0f;
+		}
+
+		// Warp-Spring Coil
+		sp = dbcSpell.LookupEntry( 37173 );
+		if( sp != NULL )
+			sp->proc_interval = 30000;
+
+		// Hourglass of the Unraveler
+		sp = dbcSpell.LookupEntry( 33648 );
+		if( sp != NULL )
+		{
+			sp->proc_interval = 45000;
+			sp->procChance = 10.0f;
+		}
+
 		//Extract Gas 
 		sp = dbcSpell.LookupEntryForced( 30427 );
 		if( sp != NULL )
@@ -20084,16 +20086,6 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 33297 ); 
 		if( sp != NULL )
 			sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
-
-		// Band of the Eternal Sage
-		sp = dbcSpell.LookupEntryForced( 35083 );
-		if( sp != NULL )
-			sp->procFlags = PROC_ON_CAST_SPELL;
-
-		// Band of the Eternal Restorer 
-		sp = dbcSpell.LookupEntryForced( 35086 );
-		if( sp != NULL )
-			sp->procFlags = PROC_ON_CAST_SPELL;
 
 		// Ashtongue Talisman of Shadows 
 		sp = dbcSpell.LookupEntryForced( 40478 );
@@ -20234,6 +20226,7 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 34774 );
 		if( sp != NULL ) //dragonspine trophy proc
 		{
+			sp->proc_interval = 20000;
 			sp->procChance = 6;
 		}
 	#ifndef NEW_PROCFLAGS
@@ -20273,6 +20266,11 @@ void ApplyNormalFixes()
 			sp->EffectSpellGroupRelation[0]=8519680;
 			sp->EffectSpellGroupRelation_high[0]=8;
 		}
+
+		//Item Set: Priest arena
+		sp = dbcSpell.LookupEntry( 33333 );
+		if( sp != NULL )
+			sp->EffectSpellGroupRelation[0] = 0x20000000;
 
 		//Item Set: Thunderheart Harness
 		sp = dbcSpell.LookupEntryForced( 38447 );
@@ -20916,23 +20914,32 @@ void ApplyNormalFixes()
 		// Band of the Eternal Champion: reduced proc rate
 		sp = dbcSpell.LookupEntryForced( 35080 );
 		if( sp != NULL )
-			sp->procChance = 5;
+		{
+			sp->proc_interval = 60000;
+		}
 
 		// Band of the Eternal Sage: reduced proc rate
 		sp = dbcSpell.LookupEntryForced( 35083 );
 		if( sp != NULL )
-			sp->procChance = 5;
+		{
+			sp->procFlags = PROC_ON_CAST_SPELL;
+			sp->proc_interval = 60000;
+		}
 
 		// Band of the Eternal Defender: reduced proc rate
 		sp = dbcSpell.LookupEntryForced( 35077 );
 		if( sp != NULL )
-			sp->procChance = 5;
+		{
+			sp->proc_interval = 60000;
+		}
 
 		// Band of the Eternal Restorer: reduced proc rate
 		sp = dbcSpell.LookupEntryForced( 35086 );
 		if( sp != NULL )
-			sp->procChance = 5;
-
+		{
+			sp->procFlags = PROC_ON_CAST_SPELL;
+			sp->proc_interval = 60000;
+		}
 
 
 

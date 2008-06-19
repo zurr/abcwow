@@ -69,6 +69,11 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		Player * pl = _player->GetMapMgr()->GetPlayer((uint32)GetPlayer()->GetLootGUID());
 		if(!pl) return;
 		pLoot = &pl->loot;
+	}else if( UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_PLAYER )
+	{
+		Player * pl = _player->GetMapMgr()->GetPlayer((uint32)GetPlayer()->GetLootGUID());
+		if(!pl) return;
+		pLoot = &pl->loot;
 	}
 
 	if(!pLoot) return;
@@ -462,7 +467,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                         {
                             if( pLock->locktype[i] == 1 ) //Item or Quest Required;
 							{
-								pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 60000 : 12000 + ( RandomUInt( 60000 ) ) ) );
+								pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 300000 + ( RandomUInt( 300000 ) ) : 900000 + ( RandomUInt( 600000 ) ) ) );
 								return;
 							}
 							else if( pLock->locktype[i] == 2 ) //locktype;
@@ -489,7 +494,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                                     else
                                     {
     									pGO->CalcMineRemaining( true );
-										pGO->Despawn( 600000 + ( RandomUInt( 180000 ) ) );
+										pGO->Despawn( 900000 + ( RandomUInt( 600000 ) ) );
 										return;
                                     }
                                 }
@@ -500,7 +505,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 										pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
 										return;
 									}
-									pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 60000 : 12000 + ( RandomUInt( 60000 ) ) ) );
+									pGO->Despawn((IS_INSTANCE(pGO->GetMapId()) ? 0 : (sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 300000 + ( RandomUInt( 300000 ) ) : 900000 + ( RandomUInt( 600000 ) ) ) ) );
 									return;
 								}
 							}
@@ -511,7 +516,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 									pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
 									return;
 								}
-								pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 60000 : 12000 + ( RandomUInt( 60000 ) ) ) );
+								pGO->Despawn((IS_INSTANCE(pGO->GetMapId()) ? 0 : (sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 300000 + ( RandomUInt( 300000 ) ) : 900000 + ( RandomUInt( 600000 ) ) ) ) );
 								return;
 							}
                         }
@@ -524,7 +529,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                         pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
                         return;
                     }
-                    pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 60000 : 12000 + ( RandomUInt( 60000 ) ) ) );
+                    pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 300000 + ( RandomUInt( 300000 ) ) : 900000 + ( RandomUInt( 600000 ) ) ) );
                 }
             }
         default: break;
@@ -893,7 +898,7 @@ void WorldSession::HandleBugOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 {
-	if(_player->isAlive())
+	if(_player == NULL || _player->isAlive())
 		return;
 
 	sLog.outDetail("WORLD: Received CMSG_RECLAIM_CORPSE");
@@ -1229,6 +1234,12 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 
 	Player *plyr = GetPlayer();
    
+	if ( plyr != NULL && plyr->IsStealth() )
+	{
+		plyr->RemoveAura(plyr->m_stealth);
+		plyr->m_stealth = 0;
+	}
+
 	CALL_GO_SCRIPT_EVENT(obj, OnActivate)(_player);
 
 	uint32 type = obj->GetUInt32Value(GAMEOBJECT_TYPE_ID);
@@ -1406,6 +1417,21 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					/* expire the gameobject */
 					obj->ExpireAndDelete();
 				}
+				else if( goinfo->ID == 186811 || goinfo->ID == 181622)		// Ritual of Refreshment/Souls
+				{
+					Player * pCaster = _player->GetMapMgr()->GetPlayer(obj->m_ritualcaster);
+					if( pCaster == NULL )
+						return;
+
+					info = dbcSpell.LookupEntry(goinfo->sound1);
+					spell = new Spell(pCaster, info, true, NULL);
+					SpellCastTargets targets;
+					targets.m_unitTarget = pCaster->GetGUID();
+					spell->prepare(&targets);		
+
+					obj->ExpireAndDelete();
+				}
+
 			}
 		}break;
 	case GAMEOBJECT_TYPE_GOOBER:

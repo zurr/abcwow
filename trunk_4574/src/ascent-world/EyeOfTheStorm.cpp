@@ -20,6 +20,22 @@
 
 #include "StdAfx.h"
 
+static float EOTSBuffCoordinates[4][4] = {
+	{ 2050.542236f, 1372.680176f, 1194.561279f, 1.67552f },
+	{ 2047.728271f, 1749.736084f, 1190.198608f, -0.872665f },
+	{ 2283.300049f, 1748.891235f, 1189.706787f, 1.76278f },
+	{ 2301.271484f, 1388.116943f, 1197.304810f, -1.50098f },
+};
+
+static float EOTSBuffRotations[4][2] = {
+	{ 0.681998f, -0.731354f },
+	{ 0.771625f, 0.636078f },
+	{ 0.422618f, -0.906308f },
+	{ 0.743145f, 0.669131f },
+};
+
+uint32 EOTSbuffentrys[4] = {184964,184971,184978,184973};
+
 const float EOTSGraveyardLocations[EOTS_TOWER_COUNT][3] = {
 	{ 2012.403442f, 1455.412354f, 1172.201782f },			// BE Tower
 	{ 2013.061890f, 1677.238037f, 1182.125732f },			// Fel Reaver Ruins
@@ -81,14 +97,16 @@ const uint32 EOTSTowerIds[EOTS_TOWER_COUNT] = { EOTS_GO_BE_TOWER, EOTS_GO_FELREA
 #define EOTS_NETHERWING_FLAG_SPELL 34976
 
 
-#define EOTS_CAPTURE_RATE 20
+#define EOTS_CAPTURE_RATE 2
 
 EyeOfTheStorm::EyeOfTheStorm(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : CBattleground(mgr,id,lgroup,t)
 {
++	m_playerCountPerTeam = 15;
 	uint32 i;
 
 	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
 	{
+		m_buffs[i] = NULL;
 		m_CPStatus[i] = 50;
 		m_CPBanner[i] = NULL;
 		m_CPStatusGO[i] = NULL;
@@ -102,6 +120,29 @@ EyeOfTheStorm::EyeOfTheStorm(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) :
 
 EyeOfTheStorm::~EyeOfTheStorm()
 {
+	for(uint32 i = 0; i < EOTS_TOWER_COUNT; ++i)
+	{
+		if( m_buffs[i] != NULL && m_buffs[i]->IsInWorld() == false )
+			delete m_buffs[i];
+ 
+		if( m_CPStatusGO[i] != NULL && m_CPStatusGO[i]->IsInWorld() == false )
+			delete m_CPStatusGO[i];
+
+		if( m_CPBanner[i] != NULL && m_CPBanner[i]->IsInWorld() == false )
+			delete m_CPBanner[i];
+	}
+
+	for(uint32 i = 0; i < 2; ++i)
+	{
+		if( m_bubbles[i] != NULL && m_bubbles[i]->IsInWorld() == false )
+			delete m_bubbles[i];
+	}
+
+	if( m_dropFlag != NULL && m_dropFlag->IsInWorld() == false )
+		delete m_dropFlag;
+
+	if( m_standFlag != NULL && m_standFlag->IsInWorld() == false )
+		delete m_standFlag;
 
 }
 
@@ -155,20 +196,30 @@ bool EyeOfTheStorm::HookHandleRepop(Player * plr)
 void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 {
 	int32 tid = -1;
+	bool buff = false;
+
 	switch(id)
 	{
+	case 4568:
+		buff = true;
 	case 4476:			// BE Tower
 		tid = EOTS_TOWER_BE;
 		break;
 
+	case 4569:
+		buff = true;
 	case 4514:			// Fel Reaver Tower
 		tid = EOTS_TOWER_FELREAVER;
 		break;
 
+	case 4571:
+		buff = true;
 	case 4518:			// Draenei Tower
 		tid = EOTS_TOWER_DRAENEI;
 		break;
 
+	case 4570:
+		buff = true;
 	case 4516:			// Mage Tower
 		tid = EOTS_TOWER_MAGE;
 		break;
@@ -186,26 +237,47 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 	}
 #endif
 
-	uint32 team = plr->GetTeam();
-	if( plr->GetLowGUID() != m_flagHolder )
-		return;
-
-	int32 val;
-	uint32 i;
-	uint32 towers = 0;
-	if( team == 0 )
-		val = 100;
-	else
-		val = 0;
-
-	if( m_CPStatus[tid] != val )
-		return;			// not captured by our team
-
-	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
+	if( buff )
 	{
-		if(m_CPStatus[i] == val)
-			towers++;
+		uint32 spellid=0;
+		uint32 x = (uint32)tid;
+
+		if( m_buffs[x] && m_buffs[x]->IsInWorld() )
+		{
+			m_buffs[x]->RemoveFromWorld(false);
+			sEventMgr.AddEvent(this,&EyeOfTheStorm::SpawnBuff,x,EVENT_EOTS_RESPAWN_BUFF,EOTS_BUFF_RESPAWN_TIME,1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+
+			SpellEntry * sp = dbcSpell.LookupEntryForced( m_buffs[x]->GetInfo()->sound3 );
+			if(sp)
+			{
+				Spell * pSpell = new Spell(plr, sp, true, NULL);
+				SpellCastTargets targets(plr->GetGUID());
+				pSpell->prepare(&targets);
+			}
+		}
 	}
+	else
+	{
+		uint32 team = plr->GetTeam();
+		if( plr->GetGUIDLow() != m_flagHolder )
+			return;
+
+		int32 val;
+		uint32 i;
+		uint32 towers = 0;
+		if( team == 0 )
+			val = 100;
+		else
+			val = 0;
+
+		if( m_CPStatus[tid] != val )
+			return;			// not captured by our team
+
+		for(i = 0; i < EOTS_TOWER_COUNT; ++i)
+		{
+			if(m_CPStatus[i] == val)
+				towers++;
+		}
 
 	/*
 	Points from flag captures
@@ -216,18 +288,19 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 	* 4 towers controlled = 500 points 
 	*/
 
-	// 25 is guessed
-	const static uint32 points[5] = { 25, 75, 85, 100, 500 };
-	const char * msgs[2] = { "The Alliance have captured the flag.", "The Horde have captured the flag." };
+		// 25 is guessed
+		const static uint32 points[5] = { 25, 75, 85, 100, 500 };
+		const char * msgs[2] = { "The Alliance have captured the flag.", "The Horde have captured the flag." };
 
-	SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE + team, 0, msgs[team] );
-	GivePoints( team, points[towers] );
+		SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE + team, 0, msgs[team] );
+		GivePoints( team, points[towers] );
 
-	m_standFlag->PushToWorld( m_mapMgr );
-	m_flagHolder = 0;
-	SetWorldState( 2757, 1 );
+		m_standFlag->PushToWorld( m_mapMgr );
+		m_flagHolder = 0;
+		SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 1 );
 
-	plr->RemoveAura( EOTS_NETHERWING_FLAG_SPELL );
+		plr->RemoveAura( EOTS_NETHERWING_FLAG_SPELL );
+	}
 }
 
 void EyeOfTheStorm::HookOnPlayerDeath(Player * plr)
@@ -244,7 +317,7 @@ void EyeOfTheStorm::HookFlagDrop(Player * plr, GameObject * obj)
 	m_dropFlag->RemoveFromWorld(false);
 	plr->CastSpell( plr->GetGUID(), EOTS_NETHERWING_FLAG_SPELL, true );
 
-	SetWorldState( 2757, 0 );
+	SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 0 );
 	PlaySoundToAll( 8212 );
 	SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE + plr->GetTeam(), plr->GetGUID(), "$N has taken the flag!" );
 	m_flagHolder = plr->GetLowGUID();
@@ -265,7 +338,7 @@ bool EyeOfTheStorm::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell *
 	m_standFlag->RemoveFromWorld(false);
 	pPlayer->CastSpell( pPlayer->GetGUID(), EOTS_NETHERWING_FLAG_SPELL, true );
 
-	SetWorldState( 2757, 0 );
+	SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 0 );
 	PlaySoundToAll( 8212 );
 	SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE + pPlayer->GetTeam(), pPlayer->GetGUID(), "$N has taken the flag!" );
 	m_flagHolder = pPlayer->GetLowGUID();
@@ -283,7 +356,11 @@ void EyeOfTheStorm::HookOnMount(Player * plr)
 
 void EyeOfTheStorm::OnAddPlayer(Player * plr)
 {
-
+	if ( plr != NULL && !m_started )
+	{
+		plr->Root();
+		plr->CastSpell(plr, BG_PREPARATION, true);
+	}
 }
 
 void EyeOfTheStorm::OnRemovePlayer(Player * plr)
@@ -300,6 +377,8 @@ void EyeOfTheStorm::OnRemovePlayer(Player * plr)
 		plr->RemoveAura( EOTS_NETHERWING_FLAG_SPELL );
 		//DropFlag( plr );
 	}
+
+	plr->RemoveAura(BG_PREPARATION);
 }
 
 void EyeOfTheStorm::DropFlag(Player * plr)
@@ -322,7 +401,7 @@ void EyeOfTheStorm::EventResetFlag()
 	m_dropFlag->RemoveFromWorld(false);
 	m_standFlag->PushToWorld(m_mapMgr);
 
-	SetWorldState( 2757, 1 );
+	SetWorldState( EOTS_WORLDSTATE_FLAG_STATE, 1 );
 	PlaySoundToAll( 8192 );
 	SendChatMessage( CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The flag has been reset." );
 	m_flagHolder = 0;
@@ -335,16 +414,18 @@ void EyeOfTheStorm::OnCreate()
 
 
 	/* eww worldstates */
-	SetWorldState(2565, 142);
-	SetWorldState(2720, 0);
-	SetWorldState(2719, 0);
-	SetWorldState(2718, 0);
-	SetWorldState(2260, 0);
-	SetWorldState(2264, 0);
-	SetWorldState(2263, 0);
-	SetWorldState(2262, 0);
-	SetWorldState(2261, 0);
-	SetWorldState(2259, 0);
+	SetWorldState(3218, 0);
+	SetWorldState(3217, 0);
+	SetWorldState(3191, 2);
+	SetWorldState(3085, 379);
+	SetWorldState(2770, 1);
+	SetWorldState(2769, 1);
+	SetWorldState(EOTS_WORLDSTATE_FLAG_STATE, 1);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_BASES, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_BASES, 0);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_VICTORYPOINTS, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_VICTORYPOINTS, 0);
+	// those 8 ( 2742 - 2735 ) are markes for changing tower control on map - TODO : find which one's which. 
 	SetWorldState(2742, 0);
 	SetWorldState(2741, 0);
 	SetWorldState(2740, 0);
@@ -353,29 +434,29 @@ void EyeOfTheStorm::OnCreate()
 	SetWorldState(2737, 0);
 	SetWorldState(2736, 0);
 	SetWorldState(2735, 0);
-	SetWorldState(2733, 0);
-	SetWorldState(2732, 0);
-	SetWorldState(2731, 1);
-	SetWorldState(2730, 0);
-	SetWorldState(2729, 0);
-	SetWorldState(2728, 1);
-	SetWorldState(2727, 0);
-	SetWorldState(2726, 0);
-	SetWorldState(2725, 1);
-	SetWorldState(2724, 0);
-	SetWorldState(2723, 0);
-	SetWorldState(2722, 1);
-	SetWorldState(2757, 1);
-	SetWorldState(2753, 0);
-	SetWorldState(2752, 0);
-	SetWorldState(2770, 1);
-	SetWorldState(2769, 1);
-	SetWorldState(2750, 0);
-	SetWorldState(2749, 0);
-	SetWorldState(3191, 2);
-	SetWorldState(3218, 0);
-	SetWorldState(3217, 0);
-	SetWorldState(3085, 379);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_CONTROLL_DRAENEI, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_CONTROLL_DRAENEI, 0);
+	SetWorldState(EOTS_WORLDSTATE_SHOW_DRAENEI, 1);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_CONTROLL_MAGETOWER, 0);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_CONTROLL_MAGETOWER, 0);
+	SetWorldState(EOTS_WORLDSTATE_SHOW_MAGETOWER, 1);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_CONTROLL_FELREAVER, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_CONTROLL_FELREAVER, 0);
+	SetWorldState(EOTS_WORLDSTATE_SHOW_FELREAVER, 1);
+	SetWorldState(EOTS_WORLDSTATE_HORDE_CONTROLL_ELFTOWER, 0);
+	SetWorldState(EOTS_WORLDSTATE_ALLIANCE_CONTROLL_ELFTOWER, 0);
+	SetWorldState(EOTS_WORLDSTATE_SHOW_ELFTOWER, 1);
+	SetWorldState(2720, 0);
+	SetWorldState(EOTS_WORLDSTATE_DISPLAYVALUE, 0);
+	SetWorldState(EOTS_WORLDSTATE_DISPLAYON, 0);
+	SetWorldState(2565, 142);
+	SetWorldState(2264, 0);
+	SetWorldState(2263, 0);
+	SetWorldState(2262, 0);
+	SetWorldState(2261, 0);
+	SetWorldState(2260, 0);
+	SetWorldState(2259, 0);
+
 
 	/* create gameobjects */
 	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
@@ -469,7 +550,7 @@ void EyeOfTheStorm::UpdateCPs()
 		for( ; itr != itrend; ++itr )
 		{
 			plr = *itr;
-			if( plr->GetDistance2dSq( go ) <= EOTS_CAPTURE_DISTANCE )
+			if( (plr->GetDistance2dSq( go ) <= EOTS_CAPTURE_DISTANCE) && plr->isAlive() && !plr->IsStealth() )
 			{
 				playercounts[plr->GetTeam()]++;
 
@@ -502,6 +583,9 @@ void EyeOfTheStorm::UpdateCPs()
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_HORDE )
 				{
+					SetWorldState( TowerWorldStates[i][0], 0);
+					SetWorldState( TowerWorldStates[i][1], 1);
+
 					RespawnCPFlag(i, EOTS_BANNER_HORDE);
 					if( m_spiritGuides[i] != NULL )
 					{
@@ -519,6 +603,9 @@ void EyeOfTheStorm::UpdateCPs()
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_ALLIANCE )
 				{
+					SetWorldState( TowerWorldStates[i][1], 0);
+					SetWorldState( TowerWorldStates[i][0], 1);
+
 					RespawnCPFlag(i, EOTS_BANNER_ALLIANCE);
 					if( m_spiritGuides[i] != NULL )
 					{
@@ -536,6 +623,10 @@ void EyeOfTheStorm::UpdateCPs()
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_NEUTRAL )
 				{
+
+					for( uint32 j = 0; j < 2; ++j )
+						SetWorldState( TowerWorldStates[i][j], 0);
+
 					RespawnCPFlag(i, EOTS_BANNER_NEUTRAL);
 					if( m_spiritGuides[i] != NULL )
 					{
@@ -629,7 +720,7 @@ bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 		SetWorldState( EOTS_WORLDSTATE_ALLIANCE_VICTORYPOINTS + team, m_points[team] );
 
 		m_ended = true;
-		m_winningteam = team;
+		m_winningteam = ( team ) ? 0 : 1;
 		m_nextPvPUpdateTime = 0;
 
 		sEventMgr.RemoveEvents(this);
@@ -638,20 +729,45 @@ bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 		/* add the marks of honor to all players */
 		m_mainLock.Acquire();
 
-		SpellEntry * winner_spell = dbcSpell.LookupEntry(24953);
-		SpellEntry * loser_spell = dbcSpell.LookupEntry(24952);
 		for(uint32 i = 0; i < 2; ++i)
 		{
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
-				(*itr)->Root();
-				if(i == m_winningteam)
-					(*itr)->CastSpell((*itr), winner_spell, true);
-				else
-					(*itr)->CastSpell((*itr), loser_spell, true);
+				Player *plr = objmgr.GetPlayer(*itr);
+				if( plr != NULL )
+				{
+					plr->Root();
+				
+					uint32 reward_count;
+
+					if( i != m_winningteam )
+						reward_count = 3;
+					else
+						reward_count = 1;
+
+					ItemPrototype* it = ItemPrototypeStorage.LookupEntry(29024);
+					if( it != NULL )
+					{
+						Item *item = objmgr.CreateItem( 29024, plr );
+						item->SetUInt32Value(ITEM_FIELD_STACK_COUNT, reward_count );
+						item->SoulBind();
+
+						if( plr->GetItemInterface()->AddItemToFreeSlot(item) )
+						{
+							SlotResult *lr = plr->GetItemInterface()->LastSearchResult();
+							plr->GetSession()->SendItemPushResult(item, false, true, false, true, lr->ContainerSlot, lr->Slot, reward_count);
+						}
+						else
+						{
+							delete item;
+						}
+
+					}
+				}
 			}
 		}
 		m_mainLock.Release();
+
 		return true;
 	}
 
@@ -673,6 +789,35 @@ void EyeOfTheStorm::HookOnHK(Player * plr)
 
 void EyeOfTheStorm::SpawnBuff(uint32 x)
 {
+	uint32 chosen_buffid = EOTSbuffentrys[RandomUInt(3)];
+	GameObjectInfo * goi = GameObjectNameStorage.LookupEntry( chosen_buffid );
+	if( goi == NULL )
+		return;
+
+	if( m_buffs[x] == NULL )
+	{
+		m_buffs[x] = SpawnGameObject(chosen_buffid, m_mapMgr->GetMapId(), EOTSBuffCoordinates[x][0], EOTSBuffCoordinates[x][1], EOTSBuffCoordinates[x][2], EOTSBuffCoordinates[x][3], 0, 114, 1);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02, EOTSBuffRotations[x][0]);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03, EOTSBuffRotations[x][1]);
+		m_buffs[x]->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		m_buffs[x]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
+		m_buffs[x]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
+		m_buffs[x]->PushToWorld(m_mapMgr);
+	 }
+	else
+	{
+		if( m_buffs[x]->IsInWorld() )
+			m_buffs[x]->RemoveFromWorld(false);
+	
+		if(chosen_buffid != m_buffs[x]->GetEntry())
+		{
+			m_buffs[x]->SetNewGuid(m_mapMgr->GenerateGameobjectGuid());
+			m_buffs[x]->SetUInt32Value(OBJECT_FIELD_ENTRY, chosen_buffid);
+			m_buffs[x]->SetInfo(goi);
+		}
+	
+		m_buffs[x]->PushToWorld(m_mapMgr);
+	}
 
 }
 
@@ -686,6 +831,17 @@ LocationVector EyeOfTheStorm::GetStartingCoords(uint32 Team)
 void EyeOfTheStorm::OnStart()
 {
 	uint32 i;
+
+	m_started = true;
+
+	for(uint32 i = 0; i < 2; ++i) {
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+		{
+			Player *plr = objmgr.GetPlayer(*itr);
+			if( plr != NULL )
+				plr->RemoveAura(BG_PREPARATION);
+		}
+	}
 
 	/* start the events */
 	sEventMgr.AddEvent(this, &EyeOfTheStorm::GeneratePoints, EVENT_EOTS_GIVE_POINTS, 2000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);

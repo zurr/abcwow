@@ -186,7 +186,11 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 
 		if(objA->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP) && objB->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		{
-			if( static_cast< Player* >( objA )->m_bg != NULL )
+			if(static_cast< Player* >( objA )->m_bg != NULL && static_cast< Player* >( objB )->m_bg != NULL)
+				if(static_cast< Player* >( objA )->m_bgTeam == static_cast< Player* >( objB )->m_bgTeam)
+					return false;
+
+			if(static_cast< Player* >( objA )->GetGroup() != NULL)
 				if( static_cast< Player* >( objA )->GetGroup() == static_cast< Player* >( objB )->GetGroup() )
 					return false;
 
@@ -198,19 +202,38 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 	if(objA->IsPet())
 	{
 		if(objB->IsPlayer())
+		{
 			if(
 				static_cast<Pet *>(objA)->GetPetOwner() &&
 				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast< Player* >(objB) && 
 				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
 				)
 				return true;
+
+			if(
+				static_cast<Pet *>(objA)->GetPetOwner() &&
+				static_cast<Pet *>(objA)->GetPetOwner()->m_bg &&
+				static_cast<Pet *>(objA)->GetPetOwner()->m_bgTeam != static_cast< Player* >(objB)->m_bgTeam
+				)
+				return true;
+		}
 		if(objB->IsPet())
+		{
 			if(static_cast<Pet *>(objA)->GetPetOwner() &&
 				static_cast<Pet *>(objB)->GetPetOwner() &&
 				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast<Pet *>(objB)->GetPetOwner() && 
 				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
 				)
 				return true;
+
+			if(
+				static_cast<Pet *>(objA)->GetPetOwner() && static_cast<Pet *>(objB)->GetPetOwner() &&
+				static_cast<Pet *>(objA)->GetPetOwner()->m_bg &&
+				static_cast<Pet *>(objA)->GetPetOwner()->m_bgTeam != static_cast<Pet *>(objB)->GetPetOwner()->m_bgTeam
+				)
+				return true;
+
+		}
 	}
 	if(objB->IsPet())
 	{
@@ -236,11 +259,19 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 		if(static_cast<Creature *>(objA)->IsTotem())
 		{
 			if(objB->IsPlayer())
+			{
+				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
+					static_cast<Creature *>(objA)->GetTotemOwner()->m_bg &&
+					static_cast<Creature *>(objA)->GetTotemOwner()->m_bgTeam != static_cast< Player* >(objB)->m_bgTeam
+					)
+					return true;
+
 				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
 					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast< Player* >(objB) && 
 					static_cast<Creature *>(objA)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
 					)
 					return true;
+			}
 			if(objB->IsPet())
 				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
 					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast<Pet *>(objB)->GetPetOwner() && 
@@ -274,6 +305,8 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 	AreaTable *atB;
 	if( objA->IsPet() && static_cast< Pet* >( objA )->GetPetOwner() )
 		atA = dbcArea.LookupEntry( static_cast< Pet* >( objA )->GetPetOwner()->GetAreaID() );
+	else if(objA->IsCreature() && static_cast< Creature* >( objA )->IsTotem() && static_cast< Creature* >(objA )->GetTotemOwner())
+		atA = dbcArea.LookupEntry( static_cast< Creature* >( objA )->GetTotemOwner()->GetAreaID() );
 	else if( objA->IsPlayer() )
 		atA = dbcArea.LookupEntry( static_cast< Player* >( objA )->GetAreaID() );
 	else
@@ -281,6 +314,8 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 
 	if( objB->IsPet() && static_cast< Pet* >( objB )->GetPetOwner() )
 		atB = dbcArea.LookupEntry( static_cast< Pet* >( objB )->GetPetOwner()->GetAreaID() );
+	else if(objB->IsCreature() && static_cast< Creature* >( objB )->IsTotem() && static_cast< Creature* >(objB )->GetTotemOwner())
+		atB = dbcArea.LookupEntry( static_cast< Creature* >( objB )->GetTotemOwner()->GetAreaID() );
 	else if( objB->IsPlayer() )
 		atB = dbcArea.LookupEntry( static_cast< Player* >( objB )->GetAreaID() );
 	else

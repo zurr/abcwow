@@ -359,7 +359,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 		
 			if(static_cast<Unit*>(this)->GetAIInterface()->IsFlying())
 //				flags2 |= 0x800; //in 2.3 this is some state that i was not able to decode yet
-				flags2 |= 0x400; //Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
+				flags2 |= MOVEFLAG_TAXI; //Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
 			if(static_cast<Creature*>(this)->proto && static_cast<Creature*>(this)->proto->extra_a9_flags)
 			{
 				if(!(flags2 & 0x0200))
@@ -1411,36 +1411,68 @@ bool Object::isInFront(Object* target)
 {
 	// check if we facing something ( is the object within a 180 degree slice of our positive y axis )
 
-    double x = target->GetPositionX() - m_position.x;
-    double y = target->GetPositionY() - m_position.y;
+	if ( target == NULL )
+		return false;
 
-    double angle = atan2( y, x );
-    angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
+	double x = target->GetPositionX() - m_position.x;
+	double y = target->GetPositionY() - m_position.y;
+
+	double angle = atan2( y, x );
+	angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
 	angle -= m_position.o;
 
-    while( angle > M_PI)
-        angle -= 2.0 * M_PI;
+	while( angle > M_PI)
+		angle -= 2.0 * M_PI;
 
-    while(angle < -M_PI)
-        angle += 2.0 * M_PI;
+	while(angle < -M_PI)
+		angle += 2.0 * M_PI;
 
 	// replace M_PI in the two lines below to reduce or increase angle
 
-    double left = -1.0 * ( M_PI / 2.0 );
-    double right = ( M_PI / 2.0 );
+	double left = -1.0 * ( M_PI / 2.0 );
+	double right = ( M_PI / 2.0 );
 
-    return( ( angle >= left ) && ( angle <= right ) );
+	return( ( angle >= left ) && ( angle <= right ) );
+}
+
+bool Object::isInCone(Object* target)
+{
+	// check if we facing something within a 102 degree slice of our positive y axis
+
+	if ( target == NULL )
+		return false;
+
+	double x = target->GetPositionX() - m_position.x;
+	double y = target->GetPositionY() - m_position.y;
+
+	double angle = atan2( y, x );
+	angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
+	angle -= m_position.o;
+
+	while( angle > M_PI)
+		angle -= 2.0 * M_PI;
+
+	while(angle < -M_PI)
+		angle += 2.0 * M_PI;
+
+	double left = -1.0 * ( M_PI / 3.5 );
+	double right = ( M_PI / 3.5 );
+
+	return( ( angle >= left ) && ( angle <= right ) );
 }
 
 bool Object::isInBack(Object* target)
 {
 	// check if we are behind something ( is the object within a 180 degree slice of our negative y axis )
 
-    double x = m_position.x - target->GetPositionX();
-    double y = m_position.y - target->GetPositionY();
+	if ( target == NULL )
+		return false;
 
-    double angle = atan2( y, x );
-    angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
+	double x = m_position.x - target->GetPositionX();
+	double y = m_position.y - target->GetPositionY();
+
+	double angle = atan2( y, x );
+	angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
 
 	// if we are a unit and have a UNIT_FIELD_TARGET then we are always facing them
 	if( m_objectTypeId == TYPEID_UNIT && m_uint32Values[UNIT_FIELD_TARGET] != 0 && static_cast< Unit* >( this )->GetAIInterface()->GetNextTarget() )
@@ -1451,22 +1483,22 @@ bool Object::isInBack(Object* target)
 	else
 		angle -= target->GetOrientation();
 
-    while( angle > M_PI)
-        angle -= 2.0 * M_PI;
+	while( angle > M_PI)
+		angle -= 2.0 * M_PI;
 
-    while(angle < -M_PI)
-        angle += 2.0 * M_PI;
+	while(angle < -M_PI)
+		angle += 2.0 * M_PI;
 
 	// replace M_H_PI in the two lines below to reduce or increase angle
 
-    double left = -1.0 * ( M_H_PI / 2.0 );
-    double right = ( M_H_PI / 2.0 );
+	double left = -1.0 * ( M_H_PI / 2.0 );
+	double right = ( M_H_PI / 2.0 );
 
-    return( ( angle <= left ) && ( angle >= right ) );
+	return( ( angle <= left ) && ( angle >= right ) );
 }
 bool Object::isInArc(Object* target , float angle) // angle in degrees
 {
-    return inArc( GetPositionX() , GetPositionY() , angle , GetOrientation() , target->GetPositionX() , target->GetPositionY() );
+	return inArc( GetPositionX() , GetPositionY() , angle , GetOrientation() , target->GetPositionX() , target->GetPositionY() );
 }
 
 bool Object::isInRange(Object* target, float range)
@@ -1671,23 +1703,23 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		}		
 	}
 
-        ///Rage
-        float val;
+	// Rage generating - I am receiving damage!
+	if( damage && pVictim->IsPlayer() && pVictim->GetPowerType() == POWER_TYPE_RAGE && pVictim->CombatStatus.IsInCombat() )
+	{
+		float val;
+		float level = (float)pVictim->getLevel();
 
-		if( pVictim->GetPowerType() == POWER_TYPE_RAGE 
-			//&& !spellId //zack : general opinion is that spells should generate rage. I share the feeling
-			&& pVictim != this
-			&& pVictim->IsPlayer())
-		{
-			float level = (float)pVictim->getLevel();
-			float c = 0.0091107836f * level * level + 3.225598133f * level + 4.2652911f;
-			val = 2.5f * damage / c;
-			uint32 rage = pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
-			if( rage + float2int32( val ) > 1000 )
-			  val = 1000.0f - (float)pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
+		// Conversion Value
+		float c = 0.0091107836f * level * level + 3.225598133f * level + 4.2652911f;
 
-			ModUnsigned32Value(UNIT_FIELD_POWER2, (int32)val);
-		}
+		val = 2.5f * damage / c;
+		val *= 10;
+
+		pVictim->ModUInt32Value( UNIT_FIELD_POWER2, (int32)val );
+		if( pVictim->GetUInt32Value( UNIT_FIELD_POWER2) > 1000 )
+			pVictim->ModUInt32Value( UNIT_FIELD_POWER2, 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 ) );
+	}
+
 
 	if( pVictim->IsPlayer() )
 	{
@@ -1893,17 +1925,21 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		pVictim->SetUInt32Value(UNIT_FIELD_HEALTH, 0);
 		if(pVictim->IsPlayer())
 		{
-			uint32 self_res_spell = static_cast< Player* >( pVictim )->SoulStone;
-			static_cast< Player* >( pVictim )->SoulStone = static_cast< Player* >( pVictim )->SoulStoneReceiver = 0;
-
-			if( !self_res_spell && static_cast< Player* >( pVictim )->bReincarnation )
+			uint32 self_res_spell = 0;
+			if (GetMapMgr()->GetMapId() != 572 && GetMapMgr()->GetMapId() != 562 && GetMapMgr()->GetMapId() != 559)
 			{
-				SpellEntry* m_reincarnSpellInfo = dbcSpell.LookupEntry( 20608 );
-				if( static_cast< Player* >( pVictim )->Cooldown_CanCast( m_reincarnSpellInfo ) )
+				self_res_spell = static_cast< Player* >( pVictim )->SoulStone;
+				static_cast< Player* >( pVictim )->SoulStone = static_cast< Player* >( pVictim )->SoulStoneReceiver = 0;
+
+				if( !self_res_spell && static_cast< Player* >( pVictim )->bReincarnation )
 				{
-					uint32 ankh_count = static_cast< Player* >( pVictim )->GetItemInterface()->GetItemCount( 17030 );
-					if( ankh_count )
-						self_res_spell = 21169;
+					SpellEntry* m_reincarnSpellInfo = dbcSpell.LookupEntry( 20608 );
+					if( static_cast< Player* >( pVictim )->CanCastDueToCooldown( m_reincarnSpellInfo ) )
+					{
+						uint32 ankh_count = static_cast< Player* >( pVictim )->GetItemInterface()->GetItemCount( 17030 );
+						if( ankh_count )
+							self_res_spell = 21169;
+					}
 				}
 			}
 			pVictim->SetUInt32Value( PLAYER_SELF_RES_SPELL, self_res_spell );
@@ -1926,21 +1962,28 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			if( pVictim->IsPlayer() )
 			{
 				sHookInterface.OnKillPlayer( plr, static_cast< Player* >( pVictim ) );
+				bool setAurastateFlag = false;
 				if(plr->getLevel() > pVictim->getLevel())
 				{
 					unsigned int diff = plr->getLevel() - pVictim->getLevel();
 					if( diff <= 8 )
 					{
 						HonorHandler::OnPlayerKilledUnit(plr, pVictim);
-						SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+						setAurastateFlag = true;
 					}
-					else
-						RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 				}
 				else
 				{
 					HonorHandler::OnPlayerKilledUnit( plr, pVictim );
-					SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+					setAurastateFlag = true;
+				}
+
+				if (setAurastateFlag)
+				{
+					this->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+					if(!sEventMgr.HasEvent(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+						sEventMgr.AddEvent((Unit*)this,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+					else sEventMgr.ModifyEventTimeLeft(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
 				}
 			}
 			else
@@ -1948,7 +1991,6 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				if (!isCritter) // REPUTATION
 				{
 					plr->Reputation_OnKilledUnit( pVictim, false );
-					RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 				}
 			}
 		}
@@ -2124,6 +2166,12 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 					if( xp > 0 )
 					{
 						static_cast< Player* >( this )->GiveXP( xp, victimGuid, true );
+						this->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+						if(!sEventMgr.HasEvent(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+							sEventMgr.AddEvent((Unit*)this,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+						else
+							sEventMgr.ModifyEventTimeLeft(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
+
 						if( static_cast< Player* >( this )->GetSummon() && static_cast< Player* >( this )->GetSummon()->GetUInt32Value( UNIT_CREATED_BY_SPELL ) == 0 )
 						{
 							xp = CalculateXpToGive( pVictim, static_cast< Player* >( this )->GetSummon() );
@@ -2182,7 +2230,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 						static_cast< Pet* >( pVictim )->SetUInt32Value( UNIT_FIELD_POWER5, hap );
 					}
 					
-					static_cast< Pet* >( pVictim )->DelayedRemove( false, true );
+					static_cast< Pet* >( pVictim )->SendNullSpellsToOwner();
 					
 					//remove owner warlock soul link from caster
 					Player* owner = static_cast<Pet*>( pVictim )->GetPetOwner();
@@ -2208,7 +2256,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			static_cast< Player* >( pVictim )->m_BreathDamageTimer = 0;
 			static_cast< Player* >( pVictim )->m_SwimmingTime = 0;
 
-			/* -------------------- KILL PET WHEN PLAYER DIES ---------------*/
+			/* -------------------- KILL PET AND TOTEMS WHEN PLAYER DIES ---------------*/
 			if( static_cast< Player* >( pVictim )->GetSummon() != NULL )
 			{
 				if( pVictim->GetUInt32Value( UNIT_CREATED_BY_SPELL ) > 0 )
@@ -2216,7 +2264,12 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				else
 					static_cast< Player* >( pVictim )->GetSummon()->Remove( true, true, true );
 			}
-			/* -------------------- KILL PET WHEN PLAYER DIES END---------------*/
+			for (int slot = 0; slot < 4; slot++)
+			{
+				if (static_cast<Player*>(pVictim)->m_TotemSlots[slot] != 0)
+					static_cast<Player*>(pVictim)->m_TotemSlots[slot]->TotemExpire();
+			}
+			/* -------------------- KILL PET AND TOTEMS WHEN PLAYER DIES END---------------*/
 		}
 		else sLog.outError("DealDamage for Unknown Object.");
 	}
@@ -2562,7 +2615,7 @@ void Object::SendSpellLog(Object *Caster, Object *Target,uint32 Ability, uint8 S
 
 void Object::SendSpellNonMeleeDamageLog( Object* Caster, Object* Target, uint32 SpellID, uint32 Damage, uint8 School, uint32 AbsorbedDamage, uint32 ResistedDamage, bool PhysicalDamage, uint32 BlockedDamage, bool CriticalHit, bool bToset )
 {
-	if ((!Caster || !Target) && SpellID)
+	if ( Caster == NULL || Target == NULL || !SpellID )
 		return;
 
 	WorldPacket data(SMSG_SPELLNONMELEEDAMAGELOG,40);

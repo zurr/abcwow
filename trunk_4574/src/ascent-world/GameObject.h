@@ -258,8 +258,8 @@ public:
 			mines_remaining = GetInfo()->sound4 + RandomUInt(GetInfo()->sound5 - GetInfo()->sound4) - 1;
 	}
 	bool HasLoot();
-	uint32 GetGOReqSkill();
 	MapCell * m_respawnCell;
+	uint32 GetGOReqSkill();
 
 protected:
 
