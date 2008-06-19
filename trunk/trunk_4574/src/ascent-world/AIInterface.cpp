@@ -106,6 +106,7 @@ AIInterface::AIInterface()
 	waiting_for_cooldown = false;
 	UnitToFollow_backup = NULL;
 	m_isGuard = false;
+	m_isNeutralGuard = false;
 	m_is_in_instance=false;
 	skip_reset_hp=false;
 }
@@ -336,10 +337,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DAMAGE_TAKEN );
 
 				CALL_SCRIPT_EVENT(m_Unit, OnDamageTaken)(pUnit, float(misc1));
-				if(!modThreatByPtr(pUnit, misc1))
-				{
-					m_aiTargets.insert(TargetMap::value_type(pUnit, misc1));
-				}
+				modThreatByPtr(pUnit, misc1);
 				m_Unit->CombatStatus.OnDamageDealt(pUnit);
 			}break;
 		case EVENT_FOLLOWOWNER:
@@ -974,7 +972,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 #ifdef ENABLE_CREATURE_DAZE
 							//now if the target is facing his back to us then we could just cast dazed on him :P
 							//as far as i know dazed is casted by most of the creatures but feel free to remove this code if you think otherwise
-							if(m_nextTarget &&
+							if(m_nextTarget && m_Unit->m_factionDBC && m_Unit->m_faction &&
 								!(m_Unit->m_factionDBC->RepListId == -1 && m_Unit->m_faction->FriendlyMask==0 && m_Unit->m_faction->HostileMask==0) /* neutral creature */
 								&& m_nextTarget->IsPlayer() && !m_Unit->IsPet() && health_before_strike>m_nextTarget->GetUInt32Value(UNIT_FIELD_HEALTH)
 								&& Rand(m_Unit->get_chance_to_daze(m_nextTarget)))
@@ -1262,7 +1260,6 @@ bool AIInterface::HealReaction(Unit* caster, Unit* victim, uint32 amount)
 {
 	if(!caster || !victim)
 	{
-		printf("!!!BAD POINTER IN AIInterface::HealReaction!!!\n");
 		return false;
 	}
 
@@ -1274,21 +1271,6 @@ bool AIInterface::HealReaction(Unit* caster, Unit* victim, uint32 amount)
 	if(m_aiTargets.find(victim) != m_aiTargets.end())
 		victimInList = 1;
 
-	/*for(i = m_aiTargets.begin(); i != m_aiTargets.end(); i++)
-	{
-		if(casterInList && victimInList)
-		{ // no need to check the rest, just break that
-			break;
-		}
-		if(i->target == victim)
-		{
-			victimInList = true;
-		}
-		if(i->target == caster)
-		{
-			casterInList = true;
-		}
-	}*/
 	if(!victimInList && !casterInList) // none of the Casters is in the Creatures Threat list
 	{
 		return false;
@@ -1298,10 +1280,6 @@ bool AIInterface::HealReaction(Unit* caster, Unit* victim, uint32 amount)
 		// get caster into combat if he's hostile
 		if(isHostile(m_Unit, caster))
 		{
-			//AI_Target trgt;
-			//trgt.target = caster;
-			//trgt.threat = amount;
-			//m_aiTargets.push_back(trgt);
 			m_aiTargets.insert(TargetMap::value_type(caster, amount));
 			return true;
 		}
@@ -1376,6 +1354,59 @@ Unit* AIInterface::FindTarget()
 	{
 		return 0;
 	}
+	if (m_isNeutralGuard)
+	{
+		Player *tmpPlr;
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			tmpPlr = (*itrPlr);
+			if (tmpPlr == NULL)
+				continue;
+			if (tmpPlr->GetTaxiState())
+				continue;
+			if (tmpPlr->bInvincible)
+				continue;
+			if (tmpPlr->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
+				continue;
+			if (tmpPlr->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9))
+				continue;
+			if (tmpPlr->m_invisible)
+				continue;
+			if (tmpPlr->CombatStatus.GetPrimaryAttackTarget() == NULL)
+				continue;
+			else
+			{
+				Unit *pPTarget = GetUnit()->GetMapMgr()->GetUnit( tmpPlr->CombatStatus.GetPrimaryAttackTarget() );
+				if( pPTarget != NULL && !pPTarget->IsPlayer() )
+					continue;
+				if (tmpPlr->DuelingWith == static_cast<Player*>(pPTarget))
+					continue;
+			}
+
+			dist = m_Unit->GetDistanceSq(tmpPlr);
+
+			if (dist > 2500.0f)
+				continue;
+			if (distance > dist)
+			{
+				distance = dist;
+				target = static_cast<Unit*>(tmpPlr);
+			}
+		}
+		if (target)
+		{
+			m_Unit->m_runSpeed = m_Unit->m_base_runSpeed * 2.0f;
+			AttackReaction(target, 1, 0);
+
+			WorldPacket data(SMSG_AI_REACTION, 12);
+			data << m_Unit->GetGUID() << uint32(2);		// Aggro sound
+			static_cast< Player* >( target )->GetSession()->SendPacket( &data );
+
+			return target;
+		}
+		distance = 999999.0f; //Reset Distance for normal check
+	}
+
 
 	for( itr = m_Unit->GetInRangeOppFactsSetBegin(); itr != m_Unit->GetInRangeOppFactsSetEnd(); )
 	{
@@ -2677,7 +2708,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 	}
 
 	//Fear Code
-	if(m_AIState == STATE_FEAR && UnitToFear != NULL && m_creatureState == STOPPED)
+	if(m_AIState == STATE_FEAR && UnitToFear != NULL && !m_Unit->IsPlayer() && m_creatureState == STOPPED)
 	{
 		if(getMSTime() > m_FearTimer)   // Wait at point for x ms ;)
 		{
@@ -2741,7 +2772,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 	}
 
 	// Wander AI movement code
-	if(m_AIState == STATE_WANDER && m_creatureState == STOPPED)
+	if(m_AIState == STATE_WANDER && !m_Unit->IsPlayer() && m_creatureState == STOPPED)
 	{
 		if(getMSTime() < m_WanderTimer) // is it time to move again?
 			return;
@@ -3593,6 +3624,43 @@ bool isGuard(uint32 id)
 	return false;
 }
 
+bool isNeutralGuard(uint32 id)
+{
+	switch(id)
+	{
+		// Ratchet
+	case 3502:
+		// Booty Bay
+	case 4624:
+		// Gadgetzan
+	case 9460:
+		// Moonglade
+	case 11822:
+		// Everlook
+	case 11190:
+		// Cenarion Refuge
+	case 17855:
+		// Throne of the elements
+	case 18099:
+	case 18101:
+	case 18102:
+		// Area 52
+	case 20484:
+	case 20485:
+		// Cosmowrench
+	case 22494:
+		// Mudsprocket
+	case 23636:
+		// Concert Bruiser
+	case 23721:
+		{
+			return true;
+		}
+		break;
+	}
+	return false;
+}
+
 void AIInterface::WipeCurrentTarget()
 {
 	TargetMap::iterator itr = m_aiTargets.find( m_nextTarget );
@@ -3639,11 +3707,11 @@ bool AIInterface::TargetUpdateCheck(Unit * ptr)
 {
 	__try
 	{
-		if( ptr->event_GetCurrentInstanceId() != m_Unit->event_GetCurrentInstanceId() ||
-			!ptr->isAlive() || m_Unit->GetDistanceSq(ptr) >= 6400.0f )
-		{
+		bool boss = false;
+		if (m_Unit->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
+			boss = true;
+		if( ptr->event_GetCurrentInstanceId() != m_Unit->event_GetCurrentInstanceId() || !ptr->isAlive() || (!boss && m_Unit->GetDistanceSq(ptr) >= 6400.0f))
 			return false;
-		}
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{

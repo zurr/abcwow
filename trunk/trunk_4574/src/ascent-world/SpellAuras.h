@@ -315,7 +315,7 @@ struct ProcTriggerSpell
 	//    SpellEntry *ospinfo;
 	//    SpellEntry *spinfo;
 	uint32 LastTrigger;
-	uint32 ProcType; //0=triggerspell/1=triggerclassspell
+	uint32 ProcType; //0=triggerspell/1=triggerclassspell OR 0=talents/spells 1=weapon 2=armor
 	bool deleted;
 };
 #else
@@ -345,7 +345,7 @@ class SERVER_DECL Aura : public EventableObject
 {
 	uint64 periodic_target;
 public:
-    Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target);
+    Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target, Item* i_caster = NULL );
 	void ExpireRemove();
     void Remove();
     void Expire();
@@ -576,7 +576,9 @@ public:
 	//void SpellAuraModRangedDamageTakenPCT(bool apply);
 	void SpellAuraModBlockValue(bool apply);
 	void SpellAuraFinishingMovesCannotBeDodged(bool apply);
-	void SpellAuraAxeSkillModifier(bool apply);
+	void SpellAuraHealingByAttackPowerPct(bool apply);
+	void SpellAuraDamageByAttackPowerPct(bool apply);
+	void SpellAuraModExpertise(bool apply);
 	void SpellAuraDrinkNew(bool apply);
 	void SpellAuraModPossessPet(bool apply);
 	void EventPeriodicDrink(uint32 amount);

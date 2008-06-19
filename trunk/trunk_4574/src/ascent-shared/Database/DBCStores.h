@@ -194,7 +194,7 @@ struct SpellEntry
 	uint32 Flags3;                          //8
 	uint32 Flags4;                          //9 // Flags to
 	uint32 Flags5;                          //10 // Flags....
-	uint32 unk201_1;                        //11 // Flags 2.0.1 unknown one
+	uint32 FlagsTargets;                    //11 0x0020 - only one target can be XXX at given time.
 	uint32 unk240_1;						//12
 	uint32 RequiredShapeShift;              //13 // Flags BitMask for shapeshift spells
 	uint32 UNK14;                           //14-> this is wrong // Flags BitMask for which shapeshift forms this spell can NOT be used in.
@@ -346,7 +346,6 @@ struct SpellEntry
     /// CUSTOM: these fields are used for the modifications made in the world.cpp
     uint32 DiminishStatus;                  //
     uint32 proc_interval;                   //!!! CUSTOM, <Fill description for variable>
-    uint32 buffIndexType;					//!!! CUSTOM, <Fill description for variable>
     uint32 c_is_flags;						//!!! CUSTOM, store spell checks in a static way : isdamageind,ishealing
     uint32 buffType;                        //!!! CUSTOM, these are related to creating a item through a spell
     uint32 RankNumber;                      //!!! CUSTOM, this protects players from having >1 rank of a spell
@@ -371,6 +370,7 @@ struct SpellEntry
 	float fixed_hotdotcoef;                                 //!!! CUSTOM, fixed HOT-DOT coefficient for some spells
 	float Dspell_coef_override;                             //!!! CUSTOM, overrides any spell coefficient calculation and use this value in DD&DH
 	float OTspell_coef_override;							//!!! CUSTOM, overrides any spell coefficient calculation and use this value in HOT&DOT
+	uint32 dmg_bonus;						//!!! CUSTOM, spell co-efficiency ( dmg/healing % taken from gear )
 
 	bool self_cast_only;
 	bool apply_on_shapeshift_change;

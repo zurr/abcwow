@@ -139,12 +139,13 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 			uint32 t = pPlayer->m_bgTeam;
 			toadd.reserve(15);		// shouldnt have more than this
 			pPlayer->m_bg->Lock();
-			set<Player*> * s = &pPlayer->m_bg->m_players[t];
+			set<uint32> * s = &pPlayer->m_bg->m_players[t];
 
-			for(set<Player*>::iterator itr = s->begin(); itr != s->end(); ++itr)
+			for(set<uint32>::iterator itr = s->begin(); itr != s->end(); ++itr)
 			{
-				if((*itr) == pPlayer || (*itr)->isInRange(pPlayer,100.0f))
-					toadd.push_back(*itr);
+				Player *plr = objmgr.GetPlayer(*itr);
+				if( plr != NULL && (plr == pPlayer || plr->isInRange(pPlayer,100.0f)) )
+					toadd.push_back(plr);
 			}
 
 			if( toadd.size() > 0 )
@@ -244,6 +245,13 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 					SpellEntry * pvp_token_spell = dbcSpell.LookupEntry(pAffectedPlayer->GetTeam()? 32158 : 32155);
 					pAffectedPlayer->CastSpell(pAffectedPlayer, pvp_token_spell, true);
 				}
+				// If we are in Zangarmarsh
+				if(pPlayer->GetZoneId() == 3521)
+				{
+					// Add Mark of Thrallmar/Honor Hold
+					SpellEntry * pvp_token_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 32158 : 32155);
+					gPlayer->CastSpell(gPlayer, pvp_token_spell, true);
+				}
 			}
 		}
 	}
@@ -253,8 +261,9 @@ void HonorHandler::RecalculateHonorFields(Player *pPlayer)
 {
 	// Why are we multiplying by 10.. ho well
 	pPlayer->SetUInt32Value(PLAYER_FIELD_KILLS, pPlayer->m_killsToday);
-	pPlayer->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, pPlayer->m_honorToday);
-	pPlayer->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, pPlayer->m_killsYesterday | ( (pPlayer->m_honorYesterday * 10) << 16));
+	pPlayer->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, pPlayer->m_honorToday *10 );
+	//isnt it yesterday kills? TODO: check if PLAYER_FIELD_BYTES2 fits here.
+	pPlayer->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, pPlayer->m_killsYesterday *10 /*| ( (pPlayer->m_honorYesterday * 10) << 16)*/);
 	pPlayer->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, pPlayer->m_killsLifetime);
 	pPlayer->SetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, pPlayer->m_honorPoints);
 	pPlayer->SetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, pPlayer->m_arenaPoints);

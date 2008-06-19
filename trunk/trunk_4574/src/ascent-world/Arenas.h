@@ -22,7 +22,7 @@ class ArenaTeam;
 class Arena : public CBattleground
 {
 	set<GameObject*> m_gates;
-	set<ArenaTeam*> doneteams;
+	uint32 inscribe_teams[2];
 	bool m_started;
 	uint32 m_arenateamtype;
 public:

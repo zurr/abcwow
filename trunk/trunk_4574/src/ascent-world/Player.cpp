@@ -364,7 +364,7 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	m_speedChangeCounter=1;
 	memset(&m_bgScore,0,sizeof(BGScore));
 	m_arenaPoints = 0;
-	memset(&m_spellIndexTypeTargets, 0, sizeof(uint64)*NUM_SPELL_TYPE_INDEX);
+	memset(&m_spellIndexTypeTargets, 0, sizeof(uint64)*MECHANIC_END);
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
 	m_arenateaminviteguid=0;
@@ -1421,6 +1421,9 @@ void Player::BuildEnumData( WorldPacket * p_data )
 ///  It assumes you will send out an UpdateObject packet at a later time.
 void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 {
+	if ( isDead() )
+		return;
+
 	if ( xp < 1 )
 		return;
 
@@ -3419,7 +3422,7 @@ void Player::RemoveFromWorld()
 // TODO: perhaps item should just have a list of mods, that will simplify code
 void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedown /* = false */, bool skip_stat_apply /* = false  */)
 {
-	if (slot >= INVENTORY_SLOT_BAG_END)
+	if (slot > INVENTORY_SLOT_BAG_END)
 		return;
 
 	ASSERT( item );
@@ -3694,6 +3697,7 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 				ts.procChance = 5;
 				ts.caster = this->GetGUID();
 				ts.procFlags = PROC_ON_MELEE_ATTACK;
+				ts.ProcType = (item->GetProto()->Class == ITEM_CLASS_WEAPON)? 1 : 2;
 				ts.deleted = false;
 				m_procSpells.push_front( ts );			
 			}
@@ -3733,6 +3737,16 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 		}
 	}
 	
+	if( !apply ) // force remove auras added by using this item
+	{
+		for(uint32 k = 0; k < MAX_POSITIVE_AURAS; ++k)
+		{
+			Aura* m_aura = this->m_auras[k];
+			if( m_aura != NULL && m_aura->m_castedItemId && m_aura->m_castedItemId == proto->ItemId )
+				m_aura->Remove();
+		}
+	}
+
 	if( !skip_stat_apply )
 		UpdateStats();
 }
@@ -4493,7 +4507,12 @@ void Player::UpdateChances()
 	defence_contribution += CalcRating( PLAYER_RATING_MODIFIER_DEFENCE ) * 0.04f;
 
 	// dodge
-	tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pLevel-1][pClass] );
+	// these values are nowhere to be found, we need to improvise
+	if( dodgeRatio[pLevel - 1][pClass] != 0.0f ) {
+		tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pLevel - 1][pClass] );
+	} else {
+		tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[69][pClass] );
+	}
 	tmp += CalcRating( PLAYER_RATING_MODIFIER_DODGE ) + this->GetDodgeFromSpell();
 	tmp += defence_contribution;
 	if( tmp < 0.0f )tmp = 0.0f;
@@ -4950,10 +4969,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 					if(isInFront(pObj)) // stealthed player is in front of us
 					{
 						// Detection Range = 5yds + (Detection Skill - Stealth Skill)/5
-						if(getLevel() < 70)
-							detectRange = 5.0f + getLevel() + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
-						else
-							detectRange = 75.0f + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
+						detectRange = 5.0f + getLevel() + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
 						// Hehe... stealth skill is increased by 5 each level and detection skill is increased by 5 each level too.
 						// This way, a level 70 should easily be able to detect a level 4 rogue (level 4 because that's when you get stealth)
 						//	detectRange += 0.2f * ( getLevel() - pObj->getLevel() );
@@ -5104,7 +5120,7 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 		m_spellTypeTargets[2] = NULL;*/
 	if(pObj->IsUnit())
 	{
-		for(uint32 x = 0; x < NUM_SPELL_TYPE_INDEX; ++x)
+		for(uint32 x = 0; x < MECHANIC_END; ++x)
 			if(m_spellIndexTypeTargets[x] == pObj->GetGUID())
 				m_spellIndexTypeTargets[x] = 0;
 	}
@@ -5438,7 +5454,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 					{
 						for(GroupMembersSet::iterator itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
 						{
-							if((*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer->GetItemInterface()->CanReceiveItem(itemProto, iter->iItemsCount) == 0)
+							if((*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer->GetItemInterface()->CanReceiveItem(itemProto, iter->iItemsCount) == 0 && this->GetMapId() == (*itr)->m_loggedInPlayer->GetMapId() )
 							{
 								if( (*itr)->m_loggedInPlayer->m_passOnLoot )
 									iter->roll->PlayerRolled( (*itr)->m_loggedInPlayer, 3 );		// passed
@@ -8110,6 +8126,7 @@ void Player::CompleteLoading()
 	}
 
 	sInstanceMgr.BuildSavedInstancesForPlayer(this);
+	CombatStatus.UpdateFlag();
 }
 
 void Player::OnWorldPortAck()
@@ -8324,7 +8341,7 @@ void Player::SaveAuras(stringstream &ss)
 //	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
-		if(m_auras[x])
+		if( m_auras[x] != NULL && m_auras[x]->m_spellProto != NULL )
 		{
 			Aura *aur=m_auras[x];
 			bool skip = false;
@@ -8657,7 +8674,7 @@ void Player::CalcDamage()
 
 		// OMG?
 		ModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT ,tmp);
- 
+
 }
 
 uint32 Player::GetMainMeleeDamage(uint32 AP_owerride)
@@ -8890,6 +8907,34 @@ void Player::Possess(Unit * pTarget)
 	/* update target faction set */
 	pTarget->_setFaction();
 	pTarget->UpdateOppFactionSet();
+
+	if (pTarget->GetTypeId() == TYPEID_UNIT)
+	{
+		if (pTarget->GetAIInterface()->getAITargetsCount())
+		{
+			std::vector<Unit*> targetTable;
+			TargetMap *targets = pTarget->GetAIInterface()->GetAITargets();
+			for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+			{
+				Unit *temp = itr->first;
+				if (temp->GetTypeId() == TYPEID_UNIT && temp->isAlive())
+				{
+					temp->GetAIInterface()->RemoveThreatByPtr(this);
+					if (temp->GetAIInterface()->GetNextTarget() == pTarget)
+						temp->GetAIInterface()->SetNextTarget(NULL);
+					if (pTarget->m_faction == temp->m_faction)
+					{
+						temp->GetAIInterface()->AttackReaction(this, 1, 0);
+						temp->GetAIInterface()->SetNextTarget(this);
+					}
+				}
+			}
+		}
+
+		pTarget->GetAIInterface()->ClearHateList();
+		pTarget->GetAIInterface()->AttackReaction(this, (this->getLevel()*75), 0); // "When the spell ends, the MCed unit (if not a player) will have a large amount of threat on the priest who controlled it" no idea if (lvl*75) is right but it does his job
+		pTarget->GetAIInterface()->SetNextTarget(this);
+	}
 
 	list<uint32> avail_spells;
 	for(list<AI_Spell*>::iterator itr = pTarget->GetAIInterface()->m_spells.begin(); itr != pTarget->GetAIInterface()->m_spells.end(); ++itr)
@@ -9368,13 +9413,13 @@ void Player::_ModifySkillMaximum(uint32 SkillLine, uint32 NewMax)
 	}
 }
 
-void Player::RemoveSpellTargets(uint32 Type)
+void Player::RemoveSpellTargets(uint32 Type, Unit* target)
 {
 	if(m_spellIndexTypeTargets[Type] != 0)
 	{
 		Unit * pUnit = m_mapMgr ? m_mapMgr->GetUnit(m_spellIndexTypeTargets[Type]) : NULL;
-		if(pUnit)
-            pUnit->RemoveAurasByBuffIndexType(Type, GetGUID());
+		if( pUnit != NULL && target != NULL && pUnit != target )
+			pUnit->RemoveAurasByBuffIndexType(Type, GetGUID());
 
 		m_spellIndexTypeTargets[Type] = 0;
 	}
@@ -10401,7 +10446,7 @@ void Player::Social_AddFriend(const char * name, const char * note)
 	}*/
 
 	// team check
-	if( info->team != m_playerInfo->team )
+	if( info->team != m_playerInfo->team && sWorld.FriendFactionLimitation )
 	{
 		data << uint8(FRIEND_ENEMY) << uint64(info->guid);
 		m_session->SendPacket(&data);

@@ -1216,6 +1216,32 @@ void ObjectMgr::LoadSpellFixes()
 		}while(result->NextRow());
 		delete result;
 	}	
+
+	/*##########################################################################################*/
+
+	// Loads data from spell_data_extra table
+	QueryResult * result1 = WorldDatabase.Query("SELECT * FROM spell_data_extra");
+	if(result1 == 0) return;
+
+	uint32 override_count = 0;
+	sLog.outDetail("Loading %u spell data extra from database...",result1->GetRowCount());
+	do
+	{
+		Field * fields1 = result1->Fetch();
+		uint32 spell_id = fields1[0].GetUInt32();
+		SpellEntry * sp = dbcSpell.LookupEntry(spell_id);
+		if(sp == 0) 
+			continue;
+
+		if(sp->dmg_bonus == 0)
+		{
+			sp->dmg_bonus = fields1[1].GetUInt32();
+			override_count++;
+		}
+
+	} while (result1->NextRow());
+
+	delete result1;
 }
 
 void ObjectMgr::LoadSpellProcs()

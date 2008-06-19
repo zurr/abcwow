@@ -1425,6 +1425,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 				pDestItem = objmgr.CreateItem(pSourceItem2->GetEntry(), _player);
 				pDestItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, deposit_stack);
 				pDestItem->SetUInt32Value(ITEM_FIELD_CREATOR, pSourceItem2->GetUInt32Value(ITEM_FIELD_CREATOR));
+				pDestItem->m_isDirty = true;
 			}
 			else
 			{

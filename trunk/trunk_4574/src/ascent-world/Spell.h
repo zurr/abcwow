@@ -444,7 +444,7 @@ enum Flags3
 	FLAGS3_NULL               = 0x0,
 	FLAGS3_UNK2               = 0x1,
 	FLAGS3_UNK3               = 0x2,    // Can be used while stealthed
-	FLAGS3_UNK4               = 0x4,    // request pet maybe
+	FLAGS3_CANNOT_CRIT        = 0x4,    // cannot crit
 	FLAGS3_UNK5               = 0x8,    // something todo with temp enchanted items
 	FLAGS3_PARTY_EFFECTING_AURA = 0x10, // Party affecting aura's
 	FLAGS3_ACTIVATE_AUTO_SHOT = 0x20,   // spell that enable's auto shoot
@@ -765,7 +765,7 @@ enum SPELL_ENTRY
     SPELL_ENTRY_Flags3,
     SPELL_ENTRY_Flags4,
     SPELL_ENTRY_Flags5,
-    SPELL_ENTRY_unk201_1,
+    SPELL_ENTRY_FlagsTargets,
     SPELL_ENTRY_RequiredShapeShift,
     SPELL_ENTRY_UNK14,
     SPELL_ENTRY_Targets,
@@ -1035,6 +1035,7 @@ enum SpellIsFlags
     SPELL_FLAG_IS_EXPIREING_ON_PET		= 0x00000800, //when pet is summoned
 	SPELL_FLAG_IS_FORCEDDEBUFF			= 0x00001000, // forced to be a debuff
 	SPELL_FLAG_IS_FORCEDBUFF			= 0x00002000, // forced to be a buff
+	SPELL_FLAG_IS_JUDGEMENT				= 0x00004000,
 };
 
 enum SpellCoefficientsFlags
@@ -2008,7 +2009,6 @@ private:
     TargetsList m_targetUnits[3];
     void SafeAddTarget(TargetsList* tgt,uint64 guid);
     
-    void SafeAddMissedTarget(uint64 guid);
     void SafeAddModeratedTarget(uint64 guid, uint16 type);
 
     friend class DynamicObject;

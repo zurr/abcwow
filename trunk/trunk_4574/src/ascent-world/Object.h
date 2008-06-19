@@ -307,6 +307,7 @@ public:
 
 	// Use it to Check if a object is in front of another one
 	bool isInFront(Object* target);
+	bool isInCone(Object* target);
 	bool isInBack(Object* target);
 	// Check to see if an object is in front of a target in a specified arc (in degrees)
 	bool isInArc(Object* target , float degrees); 

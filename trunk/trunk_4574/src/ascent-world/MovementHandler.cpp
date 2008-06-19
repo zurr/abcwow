@@ -654,9 +654,10 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket &recvdata)
 
 void WorldSession::HandleWorldportOpcode(WorldPacket & recv_data)
 {
+	uint32 unk; // time in msec? but WTF for?
 	uint32 mapid;
 	float x,y,z,o;
-	recv_data >> mapid >> x >> y >> z >> o;
+	recv_data >> unk >> mapid >> x >> y >> z >> o;
 	
 	if(!_player->IsInWorld())
 		return;
@@ -671,25 +672,89 @@ void WorldSession::HandleWorldportOpcode(WorldPacket & recv_data)
 	_player->SafeTeleport(mapid,0,vec);
 }
 
-void WorldSession::HandleTeleportToUnitOpcode(WorldPacket & recv_data)
+void WorldSession::HandleWhoisOpcode(WorldPacket & recv_data)
 {
-	uint8 unk;
-	Unit * target;
-	recv_data >> unk;
-
-	if(!_player->IsInWorld())
-		return;
-
 	if(!HasGMPermissions())
 	{
-		SendNotification("You do not have permission to use this function.");
+		SendNotification("You do not have permission to perform that function");
 		return;
 	}
-
-	if( (target = _player->GetMapMgr()->GetUnit(_player->GetSelection())) == NULL )
+	
+	std::string character, message;
+	recv_data >> character;
+	
+	if(character.empty())
+	{
+		message = "Character name not specified.";
+		WorldPacket data(SMSG_WHOIS, message.size()+1);
+		data << message;
+		_player->GetSession()->SendPacket(&data);
 		return;
+	}
+ 
+	Player *player = objmgr.GetPlayer(character.c_str(), false);
+ 
+	if(player)
+	{
+		message = player->GetSession()->GetAccountName();
+	} else {
+		message = "Can't find player " + character;
+		WorldPacket data(SMSG_WHOIS, message.size()+1);
+		data << message;
+		_player->GetSession()->SendPacket(&data);
+		return;
+	}
+	// put account name in uppercase, like blizz
+	transform(message.begin(), message.end(), message.begin(), towupper);
+	WorldPacket data(SMSG_WHOIS, message.size()+1);
+	data << message;
+	_player->GetSession()->SendPacket(&data);
+}
+ 
+void WorldSession::HandleTeleportToUnitOpcode(WorldPacket & recv_data)
+{ 
+ 	if(!HasGMPermissions())
+ 	{
+ 		SendNotification("You do not have permission to use this function.");
+ 		return;
+ 	}
+ 
+	if(!_player->IsInWorld())
+ 		return; 
+ 
+	std::string unit;
+	recv_data >> unit;
 
-	_player->SafeTeleport(_player->GetMapId(), _player->GetInstanceID(), target->GetPosition());
+	if (unit.empty()) // no unit name specified
+	{
+		Unit * target;
+		if( (target = _player->GetMapMgr()->GetUnit(_player->GetSelection())) == NULL )
+		{ // no target
+			SendNotification("Specify a player or NPC to teleport to, or target one.");
+			return;
+		}
+		if (!target->IsInWorld())
+		{
+			SendNotification("Unit not in world - cannot teleport to it.");
+			return;
+		}
+		// port to target
+		_player->SafeTeleport(_player->GetMapId(), _player->GetInstanceID(), target->GetPosition());
+	} else {
+		Player *player = objmgr.GetPlayer(unit.c_str(), false); // try and find specified player
+		if (!player) // player not found, try and find npc with that name
+		{
+			SendNotification("Can't find player or NPC named '%s'", unit.c_str());
+			return;
+		}
+		if (!player->IsInWorld())
+		{
+			SendNotification("Player '%s' is either offline or being teleported - cannot teleport to them now.");
+			return;
+		}
+		_player->SafeTeleport(player->GetMapId(), player->GetInstanceID(), player->GetPosition());
+	}
+	 
 }
 
 void WorldSession::HandleTeleportCheatOpcode(WorldPacket & recv_data)

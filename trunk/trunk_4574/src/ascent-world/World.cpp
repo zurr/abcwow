@@ -889,7 +889,7 @@ void World::SaveAllPlayers()
 			{
 				mt = getMSTime();
 				itr->second->SaveToDB(false);
-				sLog.outString("Saved player `%s` (level %u) in %ums.", itr->second->GetName(), itr->second->GetUInt32Value(UNIT_FIELD_LEVEL), getMSTime() - mt);
+				//sLog.outString("Saved player `%s` (level %u) in %ums.", itr->second->GetName(), itr->second->GetUInt32Value(UNIT_FIELD_LEVEL), getMSTime() - mt);
 				++count;
 			}
 		}
@@ -1104,6 +1104,8 @@ void World::Rehash(bool load)
 		new MailSystem;
 
 	channelmgr.seperatechannels = Config.MainConfig.GetBoolDefault("Server", "SeperateChatChannels", false);
+	PvpFactionLimitation = Config.MainConfig.GetBoolDefault("Server", "PvpFactionLimitation", true);
+	FriendFactionLimitation = Config.MainConfig.GetBoolDefault("Server", "FriendFactionLimitation", true);
 	MapPath = Config.MainConfig.GetStringDefault("Terrain", "MapPath", "maps");
 	vMapPath = Config.MainConfig.GetStringDefault("Terrain", "vMapPath", "vmaps");
 	UnloadMapFiles = Config.MainConfig.GetBoolDefault("Terrain", "UnloadMapFiles", true);

@@ -327,7 +327,7 @@ const float dodgeRatio[70][12] = {
 { 0.000000f , 17.085310f , 14.237758f , 14.237758f , 11.390207f , 14.237758f , 0.000000f , 14.237758f , 14.237758f , 14.237758f , 0.000000f , 8.375162f , } , // Level 26 
 { 0.000000f , 17.454722f , 14.545602f , 14.545602f , 11.636481f , 14.545602f , 0.000000f , 14.545602f , 14.545602f , 14.545602f , 0.000000f , 8.556246f , } , // Level 27 
 { 0.000000f , 17.818362f , 14.848635f , 14.848635f , 11.878908f , 14.848635f , 0.000000f , 14.848635f , 14.848635f , 14.848635f , 0.000000f , 8.734502f , } , // Level 28 
-{ 0.000000f , 18.176520f , 15.147100f , 15.147100f , 12.117680f , 15.147100f , 0.000000f , 15.147100f , 15.147100f , 15.147100f , 0.000000f , 8.910069f , } , // Level 29 
+{ 0.0f, 11.792f, 10.12f, 9.19f, 6.024f, 15.405f, 0.0f, 10.82f, 16.85f, 11.47f, 0.0f, 6.11f },// Level 29
 { 0.000000f , 18.529462f , 15.441218f , 15.441218f , 12.352975f , 15.441218f , 0.000000f , 15.441218f , 15.441218f , 15.441218f , 0.000000f , 9.083081f , } , // Level 30 
 { 0.000000f , 18.877433f , 15.731194f , 15.731194f , 12.584955f , 15.731194f , 0.000000f , 15.731194f , 15.731194f , 15.731194f , 0.000000f , 9.253655f , } , // Level 31 
 { 0.000000f , 19.220659f , 16.017216f , 16.017216f , 12.813773f , 16.017216f , 0.000000f , 16.017216f , 16.017216f , 16.017216f , 0.000000f , 9.421903f , } , // Level 32 
@@ -358,7 +358,7 @@ const float dodgeRatio[70][12] = {
 { 0.000000f , 26.687628f , 22.239690f , 22.239690f , 17.791752f , 22.239690f , 0.000000f , 22.239690f , 22.239690f , 22.239690f , 0.000000f , 13.082186f , } , // Level 57 
 { 0.000000f , 26.953176f , 22.460980f , 22.460980f , 17.968784f , 22.460980f , 0.000000f , 22.460980f , 22.460980f , 22.460980f , 0.000000f , 13.212357f , } , // Level 58 
 { 0.000000f , 27.216777f , 22.680647f , 22.680647f , 18.144518f , 22.680647f , 0.000000f , 22.680647f , 22.680647f , 22.680647f , 0.000000f , 13.341573f , } , // Level 59 
-{ 0.000000f , 27.478477f , 22.898731f , 22.898731f , 18.318984f , 22.898731f , 0.000000f , 22.898731f , 22.898731f , 22.898731f , 0.000000f , 13.469858f , } , // Level 60 
+{ 0.0f, 20.0f, 20.07f, 20.0f, 14.5f, 20.0f, 0.0f, 20.0f, 20.0f, 20.0f, 0.0f, 20.0f },// Level 60
 { 0.000000f , 27.738320f , 23.115267f , 23.115267f , 18.492214f , 23.115267f , 0.000000f , 23.115267f , 23.115267f , 23.115267f , 0.000000f , 13.597232f , } , // Level 61 
 { 0.000000f , 27.996351f , 23.330293f , 23.330293f , 18.664234f , 23.330293f , 0.000000f , 23.330293f , 23.330293f , 23.330293f , 0.000000f , 13.723718f , } , // Level 62 
 { 0.000000f , 28.252611f , 23.543842f , 23.543842f , 18.835074f , 23.543842f , 0.000000f , 23.543842f , 23.543842f , 23.543842f , 0.000000f , 13.849336f , } , // Level 63 
@@ -622,21 +622,6 @@ struct PlayerSkill
 	void Reset(uint32 Id);
 };
 
-enum SPELL_INDEX
-{
-	SPELL_TYPE_INDEX_MARK			= 1,
-	SPELL_TYPE_INDEX_POLYMORPH		= 2,
-	SPELL_TYPE_INDEX_FEAR			= 3,
-	SPELL_TYPE_INDEX_SAP			= 4,
-	SPELL_TYPE_INDEX_SCARE_BEAST	= 5,
-	SPELL_TYPE_INDEX_HIBERNATE		= 6,
-	SPELL_TYPE_INDEX_EARTH_SHIELD	= 7,
-	SPELL_TYPE_INDEX_CYCLONE		= 8,
-	SPELL_TYPE_INDEX_BANISH			= 9,
-	SPELL_TYPE_INDEX_JUDGEMENT		= 10,	
-	NUM_SPELL_TYPE_INDEX			= 11,
-};
-
 #define PLAYER_RATING_MODIFIER_RANGED_SKILL						PLAYER_FIELD_COMBAT_RATING_1
 #define PLAYER_RATING_MODIFIER_DEFENCE							PLAYER_FIELD_COMBAT_RATING_01
 #define PLAYER_RATING_MODIFIER_DODGE							PLAYER_FIELD_COMBAT_RATING_02
@@ -765,9 +750,9 @@ protected:
 public:
 
 	bool ok_to_remove;
-	uint64 m_spellIndexTypeTargets[NUM_SPELL_TYPE_INDEX];
+	uint64 m_spellIndexTypeTargets[MECHANIC_END];
 	void OnLogin();//custom stuff on player login.
-	void RemoveSpellTargets(uint32 Type);
+	void RemoveSpellTargets(uint32 Type, Unit* target);
 	void RemoveSpellIndexReferences(uint32 Type);
 	void SetSpellTargetType(uint32 Type, Unit* target);
 	void SendMeetingStoneQueue(uint32 DungeonId, uint8 Status);
@@ -883,7 +868,7 @@ public:
     void EventPortToGM(Player *p);
 	ASCENT_INLINE uint32 GetTeam() { return m_team; }
 	ASCENT_INLINE void SetTeam(uint32 t) { m_team = t; m_bgTeam=t; }
-	ASCENT_INLINE void ResetTeam() { m_team = myRace->team_id==7 ? 0 : 1; m_bgTeam=m_team; }
+	ASCENT_INLINE void ResetTeam() { if( myRace == NULL ) return; m_team = myRace->team_id==7 ? 0 : 1; m_bgTeam=m_team; }
 
 	ASCENT_INLINE bool IsInFeralForm()
 	{
@@ -1005,8 +990,8 @@ public:
 		return false;
 	}
 	ASCENT_INLINE int          HasBeenInvited() { return m_GroupInviter != 0; }
-	ASCENT_INLINE Group*       GetGroup() { return m_playerInfo ? m_playerInfo->m_Group : NULL; }
-	ASCENT_INLINE int8		   GetSubGroup() { return m_playerInfo->subGroup; }
+	ASCENT_INLINE Group*       GetGroup() { return (m_playerInfo != NULL) ? m_playerInfo->m_Group : NULL; }
+	ASCENT_INLINE int8		   GetSubGroup() { return (m_playerInfo != NULL) ? m_playerInfo->subGroup : NULL; }
     bool                IsGroupMember(Player *plyr);
 	ASCENT_INLINE bool         IsBanned()
 	{

@@ -403,8 +403,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 		uint32 jumps=m_spellInfo->EffectChainTarget[i]-1;
 		float range=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong
 		range*=range;
-		std::set<Object*>::iterator itr;
-		for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+		for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 		{
 			if((*itr)->GetGUID()==m_targets.m_unitTarget)
 				continue;
@@ -799,6 +798,132 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 		return;
 
 	TargetsList *tmpMap=&m_targetUnits[i];
+	//float range = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+	//range *= range;
+	float range = 400; //taken from wow-europe forum
+	Unit *currentTarget = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
+	if (!currentTarget)
+		return;
+
+	uint32 jumps=m_spellInfo->EffectChainTarget[i];
+	if(m_spellInfo->SpellGroupType && u_caster)
+	{
+		SM_FIValue(u_caster->SM_FAdditionalTargets,(int32*)&jumps,m_spellInfo->SpellGroupType);
+	}
+	SafeAddTarget(tmpMap, currentTarget->GetGUID());
+	if (!jumps)
+		return;
+	jumps--;
+
+	bool groupOnly = false;
+	if (p_caster != NULL && p_caster->InGroup())
+		if (currentTarget->GetTypeId() == TYPEID_PLAYER && p_caster->GetSubGroup() == static_cast<Player*>(currentTarget)->GetSubGroup())
+			groupOnly = true;
+
+	Unit *newTarget = NULL;
+	int newTargetHealthPct = 100;
+	if (groupOnly)
+	{
+		SubGroup *pGroup = p_caster->GetGroup()->GetSubGroup(p_caster->GetSubGroup());
+		if(pGroup)
+		{
+			p_caster->GetGroup()->Lock();
+			while (jumps)
+			{
+				for(GroupMembersSet::iterator itr = pGroup->GetGroupMembersBegin(); itr != pGroup->GetGroupMembersEnd(); itr++)
+				{
+					if(!(*itr)->m_loggedInPlayer)
+						continue;
+
+					Unit *temp = static_cast<Unit*>((*itr)->m_loggedInPlayer);
+
+					//Check if Unit is already in the TargetMap
+					bool foundUnit = false;
+					for(TargetsList::iterator i=tmpMap->begin();i!=tmpMap->end();i++)
+					{
+						if((*i) == temp->GetGUID())
+						{
+							foundUnit = true;
+							break;
+						}
+					}
+					if (foundUnit)
+						continue;
+
+					if (temp->isAlive() && !isAttackable(u_caster, temp) && currentTarget->GetDistanceSq(temp) <= range)
+					{
+						if ((newTarget == NULL && temp->GetHealthPct() < 100) || temp->GetHealthPct() < newTargetHealthPct)
+						{
+							newTarget = temp;
+							newTargetHealthPct = temp->GetHealthPct();
+						}
+					}
+				}
+				if (newTarget == NULL)
+				{
+					p_caster->GetGroup()->Unlock();
+					return;
+				}
+
+				else
+				{
+					currentTarget = newTarget;
+					newTarget = NULL;
+					newTargetHealthPct = 100;
+					SafeAddTarget(tmpMap, currentTarget->GetGUID());
+					jumps--;
+				}
+			}
+			p_caster->GetGroup()->Unlock();
+		}
+	}
+	else
+	{
+		while (jumps)
+		{
+			for(std::set<Object*>::iterator itr = currentTarget->GetInRangeSetBegin(); itr != currentTarget->GetInRangeSetEnd(); itr++)
+			{
+				if((*itr)->GetTypeId() != TYPEID_PLAYER && (*itr)->GetTypeId() != TYPEID_UNIT)
+					continue;
+
+				Unit *temp = static_cast<Unit*>(*itr);
+
+				//Check if Unit is already in the TargetMap
+				bool foundUnit = false;
+				for(TargetsList::iterator i=tmpMap->begin();i!=tmpMap->end();i++)
+				{
+					if((*i) == temp->GetGUID())
+					{
+						foundUnit = true;
+						break;
+					}
+				}
+				if (foundUnit)
+					continue;
+
+				if (temp && temp->isAlive() && !isAttackable(u_caster, temp) && currentTarget->GetDistanceSq(temp) <= range)
+				{
+					if ((newTarget == NULL && temp->GetHealthPct() < 100) || temp->GetHealthPct() < newTargetHealthPct)
+					{
+						newTarget = temp;
+						newTargetHealthPct = temp->GetHealthPct();
+					}
+				}
+			}
+			if (newTarget == NULL)
+				return;
+
+			else
+			{
+				currentTarget = newTarget;
+				newTarget = NULL;
+				newTargetHealthPct = 100;
+				SafeAddTarget(tmpMap, currentTarget->GetGUID());
+				jumps--;
+			}
+		}
+	}
+	/*
 	//if selected target is party member, then jumps on party
 	Unit* firstTarget;
 
@@ -876,6 +1001,7 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 			}
 		}
 	}
+	*/
 }
 
 /// Spell target handling for commonly used simple target add's

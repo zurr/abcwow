@@ -972,9 +972,14 @@ void Guild::ChangeGuildMaster(PlayerInfo * pNewMaster, WorldSession * pClient)
 	itr2->second->pRank = newRank;
 	itr2->first->guildRank = newRank;
 	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = 0 WHERE playerid = %u AND guildid = %u", itr->first->guid, m_guildId);
-	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, itr->first->guid, m_guildId);
+	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, itr2->first->guid, m_guildId);
 	CharacterDatabase.Execute("UPDATE guilds SET leaderGuid = %u WHERE guildId = %u", itr->first->guid, m_guildId);
 	m_guildLeader = itr->first->guid;
+
+	if(itr->first->m_loggedInPlayer)
+		itr->first->m_loggedInPlayer->SetGuildRank(0);
+	if(itr2->first->m_loggedInPlayer)
+		itr2->first->m_loggedInPlayer->SetGuildRank(newRank->iId);
 	m_lock.Release();
 }
 

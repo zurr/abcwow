@@ -463,6 +463,8 @@ public:
 	string MapPath;
 	string vMapPath;
 	bool UnloadMapFiles;
+	bool PvpFactionLimitation;
+	bool FriendFactionLimitation;
 	bool BreathingEnabled;
 	bool SpeedhackProtection;
 	uint32 mInWorldPlayerCount;
