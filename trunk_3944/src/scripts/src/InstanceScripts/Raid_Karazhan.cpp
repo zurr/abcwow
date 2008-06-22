@@ -3434,7 +3434,7 @@ public:
 	ADD_CREATURE_FACTORY_FUNCTION(InfernalDummyAI);
 	InfernalDummyAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 0, 768));
+//		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 0, 768));
 	}
 
 	inline WayPoint* CreateWaypoint(int id, uint32 waittime, uint32 flags)
