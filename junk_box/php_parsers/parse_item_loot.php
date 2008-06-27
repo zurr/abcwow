@@ -7,7 +7,7 @@ $xmlfilepath="http://www.wowhead.com/?item=";
 
 $tr_f = fopen('ffa_loot_list.txt', 'w');
 
-$result = mysql_query("SELECT entry FROM items ORDER BY entry ") or die(mysql_error());
+$result = mysql_query("SELECT entry FROM items ORDER BY entry") or die(mysql_error());
 while ($item = mysql_fetch_row($result)){
 	$fp = fsockopen($proxy, $proxy_port, $errno, $errstr, 10);
 	$out = "GET $xmlfilepath$item[0] HTTP/1.0\r\nHost: $proxy";
@@ -17,17 +17,17 @@ while ($item = mysql_fetch_row($result)){
 	while (!feof($fp)) $temp .= fgets($fp, 1024);
 	fclose($fp);
 	
-	preg_match("#name: 'Contains'(.*?);\n#", $temp, $m);
+	preg_match("#id: 'contains'(.*?);\n#", $temp, $m);
 	if (isset($m[0])){
 	
 		preg_match("#_totalCount:(.*?),#", $m[0], $tot_count);	
 		preg_match("#data: \[\{(.*?)\}\]\}\);#", $m[0], $tempa);
 
-		$item_array = explode('},{', $tempa[1]);
+		$item_array = explode('},{i', $tempa[1]);
 
 		foreach($item_array as $item_data) {
 
-			preg_match("#id:(.*?),#", $item_data, $item_id);
+			preg_match("#d:(.*?),#", $item_data, $item_id);
 			preg_match("#count:(.*?),#", $item_data, $drop_count);
 			preg_match("#stack:\[(.*?)\]#", $item_data, $drop_stack);
 				$drop_stack = explode(',', $drop_stack[1]);
@@ -40,6 +40,27 @@ while ($item = mysql_fetch_row($result)){
 		}
 	}
 
+	preg_match("#id: 'disenchanting'(.*?);\n#", $temp, $m2);
+	if (isset($m2[0])){
+	
+		preg_match("#_totalCount:(.*?),#", $m2[0], $tot_count);	
+		preg_match("#data: \[\{(.*?)\}\]\}\);#", $m2[0], $tempa);
+
+		$item_array = explode('},{i', $tempa[1]);
+
+		foreach($item_array as $item_data) {
+			preg_match("#d:(.*?),#", $item_data, $item_id);
+			preg_match("#count:(.*?),#", $item_data, $drop_count);
+			preg_match("#stack:\[(.*?)\]#", $item_data, $drop_stack);
+				$drop_stack = explode(',', $drop_stack[1]);
+	
+			$drop_chance_rep = round( (($drop_count[1]*100)/$tot_count[1]),4);
+
+			mysql_query("INSERT INTO disenchantingloot (entryid, itemid, percentchance, heroicpercentchance, mincount, maxcount) 
+				VALUES ('$item[0]', '$item_id[1]', '$drop_chance_rep', 0, '$drop_stack[0]', '$drop_stack[1]')") or die(mysql_error());
+		}
+	}
+	
 	preg_match("#>Party loot<(.*?)>#", $temp, $k);
 	if (isset($k[0])) fwrite($tr_f, "$item_id[1],"); 
 
