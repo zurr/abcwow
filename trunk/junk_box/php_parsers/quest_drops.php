@@ -9,5 +9,7 @@ while ($item = mysql_fetch_row($result)){
 	$mob_drops = mysql_fetch_row($result1);
 	if($mob_drops[0] && (($mob_drops[1]/$mob_drops[0]) >= 55))
 		mysql_query("UPDATE creatureloot SET percentchance='100' WHERE itemid = '$item[0]'") or die(mysql_error());
+		
+	print "$item[0] DONE<br>";
 }
 ?>
