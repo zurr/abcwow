@@ -1495,8 +1495,8 @@ public:
 		tidalvessalive = true;
 		cataclymboltcd = 60;
 
-		m_enrage = 600;
-		enraged = 0;
+		m_enrage = 1200;
+		enraged = false;
 		caribdis = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDCARIBDIS, 459.759521f, -544.832397f, -7.547507f, 1.845423f, true, false, 0, 0);
 		sharkkis = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDSHARKKIS, 462.492615f, -540.305237f, -7.547507f, 3.143288f, true, false, 0, 0);
 		tidalvess = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_FATHOMGUARDTIDALVESS, 459.759521f, -536.210449f, -7.547507f, 4.197681f, true, false, 0, 0);
@@ -1544,6 +1544,7 @@ public:
 
 	void AIUpdate()
 	{
+		m_enrage--;
 		if (_unit->GetHealthPct() <= 75 && !enraged && (caribdisalive || sharkkisalive || tidalvessalive))
 		{
 			enraged = true;
@@ -1559,13 +1560,12 @@ public:
 				for(uint32 x = 0; x<4;x++)
 					tidalvess->CastSpell(tidalvess, 38449, true);
 		}
-		m_enrage--;
 		if (!m_enrage && !enraged)
 		{
 			for(uint32 x = 0; x<7;x++)
 				_unit->DamageDoneModPCT[x] = 5;
 
-			enraged = 1;
+			enraged = true;
 		}
 		cataclymboltcd--;
 		if (!cataclymboltcd)
@@ -1740,7 +1740,7 @@ protected:
 	uint32 cataclymboltcd;
 
 	int m_enrage;
-	int enraged;
+	bool enraged;
 };
 
 // Caribdis
