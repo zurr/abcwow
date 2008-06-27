@@ -1828,7 +1828,7 @@ public:
 				_unit->CastSpellAoF(RandomTarget->GetPositionX(), RandomTarget->GetPositionY(), RandomTarget->GetPositionZ(), dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER), true);
 
 				//3) Add the damage event
-				uint32 time = uint32(_unit->CalcDistance(orbTarget) * 100.0f);
+				uint32 time = uint32(_unit->CalcDistance(orbTarget) * 1000.0f) / dbcSpell.LookupEntry(ARCANE_ORB_TRIGGER)->speed;
 				sEventMgr.AddEvent(((Unit*)orbTarget), &Unit::EventCastSpell, ((Unit*)orbTarget), dbcSpell.LookupEntry(ARCANE_ORB), EVENT_UNK, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 				if ( orbTarget != NULL )
 					orbTarget->Despawn(time + 1000, 0);
