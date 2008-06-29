@@ -425,28 +425,12 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 	int total_level=0;
 	float xp_mod = 1.0f;
 
-/*	if(pGroup->GetGroupType() == GROUP_TYPE_RAID)
-	{   //needs to change
-		//Calc XP
-		xp = CalculateXpToGive(pVictim, PlayerInGroup);
-		xp /= pGroup->MemberCount();
-
-		GroupMembersSet::iterator itr;
-		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++)
-		{
-			for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
-			{
-				if((*itr)->getLevel() < sWorld.LevelCap)
-					(*itr)->GiveXP(xp, pVictim->GetGUID(), true);
-			}
-		}
-	}
-	else if(pGroup->GetGroupType() == GROUP_TYPE_PARTY) */
 	//change on 2007 04 22 by Zack
 	//we only take into count players that are near us, on same map
 	GroupMembersSet::iterator itr;
 	pGroup->Lock();
-	for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) {
+	for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) 
+	{
 		for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
 		{
 			pGroupGuy = (*itr)->m_loggedInPlayer;
@@ -512,50 +496,14 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 		xp = CalculateXpToGive(pVictim, pHighLvlPlayer);
 		//i'm not sure about this formula is correct or not. Maybe some brackets are wrong placed ?
 		for(int i=0;i<active_player_count;i++)
+		{
 			active_player_list[i]->GiveXP( float2int32(((xp*active_player_list[i]->getLevel()) / total_level)*xp_mod), pVictim->GetGUID(), true );
-
 			active_player_list[i]->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
 			if(!sEventMgr.HasEvent(active_player_list[i],EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
 				sEventMgr.AddEvent((Unit*)active_player_list[i],&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
 			else sEventMgr.ModifyEventTimeLeft(active_player_list[i],EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
+		}
 	}
-		/* old code start before 2007 04 22
-		GroupMembersSet::iterator itr;
-		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++)
-		{
-			for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
-			{
-				pGroupGuy = (*itr);
-				if(pGroupGuy)
-				{
-					if(pHighLvlPlayer)
-					{
-						if(pGroupGuy->getLevel() > pHighLvlPlayer->getLevel())
-						{
-							pHighLvlPlayer = pGroupGuy;
-						}
-					}
-					else
-						pHighLvlPlayer = pGroupGuy;
-				}
-			}
-		}
-
-		//Calc XP
-		xp = CalculateXpToGive(pVictim, pHighLvlPlayer);
-		uint32 giveXP = 0;
-
-		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++)
-		{
-			for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
-			{
-				pGroupGuy = (*itr);
-				giveXP = xp * pGroupGuy->getLevel() / (pHighLvlPlayer->getLevel() + pGroupGuy->getLevel());
-				if(pGroupGuy->getLevel() < sWorld.LevelCap)
-					pGroupGuy->GiveXP(giveXP, pVictim->GetGUID(), true);
-			}
-		}
-	}*/
 }
 
 void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint32 dmg, uint32 abs )
@@ -863,7 +811,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								continue;
 						}break;
 						case 4350:
-						case 16459;
+						case 16459:
 						{
 							//sword specialization
 							if( static_cast< Player* >( this )->GetItemInterface())
@@ -1596,25 +1544,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;
 							}break;
 
-						case 43839: // S1 relics
-						case 43848: // S2 relics
-						case 43849: // S3 relics
-						case 46089: // S4 relics
-						{
-							if( CastingSpell == NULL )
-								continue;
-							if( CastingSpell->NameHash != SPELL_HASH_STORMSTRIKE && 
-								CastingSpell->NameHash != SPELL_HASH_FLAME_SHOCK && 
-								CastingSpell->NameHash != SPELL_HASH_EARTH_SHOCK && 
-								CastingSpell->NameHash != SPELL_HASH_FROST_SHOCK &&
-								CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD &&
-								CastingSpell->NameHash != SPELL_HASH_JUDGEMENT &&
-								CastingSpell->NameHash != SPELL_HASH_MOONFIRE &&
-								CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_ &&
-								CastingSpell->NameHash != SPELL_HASH_MANGLE__BEAR_ )
-								continue;
-						}break;
-
 						case 37563: // Renewal ( T4 priest healing set 2 items bonus )
 						{
 							if( CastingSpell == NULL )
@@ -1789,8 +1718,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL )
 									continue;
 							}break;
-+						case 41038: // Mark of the White Stag
-						//http://www.wowhead.com/?item=33509  Idol of Terror
 						case 43738: //Your Mangle ability has a chance to grant 65 agility for 10 sec.
 							{
 								if (!CastingSpell || ( CastingSpell->NameHash != SPELL_HASH_MANGLE__BEAR_ && CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_ ))
@@ -4329,27 +4256,11 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	if(spellInfo->SpellGroupType)
 	{
 		SM_FIValue(caster->SM_FPenalty, &bonus_damage, spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(caster->SM_FPenalty,&spell_flat_modifers,spellInfo->SpellGroupType);
-		SM_FIValue(caster->SM_PPenalty,&spell_pct_modifers,spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
-#endif
 		SM_FIValue(caster->SM_FDamageBonus, &bonus_damage, spellInfo->SpellGroupType);
 		int dmg_bonus_pct=0;
 		SM_FIValue(caster->SM_PPenalty, &dmg_bonus_pct, spellInfo->SpellGroupType);		
 		SM_FIValue(caster->SM_PDamageBonus,&dmg_bonus_pct,spellInfo->SpellGroupType);
 		bonus_damage += base_dmg*dmg_bonus_pct/100;
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		spell_flat_modifers=0;
-		spell_pct_modifers=0;
-		SM_FIValue(caster->SM_FDamageBonus,&spell_flat_modifers,spellInfo->SpellGroupType);
-		SM_FIValue(caster->SM_PDamageBonus,&spell_pct_modifers,spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
-#endif
 	}
 //------------------------------by school----------------------------------------------
 	float summaryPCTmod = caster->GetDamageDonePctMod(school)-1; //value is initialized with 1

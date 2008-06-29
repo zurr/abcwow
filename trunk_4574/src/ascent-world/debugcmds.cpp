@@ -137,7 +137,7 @@ bool ChatHandler::HandleMoveInfoCommand(const char* args, WorldSession *m_sessio
 	}
 	else
 	{
-		lowfollow = unitToFollow->GetGUIDLow();
+		lowfollow = unitToFollow->GetLowGUID();
 		highfollow = unitToFollow->GetGUIDHigh();;
 	}*/
 

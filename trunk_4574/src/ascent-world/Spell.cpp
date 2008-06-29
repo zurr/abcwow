@@ -274,9 +274,9 @@ void Spell::FillSpecifiedTargetsInArea(uint32 i,float srcx,float srcy,float srcz
                 {
 					did_hit_result = DidHit(i, static_cast< Unit* >( *itr ) );
 					if( did_hit_result != SPELL_DID_HIT_SUCCESS )
-						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(), did_hit_result));
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result);
 					else
-						tmpMap->push_back((*itr)->GetGUID());
+						SafeAddTarget(tmpMap,(*itr)->GetGUID());
                 }
 
             }
@@ -286,10 +286,10 @@ void Spell::FillSpecifiedTargetsInArea(uint32 i,float srcx,float srcy,float srcz
                 {
                     //trap, check not to attack owner and friendly
                     if(isAttackable(g_caster->m_summoner,(Unit*)(*itr),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)))
-                        tmpMap->push_back((*itr)->GetGUID());
+                        SafeAddTarget(tmpMap,(*itr)->GetGUID());
                 }
                 else
-                    tmpMap->push_back((*itr)->GetGUID());
+                    SafeAddTarget(tmpMap,(*itr)->GetGUID());
             }
             if( m_spellInfo->MaxTargets)
             {
@@ -336,9 +336,9 @@ void Spell::FillAllTargetsInArea(uint32 i,float srcx,float srcy,float srcz, floa
 				{
 					did_hit_result = DidHit(i, static_cast< Unit* >( *itr ) );
 					if( did_hit_result == SPELL_DID_HIT_SUCCESS )
-						tmpMap->push_back( (*itr)->GetGUID() );
+						SafeAddTarget(tmpMap,(*itr)->GetGUID());
 					else
-						ModeratedTargets.push_back( SpellTargetMod( (*itr)->GetGUID(), did_hit_result ) );
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result );
 				}
 			}
 			else //cast from GO
@@ -347,10 +347,10 @@ void Spell::FillAllTargetsInArea(uint32 i,float srcx,float srcy,float srcz, floa
 				{
 					//trap, check not to attack owner and friendly
 					if( isAttackable( g_caster->m_summoner, static_cast< Unit* >( *itr ), !(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED) ) )
-						tmpMap->push_back( (*itr)->GetGUID() );
+						SafeAddTarget(tmpMap,(*itr)->GetGUID());
 				}
 				else
-					tmpMap->push_back( (*itr)->GetGUID() );
+					SafeAddTarget(tmpMap,(*itr)->GetGUID());
 			}			
 			if( m_spellInfo->MaxTargets )
 				if( m_spellInfo->MaxTargets == tmpMap->size() )
@@ -387,9 +387,9 @@ void Spell::FillAllFriendlyInArea( uint32 i, float srcx, float srcy, float srcz,
 				{
 					did_hit_result = DidHit(i, static_cast< Unit* >( *itr ) );
 					if( did_hit_result == SPELL_DID_HIT_SUCCESS )
-						tmpMap->push_back( (*itr)->GetGUID() );
+						SafeAddTarget(tmpMap,(*itr)->GetGUID());
 					else
-						ModeratedTargets.push_back( SpellTargetMod( (*itr)->GetGUID(), did_hit_result ) );
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result );
 				}
 			}
 			else //cast from GO
@@ -398,10 +398,10 @@ void Spell::FillAllFriendlyInArea( uint32 i, float srcx, float srcy, float srcz,
 				{
 					//trap, check not to attack owner and friendly
 					if( isFriendly( g_caster->m_summoner, static_cast< Unit* >( *itr ) ) )
-						tmpMap->push_back( (*itr)->GetGUID() );
+						SafeAddTarget(tmpMap,(*itr)->GetGUID());
 				}
 				else
-					tmpMap->push_back( (*itr)->GetGUID() );
+					SafeAddTarget(tmpMap,(*itr)->GetGUID());
 			}			
 			if( m_spellInfo->MaxTargets )
 				if( m_spellInfo->MaxTargets == tmpMap->size() )
@@ -520,11 +520,13 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	if( u_victim == NULL )
 		return SPELL_DID_HIT_MISS;
 	
-	/************************************************************************/
-	/* Elite mobs always hit                                                */
-	/************************************************************************/
-	if(u_caster && u_caster->GetTypeId()==TYPEID_UNIT && ((Creature*)u_caster)->GetCreatureName() && ((Creature*)u_caster)->GetCreatureName()->Rank >= 3)
-		return SPELL_DID_HIT_SUCCESS;
+
+	//multiple effects from same same spell cannot be resisted separately
+	for(SpellTargetsList::iterator itr = ModeratedTargets.begin(); itr != ModeratedTargets.end(); ++itr)
+	{
+		if( (*itr).TargetGuid == u_victim->GetGUID() )
+			return (*itr).TargetModType;
+	}
 
 	/************************************************************************/
 	/* Can't resist non-unit                                                */
@@ -579,17 +581,12 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	}
 	
 	/************************************************************************/
-	/* Check if the target has a % resistance to this mechanic              */
-	/************************************************************************/
-		/* Never mind, it's already done below. Lucky I didn't go through with this, or players would get double resistance. */
-
-	/************************************************************************/
 	/* Check if the spell is a melee attack and if it was missed/parried    */
 	/************************************************************************/
-	uint32 melee_test_result;
 	if( m_spellInfo->is_melee_spell || m_spellInfo->is_ranged_spell )
 	{
-		uint32 _type;
+		uint32 _type = MELEE;
+
 		if( GetType() == SPELL_DMG_TYPE_RANGED )
 			_type = RANGED;
 		else
@@ -600,15 +597,13 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 				_type = MELEE;
 		}
 
-		melee_test_result = u_caster->GetSpellDidHitResult( u_victim, _type, m_spellInfo );
-		if(melee_test_result != SPELL_DID_HIT_SUCCESS)
-			return (uint8)melee_test_result;
+		return uint8( u_caster->GetSpellDidHitResult( u_victim, _type, m_spellInfo ) );
 	}
 
 	/************************************************************************/
 	/* Check if the spell is resisted.                                      */
 	/************************************************************************/
-	if( m_spellInfo->School==0  || m_spellInfo->is_ranged_spell ) // all ranged spells are physical too...
+	if( m_spellInfo->MechanicsType == MECHANIC_DISORIENTED ) // hope its right
 		return SPELL_DID_HIT_SUCCESS;
 
 	bool pvp =(p_caster && p_victim);
@@ -637,7 +632,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	}
 	//check mechanical resistance
 	//i have no idea what is the best pace for this code
-	if( m_spellInfo->MechanicsType<27)
+	if( m_spellInfo->MechanicsType && m_spellInfo->MechanicsType < 27 )
 	{
 		if(p_victim)
 			resistchance += p_victim->MechanicsResistancesPCT[m_spellInfo->MechanicsType];
@@ -645,27 +640,19 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 			resistchance += u_victim->MechanicsResistancesPCT[m_spellInfo->MechanicsType];
 	}
 	//rating bonus
-	if( p_caster != NULL )
+	if( p_caster != NULL && m_spellInfo->School != SCHOOL_NORMAL )
 	{
 		resistchance -= p_caster->CalcRating( PLAYER_RATING_MODIFIER_SPELL_HIT );
 		resistchance -= p_caster->GetHitFromSpell();
 	}
 
-	if(p_victim)
+	if( p_victim && m_spellInfo->School != SCHOOL_NORMAL )
 		resistchance += p_victim->m_resist_hit[2];
 
 	if( this->m_spellInfo->Effect[effindex] == SPELL_EFFECT_DISPEL && m_spellInfo->SpellGroupType && u_caster)
 	{
 		SM_FFValue(u_caster->SM_FRezist_dispell,&resistchance,m_spellInfo->SpellGroupType);
 		SM_PFValue(u_caster->SM_PRezist_dispell,&resistchance,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(u_caster->SM_FRezist_dispell,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PRezist_dispell,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell dipell resist mod flat %d , spell dipell resist mod pct %d , spell dipell resist %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,resistchance,m_spellInfo->SpellGroupType);
-#endif
 	}
 
 	if(m_spellInfo->SpellGroupType && u_caster)
@@ -673,12 +660,6 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 		float hitchance=0;
 		SM_FFValue(u_caster->SM_FHitchance,&hitchance,m_spellInfo->SpellGroupType);
 		resistchance -= hitchance;
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		float spell_flat_modifers=0;
-		SM_FFValue(u_caster->SM_FHitchance,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 )
-			printf("!!!!!spell to hit mod flat %f, spell resist chance %f, spell group %u\n",spell_flat_modifers,resistchance,m_spellInfo->SpellGroupType);
-#endif
 	}
 
 	if (m_spellInfo->Attributes & ATTRIBUTES_IGNORE_INVULNERABILITY)
@@ -967,7 +948,11 @@ uint8 Spell::prepare( SpellCastTargets * targets )
 		m_castTime = 0;
 	else
 	{
-		m_castTime = GetCastTime( dbcSpellCastTime.LookupEntry( m_spellInfo->CastingTimeIndex ) );
+		SpellCastTime *time = dbcSpellCastTime.LookupEntry( m_spellInfo->CastingTimeIndex );
+		if ( time == NULL )
+			m_castTime = 0;
+		else
+			m_castTime = GetCastTime( time );
 
 		if( m_castTime && m_spellInfo->SpellGroupType && u_caster != NULL )
 		{
@@ -1252,6 +1237,11 @@ void Spell::cast(bool check)
 				p_caster->setAttackTimer( 0, true );
 				p_caster->setAttackTimer( 0, false );
 			}
+			else if( m_spellInfo->NameHash == SPELL_HASH_VICTORY_RUSH )
+ 			{
+				p_caster->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+			}
+
 			if( p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_NOT_BREAK_STEALTH) && m_spellInfo->Id != 1 ) // <-- baaaad, baaad hackfix - for some reason some spells were triggering Spell ID #1 and stuffing up the spell system.
 			{
 				/* talents procing - don't remove stealth either */
@@ -2168,7 +2158,7 @@ void Spell::SendChannelStart(uint32 duration)
 	if(!target)
 		return;
  
-	m_caster->SetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT,target->GetGUIDLow());
+	m_caster->SetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT,target->GetLowGUID());
 	m_caster->SetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT+1,target->GetGUIDHigh());
 	//disabled it can be not only creature but GO as well
 	//and GO is not selectable, so this method will not work
@@ -2256,6 +2246,13 @@ bool Spell::HasPower()
 		else
 			cost += u_caster->PowerCostMod[0];
 		cost +=float2int32(cost*u_caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER+m_spellInfo->School));
+	}
+
+	if (p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_SHIV && p_caster->GetItemInterface()) //hackfix for shiv's energy cost
+	{
+		Item *it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+		if( it != NULL )
+			cost += (uint32)(10* (it->GetProto()->Delay / 1000.0f));
 	}
 
 	//apply modifiers
@@ -2356,21 +2353,19 @@ bool Spell::TakePower()
 		cost +=float2int32(cost*u_caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER+m_spellInfo->School));
 	}
 
+	if (p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_SHIV && p_caster->GetItemInterface()) //hackfix for shiv's energy cost
+	{
+		Item *it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+		if( it != NULL )
+			cost += (uint32)(10* (it->GetProto()->Delay / 1000.0f));
+	}
+
 	//apply modifiers
 	if( m_spellInfo->SpellGroupType && u_caster)
 	{
 		  SM_FIValue(u_caster->SM_FCost,&cost,m_spellInfo->SpellGroupType);
 		  SM_PIValue(u_caster->SM_PCost,&cost,m_spellInfo->SpellGroupType);
 	}
-		 
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-	int spell_flat_modifers=0;
-	int spell_pct_modifers=0;
-	SM_FIValue(u_caster->SM_FCost,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-	SM_FIValue(u_caster->SM_PCost,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-	if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-		printf("!!!!!spell cost mod flat %d , spell cost mod pct %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cost,m_spellInfo->SpellGroupType);
-#endif
 
 	if (cost <=0)
 		return true;
@@ -2532,7 +2527,7 @@ void Spell::HandleAddAura(uint64 guid)
 				Aura *aur=NULL;
 				for(int i=0;i<itr->second->GetSpellProto()->procCharges-1;i++)
 				{
-					aur = new Aura(itr->second->GetSpellProto(),itr->second->GetDuration(),itr->second->GetCaster(),itr->second->GetTarget());
+					aur = new Aura(itr->second->GetSpellProto(),itr->second->GetDuration(),itr->second->GetCaster(),itr->second->GetTarget(), i_caster);
 					Target->AddAura(aur);
 					aur=NULL;
 				}
@@ -2761,13 +2756,14 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 
 		// check for duel areas
+		/*
 		if(p_caster && m_spellInfo->Id == 7266)
 		{
 			AreaTable* at = dbcArea.LookupEntry( p_caster->GetAreaID() );
 			if(at->AreaFlags & AREA_CITY_AREA)
 				return SPELL_FAILED_NO_DUELING;
 		}
-
+		*/
 		// check if spell is allowed while player is on a taxi
 		if(p_caster->m_onTaxi)
 		{
@@ -2984,10 +2980,6 @@ uint8 Spell::CanCast(bool tolerate)
 				case SPELL_EFFECT_ENCHANT_ITEM:
 				case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
 				{
-					// check for enchants that can only be done on your own items
-					if( m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY )
-						return SPELL_FAILED_BAD_TARGETS;
-
 					// get the player we are trading with
 					Player* t_player = p_caster->GetTradeTarget();
 					// get the targeted trade item
@@ -3553,7 +3545,7 @@ uint8 Spell::CanCast(bool tolerate)
 
 
 						{
-							if( u_caster->m_special_state & ( UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP | UNIT_STATE_ROOT | UNIT_STATE_STUN | UNIT_STATE_CONFUSE | UNIT_STATE_SNARE ) )
+							if( u_caster->m_special_state & ( UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP | UNIT_STATE_ROOT | UNIT_STATE_STUN | UNIT_STATE_CONFUSE | UNIT_STATE_SNARE | UNIT_STATE_SILENCE) )
 								break;
 						}
 							break;
@@ -3612,6 +3604,7 @@ uint8 Spell::CanCast(bool tolerate)
 			{
 				case SPELL_HASH_ICE_BLOCK: //Ice Block
 				case 0x9840A1A6: //Divine Shield
+					break;
 				case 0x3DFA70E5: //Will of the Forsaken
 				{
 					if( u_caster->m_special_state & (UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP))
@@ -4223,14 +4216,6 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 			SM_FIValue( u_caster->SM_FPenalty, &penalty_flt, m_spellInfo->SpellGroupType );
 			bonus += penalty_flt;
 			SM_FIValue( u_caster->SM_CriticalChance,&critchance,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			int spell_flat_modifers=0;
-			int spell_pct_modifers=0;
-			SM_FIValue(u_caster->SM_FPenalty,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_FIValue(u_caster->SM_PPenalty,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-				printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,m_spellInfo->SpellGroupType);
-#endif
 		}
 		
 		amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
@@ -4408,20 +4393,6 @@ void Spell::SafeAddTarget(TargetsList* tgt,uint64 guid)
 	tgt->push_back(guid);
 }
 
-void Spell::SafeAddMissedTarget(uint64 guid)
-{
-    for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
-        if((*i).TargetGuid==guid)
-        {
-            //sLog.outDebug("[SPELL] Something goes wrong in spell target system");
-			// this isnt actually wrong, since we only have one missed target map,
-			// whereas hit targets have multiple maps per effect.
-            return;
-        }
-
-    ModeratedTargets.push_back(SpellTargetMod(guid,2));
-}
-
 void Spell::SafeAddModeratedTarget(uint64 guid, uint16 type)
 {
 	for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
@@ -4566,55 +4537,45 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	{
 	case SPELL_HASH_SAP:					// Sap
 	case SPELL_HASH_GOUGE:					// Gouge
+	case SPELL_HASH_REPENTANCE:			// Repentance
+	case SPELL_HASH_MAIM:
 		grp = 0;
 		break;
 
-	case SPELL_HASH_CHEAP_SHOT:				// Cheap Shot
+	case SPELL_HASH_POUNCE:
+ 	case SPELL_HASH_CHEAP_SHOT:				// Cheap Shot
+	case SPELL_HASH_KIDNEY_SHOT:			// Kidney Shot
+	case SPELL_HASH_HAMMER_OF_JUSTICE:		// Hammer of Justice
+	case SPELL_HASH_CHARGE:					// Charge
+	case SPELL_HASH_INTERCEPT :				// Intercept
+	case SPELL_HASH_CONCUSSION_BLOW:		// Concussion Blow
+	case SPELL_HASH_CELESTIAL_FOCUS:		// Celestial Focus
+	case SPELL_HASH_IMPACT:					// Impact
+	case SPELL_HASH_BLACKOUT:				// Blackout
+	case SPELL_HASH_SHADOWFURY:				// Shadowfury
 		{
 			grp = 1;
 			pve = true;
 		}break;
 
-	case SPELL_HASH_KIDNEY_SHOT:			// Kidney Shot
-		{
-			grp = 2;
-			pve = true;
-		}break;
-
+	case SPELL_HASH_STUN:					// Stuns (all of them)
 	case SPELL_HASH_BASH:					// Bash
 		grp = 3;
 		break;
 
+	case SPELL_HASH_FROST_NOVA:				// Frost Nova
+	case SPELL_HASH_FROSTBITE:				// Frostbite
 	case SPELL_HASH_ENTANGLING_ROOTS:		// Entangling Roots
 		grp = 4;
 		break;
 
-	case SPELL_HASH_HAMMER_OF_JUSTICE:		// Hammer of Justice
-		{
-			grp = 5;
-			pve = true;
-		}break;
-
-	case SPELL_HASH_STUN:					// Stuns (all of them)
-		grp = 6;
-		break;
-
-	case SPELL_HASH_CHARGE:					// Charge
-	case SPELL_HASH_INTERCEPT :				// Intercept
-	case SPELL_HASH_CONCUSSION_BLOW:		// Concussion Blow
-		{
-			grp = 7;
-			pve = true;
-		}break;
-
-	case SPELL_HASH_FEAR:					// Fear
 	case SPELL_HASH_SEDUCTION:				// Seduction
-	case SPELL_HASH_HOWL_OF_TERROR:			// Howl of Terror
+ 	case SPELL_HASH_FEAR:					// Fear
+ 	case SPELL_HASH_HOWL_OF_TERROR:			// Howl of Terror
+	case SPELL_HASH_DEATH_COIL:			// Death Coil
+	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
+	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
 		grp = 8;
-		break;
-
-	case SPELL_HASH_FROST_NOVA:				// Frost Nova
-		grp = 9;
 		break;
 
 	case SPELL_HASH_POLYMORPH:				// Polymorph
@@ -4627,10 +4588,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			pve = true;   
 		}break;
 
-	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
-		grp = 11;
-		break;
-
+	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
 	case SPELL_HASH_MIND_CONTROL:			// Mind Control
 		grp = 12;
 		break;
@@ -4649,39 +4607,12 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			grp = 15;
 			pve = true;
 		}break;
-
-	case SPELL_HASH_CELESTIAL_FOCUS:		// Celestial Focus
-		{
-			grp = 16;
-			pve = true;
-		}break;
-
-	case SPELL_HASH_IMPACT:					// Impact
-		{
-			grp = 17;
-			pve = true;
-		}break;
-
-	case SPELL_HASH_BLACKOUT:				// Blackout
-		{
-			grp = 18;
-			pve = true;
-		}break;
-
 	case SPELL_HASH_BANISH:					// Banish
 		grp = 19;
 		break;
 
 	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
 		grp = 20;
-		break;
-
-	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
-		grp = 21;
-		break;
-
-	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
-		grp = 22;
 		break;
 	case SPELL_HASH_SLEEP:					// Sleep
 	case SPELL_HASH_RECKLESS_CHARGE:		// Reckless Charge

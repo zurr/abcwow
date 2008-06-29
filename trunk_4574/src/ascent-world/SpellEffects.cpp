@@ -586,6 +586,57 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		Effect #2	Trigger Spell
 			Spell #35729 <--- THIS SPELL
 	*/
+	case 5420: //Tree of Life
+		{
+			if( unitTarget == NULL )
+				return;
+
+			SpellEntry *spellInfo = dbcSpell.LookupEntry( 34123 );
+
+			Spell *sp = new Spell( unitTarget, spellInfo, true, NULL );
+			SpellCastTargets tgt;
+			tgt.m_unitTarget = unitTarget->GetGUID();
+			sp->prepare(&tgt);
+
+		} break;
+	case 5938: //shiv
+		{
+			if( p_caster == NULL || unitTarget == NULL )
+				return;
+
+			p_caster->Strike( unitTarget, OFFHAND, m_spellInfo, 0, 0, 0, false, true );
+			p_caster->AddComboPoints( unitTarget->GetGUID(), 1 );
+
+			if( p_caster->GetItemInterface() )
+			{
+				Item *it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+				if( it == NULL )
+					return;
+		
+				EnchantmentInstance * ench = it->GetEnchantment( 1 ); // temp enchantment slot
+				if(ench)
+				{
+					EnchantEntry* Entry = ench->Enchantment;
+					for( uint32 c = 0; c < 3; c++ )
+					{
+						if( Entry->type[c] && Entry->spell[c] )
+						{
+							SpellEntry *sp = dbcSpell.LookupEntry( Entry->spell[c] );
+							if( sp == NULL )
+								return;
+
+							if( sp->c_is_flags & SPELL_FLAG_IS_POISON )
+							{
+								SpellCastTargets targets( unitTarget->GetGUID() );
+								Spell *spell = new Spell( p_caster, sp, true, 0 );
+								spell->prepare( &targets );
+							}
+						}
+					}
+				}
+			}
+
+		} break;
 	case 35729:
 		{
 			if( !unitTarget || !unitTarget->isAlive())
@@ -1464,13 +1515,13 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 		}
 
 		// avoid teleporting into the model on scaled models
-		const static float shadowstep_distance = 1.6f * unitTarget->GetFloatValue(OBJECT_FIELD_SCALE_X);
+		const static float shadowstep_distance = 1.35f * max(unitTarget->GetFloatValue(OBJECT_FIELD_SCALE_X), 1.0f);
 		float new_x = unitTarget->GetPositionX() - (shadowstep_distance * cosf(ang));
 		float new_y = unitTarget->GetPositionY() - (shadowstep_distance * sinf(ang));
 		
 		/* Send a movement packet to "charge" at this target. Similar to warrior charge. */
 		p_caster->z_axisposition = 0.0f;
-		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, (unitTarget->GetPositionZ() + 0.1f), unitTarget->GetOrientation()));
+		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, (unitTarget->GetPositionZ() + 0.2f), unitTarget->GetOrientation()));
 
 
 		return;
@@ -1486,28 +1537,125 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 {
 	if(!unitTarget)
 		return;
-	// can't apply stuns/fear/polymorph/root etc on boss
-	if ( !playerTarget )
-	{
-		Creature * c = (Creature*)( unitTarget );
-		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
-		{
-			switch(m_spellInfo->EffectApplyAuraName[i])
-			{
-			case 5:  // confuse
-			case 6:  // charm
-			case 7:  // fear
-			case 12: // stun
-			case 25: // pacify
-			case 26: // root
-			case 27: // silence
-			case 31: // increase speed
-			case 33: // decrease speed
-				//SendCastResult(SPELL_FAILED_IMMUNE);
-				return;
-			}
-		}
-	}
+
+	if (!unitTarget->IsPlayer())
+ 	{
+		if (u_caster && (u_caster != unitTarget))
+ 		{
+			Creature * c = (Creature*)( unitTarget );
+			if (c)
+ 			{
+ 
+				/*
+				Charm (Mind Control, enslave demon): 1
+				Confuse (Blind etc): 2
+				Fear: 4
+				Root: 8
+				Silence : 16
+				Stun: 32
+				Sheep: 64
+				Banish: 128
+				Taunt (applyaura): 256
+				Decrease Speed (Hamstring) (applyaura): 512
+				Spell Haste (Curse of Tongues) (applyaura): 1024
+				Interupt Cast: 2048
+				Mod Healing % (Mortal Strike) (applyaura):4096
+				*/
+
+				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
+				if (c->proto && c->proto->modImmunities)
+				{
+					bool immune = false;
+					if (m_spellInfo->MechanicsType)
+					{
+						switch(m_spellInfo->MechanicsType)
+						{
+						case MECHANIC_CHARMED:
+							if (c->proto->modImmunities & 1)
+								immune = true;
+							break;
+						case MECHANIC_DISORIENTED:
+							if (c->proto->modImmunities & 2)
+								immune = true;
+							break;
+						case MECHANIC_FLEEING:
+							if (c->proto->modImmunities & 4)
+								immune = true;
+							break;
+						case MECHANIC_ROOTED:
+							if (c->proto->modImmunities & 8)
+								immune = true;
+							break;
+						case MECHANIC_SILENCED:
+							if ( c->proto->modImmunities & 16)
+								immune = true;
+							break;
+						case MECHANIC_STUNNED:
+							if (c->proto->modImmunities & 32)
+								immune = true;
+							break;
+						case MECHANIC_POLYMORPHED:
+							if (c->proto->modImmunities & 64)
+								immune = true;
+							break;
+						case MECHANIC_BANISHED:
+							if (c->proto->modImmunities & 128)
+								immune = true;
+							break;
+						}
+					}
+					else
+					{
+						// Spells wich do more than just one thing (damage and the effect) dont have a mechanic and we should only cancel the aura to be placed
+						switch (m_spellInfo->EffectApplyAuraName[i])
+						{
+						case SPELL_AURA_MOD_CONFUSE:
+							if (c->proto->modImmunities & 2)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_FEAR:
+							if (c->proto->modImmunities & 4)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_TAUNT:
+							if (c->proto->modImmunities & 256)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_STUN: // no idea if its needed, just to be sure
+							if (c->proto->modImmunities & 32)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_SILENCE:
+							if ((c->proto->modImmunities & 2048) || (c->proto->modImmunities & 16))
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_DECREASE_SPEED:
+							if (c->proto->modImmunities & 512)
+								immune = true;
+							break;
+						case SPELL_AURA_INCREASE_CASTING_TIME_PCT:
+							if (c->proto->modImmunities & 1024)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_LANGUAGE: //hacky way to prefer that the COT icon is set to mob
+							if (c->proto->modImmunities & 1024)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
+							if (c->proto->modImmunities & 4096)
+								immune = true;
+							break;
+						}
+					}
+					if (immune)
+					{
+						return;
+					}
+				}
+ 			}
+ 		}
+ 	}
+
 	
 	// avoid map corruption.
 	if(unitTarget->GetInstanceID()!=m_caster->GetInstanceID())
@@ -1534,7 +1682,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 		if(g_caster && g_caster->GetUInt32Value(OBJECT_FIELD_CREATED_BY) && g_caster->m_summoner)
 			pAura=new Aura(m_spellInfo, Duration, g_caster->m_summoner, unitTarget);
 		else
-			pAura=new Aura(m_spellInfo, Duration, m_caster, unitTarget);
+			pAura=new Aura(m_spellInfo, Duration, m_caster, unitTarget, i_caster );
 
 		pAura->pSpellId = pSpellId; //this is required for triggered spells
 		
@@ -1560,7 +1708,11 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 
 		damage *= float2int32( 1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) );
 	}
-	uint32 amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*80)/100);
+	uint32 amt;
+	if (m_spellInfo->NameHash == SPELL_HASH_DARK_PACT)
+		amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*96)/100);
+	else
+		amt=damage;
 	if(amt>curPower)
 	{
 		amt=curPower;
@@ -1846,6 +1998,10 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			break;
 		}
 
+		// potions learned by discovery variables
+		uint32 cast_chance = 5;
+		uint32 learn_spell = 0;
+
 		if (skill && skill->skilline == SKILL_ALCHEMY)
 		{
 			//Potion Master
@@ -1853,20 +2009,76 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			{
 				if(p_caster->HasSpell(28675)) 
 					while (Rand(20) && item_count<10) item_count++;
+
+				// Super Rejuvenation Potion
+				cast_chance = 2;
+				learn_spell = 28586;
 			}
 			//Elixir Master
 			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
 			{
 				if(p_caster->HasSpell(28677)) 
 					while (Rand(20) && item_count<10) item_count++;
+
+				uint32 spList[] = {28590,28587,28588,28591,28589};
+				cast_chance = 2;
+				learn_spell = spList[RandomUInt(4)];
 			}
 			//Transmutation Master
 			if (m_spellInfo->Category == 310)
 			{
 				if(p_caster->HasSpell(28672)) 
 					while (Rand(20) && item_count<10) item_count++;
+
+				uint32 spList[] = {28581,28585,28585,28584,28582,28580};
+				cast_chance = 5;
+				learn_spell = spList[RandomUInt(5)];
 			}
 		}
+
+		//random discovery by crafter item id
+			switch ( m_itemProto->ItemId )
+			{
+			case 22845: //Major Arcane Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41458;
+				}break;
+			case 22841: //Major Fire Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41500;
+				}break;
+			case 22842: //Major Frost Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41501;
+				}break;
+			case 22847: //Major Holy Protection Potion
+				{
+					// there is none
+				}break;
+			case 22844: //Major Nature Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41502;
+				}break;
+			case 22846: //Major Shadow Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41503;
+				}break;
+			}
+
+			if ( learn_spell && p_caster->getLevel() > 60 && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
+			{
+				SpellEntry* _spellproto = dbcSpell.LookupEntry( learn_spell );
+				if( _spellproto != NULL )
+				{
+					p_caster->BroadcastMessage( "%sDISCOVERY! You discovered the %s !|r", MSG_COLOR_YELLOW, _spellproto->Name );
+					p_caster->addSpell( learn_spell );
+				}
+			}
 
 		// item count cannot be more than allowed in a single stack
 		if (item_count > m_itemProto->MaxCount)
@@ -2206,8 +2418,19 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 	       pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
 	       pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, p_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 	       pCreature->_setFaction();
+		   pCreature->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, p_caster->GetGUID());
+		   pCreature->SetUInt64Value(UNIT_FIELD_CREATEDBY, p_caster->GetGUID());
 	       p_caster->SetUInt64Value(UNIT_FIELD_SUMMON, pCreature->GetGUID());
 	       p_caster->m_tempSummon = pCreature;
+		    if ( m_spellInfo->EffectMiscValue[i] == 19668 ) //shadowfiend
+			{
+				float parent_bonus = (float)(p_caster->GetDamageDoneMod(SCHOOL_SHADOW)*0.065f);
+				pCreature->SetFloatValue(UNIT_FIELD_MINDAMAGE, pCreature->GetFloatValue(UNIT_FIELD_MINDAMAGE) + parent_bonus);
+				pCreature->SetFloatValue(UNIT_FIELD_MAXDAMAGE, pCreature->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + parent_bonus);
+				pCreature->BaseDamage[0] += parent_bonus;
+				pCreature->BaseDamage[1] += parent_bonus;
+				//TODO add avoidance chance 75%
+			}
 	       pCreature->PushToWorld(p_caster->GetMapMgr());
 
 	       /*if(p_caster->isInCombat())
@@ -2218,7 +2441,7 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 	       }*/
 	       
 	       /* not sure on this */
-	       sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE, /*GetDuration()*/45000, 1, 0);
+	       sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE, GetDuration()+2000 /*45000*/, 1, 0);
 	}
 }
 
@@ -3691,9 +3914,15 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 	// can't apply stuns/fear/polymorph/root etc on boss
 	if(unitTarget->GetTypeId()==TYPEID_UNIT)
 	{
-		Creature * c = (Creature*)( unitTarget );
-		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
-			return;
+		if (u_caster && (u_caster != unitTarget))
+		{
+			Creature *c = (Creature*)( unitTarget );
+			if (c && c->proto && c->proto->modImmunities)
+			{
+				if (c->proto->modImmunities & 2048)
+					return;
+			}
+		}
 	}
 	// FIXME:This thing prevent target from spell casting too but cant find.
 	uint32 school=0;
@@ -3745,7 +3974,7 @@ void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
 		return;
 
 	Creature *target = static_cast<Creature*>( unitTarget );
-	if(target->IsPickPocketed() || (target->GetCreatureName() && target->GetCreatureName()->Type != HUMANOID))
+	if(target->IsPickPocketed() || !lootmgr.IsPickpocketable( target->GetEntry() ) )
 	{
 		SendCastResult(SPELL_FAILED_TARGET_NO_POCKETS);
 		return;
@@ -4731,7 +4960,7 @@ void Spell::SpellEffectCharge(uint32 i)
 
 	x = d*cosf(alpha)+m_caster->GetPositionX();
 	y = d*sinf(alpha)+m_caster->GetPositionY();
-	z = unitTarget->GetPositionZ();
+	z = unitTarget->GetPositionZ() + 0.2f;
 
 	uint32 time = uint32( (m_caster->CalcDistance(unitTarget) / ((m_caster->m_runSpeed * 3.5) * 0.001f)) + 0.5);
 
@@ -5074,9 +5303,10 @@ void Spell::SpellEffectSummonDeadPet(uint32 i)
 	if(pPet)
 	{
 		pPet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
-		pPet->SetUInt32Value(UNIT_FIELD_HEALTH, (uint32)(pPet->GetUInt32Value(UNIT_FIELD_MAXHEALTH) * 0.5));
+		pPet->SetUInt32Value(UNIT_FIELD_HEALTH, (uint32)(pPet->GetUInt32Value(UNIT_FIELD_MAXHEALTH) * 0.15));
 		pPet->setDeathState(ALIVE);
 		pPet->GetAIInterface()->HandleEvent(EVENT_FOLLOWOWNER, pPet, 0);
+		pPet->SendSpellsToOwner();
 		sEventMgr.RemoveEvents(pPet, EVENT_PET_DELAYED_REMOVE);
 	}
 }
@@ -5351,6 +5581,7 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 			return; //no damage = no joy
 		damage = damage*sunder_count;
 	}
+	/*
 	else if( m_spellInfo->NameHash == SPELL_HASH_CRUSADER_STRIKE ) // Crusader Strike - refreshes *all* judgements, not just your own
 	{
 		for( int x = MAX_POSITIVE_AURAS ; x <= MAX_AURAS ; x ++ ) // there are only debuff judgements anyway :P
@@ -5370,6 +5601,7 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 			}
 		}
 	}
+	*/
 	//Hemorrhage
 	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
 		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
@@ -5455,12 +5687,26 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 				data << unitTarget->GetNewGUID();
 				data << (uint32)1;
 				data << aur->GetSpellId();
-				m_caster->SendMessageToSet(&data,true);
-				Aura *aura = new Aura(aur->GetSpellProto(), (aur->GetDuration()>120000) ? 120000 : aur->GetDuration(), u_caster, u_caster);
-				u_caster->AddAura(aura);
-				unitTarget->RemoveAura(aur);
-				if( --spells_to_steal <= 0 )
-					break; //exit loop now
+ 				m_caster->SendMessageToSet(&data,true);
+				uint32 dur = aur->GetDuration();
+				if (dur > 120000)
+					dur = 120000;
+ 				u_caster->CastSpell(u_caster, aur->GetSpellProto(), true);
+ 				unitTarget->RemoveAllAuras(aur->GetSpellProto()->Id,aur->GetCasterGUID());
+				Aura *aura = u_caster->FindAura(aur->GetSpellId());
+				if (aura)
+				{
+					aura->SetDuration(dur);
+					sEventMgr.ModifyEventTimeLeft(aura, EVENT_AURA_REMOVE, dur);
+					if(u_caster->IsPlayer())
+					{
+						WorldPacket data(5);
+						data.SetOpcode(SMSG_UPDATE_AURA_DURATION);
+						data << (uint8)(aura)->GetAuraSlot() << dur;
+						p_caster->GetSession()->SendPacket(&data);
+					}
+				}
+				return;
 			}			
 		}
 	}   

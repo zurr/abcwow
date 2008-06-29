@@ -750,7 +750,7 @@ protected:
 public:
 
 	bool ok_to_remove;
-	uint64 m_spellIndexTypeTargets[MECHANIC_END];
+	uint64 m_spellIndexTypeTargets[31]; // MECHANIC_SAPPED + 1
 	void OnLogin();//custom stuff on player login.
 	void RemoveSpellTargets(uint32 Type, Unit* target);
 	void RemoveSpellIndexReferences(uint32 Type);

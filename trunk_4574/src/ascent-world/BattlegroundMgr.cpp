@@ -668,26 +668,31 @@ void CBattleground::BuildPvPUpdateDataPacket(WorldPacket * data)
 		*data << uint32(m_players[0].size() + m_players[1].size());
 		for(uint32 i = 0; i < 2; ++i)
 		{
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
-				*data << (*itr)->GetGUID();
-				bs = &(*itr)->m_bgScore;
-				*data << bs->KillingBlows;
-
-				// would this be correct?
-				if( Rated() )
+				Player *plr = objmgr.GetPlayer(*itr);
+				if( plr != NULL )
 				{
-					*data << uint8((*itr)->m_bgTeam);
-				}
-				else
-				{
-					*data << uint32(0);		// w
-					*data << uint32(0);		// t
-					*data << uint32(0);		// f
-				}
 
-				*data << uint32(1);			// count of values after this
-				*data << uint32(bs->Misc1);	// rating change
+					*data << plr->GetGUID();
+					bs = &plr->m_bgScore;
+					*data << bs->KillingBlows;
+
+					// would this be correct?
+					if( Rated() )
+					{
+						*data << uint8(plr->m_bgTeam);
+					}
+					else
+					{
+						*data << uint32(0);		// w
+						*data << uint32(0);		// t
+						*data << uint32(0);		// f
+					}
+
+					*data << uint32(1);			// count of values after this
+					*data << uint32(bs->Misc1);	// rating change
+				}
 			}
 		}
 	}
@@ -710,8 +715,8 @@ void CBattleground::BuildPvPUpdateDataPacket(WorldPacket * data)
 				Player *plr = objmgr.GetPlayer(*itr);
 				if( plr != NULL )
 				{
-					*data << (*plr)->GetGUID();
-					bs = &(*plr)->m_bgScore;
+					*data << plr->GetGUID();
+					bs = &plr->m_bgScore;
 
 					*data << bs->KillingBlows;
 					*data << bs->HonorableKills;
@@ -793,7 +798,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		plr->m_bgTeam = plr->GetTeam();
 
 	m_pendPlayers[plr->m_bgTeam].erase(plr->GetLowGUID());
-	if(m_players[plr->m_bgTeam].find(plr->GetGUIDLow()) != m_players[plr->m_bgTeam].end())
+	if(m_players[plr->m_bgTeam].find(plr->GetLowGUID()) != m_players[plr->m_bgTeam].end())
 	{
 		m_mainLock.Release();
 		return;
@@ -806,7 +811,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		data << plr->GetGUID();
 		DistributePacketToAll(&data);
 	}
-	m_players[plr->m_bgTeam].insert(plr->GetGUIDLow());
+	m_players[plr->m_bgTeam].insert(plr->GetLowGUID());
 
 	/* remove from any auto queue remove events */
 	sEventMgr.RemoveEvents(plr, EVENT_BATTLEGROUND_QUEUE_UPDATE);
@@ -1121,7 +1126,7 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	m_mainLock.Acquire();
 	if( plr->m_bgTeam > 1 )
 		plr->m_bgTeam = plr->GetTeam();
-	m_players[plr->m_bgTeam].erase(plr->GetGUIDLow());
+	m_players[plr->m_bgTeam].erase(plr->GetLowGUID());
 
 	memset(&plr->m_bgScore, 0, sizeof(BGScore));
 	OnRemovePlayer(plr);
