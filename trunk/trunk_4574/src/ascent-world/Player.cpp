@@ -364,7 +364,7 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	m_speedChangeCounter=1;
 	memset(&m_bgScore,0,sizeof(BGScore));
 	m_arenaPoints = 0;
-	memset(&m_spellIndexTypeTargets, 0, sizeof(uint64)*MECHANIC_END);
+	memset(&m_spellIndexTypeTargets, 0, sizeof(uint64)*31); //MECHANIC_END
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
 	m_arenateaminviteguid=0;
@@ -5120,7 +5120,7 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 		m_spellTypeTargets[2] = NULL;*/
 	if(pObj->IsUnit())
 	{
-		for(uint32 x = 0; x < MECHANIC_END; ++x)
+		for(uint32 x = 0; x < 31; ++x)
 			if(m_spellIndexTypeTargets[x] == pObj->GetGUID())
 				m_spellIndexTypeTargets[x] = 0;
 	}

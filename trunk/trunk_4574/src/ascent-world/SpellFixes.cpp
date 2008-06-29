@@ -16657,7 +16657,7 @@ void ApplyNormalFixes()
 		if (sp != NULL)
 			sp->procFlags = PROC_ON_CAST_SPELL;
 		sp = dbcSpell.LookupEntryForced( 34860 );
-		f (sp != NULL)
+		if (sp != NULL)
 			sp->procFlags = PROC_ON_CAST_SPELL;
 		sp = dbcSpell.LookupEntryForced( 34754 );
 		if (sp != NULL)
@@ -19976,7 +19976,7 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 		{
 			sp->proc_interval = 45000;
-			sp->procChance = 10.0f;
+			sp->procChance = 10;
 		}
 
 		// Warp-Spring Coil
@@ -19989,7 +19989,7 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 		{
 			sp->proc_interval = 45000;
-			sp->procChance = 10.0f;
+			sp->procChance = 10;
 		}
 
 		//Extract Gas 

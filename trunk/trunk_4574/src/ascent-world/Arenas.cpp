@@ -372,7 +372,7 @@ void Arena::Finish()
 	for(int i = 0; i < 2; i++)
 	{
 		bool victorious = (i == m_winningteam);
-		set<Player*>::iterator itr = m_players[i].begin();
+		set<uint32>::iterator itr = m_players[i].begin();
 		for(; itr != m_players[i].end(); itr++)
 		{
 			Player * plr = (Player *)(*itr);

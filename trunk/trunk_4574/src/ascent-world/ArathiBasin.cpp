@@ -409,7 +409,7 @@ void ArathiBasin::OnCreate()
 void ArathiBasin::OnStart()
 {
 	for(uint32 i = 0; i < 2; ++i) {
-		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
 			Player *plr = objmgr.GetPlayer(*itr);
 			if ( plr != NULL )
 				plr->RemoveAura(BG_PREPARATION);

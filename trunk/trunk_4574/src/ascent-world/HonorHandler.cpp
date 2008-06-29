@@ -249,8 +249,8 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 				if(pPlayer->GetZoneId() == 3521)
 				{
 					// Add Mark of Thrallmar/Honor Hold
-					SpellEntry * pvp_token_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 32158 : 32155);
-					gPlayer->CastSpell(gPlayer, pvp_token_spell, true);
+					SpellEntry * pvp_token_spell = dbcSpell.LookupEntry(pAffectedPlayer->GetTeam()? 32158 : 32155);
+					pAffectedPlayer->CastSpell(pAffectedPlayer, pvp_token_spell, true);
 				}
 			}
 		}

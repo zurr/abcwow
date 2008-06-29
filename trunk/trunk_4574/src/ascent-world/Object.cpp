@@ -1715,9 +1715,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		val = 2.5f * damage / c;
 		val *= 10;
 
-		pVictim->ModUInt32Value( UNIT_FIELD_POWER2, (int32)val );
+		pVictim->ModUnsigned32Value( UNIT_FIELD_POWER2, (int32)val );
 		if( pVictim->GetUInt32Value( UNIT_FIELD_POWER2) > 1000 )
-			pVictim->ModUInt32Value( UNIT_FIELD_POWER2, 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 ) );
+			pVictim->ModUnsigned32Value( UNIT_FIELD_POWER2, 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 ) );
 	}
 
 
@@ -1934,7 +1934,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				if( !self_res_spell && static_cast< Player* >( pVictim )->bReincarnation )
 				{
 					SpellEntry* m_reincarnSpellInfo = dbcSpell.LookupEntry( 20608 );
-					if( static_cast< Player* >( pVictim )->CanCastDueToCooldown( m_reincarnSpellInfo ) )
+					if( static_cast< Player* >( pVictim )->canCast( m_reincarnSpellInfo ) )
 					{
 						uint32 ankh_count = static_cast< Player* >( pVictim )->GetItemInterface()->GetItemCount( 17030 );
 						if( ankh_count )
@@ -2339,7 +2339,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 		if( res < 0 )
 			res = 0;
-		else if( spellInfo->spell_can_crit == true )
+		else if( spellInfo->spell_can_crit == true && !(spellInfo->Flags3 & FLAGS3_CANNOT_CRIT))
 		{
 //------------------------------critical strike chance--------------------------------------	
 			// lol ranged spells were using spell crit chance

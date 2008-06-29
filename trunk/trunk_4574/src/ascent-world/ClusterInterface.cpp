@@ -301,7 +301,7 @@ void ClusterInterface::HandlePlayerChangedServers(WorldPacket & pck)
 
 	/* build the packet with the players information */
 	WorldPacket data(ICMSG_PLAYER_CHANGE_SERVER_INFO, 1000);
-	data << sessionid << plr->GetGUIDLow();
+	data << sessionid << plr->GetLowGUID();
 
 	/* pack */
 	//data << plr->

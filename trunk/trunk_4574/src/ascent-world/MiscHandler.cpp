@@ -69,11 +69,6 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		Player * pl = _player->GetMapMgr()->GetPlayer((uint32)GetPlayer()->GetLootGUID());
 		if(!pl) return;
 		pLoot = &pl->loot;
-	}else if( UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_PLAYER )
-	{
-		Player * pl = _player->GetMapMgr()->GetPlayer((uint32)GetPlayer()->GetLootGUID());
-		if(!pl) return;
-		pLoot = &pl->loot;
 	}
 
 	if(!pLoot) return;
