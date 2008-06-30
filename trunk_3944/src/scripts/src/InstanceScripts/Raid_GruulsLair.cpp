@@ -829,44 +829,19 @@ protected:
 #define GREAT_FIREBALL	33051
 #define BLAST_WAVE		33061
 #define FIRE_WARD		37844
-#define SPELLSHIELD 33054
+#define SPELLSHIELD		33054
 
 class KroshFirehandAI : public CreatureAIScript
 {
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(KroshFirehandAI);
-	SP_AI_Spell spells[3];
-	bool m_spellcheck[3];
 
 	KroshFirehandAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		nrspells = 1;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-
-		} 
-
-		spells[0].info = dbcSpell.LookupEntry(GREAT_FIREBALL);
-		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = false;
-		spells[0].perctrigger = 10.0f;
-		spells[0].attackstoptimer = 1000;
-
-		spells[1].info = dbcSpell.LookupEntry(BLAST_WAVE);
-		spells[1].targettype = TARGET_VARIOUS;
-		spells[1].instant = true;
-		spells[1].perctrigger = 2.0f;
-		spells[1].attackstoptimer = 1000;
-
-		spells[2].info = dbcSpell.LookupEntry(SPELLSHIELD);
-		spells[2].targettype = TARGET_SELF;
-		spells[2].instant = true;
-		spells[2].perctrigger = 0.0f;
-		spells[2].attackstoptimer = 1000;
 
 		maulgar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(148.645508f, 194.516510f, -10.934792f, CN_HIGH_KING_MAULAGR);
 		FireWardCooldown = 1;
+		m_blastWaveCd = 1;
 
 	}
 	void OnCombatStart(Unit* mTarget)
@@ -899,60 +874,42 @@ public:
 
 	void AIUpdate()
 	{
+		if (m_blastWaveCd > 0)
+			m_blastWaveCd--;
+
+		if (!m_blastWaveCd && CheckTargets())
+		{
+			m_blastWaveCd = 3;
+			_unit->CastSpell(_unit, BLAST_WAVE, false);
+		}
 		FireWardCooldown--;
 		if(!FireWardCooldown)
 		{
-			//_unit->CastSpell(_unit, SPELLSHIELD, true);
+			//_unit->CastSpell(_unit, SPELLSHIELD, false);
 			FireWardCooldown=30;
 		}
-		else
-		{
-			float val = (float)RandomFloat(100.0f);
-			SpellCast(val);
-		}
+		if (_unit->GetCurrentSpell() == NULL)
+			_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(), GREAT_FIREBALL, false);
 	}
-	void SpellCast(float val)
+
+	bool CheckTargets()
 	{
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return false;
+
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			float comulativeperc = 0;
-			target = NULL;
-			for(int i=0;i<nrspells;i++)
-			{
-				if(!spells[i].perctrigger) continue;
-
-				if(m_spellcheck[i])
-				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
-					{
-					case TARGET_SELF:
-					case TARGET_VARIOUS:
-						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-					case TARGET_ATTACKING:
-						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-					case TARGET_DESTINATION:
-						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-					}
-					m_spellcheck[i] = false;
-					return;
-				}
-
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
-			}
+			if (_unit->CalcDistance(itr->first) <= 10.0f)
+				return true;
 		}
+
+		return false;
 	}
 
 protected:
-
-	Unit *target;
 	uint32 FireWardCooldown;
-	int nrspells;
+	uint32 m_blastWaveCd;
 	Creature *maulgar;
 };
 
