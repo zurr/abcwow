@@ -1792,9 +1792,9 @@ float AIInterface::_CalcAggroRange(Unit* target)
 	if(((Creature*)m_Unit)->GetCreatureName() && ((Creature*)m_Unit)->GetCreatureName()->Rank > 0)
 		AggroRange *= (((Creature*)m_Unit)->GetCreatureName()->Rank) * 1.50f;
 
-	if(AggroRange > 60.0f) // cap at 40.0f
+	if(AggroRange > 45.0f) // cap at 40.0f
 	{
-		AggroRange = 60.0f;
+		AggroRange = 45.0f;
 	}
   /*  //printf("aggro range: %f , stealthlvl: %d , detectlvl: %d\n",AggroRange,target->GetStealthLevel(),m_Unit->m_stealthDetectBonus);
 	if(! ((Creature*)m_Unit)->CanSee(target))
@@ -1812,9 +1812,9 @@ float AIInterface::_CalcAggroRange(Unit* target)
 	{
 		AggroRange = 3.0f;
 	}
-	if(AggroRange > 60.0f) // cap at 40.0f
+	if(AggroRange > 45.0f) // cap at 40.0f
 	{
-		AggroRange = 60.0f;
+		AggroRange = 45.0f;
 	}
 
 	return (AggroRange*AggroRange);
