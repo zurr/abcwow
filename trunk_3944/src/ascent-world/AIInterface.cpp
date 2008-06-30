@@ -3573,6 +3573,8 @@ uint32 AIInterface::_CalcThreat(uint32 damage, SpellEntry * sp, Unit* Attacker)
 	// modify mod by Affects
 	mod += (mod * Attacker->GetGeneratedThreatModifyer() / 100);
 
+	if (mod < 1)
+		mod = 1;
 	return mod;
 }
 
