@@ -12072,36 +12072,6 @@ void Apply112SpellFixes()
 		sp->EffectSpellGroupRelation[0] = 16384;
 	}
 
-	// Spell 19485 Group Relation (Mortal Shots Rank 1)
-	sp = dbcSpell.LookupEntryForced(19485);
-	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
-	}
-
-	// Spell 19487 Group Relation (Mortal Shots Rank 2)
-	sp = dbcSpell.LookupEntryForced(19487);
-	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
-	}
-
-	// Spell 19488 Group Relation (Mortal Shots Rank 3)
-	sp = dbcSpell.LookupEntryForced(19488);
-	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
-	}
-
-	// Spell 19489 Group Relation (Mortal Shots Rank 4)
-	sp = dbcSpell.LookupEntryForced(19489);
-	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
-	}
-
-	// Spell 19490 Group Relation (Mortal Shots Rank 5)
-	sp = dbcSpell.LookupEntryForced(19490);
-	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
-	}
-
 	// Spell 19498 Group Relation (Hawk Eye Rank 1)
 	sp = dbcSpell.LookupEntryForced(19498);
 	if(sp != NULL) {
@@ -12519,6 +12489,18 @@ void Apply112SpellFixes()
 	if(sp != NULL) {
 		sp->EffectSpellGroupRelation[0] = 65536;
 	}
+
+	sp = dbcSpell.LookupEntryForced( 44302 ); //Improved Polymorph -cast time ( arena set bonus )
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x1000000;
+
+	sp = dbcSpell.LookupEntryForced( 44301 ); //Improved Polymorph interruption avoidance ( arena set bonus )
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x1000000;
+
+	sp = dbcSpell.LookupEntryForced( 33066 ); //Mage Fire Blast Range Bonus ( arena gloves bonus )
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 0x000002;
 
 	// Spell 23047 Group Relation (Fear Cast Time Reduction )
 	sp = dbcSpell.LookupEntryForced(23047);
@@ -13200,9 +13182,9 @@ void ApplyNormalFixes()
         else if( strstr( nametext, "Sting") || strstr( nametext, "sting"))
             type |= SPELL_TYPE_STING;
         // don't break armor items!
-        else if(strcmp(nametext, "Armor") && strstr( nametext, "Armor") || strstr( nametext, "Demon Skin"))
+        else if(strstr( nametext, "Fel Armor") || strstr( nametext, "Frost Armor") || strstr( nametext, "Ice Armor") || strstr( nametext, "Mage Armor") || strstr( nametext, "Molten Armor") || strstr( nametext, "Demon Skin") || strstr( nametext, "Demon Armor"))
             type |= SPELL_TYPE_ARMOR;
-        else if( strstr( nametext, "Aura"))
+        else if( strstr( nametext, "Aura") && !strstr( nametext, "Trueshot") && !strstr( nametext, "Moonkin"))
             type |= SPELL_TYPE_AURA;
 		else if( strstr( nametext, "Track")==nametext)
             type |= SPELL_TYPE_TRACK;
@@ -13417,6 +13399,8 @@ void ApplyNormalFixes()
 					//dirty code for procs, if any1 got any better idea-> u are welcome
 					//139944 --- some magic number, it will trigger on all hits etc
 						//for seems to be smth like custom check
+					if( strstr( desc,"Friendly targets of the caster's heals gain"))
+						pr|=PROC_ON_CAST_SPELL;
 					if( strstr( desc,"your ranged criticals"))
 						pr|=PROC_ON_RANGED_CRIT_ATTACK;
 					if( strstr( desc,"chance on hit"))
@@ -20086,6 +20070,15 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 33297 ); 
 		if( sp != NULL )
 			sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+
+		//Mental Protection Field - Staff of Disintegration
+		sp = dbcSpell.LookupEntryForced( 36480 );
+		if( sp != NULL )
+		{
+			sp->Attributes = 151257088;
+			sp->AuraInterruptFlags = 0;
+			sp->unkflags = 133;
+		}
 
 		// Ashtongue Talisman of Shadows 
 		sp = dbcSpell.LookupEntryForced( 40478 );

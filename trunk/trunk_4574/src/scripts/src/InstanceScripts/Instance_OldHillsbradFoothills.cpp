@@ -49,7 +49,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(FRIGHTENING_SHOUT);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
-		spells[0].cooldown = 8;
+		spells[0].cooldown = 20;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000;
 		spells[0].speech = "Run, you blasted cowards!";
@@ -65,7 +65,7 @@ public:
 		spells[2].info = dbcSpell.LookupEntry(MORTAL_STRIKE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
-		spells[2].cooldown = 5;
+		spells[2].cooldown = 6;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 

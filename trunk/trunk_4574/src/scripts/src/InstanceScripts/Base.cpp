@@ -288,7 +288,7 @@ MoonScriptCreatureAI* MoonScriptCreatureAI::SpawnCreature(uint32 pCreatureId, bo
 
 MoonScriptCreatureAI* MoonScriptCreatureAI::SpawnCreature(uint32 pCreatureId, float pX, float pY, float pZ, float pO, bool pForceSameFaction)
 {
-	Creature* NewCreature = _unit->GetMapMgr()->GetInterface()->SpawnCreature(pCreatureId, pX, pY, pZ, pO, false, false, 0, 0);
+	Creature* NewCreature = _unit->GetMapMgr()->GetInterface()->SpawnCreature(pCreatureId, pX, pY, pZ+1.5f, pO, false, false, 0, 0);
 	if ( NewCreature == NULL )
 		return NULL;
 
@@ -1047,10 +1047,21 @@ void SpellFunc_ClearHateList(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI
 
 void SpellFunc_Disappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType)
 {
-	pCreatureAI->ClearHateList();
-	pCreatureAI->SetCanMove(false);
-	pCreatureAI->SetCanEnterCombat(false);
-	pCreatureAI->ApplyAura(SPELLFUNC_VANISH);
+	if ( pCreatureAI != NULL && pCreatureAI->GetUnit() != NULL )
+	{
+		Aura * pAura;
+		for(uint32 i = 0; i < MAX_PASSIVE_AURAS; ++i)
+		{
+			pAura = pCreatureAI->GetUnit()->m_auras[i];
+			if( pAura != NULL && !pAura->IsPassive() && !pAura->IsPositive() )
+				pAura->Remove();
+		}
+
+		//pCreatureAI->ClearHateList();
+		pCreatureAI->SetCanMove(false);
+		pCreatureAI->SetCanEnterCombat(false);
+		pCreatureAI->ApplyAura(SPELLFUNC_VANISH);
+	}
 }
 
 void SpellFunc_Reappear(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType)
