@@ -4140,7 +4140,7 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 {
 	int32 base_amount = amount; //store base_amount for later use
 
-	if(!unitTarget || !unitTarget->isAlive())
+	if( !unitTarget || !unitTarget->isAlive() || m_spellInfo == NULL )
 		return;
 	
 	if( p_caster != NULL )
