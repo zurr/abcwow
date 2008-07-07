@@ -380,8 +380,7 @@ public:
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-					uint32 t = (uint32)time(NULL);
+				uint32 t = (uint32)time(NULL);
 				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);

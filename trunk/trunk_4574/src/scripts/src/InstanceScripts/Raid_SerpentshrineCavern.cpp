@@ -490,7 +490,6 @@ public:
 				submergetimer = 60;
 				submerged = 1;
 
-				Creature *summon;
 				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 12.239388f, -454.372284f, -19.793467f, 1.132437f, true, false, 0, 0);
 				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 48.335369f, -458.581665f, -19.793333f, 1.807879f, true, false, 0, 0);
 				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGAMBUSHER, 62.277702f, -380.135712f, -19.721540f, 4.036446f, true, false, 0, 0);
