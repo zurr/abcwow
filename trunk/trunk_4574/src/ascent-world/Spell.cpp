@@ -3106,7 +3106,7 @@ uint8 Spell::CanCast(bool tolerate)
 		{
 			Unit * utarget;
 			utarget = m_caster->GetMapMgr()->GetUnit( m_targets.m_unitTarget );
-			if( utarget->IsPlayer() && static_cast< Player* >( utarget )->m_isMoving )
+			if(utarget != NULL && utarget->IsPlayer() && static_cast< Player* >( utarget )->m_isMoving )
 				{
 					// this only applies to PvP.
 					uint32 lat = static_cast< Player* >( utarget )->GetSession() ? static_cast< Player* >( utarget )->GetSession()->GetLatency() : 0;
