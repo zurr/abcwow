@@ -40,10 +40,7 @@
  * As of last update, it was nowhere near complete. Only enable for dev use.
  * Default: Disabled
  */
-#ifdef ENABLE_COLLISION
 # define COLLISION 1
-#endif
-//#define COLLISION 1
 
 /** Use memory mapping for map files for faster access (let OS take care of caching)
  * (currently only available under windows)
