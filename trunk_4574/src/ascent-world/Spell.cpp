@@ -958,14 +958,6 @@ uint8 Spell::prepare( SpellCastTargets * targets )
 		{
 			SM_FIValue( u_caster->SM_FCastTime, (int32*)&m_castTime, m_spellInfo->SpellGroupType );
 			SM_PIValue( u_caster->SM_PCastTime, (int32*)&m_castTime, m_spellInfo->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			int spell_flat_modifers=0;
-			int spell_pct_modifers=0;
-			SM_FIValue(u_caster->SM_FCastTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_FIValue(u_caster->SM_PCastTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-				printf("!!!!!spell casttime mod flat %d , spell casttime mod pct %d , spell casttime %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,m_castTime,m_spellInfo->SpellGroupType);
-#endif
 		}
 
 		// handle MOD_CAST_TIME
@@ -1497,12 +1489,6 @@ void Spell::AddTime(uint32 type)
 		{
 			float ch=0;
 			SM_FFValue(u_caster->SM_PNonInterrupt,&ch,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			float spell_pct_modifers=0;
-			SM_FFValue(u_caster->SM_PNonInterrupt,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_pct_modifers!=0)
-				printf("!!!!!spell interrupt chance mod pct %f , uninterrupt chance %f, spell group %u\n",spell_pct_modifers,ch,m_spellInfo->SpellGroupType);
-#endif
 			if(Rand(ch))
 				return;
 		}
@@ -2713,6 +2699,8 @@ uint8 Spell::CanCast(bool tolerate)
 			return SPELL_FAILED_CASTER_DEAD;
 		}
 #ifdef COLLISION
+		if (CollideInterface.isCollitionMap(p_caster->GetMapId()))
+		{
 		if (m_spellInfo->MechanicsType == MECHANIC_MOUNTED)
 		{
 			if (CollideInterface.IsIndoor( p_caster->GetMapId(), p_caster->GetPositionNC() ))
@@ -2722,6 +2710,7 @@ uint8 Spell::CanCast(bool tolerate)
 		{
 			if( !CollideInterface.IsOutdoor( p_caster->GetMapId(), p_caster->GetPositionNC() ) )
 				return SPELL_FAILED_ONLY_OUTDOORS;
+		}
 		}
 #endif
 		//are we in an arena and the spell cooldown is longer then 15mins?
@@ -3133,14 +3122,6 @@ uint8 Spell::CanCast(bool tolerate)
 	{
 		SM_FFValue( u_caster->SM_FRange, &maxRange, m_spellInfo->SpellGroupType );
 		SM_PFValue( u_caster->SM_PRange, &maxRange, m_spellInfo->SpellGroupType );
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		float spell_flat_modifers=0;
-		float spell_pct_modifers=0;
-		SM_FFValue(u_caster->SM_FRange,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FFValue(u_caster->SM_PRange,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell range bonus mod flat %f , spell range bonus pct %f , spell range %f, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxRange,m_spellInfo->SpellGroupType);
-#endif
 	}
 
 	// Targeted Location Checks (AoE spells)
@@ -3182,8 +3163,9 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_NO_AMMO;
 				}
 #ifdef COLLISION
-				if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
-					return SPELL_FAILED_LINE_OF_SIGHT;
+				if (CollideInterface.isCollitionMap(p_caster->GetMapId()))
+					if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
+						return SPELL_FAILED_LINE_OF_SIGHT;
 #endif
 
 				// check aurastate
@@ -3955,10 +3937,6 @@ exit:
 
 			SM_FIValue(item_creator->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
 			SM_FIValue(item_creator->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0 || spell_pct_modifers2!=0)
-				printf("!!!!ITEMCASTER ! : spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
-#endif
 			value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
 		}
 	}

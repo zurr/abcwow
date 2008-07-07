@@ -2506,34 +2506,25 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 			}
 		}
 	}
-#ifndef COLLISION
-	p_caster->blinked = true;
-
-	WorldPacket data(SMSG_MOVE_KNOCK_BACK, 50);
-	data << p_caster->GetNewGUID();
-	data << getMSTime();
-	data << cosf(p_caster->GetOrientation()) << sinf(p_caster->GetOrientation());
-	data << radius;
-	data << float(-10.0f);
-	p_caster->GetSession()->SendPacket(&data);
-	//m_caster->SendMessageToSet(&data, true);
-#else
+#ifdef COLLISION
+	if (CollideInterface.isCollitionMap(m_caster->GetMapId()))
+	{
 	if(!p_caster)
 		return;
 
 	float ori = m_caster->GetOrientation();				
 	float posX = m_caster->GetPositionX()+(radius*(cosf(ori)));
 	float posY = m_caster->GetPositionY()+(radius*(sinf(ori)));
-	float z = CollideInterface.GetHeight(m_caster->GetMapId(), posX, posY, m_caster->GetPositionZ() + 2.0f);
+	float z = CollideInterface.GetHeight(m_caster->GetMapId(), posX, posY, m_caster->GetPositionZ() + 2.3f);
 	if(z == NO_WMO_HEIGHT)		// not found height, or on adt
 		z = m_caster->GetMapMgr()->GetLandHeight(posX,posY);
 
 	if( fabs( z - m_caster->GetPositionZ() ) >= 10.0f )
 		return;
 
-	LocationVector dest(posX, posY, z + 2.0f, ori);
+	LocationVector dest(posX, posY, z + 2.3f, ori);
 	LocationVector destest(posX, posY, dest.z, ori);
-	LocationVector src(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 2.0f);
+	LocationVector src(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 2.3f);
 
 	if(CollideInterface.GetFirstPoint(m_caster->GetMapId(), src, destest, dest, -1.5f))
 	{
@@ -2547,7 +2538,30 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	dest.o = p_caster->GetOrientation();
 	p_caster->blinked = true;
 	p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), dest );
-#endif
+	}
+	else
+	{
+		p_caster->blinked = true;
+
+		WorldPacket data(SMSG_MOVE_KNOCK_BACK, 50);
+		data << p_caster->GetNewGUID();
+		data << getMSTime();
+		data << cosf(p_caster->GetOrientation()) << sinf(p_caster->GetOrientation());
+		data << radius;
+		data << float(-10.0f);
+		m_caster->SendMessageToSet(&data, true);
+	}
+#else
+	p_caster->blinked = true;
+
+	WorldPacket data(SMSG_MOVE_KNOCK_BACK, 50);
+	data << p_caster->GetNewGUID();
+	data << getMSTime();
+	data << cosf(p_caster->GetOrientation()) << sinf(p_caster->GetOrientation());
+	data << radius;
+	data << float(-10.0f);
+	m_caster->SendMessageToSet(&data, true);
+ #endif
 
 
 	// reset heartbeat for a little while, 2 seconds maybe?

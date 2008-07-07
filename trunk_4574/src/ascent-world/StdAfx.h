@@ -172,6 +172,5 @@
 #include "Master.h"
 #include "BaseConsole.h"
 #include "CConsole.h"
-//#define COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS 1
 
 #endif
