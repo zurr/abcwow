@@ -372,10 +372,10 @@ void Arena::Finish()
 	for(int i = 0; i < 2; i++)
 	{
 		bool victorious = (i == m_winningteam);
-		set<uint32>::iterator itr = m_players[i].begin();
-		for(; itr != m_players[i].end(); itr++)
+		
+		for(set<uint32>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); itr++)
 		{
-			Player * plr = (Player *)(*itr);
+			Player *plr = objmgr.GetPlayer(*itr);
 			if (plr != NULL)
 				sHookInterface.OnArenaFinish(plr, plr->m_arenaTeams[m_arenateamtype], victorious, rated_match);
 		}
