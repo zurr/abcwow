@@ -1953,16 +1953,16 @@ void Spell::SendSpellGo()
 	data << flags;
 	data << getMSTime();
 	data << (uint8)(UniqueTargets.size()); //number of hits
-	
-	if( flags & 0x400 )
-		data << (uint8)(ModeratedTargets.size()); //number if misses
-  
+
+	//if( flags & 0x400 )
+	data << (uint8)(ModeratedTargets.size()); //number if misses
+
 	writeSpellGoTargets( &data );
 	
 	if( flags & 0x400 )
 		writeSpellMissedTargets( &data );
-	else
-		data << uint8( 0 );
+	//else
+	//	data << uint8( 0 );
 
 	m_targets.write( data ); // this write is included the target flag
 
