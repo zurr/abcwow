@@ -4122,11 +4122,11 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 
 	if( !unitTarget || !unitTarget->isAlive() || m_spellInfo == NULL )
 		return;
-	
+
 	if( p_caster != NULL )
 		p_caster->last_heal_spell=m_spellInfo;
 
-    //self healing shouldn't flag himself
+	//self healing shouldn't flag himself
 	if(p_caster && playerTarget && p_caster != playerTarget)
 	{
 		// Healing a flagged target will flag you.
@@ -4197,19 +4197,19 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 			bonus += penalty_flt;
 			SM_FIValue( u_caster->SM_CriticalChance,&critchance,m_spellInfo->SpellGroupType);
 		}
-		
+
 		amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
 		amount += amount*u_caster->HealDonePctMod[m_spellInfo->School]/100;
 		amount += float2int32( float( amount ) * unitTarget->HealTakenPctMod[m_spellInfo->School] );
 
 		if (m_spellInfo->SpellGroupType)
 			SM_FIValue(u_caster->SM_PDamageBonus,&amount,m_spellInfo->SpellGroupType);
-		
+
 		if( critical = Rand(critchance) || ForceCrit )
 		{
 			/*int32 critbonus = amount >> 1;
 			if( m_spellInfo->SpellGroupType)
-					SM_PIValue(static_cast<Unit*>(u_caster)->SM_PCriticalDamage, &critbonus, m_spellInfo->SpellGroupType);
+			SM_PIValue(static_cast<Unit*>(u_caster)->SM_PCriticalDamage, &critbonus, m_spellInfo->SpellGroupType);
 			amount += critbonus;*/
 
 			int32 critical_bonus = 100;
@@ -4227,12 +4227,12 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 			// Or mb i'm completely wrong? So if true  - just replace with old string. 
 			//u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, unitTarget, m_spellInfo, amount);
 			//Replaced with following one:
-			
-		
+
+
 			unitTarget->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, u_caster, m_spellInfo, amount);
 			u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT, unitTarget, m_spellInfo, amount);
 		}
-		
+
 	}
 
 	if(amount < 0) 
@@ -4251,7 +4251,10 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 	uint32 curHealth = unitTarget->GetUInt32Value(UNIT_FIELD_HEALTH);
 	uint32 maxHealth = unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
 	if((curHealth + amount) >= maxHealth)
+	{
+		amount = maxHealth - curHealth;
 		unitTarget->SetUInt32Value(UNIT_FIELD_HEALTH, maxHealth);
+	}
 	else
 		unitTarget->ModUnsigned32Value(UNIT_FIELD_HEALTH, amount);
 
@@ -4261,7 +4264,7 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 		p_caster->HandleProc( PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL, unitTarget, m_spellInfo );
 	}
 
-	int doneTarget = 0;
+	//int doneTarget = 0;
 
 	// add threat
 	if( u_caster != NULL )
@@ -4272,54 +4275,73 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 
 		uint32 base_threat=GetBaseThreat(base_amount);
 		int count = 0;
-		Unit *unit;
 		std::vector<Unit*> target_threat;
 		if(base_threat)
 		{
-			/* 
-			http://www.wowwiki.com/Threat
-			Healing threat is global, and is normally .5x of the amount healed.
-			Healing effects cause no threat if the target is already at full health.
-
-			Example: Player 1 is involved in combat with 5 mobs. Player 2 (priest) heals Player 1 for 1000 health,
-			and has no threat reduction talents. A 1000 heal generates 500 threat,
-			however that 500 threat is split amongst the 5 mobs.
-			Each of the 5 mobs now has 100 threat towards Player 2.
-			*/
-
-			target_threat.reserve(u_caster->GetInRangeCount()); // this helps speed
-
+			std::vector<Unit*> target_threat;
+			int count = 0;
 			for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
 			{
-				if((*itr)->GetTypeId() != TYPEID_UNIT)
+				if((*itr)->GetTypeId() != TYPEID_UNIT || !static_cast<Unit *>(*itr)->CombatStatus.IsInCombat() || (static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(u_caster) == 0 && static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(unitTarget) == 0))
 					continue;
-				unit = static_cast<Unit*>((*itr));
-				if(unit->GetAIInterface()->GetNextTarget() == unitTarget)
-				{
-					target_threat.push_back(unit);
-					++count;
-				}
+
+				target_threat.push_back(static_cast<Unit *>(*itr));
+				count++;
 			}
-			count = ( count == 0 ? 1 : count );  // division against 0 protection
+			if (count == 0)
+				return;
 
-			// every unit on threatlist should get 1/2 the threat, divided by size of list
-			uint32 threat = base_threat / (count * 2);
+			amount = amount / count;
 
-			// update threatlist (HealReaction)
 			for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
 			{
-				// for now we'll just use heal amount as threat.. we'll prolly need a formula though
-				static_cast< Unit* >( *itr )->GetAIInterface()->HealReaction( u_caster, unitTarget, threat );
-
-				if( (*itr)->GetGUID() == u_caster->CombatStatus.GetPrimaryAttackTarget() )
-					doneTarget = 1;
+				static_cast<Unit *>(*itr)->GetAIInterface()->HealReaction(u_caster, unitTarget, m_spellInfo, amount);
 			}
 		}
+		/*
+		http://www.wowwiki.com/Threat
+		Healing threat is global, and is normally .5x of the amount healed.
+		Healing effects cause no threat if the target is already at full health.
+
+		Example: Player 1 is involved in combat with 5 mobs. Player 2 (priest) heals Player 1 for 1000 health,
+		and has no threat reduction talents. A 1000 heal generates 500 threat,
+		however that 500 threat is split amongst the 5 mobs.
+		Each of the 5 mobs now has 100 threat towards Player 2.
+
+		target_threat.reserve(u_caster->GetInRangeCount()); // this helps speed
+
+		for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
+		{
+		if((*itr)->GetTypeId() != TYPEID_UNIT)
+		continue;
+		unit = static_cast<Unit*>((*itr));
+		if(unit->GetAIInterface()->GetNextTarget() == unitTarget)
+		{
+		target_threat.push_back(unit);
+		++count;
+		}
+		}
+		count = ( count == 0 ? 1 : count );  // division against 0 protection
+
+		// every unit on threatlist should get 1/2 the threat, divided by size of list
+		uint32 threat = base_threat / (count * 2);
+
+		// update threatlist (HealReaction)
+		for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
+		{
+		// for now we'll just use heal amount as threat.. we'll prolly need a formula though
+		static_cast< Unit* >( *itr )->GetAIInterface()->HealReaction( u_caster, unitTarget, threat );
+
+		if( (*itr)->GetGUID() == u_caster->CombatStatus.GetPrimaryAttackTarget() )
+		doneTarget = 1;
+		}
+		}
+		*/
 		// remember that we healed (for combat status)
 		if(unitTarget->IsInWorld() && u_caster->IsInWorld())
 			u_caster->CombatStatus.WeHealed(unitTarget);
 	}
-}
+	}
 
 void Spell::DetermineSkillUp(uint32 skillid,uint32 targetlevel)
 {

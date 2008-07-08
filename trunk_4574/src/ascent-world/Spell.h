@@ -1732,6 +1732,8 @@ public:
     void SpellEffectSpawn(uint32 i);
     void SpellEffectApplyAura128(uint32 i);
 	void SpellEffectTriggerSpellWithValue(uint32 i);
+	void SpellEffectReduceThreatPercent(uint32 i);
+	void SpellEffectRedirectThreat(uint32 i);
 
     // Spell Targets Handlers
     void SpellTargetNULL(uint32 i, uint32 j);
