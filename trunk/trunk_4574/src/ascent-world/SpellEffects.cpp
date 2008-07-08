@@ -145,12 +145,12 @@ pSpellEffect SpellEffectsHandler[TOTAL_SPELL_EFFECTS]={
 		&Spell::SpellEffectNULL,//unknown - 122 //not used
 		&Spell::SpellEffectNULL,//SPELL_EFFECT_FILMING - 123 // http://www.thottbot.com/?sp=27998: flightpath 
 		&Spell::SpellEffectPlayerPull, // SPELL_EFFECT_PLAYER_PULL - 124 - http://thottbot.com/e2312
-		&Spell::SpellEffectNULL,//unknown - 125 // Reduce Threat by % //http://www.thottbot.com/?sp=32835
+		&Spell::SpellEffectReduceThreatPercent,//unknown - 125 // Reduce Threat by %
 		&Spell::SpellEffectSpellSteal,//SPELL_EFFECT_SPELL_STEAL - 126 // Steal Beneficial Buff (Magic) //http://www.thottbot.com/?sp=30449
 		&Spell::SpellEffectProspecting,//unknown - 127 // Search 5 ore of a base metal for precious gems.  This will destroy the ore in the process.
 		&Spell::SpellEffectApplyAura128,//unknown - 128 // Adjust a stats by %: Mod Stat // ITS FLAT
 		&Spell::SpellEffectNULL,// unknown - 129 // Mod Dmg % (Spells)
-		&Spell::SpellEffectNULL,// unknown - 130 // http://www.thottbot.com/s34477
+		&Spell::SpellEffectRedirectThreat,// unknown - 130 // http://www.thottbot.com/s34477
 		&Spell::SpellEffectNULL,// unknown - 131 // test spell
 		&Spell::SpellEffectNULL,// unknown - 132 // no spells
 		&Spell::SpellEffectNULL,// SPELL_EFFECT_FORGET_SPECIALIZATION - 133 // http://www.thottbot.com/s36441 // I think this is a gm/npc spell
@@ -1005,6 +1005,14 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			uint32 gain = (uint32)(count * (2.17*p_caster->getLevel()+9.136));
 			p_caster->Energize(unitTarget,28730,gain,POWER_TYPE_MANA);
 		}break;
+	case 28734://Mana Tap
+		{
+			if( !unitTarget || !u_caster) 
+				return;
+
+			if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1) > 0)
+				unitTarget->GetAIInterface()->AttackReaction(u_caster, 1, m_spellInfo->Id);
+		}break;
 	case 39610://Mana Tide
 		{
 			if(unitTarget == NULL || unitTarget->isDead() || unitTarget->getClass() == WARRIOR || unitTarget->getClass() == ROGUE)
@@ -1466,19 +1474,10 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		}break;
 	case 29858: //Soulshatter
 		{
-			if( unitTarget == NULL || !unitTarget->isAlive() )
+			if( !u_caster || !u_caster->isAlive() || !unitTarget || !unitTarget->isAlive() )
 				return;
 
-			std::set< Object* >::iterator itr;
-
-			for( itr = unitTarget->GetInRangeSetBegin(); itr != unitTarget->GetInRangeSetEnd(); itr++ )
-			{
-				if( (*itr) == NULL || (*itr)->GetTypeId() != TYPEID_UNIT || !static_cast< Unit* >( *itr )->IsCreature() || unitTarget->CalcDistance( (*itr) ) > 50.0f )
-					continue;
-
-				Creature *tCreature = static_cast< Creature* >( *itr );
-				tCreature->GetAIInterface()->modThreatByPtr( unitTarget, tCreature->GetAIInterface()->getThreatByPtr( unitTarget )/2 );
-			}
+			u_caster->CastSpell(unitTarget, 32835, false);
 		}break;
 	}										 
 }
@@ -3253,7 +3252,8 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 
 	Aura *aur;
 	uint32 start,end;
-	if(isAttackable(u_caster,unitTarget))
+	bool enemy = isAttackable(u_caster, unitTarget);
+	if(enemy)
 	{
 		start=0;
 		end=MAX_POSITIVE_AURAS;
@@ -3273,6 +3273,9 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 		//Nothing can dispel resurrection sickness;
 		if(!aur->IsPassive() && !(aur->GetSpellProto()->Attributes & ATTRIBUTES_IGNORE_INVULNERABILITY))
 		{
+			if (enemy && !aur->IsPositive())
+				continue;
+
 			uint32 UARank = 0;
 			if(m_spellInfo->DispelType == DISPEL_ALL)
 			{
@@ -3324,7 +3327,7 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 				u_caster->SpellNonMeleeDamageLog(u_caster,31117,dmg,true,true);
 			}
 		}
-	}   
+	}
 }
 
 void Spell::SpellEffectDualWield(uint32 i)
@@ -3880,9 +3883,10 @@ void Spell::SpellEffectThreat(uint32 i) // Threat
 	if(!unitTarget || !unitTarget->isAlive() )
 		return;
 
-	bool chck = unitTarget->GetAIInterface()->modThreatByPtr(u_caster,m_spellInfo->EffectBasePoints[i]);
-	if(chck == false)
-		unitTarget->GetAIInterface()->AttackReaction(u_caster,1,0);	
+	if (unitTarget->GetAIInterface()->getThreatByPtr(u_caster) > 0)
+		unitTarget->GetAIInterface()->modThreatByPtr(u_caster, m_spellInfo->EffectBasePoints[i]);
+	else
+		unitTarget->GetAIInterface()->AttackReaction(u_caster, 1, 0);
 }
 
 void Spell::SpellEffectTriggerSpell(uint32 i) // Trigger Spell
@@ -3946,6 +3950,7 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 	{
 		if (u_caster && (u_caster != unitTarget))
 		{
+						unitTarget->GetAIInterface()->AttackReaction(u_caster, 1, m_spellInfo->Id);
 			Creature *c = (Creature*)( unitTarget );
 			if (c && c->proto && c->proto->modImmunities)
 			{
@@ -5241,6 +5246,25 @@ void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 	}
 }
 
+void Spell::SpellEffectRedirectThreat(uint32 i)
+{
+	sLog.outString("im working now");
+	/*
+	if (!p_caster || !unitTarget)
+		return;
+
+	p_caster->SetMisdirectionTarget((uint32)unitTarget->GetGUID());
+	*/
+}
+
+void Spell::SpellEffectReduceThreatPercent(uint32 i)
+{
+	if (!unitTarget || !unitTarget->IsCreature() || !u_caster || unitTarget->GetAIInterface()->getThreatByPtr(u_caster) == 0)
+		return;
+
+		unitTarget->GetAIInterface()->modThreatByPtr(u_caster, (int32)unitTarget->GetAIInterface()->getThreatByPtr(u_caster) * damage / 100);
+}
+
 void Spell::SpellEffectReputation(uint32 i)
 {
 	if(!playerTarget)
@@ -5915,6 +5939,9 @@ void Spell::SpellEffectEnchantHeldItem( uint32 i )
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry( m_spellInfo->EffectMiscValue[i] );
 	
 	if( Enchantment == NULL )
+		return;
+
+		if (m_spellInfo->NameHash == SPELL_HASH_WINDFURY_TOTEM_EFFECT && item->HasEnchantmentOnSlot( 1 ) && item->GetEnchantment( 1 )->Enchantment != Enchantment) //dirty fix for Windfury totem not overwriting existing enchantments
 		return;
 
 	item->RemoveEnchantment( 1 );

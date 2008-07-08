@@ -186,6 +186,7 @@ Unit::Unit()
 		AttackerCritChanceMod[x]=0;
 		CritMeleeDamageTakenPctMod[x]=0;
 		CritRangedDamageTakenPctMod[x]=0;
+		m_generatedThreatModifyer[x] = 0;
 	}
 	DamageTakenPctModOnHP35 = 1;
 	RangedDamageTaken = 0;
@@ -199,7 +200,6 @@ Unit::Unit()
 	trackStealth = false;
 
 	m_threatModifyer = 0;
-	m_generatedThreatModifyer = 0;
 	memset(m_auras, 0, (MAX_AURAS+MAX_PASSIVE_AURAS)*sizeof(Aura*));
 	
 	// diminishing return stuff
@@ -3322,7 +3322,7 @@ else
 		static_cast< Player* >( this )->m_casted_amount[dmg.school_type]=(uint32)(realdamage+abs);
 	if(realdamage)
 	{
-		DealDamage(pVictim, realdamage, 0, targetEvent, 0);
+				DealDamage(pVictim, realdamage, 0, targetEvent, ability ? ability->Id : 0);
 		//pVictim->HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,this);
 //		HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,pVictim);
 

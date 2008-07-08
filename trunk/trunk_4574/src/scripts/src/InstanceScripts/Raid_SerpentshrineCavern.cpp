@@ -1486,9 +1486,6 @@ public:
 
 	KARATHRESSAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		for(uint32 x = 0; x<7;x++)
-			_unit->DamageDoneModPCT[x] = 0;
-
 		m_eventstarted = false;
 		sharkkisalive = true;
 		caribdisalive = true;
@@ -1543,11 +1540,35 @@ public:
 
 	void AIUpdate()
 	{
+		if (_unit->GetHealthPct() <= 75 && !enraged && (caribdisalive || sharkkisalive || tidalvessalive))
+		{
+			enraged = true;
+			for(uint32 x = 0; x<4;x++)
+				_unit->CastSpell(_unit, 38449, true);
+			if (caribdis != NULL && caribdisalive)
+				for(uint32 x = 0; x<4;x++)
+					caribdis->CastSpell(caribdis, 38449, true);
+			if (sharkkis != NULL && sharkkisalive)
+				for(uint32 x = 0; x<4;x++)
+					sharkkis->CastSpell(sharkkis, 38449, true);
+			if (tidalvess != NULL && tidalvessalive)
+				for(uint32 x = 0; x<4;x++)
+					tidalvess->CastSpell(tidalvess, 38449, true);
+		}
 		m_enrage--;
 		if (!m_enrage && !enraged)
 		{
-			for(uint32 x = 0; x<7;x++)
-				_unit->DamageDoneModPCT[x] = 5;
+			for(uint32 x = 0; x<4;x++)
+				_unit->CastSpell(_unit, 38449, true);
+			if (caribdis != NULL && caribdisalive)
+				for(uint32 x = 0; x<4;x++)
+					caribdis->CastSpell(caribdis, 38449, true);
+			if (sharkkis != NULL && sharkkisalive)
+				for(uint32 x = 0; x<4;x++)
+					sharkkis->CastSpell(sharkkis, 38449, true);
+			if (tidalvess != NULL && tidalvessalive)
+				for(uint32 x = 0; x<4;x++)
+					tidalvess->CastSpell(tidalvess, 38449, true);
 
 			enraged = true;
 		}

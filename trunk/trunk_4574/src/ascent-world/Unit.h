@@ -849,8 +849,8 @@ public:
 
 	int32 GetThreatModifyer() { return m_threatModifyer; }
 	void ModThreatModifyer(int32 mod) { m_threatModifyer += mod; }
-	int32 GetGeneratedThreatModifyer() { return m_generatedThreatModifyer; }
-	void ModGeneratedThreatModifyer(int32 mod) { m_generatedThreatModifyer += mod; }
+	int32 GetGeneratedThreatModifyer(uint32 school) { return m_generatedThreatModifyer[school]; }
+	void ModGeneratedThreatModifyer(uint32 school, int32 mod) { m_generatedThreatModifyer[school] += mod; }
 
 	// DK:Affect
 	ASCENT_INLINE uint32 IsPacified() { return m_pacified; }
@@ -1187,7 +1187,7 @@ protected:
 	bool m_useAI;
 	bool can_parry;//will be enabled by block spell
 	int32 m_threatModifyer;
-	int32 m_generatedThreatModifyer;
+	int32 m_generatedThreatModifyer[7];
 
 	//	float getDistance( float Position1X, float Position1Y, float Position2X, float Position2Y );	
 
