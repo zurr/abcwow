@@ -1954,11 +1954,11 @@ void Spell::SendSpellGo()
 	data << getMSTime();
 	data << (uint8)(UniqueTargets.size()); //number of hits
 
+	writeSpellGoTargets( &data );
+	
 	//if( flags & 0x400 )
 	data << (uint8)(ModeratedTargets.size()); //number if misses
 
-	writeSpellGoTargets( &data );
-	
 	if( flags & 0x400 )
 		writeSpellMissedTargets( &data );
 	//else
