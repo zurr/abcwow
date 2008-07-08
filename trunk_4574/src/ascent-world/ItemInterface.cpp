@@ -1528,10 +1528,8 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 			return INV_ERR_CANT_CARRY_MORE_OF_THIS;
 		
 		// Check to see if we have the correct race
-		/*
-		if(!(proto->AllowableRace& (1<<m_pOwner->getRace())))
+		if(!(proto->AllowableRace & (1<<(m_pOwner->getRace()-1))))
 			return INV_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
-*/
 
 		// Check to see if we have the correct class
 		if(!(proto->AllowableClass & (1<<(m_pOwner->getClass()-1))))
