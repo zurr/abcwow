@@ -5248,13 +5248,13 @@ void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 
 void Spell::SpellEffectRedirectThreat(uint32 i)
 {
-	sLog.outString("im working now");
-	/*
 	if (!p_caster || !unitTarget)
 		return;
 
-	p_caster->SetMisdirectionTarget((uint32)unitTarget->GetGUID());
-	*/
+	if ((unitTarget->GetTypeId() == TYPEID_PLAYER && p_caster->GetGroup() != static_cast<Player *>(unitTarget)->GetGroup()) || (unitTarget->GetTypeId() == TYPEID_UNIT && !unitTarget->IsPet()))
+		return;
+
+	p_caster->SetMisdirectionTarget(unitTarget->GetGUID());
 }
 
 void Spell::SpellEffectReduceThreatPercent(uint32 i)

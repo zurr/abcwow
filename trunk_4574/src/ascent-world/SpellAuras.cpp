@@ -2312,23 +2312,10 @@ void Aura::SpellAuraDummy(bool apply)
 
 			case 34477: // Misdirection
 		{
-			//hack till the spelleffect works
-			Unit *m_caster = GetUnitCaster();
-			if (!m_caster || m_caster->GetTypeId() != TYPEID_PLAYER)
+			if (GetUnitCaster()->GetTypeId() != TYPEID_PLAYER)
 				return;
 
-			if (apply)
-			{
-				Unit *unitTarget = m_caster->GetMapMgr()->GetUnit(static_cast<Player *>(m_caster)->GetSelection());
-				if (unitTarget != NULL && isFriendly(m_caster, unitTarget))
-				{
-					if ((unitTarget->GetTypeId() == TYPEID_PLAYER && static_cast<Player *>(m_caster)->GetGroup() != static_cast<Player *>(unitTarget)->GetGroup()) || (unitTarget->GetTypeId() == TYPEID_UNIT && !unitTarget->IsPet()))
-						return;
-
-					static_cast<Player *>(m_caster)->SetMisdirectionTarget(static_cast<Player *>(m_caster)->GetSelection());
-				}
-			}
-			else
+			if (!apply)
 			{
 				static_cast<Player *>(GetUnitCaster())->SetMisdirectionTarget(0);
 			}
