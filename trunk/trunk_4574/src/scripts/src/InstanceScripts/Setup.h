@@ -47,7 +47,7 @@ void SetupMagtheridonsLair(ScriptMgr * mgr);
 void SetupWorldBosses(ScriptMgr * mgr);
 void SetupZulAman(ScriptMgr * mgr);
 //Events
-void SetupEventDarkPortal(ScriptMgr * mgr);
+//void SetupEventDarkPortal(ScriptMgr * mgr);
 //other
 //void SetupGenericAI(ScriptMgr * mgr);
 

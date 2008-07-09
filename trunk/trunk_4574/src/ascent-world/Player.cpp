@@ -8418,7 +8418,7 @@ void Player::SetShapeShift(uint8 ss)
 		if( m_auras[x] != NULL )
 		{
 			uint32 reqss = m_auras[x]->GetSpellProto()->RequiredShapeShift;
-			if( reqss != 0 && m_auras[x]->IsPositive() )
+			if( reqss != 0 && m_auras[x]->IsPositive() && this->getClass() != PRIEST )
 			{
 				if( old_ss > 0 )
 				{
