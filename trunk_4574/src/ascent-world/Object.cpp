@@ -2276,7 +2276,15 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	else /* ---------- NOT DEAD YET --------- */
 	{
 		if(pVictim != this && pVictim->GetTypeId() == TYPEID_UNIT )
-			pVictim->GetAIInterface()->AttackReaction(static_cast< Unit* >( this ), damage, spellId);
+		{
+			if (GetTypeId() == TYPEID_GAMEOBJECT)
+			{
+				if (static_cast<GameObject*>(this)->m_summoner != NULL && static_cast<GameObject*>(this)->m_summoner->IsInWorld() && static_cast<GameObject*>(this)->m_summoner->isAlive())
+					pVictim->GetAIInterface()->AttackReaction(static_cast< GameObject* >( this )->m_summoner, damage, spellId);
+			}
+			else
+				pVictim->GetAIInterface()->AttackReaction(static_cast< Unit* >( this ), damage, spellId);
+		}
 		
 		// TODO: Mark victim as a HK
 		/*if( static_cast< Player* >( pVictim )->GetCurrentBattleground() != NULL && static_cast< Player* >( this )->GetCurrentBattleground() != NULL)
