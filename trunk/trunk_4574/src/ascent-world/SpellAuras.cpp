@@ -2706,8 +2706,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 			SM_PIValue(c->SM_PDOT,&add,m_spellProto->SpellGroupType);
 	}
 
-	
-	
+	SendPeriodicHealAuraLog( add );
 
 	uint32 curHealth = m_target->GetUInt32Value(UNIT_FIELD_HEALTH);
 	uint32 maxHealth = m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
@@ -2719,8 +2718,6 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	else
 		m_target->SetUInt32Value(UNIT_FIELD_HEALTH, curHealth + add);
 
-	SendPeriodicHealAuraLog( add );
-
 	if( GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP )
 	{
 		m_target->Emote( EMOTE_ONESHOT_EAT );
@@ -2728,7 +2725,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 	// add threat
 	Unit* u_caster = this->GetUnitCaster();
-	if( u_caster != NULL )
+	if( u_caster != NULL)
 	{
 		std::vector<Unit*> target_threat;
 		int count = 0;

@@ -4264,39 +4264,27 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 		p_caster->HandleProc( PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL, unitTarget, m_spellInfo );
 	}
 
-	//int doneTarget = 0;
-
 	// add threat
-	if( u_caster != NULL )
+	if( u_caster != NULL)
 	{
-		//preventing overheal ;)
-		if( (curHealth + base_amount) >= maxHealth )
-			base_amount = maxHealth - curHealth;
-
-		uint32 base_threat=GetBaseThreat(base_amount);
-		int count = 0;
 		std::vector<Unit*> target_threat;
-		if(base_threat)
+		int count = 0;
+		for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
 		{
-			std::vector<Unit*> target_threat;
-			int count = 0;
-			for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
-			{
-				if((*itr)->GetTypeId() != TYPEID_UNIT || !static_cast<Unit *>(*itr)->CombatStatus.IsInCombat() || (static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(u_caster) == 0 && static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(unitTarget) == 0))
-					continue;
+			if((*itr)->GetTypeId() != TYPEID_UNIT || !static_cast<Unit *>(*itr)->CombatStatus.IsInCombat() || (static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(u_caster) == 0 && static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(unitTarget) == 0))
+				continue;
 
-				target_threat.push_back(static_cast<Unit *>(*itr));
-				count++;
-			}
-			if (count == 0)
-				return;
+			target_threat.push_back(static_cast<Unit *>(*itr));
+			count++;
+		}
+		if (count == 0)
+			return;
 
-			amount = amount / count;
+		amount = amount / count;
 
-			for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
-			{
-				static_cast<Unit *>(*itr)->GetAIInterface()->HealReaction(u_caster, unitTarget, m_spellInfo, amount);
-			}
+		for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
+		{
+			static_cast<Unit *>(*itr)->GetAIInterface()->HealReaction(u_caster, unitTarget, m_spellInfo, amount);
 		}
 		/*
 		http://www.wowwiki.com/Threat
@@ -4341,7 +4329,7 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 		if(unitTarget->IsInWorld() && u_caster->IsInWorld())
 			u_caster->CombatStatus.WeHealed(unitTarget);
 	}
-	}
+}
 
 void Spell::DetermineSkillUp(uint32 skillid,uint32 targetlevel)
 {
