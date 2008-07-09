@@ -57,9 +57,12 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 		break;
 		
 	case SPELL_HASH_PHASE_SHIFT:		// Phase Shift
-	case SPELL_HASH_CONSUME_SHADOWS:
 	case SPELL_HASH_LESSER_INVISIBILITY:
 		return AUTOCAST_EVENT_LEAVE_COMBAT;
+		break;
+
+	case SPELL_HASH_CONSUME_SHADOWS:
+		return AUTOCAST_EVENT_NONE;
 		break;
 
 	/************************************************************************/
