@@ -2872,7 +2872,7 @@ else
 			if( pct_dmg_mod > 0 )
 				dmg.full_damage = float2int32( dmg.full_damage *  ( float( pct_dmg_mod) / 100.0f ) );
 
-//			dmg.full_damage += add_damage;
+			dmg.full_damage += add_damage;
 
 			dmg.full_damage += float2int32( dmg.full_damage * pVictim->DamageTakenPctMod[ dmg.school_type ] );
 			dmg.full_damage += float2int32( dmg.full_damage * DamageDoneModPCT[dmg.school_type] );
