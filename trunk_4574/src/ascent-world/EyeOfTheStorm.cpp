@@ -724,7 +724,6 @@ void EyeOfTheStorm::GeneratePoints()
 	{
 		if( towers[i] == 0 )
 		{
-			printf("EOTS: No points on team %u\n", i);
 			continue;
 		}
 
