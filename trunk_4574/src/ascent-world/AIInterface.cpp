@@ -1293,6 +1293,9 @@ void AIInterface::HealReaction(Unit* caster, Unit* victim, SpellEntry* sp, uint3
 	if (sp != NULL && sp->School)
 		threat += (threat * caster->GetGeneratedThreatModifyer(sp->School) / 100);
 
+	if (threat < 1)
+		threat = 1;
+
 	if(!casterInList && victimInList) // caster is not yet in Combat but victim is
 	{
 		// get caster into combat if he's hostile
@@ -1304,8 +1307,7 @@ void AIInterface::HealReaction(Unit* caster, Unit* victim, SpellEntry* sp, uint3
 
 	else // caster is in Combat already but victim is not
 	{
-		modThreatByPtr(caster, threat
-);
+		modThreatByPtr(caster, threat);
 		// both are players so they might be in the same group
 		if( caster->GetTypeId() == TYPEID_PLAYER && victim->GetTypeId() == TYPEID_PLAYER )
 		{
