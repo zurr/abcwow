@@ -74,7 +74,7 @@ AIInterface::AIInterface()
 	m_flySpeed = 0.0f;
 	UnitToFear = NULL;
 	firstLeaveCombat = true;
-	m_outOfCombatRange = 2500;
+	m_outOfCombatRange = 2500.0f;
 
 	tauntedBy = NULL;
 	isTaunted = false;
@@ -229,11 +229,30 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			{
 				if( pUnit == NULL ) return;
 
-				Unit* target = FindTarget();
-				if(target)
+
+				Unit* target;
+				if (m_Unit->GetMapMgr()->GetMapInfo() != NULL)
 				{
-					AttackReaction(target, 1, 0);
-					return;
+					switch (m_Unit->GetMapMgr()->GetMapInfo()->type)
+					{
+					case INSTANCE_NULL:
+					case INSTANCE_PVP:
+						if (m_outOfCombatRange && _CalcDistanceFromHome <= m_outOfCombatRange)
+							target = FindTarget();
+						break;
+
+					case INSTANCE_RAID:
+					case INSTANCE_NONRAID:
+					case INSTANCE_MULTIMODE:
+						target = FindTarget();
+						break;
+					}
+
+					if(target != NULL)
+					{
+						AttackReaction(target, 1, 0);
+						return;
+					}
 				}
 
 				if( pUnit->IsCreature() )
@@ -823,7 +842,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 	// If at instance dont return -- this is wrong ... instance creatures always returns to spawnpoint, dunno how do you got this ideia. 
 
 	if(	m_AIType != AITYPE_PET 
-		&& (m_outOfCombatRange && m_Unit->GetDistanceSq(m_returnX,m_returnY,m_returnZ) > m_outOfCombatRange) 
+		&& (m_outOfCombatRange && _CalcDistanceFromHome() > m_outOfCombatRange) 
 		&& m_AIState != STATE_EVADE
 		&& m_AIState != STATE_SCRIPTMOVE
 		&& !m_is_in_instance)
