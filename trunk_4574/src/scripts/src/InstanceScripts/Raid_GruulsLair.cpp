@@ -1141,19 +1141,15 @@ public:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
 
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-
 					m_spellcheck[i] = false;
 					return;
 				}
 
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+					uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
@@ -1193,9 +1189,11 @@ public:
 		data << dy << dx;
 		data << affect;
 		data << -affect;
-		target->SendMessageToSet(&data, true);
 		if (target->GetTypeId() == TYPEID_PLAYER)
+		{
 			static_cast<Player*>(target)->blinked = true;
+			static_cast<Player*>(target)->GetSession()->SendPacket(&data);
+		}
 	}
 
 	void stoned()
