@@ -258,8 +258,8 @@ public:
 	void SetSoulLinkedWith(Unit* target);
 	bool GetIsSoulLinked();
 	ASCENT_INLINE size_t getAITargetsCount() { return m_aiTargets.size(); }
-	ASCENT_INLINE uint32 getOutOfCombatRange() { return m_outOfCombatRange; }
-	void setOutOfCombatRange(uint32 val) { m_outOfCombatRange = val; }
+	ASCENT_INLINE float getOutOfCombatRange() { return m_outOfCombatRange; }
+	void setOutOfCombatRange(float val) { m_outOfCombatRange = val; }
 
 	// Spell
 	void CastSpell(Unit* caster, SpellEntry *spellInfo, SpellCastTargets targets);
@@ -434,7 +434,7 @@ protected:
 	uint32 m_fleeTimer;
 	bool m_hasFleed;
 	bool m_hasCalledForHelp;
-	uint32 m_outOfCombatRange;
+	float m_outOfCombatRange;
 
 	Unit *m_Unit;
 	Unit *m_PetOwner;
