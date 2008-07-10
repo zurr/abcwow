@@ -237,7 +237,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 					{
 					case INSTANCE_NULL:
 					case INSTANCE_PVP:
-						if (m_outOfCombatRange && _CalcDistanceFromHome <= m_outOfCombatRange)
+						if (m_outOfCombatRange && _CalcDistanceFromHome() <= m_outOfCombatRange)
 							target = FindTarget();
 						break;
 
