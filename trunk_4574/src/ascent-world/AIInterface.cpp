@@ -218,7 +218,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				{
 					if(m_Unit->GetTypeId() == TYPEID_UNIT)
 					{
-						if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
+						if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 						{
 							 m_Unit->GetMapMgr()->AddCombatInProgress(m_Unit->GetGUID());
 						}
@@ -340,9 +340,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				{
 					if(m_Unit->GetTypeId() == TYPEID_UNIT)
 					{
-						if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
+						if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 						{
-							  m_Unit->GetMapMgr()->RemoveCombatInProgress(m_Unit->GetGUID());
+							m_Unit->GetMapMgr()->RemoveCombatInProgress(m_Unit->GetGUID());
 						}
 					}
 				}
@@ -508,6 +508,17 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				SetFollowDistance(3.0f);
 				HandleEvent(EVENT_FOLLOWOWNER, m_Unit, 0);
 			}*/
+
+			if(m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
+			{
+				if(m_Unit->GetTypeId() == TYPEID_UNIT)
+				{
+					if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+					{
+						m_Unit->GetMapMgr()->RemoveCombatInProgress(m_Unit->GetGUID());
+					}
+				}
+			}
 
 			if(m_Unit->GetMapMgr())
 			{

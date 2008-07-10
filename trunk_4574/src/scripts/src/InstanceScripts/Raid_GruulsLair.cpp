@@ -1176,6 +1176,9 @@ public:
 
 	void knockback(Unit *target)
 	{
+		if (target->GetTypeId() != TYPEID_PLAYER)
+			return;
+
 		float ori = (float)RandomFloat(6.282f);
 		float dx,dy;
 		float affect = 18 + RandomFloat(4.0f);
@@ -1189,11 +1192,8 @@ public:
 		data << dy << dx;
 		data << affect;
 		data << -affect;
-		if (target->GetTypeId() == TYPEID_PLAYER)
-		{
-			static_cast<Player*>(target)->blinked = true;
-			static_cast<Player*>(target)->GetSession()->SendPacket(&data);
-		}
+		static_cast<Player*>(target)->blinked = true;
+		static_cast<Player*>(target)->GetSession()->SendPacket(&data);
 	}
 
 	void stoned()
