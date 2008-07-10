@@ -2317,7 +2317,8 @@ void Aura::SpellAuraDummy(bool apply)
 
 			if (!apply)
 			{
-				static_cast<Player *>(GetUnitCaster())->SetMisdirectionTarget(0);
+				sEventMgr.AddEvent(static_cast<Player*>(GetUnitCaster()), &Player::SetMisdirectionTarget,(uint64)0, EVENT_UNK, 250, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+				//static_cast<Player *>(GetUnitCaster())->SetMisdirectionTarget(0);
 			}
 		}break;
 
