@@ -1395,7 +1395,7 @@ public:
 	uint64 misdirectionTarget;
 
 	ASCENT_INLINE uint64 GetMisdirectionTarget(){return misdirectionTarget;}
-	ASCENT_INLINE void SetMisdirectionTarget(uint64 PlayerGUID){misdirectionTarget = PlayerGUID;}
+	ASCENT_INLINE void SetMisdirectionTarget(uint64 PlayerGUID){ misdirectionTarget = PlayerGUID; }
 
     uint32 SoulStone;
 	uint32 SoulStoneReceiver;
