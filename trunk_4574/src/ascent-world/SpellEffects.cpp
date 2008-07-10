@@ -2508,35 +2508,35 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 #ifdef COLLISION
 	if (CollideInterface.isCollitionMap(m_caster->GetMapId()))
 	{
-	if(!p_caster)
-		return;
+		if(!p_caster)
+			return;
 
-	float ori = m_caster->GetOrientation();				
-	float posX = m_caster->GetPositionX()+(radius*(cosf(ori)));
-	float posY = m_caster->GetPositionY()+(radius*(sinf(ori)));
-	float z = CollideInterface.GetHeight(m_caster->GetMapId(), posX, posY, m_caster->GetPositionZ() + 2.3f);
-	if(z == NO_WMO_HEIGHT)		// not found height, or on adt
-		z = m_caster->GetMapMgr()->GetLandHeight(posX,posY);
+		float ori = m_caster->GetOrientation();				
+		float posX = m_caster->GetPositionX()+(radius*(cosf(ori)));
+		float posY = m_caster->GetPositionY()+(radius*(sinf(ori)));
+		float z = CollideInterface.GetHeight(m_caster->GetMapId(), posX, posY, m_caster->GetPositionZ() + 2.3f);
+		if(z == NO_WMO_HEIGHT)		// not found height, or on adt
+			z = m_caster->GetMapMgr()->GetLandHeight(posX,posY);
 
-	if( fabs( z - m_caster->GetPositionZ() ) >= 10.0f )
-		return;
+		if( fabs( z - m_caster->GetPositionZ() ) >= 10.0f )
+			return;
 
-	LocationVector dest(posX, posY, z + 2.3f, ori);
-	LocationVector destest(posX, posY, dest.z, ori);
-	LocationVector src(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 2.3f);
+		LocationVector dest(posX, posY, z + 2.3f, ori);
+		LocationVector destest(posX, posY, dest.z, ori);
+		LocationVector src(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 2.3f);
 
-	if(CollideInterface.GetFirstPoint(m_caster->GetMapId(), src, destest, dest, -1.5f))
-	{
-		// hit an object new point is in dest.
-		// is this necessary?
-		//dest.z = CollideInterface.GetHeight(m_caster->GetMapId(), dest.x, dest.y, dest.z + 2.0f);
-	}
-	else
-		dest.z = z;
+		if(CollideInterface.GetFirstPoint(m_caster->GetMapId(), src, destest, dest, -1.5f))
+		{
+			// hit an object new point is in dest.
+			// is this necessary?
+			//dest.z = CollideInterface.GetHeight(m_caster->GetMapId(), dest.x, dest.y, dest.z + 2.0f);
+		}
+		else
+			dest.z = z;
 
-	dest.o = p_caster->GetOrientation();
-	p_caster->blinked = true;
-	p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), dest );
+		dest.o = p_caster->GetOrientation();
+		p_caster->blinked = true;
+		p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), dest );
 	}
 	else
 	{
@@ -2548,7 +2548,8 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 		data << cosf(p_caster->GetOrientation()) << sinf(p_caster->GetOrientation());
 		data << radius;
 		data << float(-10.0f);
-		m_caster->SendMessageToSet(&data, true);
+		p_caster->GetSession()->SendPacket(&data);
+		//m_caster->SendMessageToSet(&data, true);
 	}
 #else
 	p_caster->blinked = true;
