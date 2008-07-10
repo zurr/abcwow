@@ -230,7 +230,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				if( pUnit == NULL ) return;
 
 
-				Unit* target;
+				Unit* target = NULL;
 				if (m_Unit->GetMapMgr()->GetMapInfo() != NULL)
 				{
 					switch (m_Unit->GetMapMgr()->GetMapInfo()->type)
