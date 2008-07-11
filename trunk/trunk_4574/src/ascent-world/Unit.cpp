@@ -506,7 +506,7 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 	}
 }
 
-void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint32 dmg, uint32 abs )
+void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint32 dmg, uint32 abs , bool mainhand )
 {
 	++m_procCounter;
 	bool can_delete = !bProcInUse; //if this is a nested proc then we should have this set to TRUE by the father proc
@@ -568,6 +568,20 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						continue;
 			}
 
+			// handle "equipped item class/subclass"
+			// kinda hacky.
+			if( IsPlayer() )
+			{
+				if( ospinfo->EquippedItemClass && ospinfo->EquippedItemSubClass )
+				{
+					Item * itm;
+					if( itm = static_cast<Player*>(this)->GetItemInterface()->GetInventoryItem( mainhand ? EQUIPMENT_SLOT_MAINHAND : EQUIPMENT_SLOT_OFFHAND ) )
+					{
+						if( itm->GetProto()->Class != ospinfo->EquippedItemClass || !(( 1 << itm->GetProto()->SubClass ) & ospinfo->EquippedItemSubClass) )
+							continue; // not applicable
+					}
+				}
+			}
 			uint32 proc_Chance = itr2->procChance;
 			SpellEntry* spe  = dbcSpell.LookupEntry( spellId );
 
@@ -3139,10 +3153,10 @@ else
 	// the above code was remade it for reasons : damage shield needs moslty same flags as handleproc + dual wield should proc too ?
 	if( !disable_proc && weapon_damage_type != OFFHAND )
     {
-		this->HandleProc(aproc,pVictim, ability,realdamage,abs); //maybe using dmg.resisted_damage is better sometimes but then if using godmode dmg is resisted instead of absorbed....bad
+		this->HandleProc(aproc,pVictim, ability,realdamage,abs,(weapon_damage_type == OFFHAND) ? false : true ); //maybe using dmg.resisted_damage is better sometimes but then if using godmode dmg is resisted instead of absorbed....bad
 		m_procCounter = 0;
 
-		pVictim->HandleProc(vproc,this, ability,realdamage,abs);
+		pVictim->HandleProc(vproc,this, ability,realdamage,abs,(weapon_damage_type == OFFHAND) ? false : true);
 		pVictim->m_procCounter = 0;
 
 		if(realdamage > 0)
@@ -5084,8 +5098,12 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 							if( spi && spi->NameHash != SPELL_HASH_SMITE )
 								continue;
 						}break;
-					case 34936:		// Backlash
-						{
+					case 34936:	// Backlash
+ 						{
+							if( m_currentSpell && m_currentSpell->m_spellInfo->NameHash == SPELL_HASH_SHADOW_BOLT )
+								continue;
+							if( m_currentSpell && m_currentSpell->m_spellInfo->NameHash == SPELL_HASH_INCINERATE )
+								continue;
 							SpellEntry *spi = dbcSpell.LookupEntry( skip );
 							if( spi && spi->NameHash != SPELL_HASH_SHADOW_BOLT && spi->NameHash != SPELL_HASH_INCINERATE )
 								continue;
@@ -5093,18 +5111,10 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 
 					case 17941: //Shadow Trance
 						{
+							if( m_currentSpell && m_currentSpell->m_spellInfo->NameHash == SPELL_HASH_SHADOW_BOLT)
+								continue;
 							SpellEntry *spi = dbcSpell.LookupEntry( skip );
 							if( spi && spi->NameHash != SPELL_HASH_SHADOW_BOLT )
-								continue;
-						}break;
-					case 18708: //Fel Domination
-						{
-							SpellEntry *spi = dbcSpell.LookupEntry( skip );
-							if( spi && spi->NameHash != SPELL_HASH_SUMMON_IMP &&
-								spi->NameHash != SPELL_HASH_SUMMON_VOIDWALKER &&
-								spi->NameHash != SPELL_HASH_SUMMON_SUCCUBUS &&
-								spi->NameHash != SPELL_HASH_SUMMON_FELHUNTER &&
-								spi->NameHash != SPELL_HASH_SUMMON_FELGUARD )
 								continue;
 						}break;
 				}

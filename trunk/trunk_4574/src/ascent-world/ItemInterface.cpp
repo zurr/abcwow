@@ -3040,3 +3040,31 @@ void ItemInterface::CheckAreaItems()
 		}
 	}
 }
+
+// Function for Unique-Equipped gems.
+// GemID: Gem Item ID
+// IgnoreSlot: ignore the item which is equipped in this in this slot
+bool ItemInterface::HasGemEquipped( uint32 GemID , int8 IgnoreSlot /* = -1 */ )
+{
+	Item * itm;
+	EnchantEntry * ench;
+	for( uint32 x = EQUIPMENT_SLOT_START; x <= EQUIPMENT_SLOT_END; ++x )
+	{
+		if( x == IgnoreSlot )
+			continue;
+		if( m_pItems[x] != NULL )
+		{
+			itm = m_pItems[x];
+			if( !itm->HasEnchantments() )
+				continue;
+			for( uint32 z = 2 ; z <= 5 ; z ++ )
+			{
+				ench = itm->GetEnchantment( z ) ? itm->GetEnchantment( z )->Enchantment : 0;
+				if( ench && ench->GemEntry == GemID )
+					return true; // get out of my socket
+			}
+			
+		}
+	}
+	return false; // woot, we can equip/socket this :)
+}

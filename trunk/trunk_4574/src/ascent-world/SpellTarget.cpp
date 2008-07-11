@@ -720,13 +720,17 @@ void Spell::SpellTargetPartyMember(uint32 i, uint32 j)
 	SubGroup * subgroup = Target->GetGroup() ?
 		Target->GetGroup()->GetSubGroup(Target->GetSubGroup()) : 0;
 
+	float r;
+	r = GetRadius( i );
 	if(subgroup)
 	{
 		Target->GetGroup()->Lock();
 		for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
 		{
-			if((*itr)->m_loggedInPlayer)
+			if((*itr)->m_loggedInPlayer && ( r > 0.0f ? IsInrange(Target->GetPositionX(),Target->GetPositionY(),Target->GetPositionZ(),(*itr)->m_loggedInPlayer,r*r) : true ) )
+			{
 				SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
+			}
 		}
 		Target->GetGroup()->Unlock();
 	}

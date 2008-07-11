@@ -104,6 +104,7 @@ struct GameObjectInfo
 	// Quests
 	GameObjectGOMap goMap;
 	GameObjectItemMap itemMap;
+	GossipScript * gossip_script;
 };
 #pragma pack(pop)
 
@@ -179,6 +180,7 @@ public:
 	//void LoadFromDB(GameObjectTemplate *t);
 	void DeleteFromDB();
 	void EventCloseDoor();
+	void EventCastSpell(uint32 guid, uint32 sp, bool triggered);
 
 	//Fishing stuff
 	void UseFishingNode(Player *player);

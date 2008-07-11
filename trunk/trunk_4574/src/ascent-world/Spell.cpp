@@ -2851,7 +2851,7 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 
 		// item spell checks
-		if(i_caster)
+		if(i_caster && i_caster->GetProto())
 		{
 			if( i_caster->GetProto()->ZoneNameID && i_caster->GetProto()->ZoneNameID != i_caster->GetZoneId() ) 
 				return SPELL_FAILED_NOT_HERE;
@@ -3268,6 +3268,19 @@ uint8 Spell::CanCast(bool tolerate)
 				case 38177:
 				{
 					if(target->GetEntry() != 21387)
+						return SPELL_FAILED_BAD_TARGETS;
+				}break;
+				case 44997:
+				{
+					if( target && target->IsCreature() && target->GetEntry()!=24972 ) // Erratic Sentry
+						return SPELL_FAILED_BAD_TARGETS;
+
+					if( target && target->IsCreature() && !target->isDead() )
+						return SPELL_FAILED_TARGET_NOT_DEAD;
+				}break;
+				case 30077:
+				{
+					if( target && target->IsCreature() && target->GetEntry()!=17226 ) // Viera Sunwhisper
 						return SPELL_FAILED_BAD_TARGETS;
 				}break;
 				/* adding this is plain stupid

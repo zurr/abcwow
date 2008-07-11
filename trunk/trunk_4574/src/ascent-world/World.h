@@ -382,6 +382,8 @@ public:
 	void SendZoneMessage(WorldPacket *packet, uint32 zoneid, WorldSession *self = 0);
 	void SendInstanceMessage(WorldPacket *packet, uint32 instanceid, WorldSession *self = 0);
 	void SendFactionMessage(WorldPacket *packet, uint8 teamId);
+	void SendGamemasterMessage(WorldPacket *packet, WorldSession *self = 0);
+	void SendGMWorldText(const char* text, WorldSession *self = 0);
 
 	ASCENT_INLINE void SetStartTime(uint32 val) { m_StartTime = val; }
 	ASCENT_INLINE uint32 GetUptime(void) { return (uint32)UNIXTIME - m_StartTime; }
@@ -493,6 +495,17 @@ public:
 	bool flood_message;
 	bool gm_skip_attunement;
 
+	string announce_tag;
+	bool GMAdminTag;
+	bool NameinAnnounce;
+	bool NameinWAnnounce;
+	bool announce_output;
+
+	string ann_namecolor;
+	string ann_gmtagcolor;
+	string ann_tagcolor;
+	string ann_msgcolor;
+
 	bool show_gm_in_who_list;
 	//bool allow_gm_friends;
 	uint32 map_unload_time;
@@ -568,8 +581,11 @@ public:
 	list<SpellEntry*> dummyspells;
 	uint32 m_levelCap;
 	uint32 m_genLevelCap;
+	uint32 m_startLevel;
 	bool m_limitedNames;
 	bool m_useAccountData;
+	bool m_forceGMTag;
+	bool m_showKick;
 
 	char * m_banTable;
 

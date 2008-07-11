@@ -415,6 +415,28 @@ void WorldSession::HandleSwapInvItemOpcode( WorldPacket & recv_data )
 		}
 	}
 
+		// extra check needed here for gems, because CanEquipInSlot does not pass enchantments, etc.
+	// src is the item we're equipping, dst is the item we're replacing
+	if( dstslot < EQUIPMENT_SLOT_END && srcitem->HasEnchantments() )
+	{
+		ItemPrototype * gemitm;
+		for( uint32 x = 2 ; x < 5 ; x ++ )
+		{
+			if( srcitem->GetEnchantment( x ) )
+			{
+				gemitm = ItemPrototypeStorage.LookupEntry( srcitem->GetEnchantment( x )->Enchantment->GemEntry );
+				if( !gemitm || ( gemitm && !( gemitm->Flags & ITEM_FLAG_UNIQUE_EQUIP ) ) )
+					continue; // baaad boy
+				if( _player->GetItemInterface()->HasGemEquipped( srcitem->GetEnchantment( x )->Enchantment->GemEntry , dstslot ) )
+				{
+					Log.Debug( "HandleSwapInvItemOpcode" , "testing gem %u on item %u" , srcitem->GetEnchantment( x )->Enchantment->GemEntry , srcitem->GetProto()->ItemId );
+					_player->GetItemInterface()->BuildInventoryChangeError( srcitem, dstitem, INV_ERR_ITEM_MAX_COUNT_EQUIPPED_SOCKETED );
+					return;
+				}
+			}
+		}
+	}
+
 	if(dstitem)
 	{
 		if((error=_player->GetItemInterface()->CanEquipItemInSlot(INVENTORY_SLOT_NOT_SET, srcslot, dstitem->GetProto(), skip_combat)))
@@ -594,6 +616,27 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 	{
 		_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL,INV_ERR_ITEM_CANT_BE_EQUIPPED);
 		return;
+	}
+
+	// handle equipping of items which have unique-equipped gems
+	if( eitem->HasEnchantments() )
+	{
+		EnchantmentInstance * enchinst;
+		ItemPrototype * gemproto;
+		for( uint32 x = 2 ; x < 5 ; x ++ )
+		{
+			if( eitem->GetEnchantment( x ) )
+			{
+				enchinst = eitem->GetEnchantment( x );
+				gemproto = ItemPrototypeStorage.LookupEntry( enchinst->Enchantment->GemEntry );
+				if( gemproto && gemproto->Flags & ITEM_FLAG_UNIQUE_EQUIP && _player->GetItemInterface()->HasGemEquipped( enchinst->Enchantment->GemEntry , SrcSlot ) )
+				{
+					// boo-hoo, we got one already :/
+					_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL,INV_ERR_ITEM_UNIQUE_EQUIPPABLE); // wrong error code
+					return;
+				}
+			}
+		}
 	}
 
 	// handle equipping of 2h when we have two items equipped! :) special case.
@@ -1062,6 +1105,9 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 	recv_data >> bagguid; 
 	recv_data >> slot;
 	recv_data >> amount;
+
+	if(amount == 0)
+		return;
 
 	if( _player->isCasting() )
 		_player->InterruptSpell();
@@ -1876,7 +1922,17 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 			Item * it=_player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(gemguid,true);
 			if(!it)
 				continue;
-
+			if( it->GetProto()->Flags & ITEM_FLAG_UNIQUE_EQUIP && _player->GetItemInterface()->HasGemEquipped( it->GetProto()->ItemId , -1 ) )
+			{
+				_player->GetItemInterface()->BuildInventoryChangeError( TargetItem , TargetItem , INV_ERR_ITEM_MAX_COUNT_EQUIPPED_SOCKETED );
+				// .. we removed the gem, so we gotta recompensate it :x
+				// afaik, ugly solution. However, it has the interesting bonus of being able to automatically remove the gem from the socketing screen!
+				SlotResult sr;
+				sr = _player->GetItemInterface()->FindFreeInventorySlot( it->GetProto() );
+				if( sr.Result )
+					_player->GetItemInterface()->SafeAddItem( it , sr.ContainerSlot , sr.Slot );
+				continue;
+			}
 			gp = dbcGemProperty.LookupEntry(it->GetProto()->GemProperties);
 			delete it;
 		

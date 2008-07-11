@@ -390,6 +390,13 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 	// check for no more damage left (chains)
 	if(!dmg) return;
 
+	/*********************************************************************
+	 CONFLAGRATE SHOULD REMOVE THE IMMOLATE DEBUFF
+	 **********************************************************************/
+	if( m_spellInfo->NameHash == SPELL_HASH_CONFLAGRATE )
+		if( unitTarget->HasAurasWithNameHash(SPELL_HASH_IMMOLATE) )
+			unitTarget->RemoveAuraByNameHash(SPELL_HASH_IMMOLATE );
+
 	/**************************************************************************
 	* This handles the correct damage of "Judgement of Command" (all ranks)
 	**************************************************************************/
@@ -4570,15 +4577,14 @@ void Spell::SpellEffectSanctuary(uint32 i) // Stop all attacks made to you
 		return;
 
 	Object::InRangeSet::iterator itr = u_caster->GetInRangeOppFactsSetBegin();
-	Object::InRangeSet::iterator itr_end = u_caster->GetInRangeOppFactsSetBegin();
-	Unit * pUnit;
+	Object::InRangeSet::iterator itr_end = u_caster->GetInRangeOppFactsSetEnd();
+	Unit * pUnit = NULL;
 
 	for( ; itr != itr_end; ++itr ) {
 		pUnit = static_cast<Unit*>(*itr);
-		++itr;
 
 		if( pUnit->GetTypeId() == TYPEID_UNIT )
-			pUnit->GetAIInterface()->RemoveThreatByPtr( u_caster );
+			pUnit->GetAIInterface()->RemoveThreatByPtr( unitTarget );
 	}
 }
 
