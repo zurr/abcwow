@@ -3704,7 +3704,6 @@ public:
 			_unit->GetAIInterface()->setWaypointToMove(3);
 		}
 
-
 		spells[0].info = dbcSpell.LookupEntry(COILFANGSTRIDER_MINDBLAST);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
@@ -3720,7 +3719,7 @@ public:
 	void OnCombatStart(Unit* mTarget)
 	{
 		RegisterAIUpdateEvent(1000);
-		//CastTime();
+		CastTime();
 	}
 
 	void OnCombatStop(Unit *mTarget)
@@ -3744,7 +3743,7 @@ public:
 
 		if (!m_fear)
 		{
-			_unit->CastSpell(_unit, COILFANGSTRIDER_PANIC, true);
+			_unit->CastSpell(_unit, COILFANGSTRIDER_PANIC, false);
 			m_fear = 2;
 		}
 		else
@@ -4901,6 +4900,49 @@ protected:
 	int specialcd;
 };
 
+//Greyheart Techincan
+
+#define CN_GREYHEARTTECHNICAN 21263
+
+class GREYHEARTTECHNICANAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(GREYHEARTTECHNICANAI);
+
+	GREYHEARTTECHNICANAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+	}
+
+	void OnCombatStart(Unit* mTarget)
+	{
+		RegisterAIUpdateEvent(1000);
+		Creature *master = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 21301);
+		if (master != NULL)
+			master->GetAIInterface()->AttackReaction(mTarget, 1, 0);
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void OnTargetDied(Unit* mTarget)
+	{ 
+	}
+	void AIUpdate()
+	{
+	}
+
+protected:
+};
+
 void SetupSerpentshrineCavern(ScriptMgr * mgr)
 {
 	//Hydross the Unstable
@@ -4936,7 +4978,7 @@ void SetupSerpentshrineCavern(ScriptMgr * mgr)
 
 	//Lady Vashj
 	mgr->register_creature_script(CN_VASHJ, &VASHJAI::Create);
-	//mgr->register_creature_script(CN_COILFANGSTRIDER, &COILFANGSTRIDERAI::Create);
+	mgr->register_creature_script(CN_COILFANGSTRIDER, &COILFANGSTRIDERAI::Create);
 	mgr->register_creature_script(CN_COILFANGELITE, &COILFANGELITEAI::Create);
 	mgr->register_creature_script(CN_ENCHANTEDELEMTAL, &ENCHANTEDELEMENTALAI::Create);
 	mgr->register_creature_script(CN_TAINTEDELEMTAL, &TAINTEDELEMTALAI::Create);
@@ -4945,4 +4987,5 @@ void SetupSerpentshrineCavern(ScriptMgr * mgr)
 	//Trash Mobs
 	mgr->register_creature_script(CN_UNDERBOGCOLOSSUS, &UNDERBOGCOLOSSUSAI::Create);
 	mgr->register_creature_script(CN_GREYHEARTNETHERMAGE, &GREYHEARTNETHERMAGEAI::Create);
+	mgr->register_creature_script(CN_GREYHEARTTECHNICAN, &GREYHEARTTECHNICANAI::Create);
 }
