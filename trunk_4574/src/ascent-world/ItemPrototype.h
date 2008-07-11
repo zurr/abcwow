@@ -224,6 +224,21 @@ enum INV_ERR
 	INV_ERR_ITEM_RANK_NOT_ENOUGH,
 	INV_ERR_ITEM_REPUTATION_NOT_ENOUGH,
 	INV_ERR_MORE_THAN1_SPECIAL_BAG,
+	INV_ERR_LOOT_CANT_LOOT_THAT_NOW,	// "You can't loot that item now."
+	INV_ERR_ITEM_UNIQUE_EQUIPPABLE,	// "You cannot equip more than one of those."
+	INV_ERR_VENDOR_MISSING_TURNINS,	// "You do not have the required items for that purchase"
+	INV_ERR_NOT_ENOUGH_HONOR_POINTS,	// "You don't have enough honor points"
+	INV_ERR_NOT_ENOUGH_ARENA_POINTS,	// "You don't have enough arena points"
+	INV_ERR_ITEM_MAX_COUNT_SOCKETED,	// "You have the maximum number of those gems in your inventory or socketed into items."
+	INV_ERR_MAIL_BOUND_ITEM,	// "You can't mail soulbound items."
+	INV_ERR_INTERNAL_BAG_ERROR,	// "Internal Bag Error"
+	INV_ERR_BAG_FULL7,	// "That bag is full."
+	INV_ERR_ITEM_MAX_COUNT_EQUIPPED_SOCKETED,	// "You have the maximum number of those gems socketed into equipped items."
+	INV_ERR_ITEM_UNIQUE_EQUIPPABLE_SOCKETED,	// "You cannot socket more than one of those gems into a single item."
+	INV_ERR_TOO_MUCH_GOLD,	// "At gold limit"; -- When trading money to a player and the trade would put them over the gold limit
+	INV_ERR_NOT_DURING_ARENA_MATCH,	// "You can't do that while in an arena match"
+	INV_ERR_TRADE_BOUND_ITEM,	// "You can't trade a soulbound item."
+	INV_ERR_CANT_EQUIP_RATING,	// "Your personal or team arena rating is too low for that item"
 };
 
 enum ITEM_STAT_TYPE

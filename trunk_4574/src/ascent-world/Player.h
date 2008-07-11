@@ -1921,15 +1921,15 @@ private:
 
 	void Social_SendFriendList(uint32 flag);
 	
+
+	void Social_SetNote(uint32 guid, const char * note);
+
+public:
 	void Social_AddFriend(const char * name, const char * note);
 	void Social_RemoveFriend(uint32 guid);
 	
 	void Social_AddIgnore(const char * name);
 	void Social_RemoveIgnore(uint32 guid);
-
-	void Social_SetNote(uint32 guid, const char * note);
-
-public:
 	bool Social_IsIgnoring(PlayerInfo * m_info);
 	bool Social_IsIgnoring(uint32 guid);
 

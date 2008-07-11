@@ -29,7 +29,7 @@ class Unit;
 
 enum ChatMsg
 {
-	CHAT_MSG_ADDON									= 0,
+	CHAT_MSG_ADDON									= -1,
 	CHAT_MSG_SAY									= 1,
 	CHAT_MSG_PARTY									= 2,
 	CHAT_MSG_RAID									= 3,
@@ -111,6 +111,7 @@ enum Languages
 #define MSG_COLOR_LIGHTBLUE	 "|cff00ccff"
 #define MSG_COLOR_BLUE		  "|cff0000ff"
 #define MSG_COLOR_GREEN		 "|cff00ff00"
+#define MSG_COLOR_ANN_GREEN	 "|c1f40af20"
 #define MSG_COLOR_RED		   "|cffff0000"
 #define MSG_COLOR_GOLD		  "|cffffcc00"
 #define MSG_COLOR_GREY		  "|cff888888"
@@ -154,6 +155,7 @@ class SERVER_DECL CommandTableStorage : public Singleton<CommandTableStorage>
 	ChatCommand * _recallCommandTable;
 	ChatCommand * _commandTable;
 	ChatCommand * _GuildCommandTable;
+	ChatCommand * _charCommandTable;
 
 	ChatCommand * GetSubCommandTable(const char * name);
 public:
@@ -216,6 +218,7 @@ protected:
 	bool HandleAppearCommand(const char* args, WorldSession *m_session);
 	bool HandleAnnounceCommand(const char* args, WorldSession *m_session);
 	bool HandleWAnnounceCommand(const char* args, WorldSession *m_session);
+	bool HandleGMAnnounceCommand(const char* args, WorldSession *m_session);
 	bool HandleGMOnCommand(const char* args, WorldSession *m_session);
 	bool HandleGMOffCommand(const char* args, WorldSession *m_session);
 	bool HandleGPSCommand(const char* args, WorldSession *m_session);
@@ -438,6 +441,9 @@ protected:
 	bool HandleGlobalPlaySoundCommand(const char* args, WorldSession * m_session);
 	bool HandleRecallPortPlayerCommand(const char* args, WorldSession * m_session);
 
+	//character
+	bool HandleAddFriendCommand(const char* args, WorldSession * m_session);
+
 	// bans
 	bool HandleIPBanCommand(const char * args, WorldSession * m_session);
 	bool HandleIPUnBanCommand(const char * args, WorldSession * m_session);
@@ -446,11 +452,11 @@ protected:
 	//
 	bool HandleRemoveItemCommand(const char * args, WorldSession * m_session);
 
-	//
+	//rename
 	bool HandleRenameCommand(const char * args, WorldSession * m_session);
 	bool HandleForceRenameCommand(const char * args, WorldSession * m_session);
 
-	//
+	//standing
 	bool HandleGetStandingCommand(const char * args, WorldSession * m_session);
 	bool HandleSetStandingCommand(const char * args, WorldSession * m_session);
 	bool HandleGetBaseStandingCommand(const char * args, WorldSession * m_session);

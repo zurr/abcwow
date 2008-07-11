@@ -11570,13 +11570,6 @@ void Apply112SpellFixes()
 		sp->EffectSpellGroupRelation[0] = 256;
 	}
 
-	// Spell 17941 Group Relation (Shadow Trance )
-	sp = dbcSpell.LookupEntryForced(17941);
-	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 1;
-		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
-	}
-
 	// Spell 17954 Group Relation (Emberstorm Rank 1)
 	sp = dbcSpell.LookupEntryForced(17954);
 	if(sp != NULL) {
@@ -11742,7 +11735,8 @@ void Apply112SpellFixes()
 	// Spell 18288 Group Relation (Amplify Curse )
 	sp = dbcSpell.LookupEntryForced(18288);
 	if(sp != NULL) {
-		sp->EffectSpellGroupRelation[0] = 33792;
+		sp->EffectSpellGroupRelation[0] = 1024;
+		sp->EffectSpellGroupRelation_high[0] = 2;
 		sp->EffectSpellGroupRelation[1] = 4194304;
 	}
 
@@ -14196,6 +14190,24 @@ void ApplyNormalFixes()
 		//////////////////////////////////////////
 
 		// Insert warrior spell fixes here
+
+			// Sword Specialization - Rank 1 to 5 - Proc Chance
+			// 12281 12812 12813 12814
+			sp = dbcSpell.LookupEntryForced(12281); // Rank 1
+			if(sp != NULL)
+			sp->procChance = 1;
+			sp = dbcSpell.LookupEntryForced(12812); // Rank 2
+			if(sp != NULL)
+			sp->procChance = 2;
+			sp = dbcSpell.LookupEntryForced(12813); // Rank 3
+			if(sp != NULL)
+			sp->procChance = 3;
+			sp = dbcSpell.LookupEntryForced(12814); // Rank 4
+			if(sp != NULL)
+			sp->procChance = 4;
+			sp = dbcSpell.LookupEntryForced(12815); // Rank 5
+			if(sp != NULL)
+			sp->procChance = 5;
 
 		//////////////////////////////////////////
 		// PALADIN								//
@@ -18071,7 +18083,7 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 34936 );
 		if (sp != NULL)
 		{
-			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
+			sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
 			sp->EffectSpellGroupRelation[0] = 1 ;
 			sp->EffectSpellGroupRelation_high[0] = 64;
 		}
@@ -18173,7 +18185,7 @@ void ApplyNormalFixes()
 		{
 			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 			sp->EffectTriggerSpell[0] = 17941;
-			sp->procFlags = PROC_ON_CAST_SPELL;
+			sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION | PROC_TARGET_SELF;
 			sp->procChance = 2;
 		}
 		sp = dbcSpell.LookupEntryForced( 18095 );
@@ -18181,8 +18193,42 @@ void ApplyNormalFixes()
 		{
 			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 			sp->EffectTriggerSpell[0] = 17941;
-			sp->procFlags = PROC_ON_CAST_SPELL;
+			sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION | PROC_TARGET_SELF;
 			sp->procChance = 4;
+		}
+
+		//Shadow Trance should be removed on the first SB
+		sp = dbcSpell.LookupEntryForced( 17941 );
+		if( sp != NULL )
+		{
+			sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
+			sp->EffectSpellGroupRelation[0] = 1;
+		}
+		//Fel Concentration
+		sp = dbcSpell.LookupEntryForced( 17783 );
+		if( sp != NULL)
+		{
+			sp->EffectSpellGroupRelation[0] = 8 | 16 | 16384;
+		}
+		sp = dbcSpell.LookupEntryForced( 17784 );
+		if( sp != NULL)
+		{
+			sp->EffectSpellGroupRelation[0] = 8 | 16 | 16384;
+		}
+		sp = dbcSpell.LookupEntryForced( 17785 );
+		if( sp != NULL)
+		{
+			sp->EffectSpellGroupRelation[0] = 8 | 16 | 16384;
+		}
+		sp = dbcSpell.LookupEntryForced( 17786 );
+		if( sp != NULL)
+		{
+			sp->EffectSpellGroupRelation[0] = 8 | 16 | 16384;
+		}
+		sp = dbcSpell.LookupEntryForced( 17787 );
+		if( sp != NULL)
+		{
+			sp->EffectSpellGroupRelation[0] = 8 | 16 | 16384;
 		}
 
 		//warlock: Contagion
@@ -18370,15 +18416,6 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->EffectSpellGroupRelation[0] = 32768;
 
-		//warlock - Amplify Curse
-		sp = dbcSpell.LookupEntryForced( 18288 );
-		if( sp != NULL )
-		{
-			sp->EffectSpellGroupRelation[0] = 1024;
-			sp->EffectSpellGroupRelation_high[0] = 2;
-			sp->EffectSpellGroupRelation[1] = 4194304;
-		}
-
 		//warlock - Improved Howl of Terror
 		sp = dbcSpell.LookupEntryForced( 30054 );
 		if( sp != NULL )
@@ -18542,19 +18579,34 @@ void ApplyNormalFixes()
 		//warlock - Suppression
 		sp = dbcSpell.LookupEntryForced( 18174 );
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304; //affliction spell
+		{
+			sp->EffectSpellGroupRelation[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+			sp->EffectSpellGroupRelation_high[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		}
 		sp = dbcSpell.LookupEntryForced( 18175 );
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		{
+			sp->EffectSpellGroupRelation[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+			sp->EffectSpellGroupRelation_high[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		}
 		sp = dbcSpell.LookupEntryForced( 18176 );
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		{
+			sp->EffectSpellGroupRelation[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+			sp->EffectSpellGroupRelation_high[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		}
 		sp = dbcSpell.LookupEntryForced( 18177 );
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		{
+			sp->EffectSpellGroupRelation[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+			sp->EffectSpellGroupRelation_high[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		}
 		sp = dbcSpell.LookupEntryForced( 18178 );
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		{
+			sp->EffectSpellGroupRelation[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+			sp->EffectSpellGroupRelation_high[0] = 1 | 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		}
 
 		//warlock - Improved Curse of Agony
 		sp = dbcSpell.LookupEntryForced( 18827 );
@@ -18567,10 +18619,16 @@ void ApplyNormalFixes()
 		//warlock - Grim Reach
 		sp = dbcSpell.LookupEntryForced( 18218 );
 		if( sp != NULL )
+		{
 			sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+			sp->EffectSpellGroupRelation_high[0] = 1 | 2 | 1024 ;
+		}
 		sp = dbcSpell.LookupEntryForced( 18219 );
 		if( sp != NULL )
+		{
 			sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+			sp->EffectSpellGroupRelation_high[0] = 1 | 2 | 1024 ;
+		}
 
 		//warlock - Demonic Sacrifice
 		sp = dbcSpell.LookupEntryForced( 18789 );
@@ -18661,18 +18719,21 @@ void ApplyNormalFixes()
 		{
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 4096 | 8388608;
 		}
 		sp = dbcSpell.LookupEntryForced( 18695 );
 		if( sp != NULL )
 		{
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 4096 | 8388608;
 		}
 		sp = dbcSpell.LookupEntryForced( 18696 );
 		if( sp != NULL )
 		{
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 4096 | 8388608;
 		}
 
 		//warlock - Improved Voidwalker
@@ -18681,18 +18742,21 @@ void ApplyNormalFixes()
 		{
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 33554432;
 		}
 		sp = dbcSpell.LookupEntryForced( 18706 );
 		if( sp != NULL )
 		{
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 33554432;
 		}
 		sp = dbcSpell.LookupEntryForced( 18707 );
 		if( sp != NULL )
 		{
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 33554432;
 		}
 
 		//warlock - Improved Succubus
@@ -18702,6 +18766,8 @@ void ApplyNormalFixes()
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 			sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 8192 | 1073741824;
+			sp->EffectSpellGroupRelation[1] = 1073741824;
 		}
 		sp = dbcSpell.LookupEntryForced( 18755 );
 		if( sp != NULL )
@@ -18709,6 +18775,8 @@ void ApplyNormalFixes()
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 			sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 8192 | 1073741824;
+			sp->EffectSpellGroupRelation[1] = 1073741824;
 		}
 		sp = dbcSpell.LookupEntryForced( 18756 );
 		if( sp != NULL )
@@ -18716,6 +18784,8 @@ void ApplyNormalFixes()
 			sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 			sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+			sp->EffectSpellGroupRelation[0] = 8192 | 1073741824;
+			sp->EffectSpellGroupRelation[1] = 1073741824;
 		}
 
 		//warlock - Fel Intellect

@@ -56,11 +56,14 @@ World::World()
 	SocketSendBufSize = WORLDSOCKET_SENDBUF_SIZE;
 	SocketRecvBufSize = WORLDSOCKET_RECVBUF_SIZE;
 #endif
+	m_startLevel=1;
 	m_levelCap=70;
 	m_genLevelCap=70;
 	m_limitedNames=false;
 	m_banTable = NULL;
 	m_speedHackThreshold = -600.0f;
+	m_forceGMTag = false;
+	m_showKick = true;
 }
 
 void CleanupRandomNumberGenerators();
@@ -600,6 +603,23 @@ void World::SendGlobalMessage(WorldPacket *packet, WorldSession *self)
 
 	m_sessionlock.ReleaseReadLock();
 }
+void World::SendGamemasterMessage(WorldPacket *packet, WorldSession *self)
+{
+ 	m_sessionlock.AcquireReadLock();
+ 	SessionMap::iterator itr;
+ 	for(itr = m_sessions.begin(); itr != m_sessions.end(); itr++)
+ 	{
+	  if (itr->second->GetPlayer() &&
+	  itr->second->GetPlayer()->IsInWorld()
+	  && itr->second != self)  // dont send to self!
+	  {
+ 		if(itr->second->CanUseCommand('u'))
+ 		itr->second->SendPacket(packet);
+	  }
+ 	}
+ 	m_sessionlock.ReleaseReadLock();
+}
+
 void World::SendFactionMessage(WorldPacket *packet, uint8 teamId)
 {
 	m_sessionlock.AcquireReadLock();
@@ -634,6 +654,26 @@ void World::SendZoneMessage(WorldPacket *packet, uint32 zoneid, WorldSession *se
 	}
 
 	m_sessionlock.ReleaseReadLock();
+}
+
+void World::SendGMWorldText(const char* text, WorldSession *self)
+{
+    uint32 textLen = (uint32)strlen((char*)text) + 1;
+
+    WorldPacket data(textLen + 40);
+
+	data.Initialize(SMSG_MESSAGECHAT);
+	data << uint8(CHAT_MSG_SYSTEM);
+	data << uint32(LANG_UNIVERSAL);
+	
+	data << (uint64)0;
+	data << (uint32)0;
+	data << (uint64)0;
+
+	data << textLen;
+	data << text;
+	data << uint8(0);
+	SendGamemasterMessage(&data, self);
 }
 
 void World::SendInstanceMessage(WorldPacket *packet, uint32 instanceid, WorldSession *self)
@@ -675,6 +715,7 @@ void World::SendWorldText(const char* text, WorldSession *self)
 
 	SendGlobalMessage(&data, self);
 
+	if(announce_output)
 	sLog.outString("> %s", text);
 }
 
@@ -684,6 +725,8 @@ void World::SendWorldWideScreenText(const char *text, WorldSession *self)
 	data.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
 	data << (uint32)0 << text << (uint8)0x00;
 	SendGlobalMessage(&data, self);
+	if(announce_output)
+	sLog.outString("> %s", text);
 }
 
 void World::UpdateSessions(uint32 diff)
@@ -1240,6 +1283,16 @@ void World::Rehash(bool load)
 	if(!flood_lines || !flood_seconds)
 		flood_lines = flood_seconds = 0;
 
+	announce_tag = Config.MainConfig.GetStringDefault("Announce", "Tag", "Staff");
+	GMAdminTag = Config.MainConfig.GetBoolDefault("Announce", "GMAdminTag", false);
+	NameinAnnounce = Config.MainConfig.GetBoolDefault("Announce", "NameinAnnounce", true);
+	NameinWAnnounce = Config.MainConfig.GetBoolDefault("Announce", "NameinWAnnounce", true);
+	announce_output = Config.MainConfig.GetBoolDefault("Announce", "ShowInConsole", true);
+	ann_namecolor = Config.MainConfig.GetStringDefault("Color", "AnnNameColor", "|c1f40af20");
+	ann_gmtagcolor = Config.MainConfig.GetStringDefault("Color", "AnnGMTagColor", "|cffff6060");
+	ann_tagcolor = Config.MainConfig.GetStringDefault("Color", "AnnTagColor", "|cff00ccff");
+	ann_msgcolor = Config.MainConfig.GetStringDefault("Color", "AnnMsgColor", "|cffffcc00");
+
 	map_unload_time=Config.MainConfig.GetIntDefault("Server", "MapUnloadTime", 0);
 
 	antihack_teleport = Config.MainConfig.GetBoolDefault("AntiHack", "Teleport", true);
@@ -1249,10 +1302,14 @@ void World::Rehash(bool load)
 	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", false);
 	m_speedHackThreshold = Config.MainConfig.GetFloatDefault("AntiHack", "SpeedThreshold", -600.0f);
 	SpeedhackProtection = antihack_speed;
+	m_startLevel = Config.MainConfig.GetIntDefault("Server", "StartingLevel", 1);
+	if(m_startLevel > 70) {m_startLevel = 70;} //force the startLevel to not be higher than 70
 	m_levelCap = Config.MainConfig.GetIntDefault("Server", "LevelCap", 70);
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
 	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);
 	m_useAccountData = Config.MainConfig.GetBoolDefault("Server", "UseAccountData", false);
+	m_forceGMTag = Config.MainConfig.GetBoolDefault("Server", "ForceGMTag", false);
+	m_showKick = Config.MainConfig.GetBoolDefault("Server", "ShowKickMessage", true);
 
 	// ======================================
 	m_movementCompressInterval = Config.MainConfig.GetIntDefault("Movement", "FlushInterval", 1000);

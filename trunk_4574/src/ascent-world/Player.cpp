@@ -659,7 +659,11 @@ bool Player::Create(WorldPacket& data )
 	SetUInt32Value(UNIT_FIELD_BASE_HEALTH, info->health);
 	SetUInt32Value(UNIT_FIELD_BASE_MANA, info->mana );
 	SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, info->factiontemplate );
-	SetUInt32Value(UNIT_FIELD_LEVEL, 1 );
+	SetUInt32Value(UNIT_FIELD_LEVEL, sWorld.m_startLevel );
+	if(sWorld.m_startLevel >= 10 && sWorld.m_startLevel <= 70)
+		{uint32 startingTalents;
+		startingTalents = sWorld.m_startLevel - 9;
+		SetUInt32Value(PLAYER_CHARACTER_POINTS1,startingTalents);}
 	
 	SetUInt32Value(UNIT_FIELD_BYTES_0, ( ( race ) | ( class_ << 8 ) | ( gender << 16 ) | ( powertype << 24 ) ) );
 	//UNIT_FIELD_BYTES_1	(standstate) | (unk1) | (unk2) | (attackstate)
@@ -3245,10 +3249,17 @@ void Player::OnPushToWorld()
 	if(m_FirstLogin)
 	{
 		sHookInterface.OnFirstEnterWorld(this);
+		LevelInfo * Info = objmgr.GetLevelInfo(getRace(), getClass(), sWorld.m_startLevel);
+		ApplyLevelInfo(Info, sWorld.m_startLevel);
 		m_FirstLogin = false;
 	}
 
 	sHookInterface.OnEnterWorld(this);
+	if(sWorld.m_forceGMTag && m_session->HasGMPermissions() && !m_session->CanUseCommand('z'))
+	{
+	m_session->GetPlayer()->bGMTagOn = true;
+	m_session->GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAG_GM);	// <GM> & Blizz symbol
+	}
 
 	if(m_TeleportState == 1)		// First world enter
 		CompleteLoading();
@@ -3709,6 +3720,24 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 	}
 	else
 	{
+		// Remove certain "enchantments" that are not actually enchantments - WTF! Damn you, Blizzard.
+		// Classic example: http://www.wowhead.com/?spell=29720
+		// (Greater Ward of Shielding) - Absorbs 4000 damage. Requires a shield.
+		// Doesn't get removed when we unequip the shield. Why? Because it's just an Aura. Not an enchantment.
+			// damn bitwise values
+
+		for( uint32 x = 0 ; x <= MAX_POSITIVE_AURAS ; x ++ )
+		{
+			if( m_auras[x] )
+			{
+				//Log.Notice( "Player" , " Test: (%u) %u (%s) [%u,%u]" , x , m_auras[x]->GetSpellId() , m_auras[x]->GetSpellProto()->Name ,m_auras[x]->GetSpellProto()->EquippedItemClass , m_auras[x]->GetSpellProto()->EquippedItemSubClass );
+				if( m_auras[x]->GetSpellProto()->EquippedItemClass && m_auras[x]->GetSpellProto()->EquippedItemSubClass )
+				{
+					if( item->GetProto()->Class == m_auras[x]->GetSpellProto()->EquippedItemClass && ( 1 << item->GetProto()->SubClass ) & m_auras[x]->GetSpellProto()->EquippedItemSubClass ) // fucking bits
+						m_auras[x]->Remove();
+				}
+			}
+		}
 		// Remove all enchantment bonuses
 		item->RemoveEnchantmentBonuses();
 		for( int k = 0; k < 5; k++ )

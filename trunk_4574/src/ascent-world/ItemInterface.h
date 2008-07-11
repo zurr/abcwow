@@ -117,6 +117,8 @@ public:
 	void SwapItemSlots(int8 srcslot, int8 dstslot);
 
 	int8 GetInternalBankSlotFromPlayer(int8 islot); //converts inventory slots into 0-x numbers
+	// Checks if the player has slotted an item with an item ID
+	bool HasGemEquipped( uint32 GemID , int8 IgnoreSlot = -1 ); // (GemID: The item ID of the gem)
 
 	//buyback stuff
 	ASCENT_INLINE Item* GetBuyBack(int32 slot) 
