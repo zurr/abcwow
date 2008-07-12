@@ -13014,6 +13014,21 @@ void Apply112SpellFixes()
 	sp = dbcSpell.LookupEntryForced(27011);
 	if(sp != NULL)
 		sp->globalMaxstack = true;
+
+	//spell 67 Global Max Stack (Vindication)
+	sp = dbcSpell.LookupEntryForced(67);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 26017 Global Max Stack (Vindication)
+	sp = dbcSpell.LookupEntryForced(26017);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 26018 Global Max Stack (Vindication)
+	sp = dbcSpell.LookupEntryForced(26018);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
 }
 
 void ApplyNormalFixes()

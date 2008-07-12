@@ -10343,7 +10343,7 @@ void Player::_FlyhackCheck()
 
 		float p_height = GetPositionZ();
 
-		int32 diff = p_height - t_height;
+		int32 diff = int32(p_height - t_height);
 		if(diff < 0)
 			diff = -diff;
 
