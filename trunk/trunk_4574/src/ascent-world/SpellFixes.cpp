@@ -12759,6 +12759,261 @@ void Apply112SpellFixes()
 	sp = dbcSpell.LookupEntryForced(38617);
 	if(sp != NULL)
 		sp->procChance = 10;
+
+	// Spell 22959 Global Max Stack (Fire Vulnerability)
+	sp = dbcSpell.LookupEntryForced(22959);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	// Spell 7386 Global Max Stack (Sunder Armor)
+	sp = dbcSpell.LookupEntryForced(7386);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 7405 Global Max Stack (Sunder Armor)
+	sp = dbcSpell.LookupEntryForced(7405);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 8380 Global Max Stack (Sunder Armor)
+	sp = dbcSpell.LookupEntryForced(8380);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 11596 Global Max Stack (Sunder Armor)
+	sp = dbcSpell.LookupEntryForced(11596);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 11597 Global Max Stack (Sunder Armor)
+	sp = dbcSpell.LookupEntryForced(11597);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 25225 Global Max Stack (Sunder Armor)
+	sp = dbcSpell.LookupEntryForced(25225);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17862 Global Max Stack (Curse of Shadows)
+	sp = dbcSpell.LookupEntryForced(17862);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17937 Global Max Stack (Curse of Shadows)
+	sp = dbcSpell.LookupEntryForced(17937);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 27229 Global Max Stack (Curse of Shadows)
+	sp = dbcSpell.LookupEntryForced(27229);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 1490 Global Max Stack (Curse of Elements)
+	sp = dbcSpell.LookupEntryForced(1490);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 11721 Global Max Stack (Curse of Elements)
+	sp = dbcSpell.LookupEntryForced(11721);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 11722 Global Max Stack (Curse of Elements)
+	sp = dbcSpell.LookupEntryForced(11722);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 27228 Global Max Stack (Curse of Elements)
+	sp = dbcSpell.LookupEntryForced(27228);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 1714 Global Max Stack (Curse of Tongue)
+	sp = dbcSpell.LookupEntryForced(1714);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 11719 Global Max Stack (Curse of Tongue)
+	sp = dbcSpell.LookupEntryForced(11719);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 33196 Global Max Stack (Misery)
+	sp = dbcSpell.LookupEntryForced(33196);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 33197 Global Max Stack (Misery)
+	sp = dbcSpell.LookupEntryForced(33197);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 33198 Global Max Stack (Misery)
+	sp = dbcSpell.LookupEntryForced(33198);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 33199 Global Max Stack (Misery)
+	sp = dbcSpell.LookupEntryForced(33199);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 33200 Global Max Stack (Misery)
+	sp = dbcSpell.LookupEntryForced(33200);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 15258 Global Max Stack (Shadow Vulnerability)
+	sp = dbcSpell.LookupEntryForced(15258);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17794 Global Max Stack (Shadow Vulnerability)
+	sp = dbcSpell.LookupEntryForced(17794);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17798 Global Max Stack (Shadow Vulnerability)
+	sp = dbcSpell.LookupEntryForced(17798);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17797 Global Max Stack (Shadow Vulnerability)
+	sp = dbcSpell.LookupEntryForced(17797);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17799 Global Max Stack (Shadow Vulnerability)
+	sp = dbcSpell.LookupEntryForced(17799);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17800 Global Max Stack (Shadow Vulnerability)
+	sp = dbcSpell.LookupEntryForced(17800);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 12579 Global Max Stack (Winter's Chill)
+	sp = dbcSpell.LookupEntryForced(12579);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 32386 Global Max Stack (Shadow Embrace)
+	sp = dbcSpell.LookupEntryForced(32386);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 32388 Global Max Stack (Shadow Embrace)
+	sp = dbcSpell.LookupEntryForced(32388);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 32389 Global Max Stack (Shadow Embrace)
+	sp = dbcSpell.LookupEntryForced(32389);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 32390 Global Max Stack (Shadow Embrace)
+	sp = dbcSpell.LookupEntryForced(32390);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 32391 Global Max Stack (Shadow Embrace)
+	sp = dbcSpell.LookupEntryForced(32391);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 30069 Global Max Stack (Blood Frenzy)
+	sp = dbcSpell.LookupEntryForced(30069);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 30070 Global Max Stack (Blood Frenzy)
+	sp = dbcSpell.LookupEntryForced(30070);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 8647 Global Max Stack (Expose Armor)
+	sp = dbcSpell.LookupEntryForced(8647);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 8649 Global Max Stack (Expose Armor)
+	sp = dbcSpell.LookupEntryForced(8649);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 8650 Global Max Stack (Expose Armor)
+	sp = dbcSpell.LookupEntryForced(8650);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 11197 Global Max Stack (Expose Armor)
+	sp = dbcSpell.LookupEntryForced(11197);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 11198 Global Max Stack (Expose Armor)
+	sp = dbcSpell.LookupEntryForced(11198);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 26866 Global Max Stack (Expose Armor)
+	sp = dbcSpell.LookupEntryForced(26866);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 770 Global Max Stack (Faerie Fire)
+	sp = dbcSpell.LookupEntryForced(770);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 778 Global Max Stack (Faerie Fire)
+	sp = dbcSpell.LookupEntryForced(778);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 9749 Global Max Stack (Faerie Fire)
+	sp = dbcSpell.LookupEntryForced(9749);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 9907 Global Max Stack (Faerie Fire)
+	sp = dbcSpell.LookupEntryForced(9907);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 26993 Global Max Stack (Faerie Fire)
+	sp = dbcSpell.LookupEntryForced(26993);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 16857 Global Max Stack (Faerie Fire (Feral))
+	sp = dbcSpell.LookupEntryForced(16857);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17390 Global Max Stack (Faerie Fire (Feral))
+	sp = dbcSpell.LookupEntryForced(17390);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17391 Global Max Stack (Faerie Fire (Feral))
+	sp = dbcSpell.LookupEntryForced(17391);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 17392 Global Max Stack (Faerie Fire (Feral))
+	sp = dbcSpell.LookupEntryForced(17392);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
+
+	//spell 27011 Global Max Stack (Faerie Fire (Feral))
+	sp = dbcSpell.LookupEntryForced(27011);
+	if(sp != NULL)
+		sp->globalMaxstack = true;
 }
 
 void ApplyNormalFixes()
