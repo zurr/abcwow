@@ -114,7 +114,7 @@ const uint32 EOTSTowerIds[EOTS_TOWER_COUNT] = { EOTS_GO_BE_TOWER, EOTS_GO_FELREA
 
 #define EOTS_NETHERWING_FLAG_SPELL 34976
 
-#define EOTS_CAPTURE_RATE 20
+#define EOTS_CAPTURE_RATE 2
 
 static uint32 TowerWorldStates[EOTS_TOWER_COUNT][2] = {
 		{ EOTS_WORLDSTATE_ALLIANCE_CONTROLL_ELFTOWER, EOTS_WORLDSTATE_HORDE_CONTROLL_ELFTOWER}, // EOTS_TOWER_BE
@@ -524,6 +524,7 @@ void EyeOfTheStorm::OnCreate()
 			return;
 		}
 
+		m_bubbles[i]->SetFloatValue(OBJECT_FIELD_SCALE_X,0.5f);
 		m_bubbles[i]->PushToWorld( m_mapMgr );
 	}
 
