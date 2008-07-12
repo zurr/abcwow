@@ -3871,9 +3871,6 @@ public:
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(9, 0, RUN));
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(10, 0, RUN));
 
-		_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-
 		if ((_unit->GetPositionX() == 95.416428f) && (_unit->GetPositionY() == -858.470093f) && (_unit->GetPositionZ() == 20.874939f))
 		{
 			_unit->GetAIInterface()->setWaypointToMove(1);
@@ -3914,6 +3911,9 @@ public:
 		{
 			//if something wents wrong directly to vashj plz
 			_unit->GetAIInterface()->setWaypointToMove(10);
+
+			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
 		}
 
 		nrspells = 1;
@@ -4071,9 +4071,6 @@ public:
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(9, 0, WALK));
 		_unit->GetAIInterface()->addWayPoint(CreateWaypoint(10, 0, WALK));
 
-		_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
-		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
-
 		if ((_unit->GetPositionX() == 95.416428f) && (_unit->GetPositionY() == -858.470093f) && (_unit->GetPositionZ() == 20.874939f))
 		{
 			_unit->GetAIInterface()->setWaypointToMove(1);
@@ -4115,6 +4112,9 @@ public:
 			//if something wents wrong directly to vashj plz
 			_unit->GetAIInterface()->setWaypointToMove(10);
 		}
+
+		_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
+		_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
 
 		vashj = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(29.798161f, -923.358276f, 42.900517f, CN_VASHJ);
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);

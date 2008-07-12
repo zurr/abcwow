@@ -3643,14 +3643,21 @@ void Unit::AddAura(Aura *aur)
 					{
 						// Check for auras by specific type.
 						// Check for auras with the same name and a different rank.
-						
+
 						if(info->buffType > 0 && m_auras[x]->GetSpellProto()->buffType & info->buffType && maxStack == 0)
-							deleteAur = HasAurasOfBuffType(info->buffType, aur->m_casterGuid,0);
+							if(HasAurasOfBuffType(info->buffType, aur->m_casterGuid,0))
+							{
+								deleteAur = true;
+								break;
+							}
 						else
 						{
 							acr = AuraCheck(info->NameHash, info->RankNumber, m_auras[x],aur->GetCaster());
 							if(acr.Error == AURA_CHECK_RESULT_HIGHER_BUFF_PRESENT)
+							{
 								deleteAur = true;
+								break;
+							}
 							else if(acr.Error == AURA_CHECK_RESULT_LOWER_BUFF_PRESENT)
 							{
 								// remove the lower aura
@@ -3661,30 +3668,30 @@ void Unit::AddAura(Aura *aur)
 							}
 						}					   
 					}
-					else if( m_auras[x]->GetSpellId() == aur->GetSpellId() ) // not the best formula to test this I know, but it works until we find a solution
+					if( m_auras[x]->GetSpellId() == aur->GetSpellId() ) // not the best formula to test this I know, but it works until we find a solution
 					{
 						if( !aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid && !aur->m_spellProto->globalMaxstack)
 							continue;
+
 						f++;
-						//if(maxStack > 1)
+
+						//update duration,the same aura (update the whole stack whenever we cast a new one)
+						m_auras[x]->SetDuration(aur->GetDuration());
+						sEventMgr.ModifyEventTimeLeft(m_auras[x], EVENT_AURA_REMOVE, aur->GetDuration());
+						if(maxStack <= 1)
 						{
-							//update duration,the same aura (update the whole stack whenever we cast a new one)
-							m_auras[x]->SetDuration(aur->GetDuration());
-							sEventMgr.ModifyEventTimeLeft(m_auras[x], EVENT_AURA_REMOVE, aur->GetDuration());
-							if(maxStack <= 1)
+							if(this->IsPlayer())
 							{
-								if(this->IsPlayer())
-								{
-									data.Initialize(SMSG_UPDATE_AURA_DURATION);
-									data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
-									((Player*)this)->GetSession()->SendPacket(&data);
-								}
-								
-								data.Initialize(SMSG_SET_AURA_SINGLE);
-								data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
-								SendMessageToSet(&data,false);
+								data.Initialize(SMSG_UPDATE_AURA_DURATION);
+								data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
+								((Player*)this)->GetSession()->SendPacket(&data);
 							}
+
+							data.Initialize(SMSG_SET_AURA_SINGLE);
+							data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
+							SendMessageToSet(&data,false);
 						}
+
 						if(maxStack <= f)
 						{
 							deleteAur = true;
@@ -5671,6 +5678,10 @@ void CombatStatusHandler::RemoveHealed(Unit * pHealTarget)
 void CombatStatusHandler::UpdateFlag()
 {
 	bool n_status = InternalIsInCombat();
+	if (n_status)
+		sLog.outString("im in combat!");
+	else
+		sLog.outString("im not in combat!");
 	if(n_status != m_lastStatus)
 	{
 		m_lastStatus = n_status;

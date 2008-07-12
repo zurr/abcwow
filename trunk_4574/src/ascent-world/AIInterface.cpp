@@ -3606,6 +3606,9 @@ uint32 AIInterface::_CalcThreat(uint32 damage, SpellEntry * sp, Unit* Attacker)
 	else
 		mod += damage;
 
+	if (Attacker->getClass() == ROGUE)
+		mod = int32(mod * 0.71); // Rogues generate 0.71x threat per damage. 
+
 	// modify threat by Buffs
 	if (sp != NULL && sp->School)
 		mod += (mod * Attacker->GetGeneratedThreatModifyer(sp->School) / 100);
