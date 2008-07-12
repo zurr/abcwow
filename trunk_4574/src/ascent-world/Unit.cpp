@@ -3663,7 +3663,7 @@ void Unit::AddAura(Aura *aur)
 					}
 					else if( m_auras[x]->GetSpellId() == aur->GetSpellId() ) // not the best formula to test this I know, but it works until we find a solution
 					{
-						if( !aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid )
+						if( !aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid && !aur->m_spellProto->globalMaxstack)
 							continue;
 						f++;
 						//if(maxStack > 1)

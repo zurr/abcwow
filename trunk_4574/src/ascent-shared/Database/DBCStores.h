@@ -359,6 +359,7 @@ struct SpellEntry
     uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
 	uint32 ThreatForSpell;
 	float ThreatForSpellCoef;
+	bool globalMaxstack;
 
 	uint32 ProcOnNameHash[3];
 
