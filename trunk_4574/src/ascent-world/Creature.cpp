@@ -607,12 +607,18 @@ void Creature::RegenerateHealth()
 	float amt = 0.0f;
 	float lvl = float(getLevel());
 
-	if(PctRegenModifier == 0.0f)
-		amt = lvl*2.0f;
-	else if(PctRegenModifier > 0)
-		amt = (lvl*2.0f)*(1.0f+PctRegenModifier);
+	if(GetCreatureName() && GetCreatureName()->Rank == ELITE_WORLDBOSS) //I dont like bosses to regen 142hp...
+		amt = 100000.0f;
 	else
-		amt = (lvl*2.0f)*(-1.0f+PctRegenModifier);
+	{
+		if(PctRegenModifier == 0.0f)
+			amt = lvl*2.0f;
+		else if(PctRegenModifier > 0)
+			amt = (lvl*2.0f)*(1.0f+PctRegenModifier);
+		else
+			amt = (lvl*2.0f)*(-1.0f+PctRegenModifier);
+	}
+
 		
 	//Apply shit from conf file
 	amt*=sWorld.getRate(RATE_HEALTH);
