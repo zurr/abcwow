@@ -5678,10 +5678,6 @@ void CombatStatusHandler::RemoveHealed(Unit * pHealTarget)
 void CombatStatusHandler::UpdateFlag()
 {
 	bool n_status = InternalIsInCombat();
-	if (n_status)
-		sLog.outString("im in combat!");
-	else
-		sLog.outString("im not in combat!");
 	if(n_status != m_lastStatus)
 	{
 		m_lastStatus = n_status;
