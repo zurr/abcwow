@@ -3336,18 +3336,24 @@ bool AIInterface::modThreatByPtr(Unit* obj, int32 mod)
 {
 	if(!obj)
 		return false;
+
+	int32 tempthreat;
 	TargetMap::iterator it = m_aiTargets.find(obj);
 	if(it != m_aiTargets.end())
 	{
 		it->second += mod;
 		if (it->second < 1)
 			it->second = 1;
-		if((it->second + obj->GetThreatModifyer()) > m_currentHighestThreat)
+		
+		tempthreat = it->second + obj->GetThreatModifyer();
+		if (tempthreat < 1)
+			tempthreat = 1;
+		if(tempthreat > m_currentHighestThreat)
 		{
 			// new target!
 			if(!isTaunted)
 			{
-				m_currentHighestThreat = it->second + obj->GetThreatModifyer();
+				m_currentHighestThreat = tempthreat;
 				SetNextTarget(obj);
 			}
 		}
@@ -3355,11 +3361,15 @@ bool AIInterface::modThreatByPtr(Unit* obj, int32 mod)
 	else
 	{
 		m_aiTargets.insert( make_pair( obj, mod ) );
-		if((mod + obj->GetThreatModifyer()) > m_currentHighestThreat)
+
+		tempthreat = mod + obj->GetThreatModifyer();
+		if (tempthreat < 1)
+			tempthreat = 1;
+		if(tempthreat > m_currentHighestThreat)
 		{
 			if(!isTaunted)
 			{
-				m_currentHighestThreat = mod + obj->GetThreatModifyer();
+				m_currentHighestThreat = tempthreat;
 				SetNextTarget(obj);
 			}
 		}
