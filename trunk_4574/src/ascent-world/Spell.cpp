@@ -3340,7 +3340,7 @@ uint8 Spell::CanCast(bool tolerate)
 					}
 					else
 					{ // our spell is not a ranged spell
-						if( GetType() == SPELL_DMG_TYPE_MAGIC && m_spellInfo->in_front_status == 1 )
+						if( GetType() == SPELL_DMG_TYPE_MAGIC && m_spellInfo->in_front_status == 0 )
 						{
 							// must be in front
 							if(!u_caster->isInFront(target))
@@ -4569,6 +4569,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_FROST_NOVA:				// Frost Nova
 	case SPELL_HASH_FROSTBITE:				// Frostbite
 	case SPELL_HASH_ENTANGLING_ROOTS:		// Entangling Roots
+	case SPELL_HASH_IMPROVED_HAMSTRING:		// Improved Hamstring
 		grp = 4;
 		break;
 
