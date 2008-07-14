@@ -728,7 +728,7 @@ void AIInterface::_UpdateTargets()
 	}
 	else if(m_AIState != STATE_IDLE && m_AIState != STATE_SCRIPTIDLE)
 	{
-		FindFriends(16.0f/*4.0f*/);
+		FindFriends(25.0f/*5.0f*/);
 	}
 
 	if( m_updateAssist )
@@ -1222,7 +1222,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 			}break;
 		case AGENT_CALLFORHELP:
 			{
-				FindFriends( 50.0f /*7.0f*/ );
+				FindFriends( 64.0f /*8.0f*/ );
 				m_hasCalledForHelp = true; // We only want to call for Help once in a Fight.
 				if( m_Unit->GetTypeId() == TYPEID_UNIT )
 						objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_CALL_HELP );
@@ -1644,8 +1644,6 @@ bool AIInterface::FindFriends(float dist)
 	std::set<Object*>::iterator itr;
 	Unit *pUnit;
 
-	
-
 	for( itr = m_Unit->GetInRangeSetBegin(); itr != m_Unit->GetInRangeSetEnd(); itr++ )
 	{
 		if(!(*itr) || (*itr)->GetTypeId() != TYPEID_UNIT)
@@ -1668,15 +1666,15 @@ bool AIInterface::FindFriends(float dist)
 		{
 			if( m_Unit->GetDistanceSq(pUnit) < dist)
 			{
-				if( m_assistTargets.count( pUnit ) > 0 ) // already have him
-					break;
+				if( m_assistTargets.count( pUnit ) == 0 )
+				{
+					m_assistTargets.insert(pUnit);
+					result = true;
+				}
 
-				result = true;
-				m_assistTargets.insert(pUnit);
-					
 				for(it = m_aiTargets.begin(); it != m_aiTargets.end(); ++it)
 				{
-					static_cast< Unit* >( *itr )->GetAIInterface()->AttackReaction( it->first, 1, 0 );
+					pUnit->GetAIInterface()->AttackReaction( it->first, 1, 0 );
 				}
 			}
 		}
