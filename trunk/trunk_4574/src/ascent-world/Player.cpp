@@ -8933,34 +8933,6 @@ void Player::Possess(Unit * pTarget)
 	pTarget->_setFaction();
 	pTarget->UpdateOppFactionSet();
 
-	if (pTarget->GetTypeId() == TYPEID_UNIT)
-	{
-		if (pTarget->GetAIInterface()->getAITargetsCount())
-		{
-			std::vector<Unit*> targetTable;
-			TargetMap *targets = pTarget->GetAIInterface()->GetAITargets();
-			for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
-			{
-				Unit *temp = itr->first;
-				if (temp->GetTypeId() == TYPEID_UNIT && temp->isAlive())
-				{
-					temp->GetAIInterface()->RemoveThreatByPtr(this);
-					if (temp->GetAIInterface()->GetNextTarget() == pTarget)
-						temp->GetAIInterface()->SetNextTarget(NULL);
-					if (pTarget->m_faction == temp->m_faction)
-					{
-						temp->GetAIInterface()->AttackReaction(this, 1, 0);
-						temp->GetAIInterface()->SetNextTarget(this);
-					}
-				}
-			}
-		}
-
-		pTarget->GetAIInterface()->ClearHateList();
-		pTarget->GetAIInterface()->AttackReaction(this, (this->getLevel()*75), 0); // "When the spell ends, the MCed unit (if not a player) will have a large amount of threat on the priest who controlled it" no idea if (lvl*75) is right but it does his job
-		pTarget->GetAIInterface()->SetNextTarget(this);
-	}
-
 	list<uint32> avail_spells;
 	for(list<AI_Spell*>::iterator itr = pTarget->GetAIInterface()->m_spells.begin(); itr != pTarget->GetAIInterface()->m_spells.end(); ++itr)
 	{
@@ -9033,6 +9005,34 @@ void Player::UnPossess()
 	WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
 	data << GetNewGUID() << uint8(1);
 	m_session->SendPacket(&data);
+
+	if (pTarget->GetTypeId() == TYPEID_UNIT)
+	{
+		if (pTarget->GetAIInterface()->getAITargetsCount())
+		{
+			std::vector<Unit*> targetTable;
+			TargetMap *targets = pTarget->GetAIInterface()->GetAITargets();
+			for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+			{
+				Unit *temp = itr->first;
+				if (temp->GetTypeId() == TYPEID_UNIT && temp->isAlive())
+				{
+					temp->GetAIInterface()->RemoveThreatByPtr(this);
+					if (temp->GetAIInterface()->GetNextTarget() == pTarget)
+						temp->GetAIInterface()->SetNextTarget(NULL);
+					if (pTarget->m_faction == temp->m_faction)
+					{
+						temp->GetAIInterface()->AttackReaction(this, 1, 0);
+						temp->GetAIInterface()->SetNextTarget(this);
+					}
+				}
+			}
+		}
+
+		pTarget->GetAIInterface()->ClearHateList();
+		pTarget->GetAIInterface()->AttackReaction(this, (this->getLevel()*75), 0); // "When the spell ends, the MCed unit (if not a player) will have a large amount of threat on the priest who controlled it" no idea if (lvl*75) is right but it does his job
+		pTarget->GetAIInterface()->SetNextTarget(this);
+	}
 
 	if(pTarget->m_temp_summon)
 		return;
