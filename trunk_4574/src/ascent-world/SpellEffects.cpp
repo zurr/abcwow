@@ -1582,6 +1582,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 				Spell Haste (Curse of Tongues) (applyaura): 1024
 				Interupt Cast: 2048
 				Mod Healing % (Mortal Strike) (applyaura):4096
+				Total Stats % (Vindication) (applyaura):8192
 				*/
 
 				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
@@ -1665,6 +1666,10 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 							break;
 						case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
 							if (c->proto->modImmunities & 4096)
+								immune = true;
+							break;
+						case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
+							if (c->proto->modImmunities & 8192)
 								immune = true;
 							break;
 						}
