@@ -516,15 +516,14 @@ void EyeOfTheStorm::OnCreate()
 		m_bubbles[i] = m_mapMgr->CreateGameObject(184719);
 		if( !m_bubbles[i]->CreateFromProto( 184719, m_mapMgr->GetMapId(), EOTSBubbleLocations[i][0], EOTSBubbleLocations[i][1], EOTSBubbleLocations[i][2], EOTSBubbleLocations[i][3] ) )
 		{
-			m_bubbles[i]->SetFloatValue(OBJECT_FIELD_SCALE_X,0.1f);
-			m_bubbles[i]->SetUInt32Value(GAMEOBJECT_STATE,1);
-			m_bubbles[i]->SetUInt32Value(GAMEOBJECT_FLAGS,32);
 			Log.LargeErrorMessage(LARGERRORMESSAGE_ERROR, "EOTS is being created and you are missing gameobjects. Terminating.");
 			abort();
 			return;
 		}
+		m_bubbles[i]->SetFloatValue(OBJECT_FIELD_SCALE_X,0.1f);
+		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_STATE,1);
+		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_FLAGS,32);
 
-		m_bubbles[i]->SetFloatValue(OBJECT_FIELD_SCALE_X,0.5f);
 		m_bubbles[i]->PushToWorld( m_mapMgr );
 	}
 
