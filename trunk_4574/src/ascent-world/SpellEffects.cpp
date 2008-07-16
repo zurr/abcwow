@@ -718,6 +718,11 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 //		{
 //		}break;
 
+	case 34074:
+		{
+			sEventMgr.AddEvent(this, &Aura::EventPeriodicManaPct,(float)p_caster->getLevel()*0.35f, EVENT_AURA_PERIOCIC_MANA, pAura->GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+		}break;
+
 	/*************************
 	 * PALADIN SPELLS
 	 *************************
