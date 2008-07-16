@@ -1838,7 +1838,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			pVictim->GetAIInterface()->HandleEvent( EVENT_LEAVECOMBAT, static_cast< Unit* >( this ), 0);
 		}
 
-		if( pVictim->IsPlayer() && (!IsPlayer() || pVictim == this ) )
+		if( pVictim->IsPlayer() && !IsPlayer() )
 		{
 			static_cast< Player* >( pVictim )->DeathDurabilityLoss(0.10);
 		}
@@ -2144,8 +2144,83 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				}
 			}
 			//---------------------------------looot-----------------------------------------  
-			
-			if( GetTypeId() == TYPEID_PLAYER && 
+
+			// ----------------------------- XP --------------
+			if ( pVictim->GetUInt64Value( UNIT_FIELD_CREATEDBY ) == 0 && 
+				pVictim->GetUInt64Value( OBJECT_FIELD_CREATED_BY ) == 0 &&
+				!pVictim->IsPet() && static_cast<Creature*>(pVictim)->Tagged)
+			{
+				Unit *uTagger = pVictim->GetMapMgr()->GetUnit(static_cast<Creature*>(pVictim)->TaggerGuid);
+				if (uTagger != NULL)
+				{
+					if (uTagger->IsPlayer())
+					{
+						Player *pTagger = static_cast<Player*>(uTagger);
+						if (pTagger->InGroup())
+						{
+							pTagger->GiveGroupXP( pVictim, pTagger);
+						}
+						else
+						{
+							uint32 xp = CalculateXpToGive( pVictim, uTagger );
+							if( xp > 0 )
+							{
+								pTagger->GiveXP( xp, victimGuid, true );
+								uTagger->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+								if(!sEventMgr.HasEvent(uTagger,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+									sEventMgr.AddEvent(uTagger,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+								else
+									sEventMgr.ModifyEventTimeLeft(uTagger,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
+
+								if( pTagger->GetSummon() && !pTagger->GetSummon()->IsSummon() )
+								{
+									xp = CalculateXpToGive( pVictim, pTagger->GetSummon() );
+									if( xp > 0 )
+										pTagger->GetSummon()->GiveXP( xp );
+								}
+							}
+							if( !pVictim->IsPlayer() )
+								sQuestMgr.OnPlayerKill( pTagger, static_cast< Creature* >( pVictim ) );
+						}
+					}
+					else if (uTagger->IsPet())
+					{
+						Pet* petTagger = static_cast<Pet*>(uTagger);
+						if (petTagger != NULL)
+						{
+							Player* petOwner = petTagger->GetPetOwner();
+							if( petOwner != NULL)
+							{
+								if( petOwner->InGroup() )
+								{
+									//Calc Group XP
+									petOwner->GiveGroupXP( pVictim, petOwner );
+									//TODO: pet xp if player in group
+								}
+								else
+								{
+									uint32 xp = CalculateXpToGive( pVictim, petOwner );
+									if( xp > 0 )
+									{
+										petOwner->GiveXP( xp, victimGuid, true );
+										if( !petTagger->IsSummon() )
+										{
+											xp = CalculateXpToGive( pVictim, petTagger );
+											if( xp > 0 )
+												petTagger->GiveXP( xp );
+										}
+									}
+								}
+							}
+							if(pVictim->GetTypeId() != TYPEID_PLAYER)
+								sQuestMgr.OnPlayerKill( petOwner, static_cast< Creature* >( pVictim ) );
+						}
+					}
+				}
+			}
+			// ----------------------------- XP --------------
+				/*
+				if( GetTypeId() == TYPEID_PLAYER && 
 				pVictim->GetUInt64Value( UNIT_FIELD_CREATEDBY ) == 0 && 
 				pVictim->GetUInt64Value( OBJECT_FIELD_CREATED_BY ) == 0 &&
 				!pVictim->IsPet() )
@@ -2183,10 +2258,11 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
 				if( pVictim->GetTypeId() != TYPEID_PLAYER )
 					sQuestMgr.OnPlayerKill( static_cast< Player* >( this ), static_cast< Creature* >( pVictim ) );
+				// ----------------------------- PLAYER XP --------------
 			}
-			else /* is Creature or GameObject*/
+			else // is Creature or GameObject
 			{
-				/* ----------------------------- PET XP HANDLING -------------- */
+				// ----------------------------- PET XP HANDLING --------------
 				if( owner_participe && IsPet() && !pVictim->IsPet() )
 				{
 					Player* petOwner = static_cast< Pet* >( this )->GetPetOwner();
@@ -2217,35 +2293,34 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 						pVictim->GetTypeId() == TYPEID_UNIT )
 						sQuestMgr.OnPlayerKill( petOwner, static_cast< Creature* >( pVictim ) );
 				}
-				/* ----------------------------- PET XP HANDLING END-------------- */
+				// ----------------------------- PET XP HANDLING END-------------- 
+				*/
+			/* ----------------------------- PET DEATH HANDLING -------------- */
+			if( pVictim->IsPet() )
+			{
+				// dying pet looses 1 happiness level
+				if( !static_cast< Pet* >( pVictim )->IsSummon() )
+				{
+					uint32 hap = static_cast< Pet* >( pVictim )->GetUInt32Value( UNIT_FIELD_POWER5 );
+					hap = hap - PET_HAPPINESS_UPDATE_VALUE > 0 ? hap - PET_HAPPINESS_UPDATE_VALUE : 0;
+					static_cast< Pet* >( pVictim )->SetUInt32Value( UNIT_FIELD_POWER5, hap );
+				}
 
-				/* ----------------------------- PET DEATH HANDLING -------------- */
-				if( pVictim->IsPet() )
-				{
-					// dying pet looses 1 happiness level
-					if( !static_cast< Pet* >( pVictim )->IsSummon() )
-					{
-						uint32 hap = static_cast< Pet* >( pVictim )->GetUInt32Value( UNIT_FIELD_POWER5 );
-						hap = hap - PET_HAPPINESS_UPDATE_VALUE > 0 ? hap - PET_HAPPINESS_UPDATE_VALUE : 0;
-						static_cast< Pet* >( pVictim )->SetUInt32Value( UNIT_FIELD_POWER5, hap );
-					}
-					
-					static_cast< Pet* >( pVictim )->SendNullSpellsToOwner();
-					
-					//remove owner warlock soul link from caster
-					Player* owner = static_cast<Pet*>( pVictim )->GetPetOwner();
-					if( owner != NULL )
-						owner->EventDismissPet();
-				}
-				/* ----------------------------- PET DEATH HANDLING END -------------- */
-				else if( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) )
-				{
-					//remove owner warlock soul link from caster
-					Unit *owner=pVictim->GetMapMgr()->GetUnit( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) );
-					if( owner != NULL && owner->IsPlayer())
-						static_cast< Player* >( owner )->EventDismissPet();
-				}
+				static_cast< Pet* >( pVictim )->SendNullSpellsToOwner();
+
+				//remove owner warlock soul link from caster
+				Player* owner = static_cast<Pet*>( pVictim )->GetPetOwner();
+				if( owner != NULL )
+					owner->EventDismissPet();
 			}
+			else if( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) )
+			{
+				//remove owner warlock soul link from caster
+				Unit *owner=pVictim->GetMapMgr()->GetUnit( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) );
+				if( owner != NULL && owner->IsPlayer())
+					static_cast< Player* >( owner )->EventDismissPet();
+			}
+			/* ----------------------------- PET DEATH HANDLING END -------------- */
 		}
 		else if( pVictim->GetTypeId() == TYPEID_PLAYER )
 		{
