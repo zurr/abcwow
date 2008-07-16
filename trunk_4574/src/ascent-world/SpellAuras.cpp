@@ -246,7 +246,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//223 // used in one spell, cold stare 43593
 		&Aura::SpellAuraNULL,//224 // not used
 		&Aura::SpellAuraNULL,//225 // Prayer of Mending "Places a spell on the target that heals them for $s1 the next time they take damage.  When the heal occurs, Prayer of Mending jumps to a raid member within $a1 yards.  Jumps up to $n times and lasts $d after each jump.  This spell can only be placed on one target at a time."
-		&Aura::SpellAuraDrinkNew,//226 // used in brewfest spells, headless hoerseman
+		&Aura::SpellAuraDummyAura,//226 // used in brewfest spells, headless hoerseman, aspect of the viper
 		&Aura::SpellAuraNULL,//227 Inflicts [SPELL DAMAGE] damage to enemies in a cone in front of the caster. (based on combat range) http://www.thottbot.com/s40938
 		&Aura::SpellAuraNULL,//228 Stealth Detection. http://www.thottbot.com/s34709
 		&Aura::SpellAuraNULL,//229 Apply Aura:Reduces the damage your pet takes from area of effect attacks http://www.thottbot.com/s35694
@@ -5842,14 +5842,45 @@ void Aura::SpellAuraModRegen(bool apply)
 	}
 }
 
-void Aura::SpellAuraDrinkNew(bool apply)
+void Aura::SpellAuraDummyAura(bool apply)
 {
+	// I know, there's already an Aura::SpellAuraDummy, but some spells use a different aura ID (226), which is also Dummy.
+	switch( m_spellProto->NameHash )
+	{
+		case SPELL_HASH_ASPECT_OF_THE_VIPER:
+			if( p_target )
+			{
+				if( apply )
+				{
+					float regen, manaPct;
+					// http://www.wowwiki.com/Aspect_of_the_Viper
+					// MP5Viper = Intellect × 22/35 × ( 0.9 - Manacurrent / Manamax ) + Intellect × 0.11
+					
+					manaPct = (float)(p_target->GetManaPct() / 100);
+					if( manaPct <= 20.0f )
+						manaPct = 20.0f;
+					if( manaPct >= 90.0f )
+						manaPct = 90.0f;
+
+					regen = ( 22.0f / 35.0f * (0.9f - manaPct) + 0.11f ) * (float)p_target->GetUInt32Value( UNIT_FIELD_STAT3 );
+
+				SetPositive();
+				sEventMgr.AddEvent(this, &Aura::EventPeriodicManaPct,(float)regen,
+				EVENT_AURA_PERIOCIC_MANA,	GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+				}
+			}
+		break;
+		default:
+			sLog.outDetail( "[AURA] Unhandled DummyAura 226 used on spell %u!" , m_spellProto->Id );
+	}
+/*** some Brewfest drinks?
 	if( apply )
 	{
 		SetPositive();
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicDrink, uint32(float2int32(float(mod->m_amount)/5.0f)),
 			EVENT_AURA_PERIODIC_REGEN, 1000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
+*/
 }
 
 void Aura::EventPeriodicDrink(uint32 amount)
