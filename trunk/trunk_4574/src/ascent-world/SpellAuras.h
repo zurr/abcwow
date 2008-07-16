@@ -243,6 +243,7 @@ enum MOD_TYPES
     SPELL_AURA_INCREASE_CASTING_TIME_PCT = 216,
     SPELL_AURA_REGEN_MANA_STAT_PCT=219,
     SPELL_AURA_HEALING_STAT_PCT=220,
+    SPELL_AURA_DUMMY_AURA =226 ,  // Used by Aspect of the Viper
     SPELL_AURA_INCREASE_MAX_HEALTH=230,//Used by Commanding Shout
 	SPELL_AURA_MODIFY_AXE_SKILL=240,
     TOTAL_SPELL_AURAS = 241,
@@ -568,6 +569,7 @@ public:
 	void SpellAuraIncreaseCastTimePCT(bool apply);
 	void SpellAuraRegenManaStatPCT(bool apply);
 	void SpellAuraSpellHealingStatPCT(bool apply);
+	void SpellAuraDummyAura(bool apply);
 	void SpellAuraIncreaseMaxHealth(bool apply);
 	void SpellAuraSpiritOfRedemption(bool apply);
 	void SpellAuraIncreaseAttackerSpellCrit(bool apply);
@@ -579,7 +581,6 @@ public:
 	void SpellAuraHealingByAttackPowerPct(bool apply);
 	void SpellAuraDamageByAttackPowerPct(bool apply);
 	void SpellAuraModExpertise(bool apply);
-	void SpellAuraDrinkNew(bool apply);
 	void SpellAuraModPossessPet(bool apply);
 	void SpellAuraMeleeHaste(bool apply);
 	void EventPeriodicDrink(uint32 amount);
