@@ -2156,27 +2156,30 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 					if (uTagger->IsPlayer())
 					{
 						Player *pTagger = static_cast<Player*>(uTagger);
-						if (pTagger->InGroup())
+						if (pTagger)
 						{
-							pTagger->GiveGroupXP( pVictim, pTagger);
-						}
-						else
-						{
-							uint32 xp = CalculateXpToGive( pVictim, uTagger );
-							if( xp > 0 )
+							if (pTagger->InGroup())
 							{
-								pTagger->GiveXP( xp, victimGuid, true );
-								uTagger->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
-								if(!sEventMgr.HasEvent(uTagger,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
-									sEventMgr.AddEvent(uTagger,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
-								else
-									sEventMgr.ModifyEventTimeLeft(uTagger,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
-
-								if( pTagger->GetSummon() && !pTagger->GetSummon()->IsSummon() )
+								pTagger->GiveGroupXP( pVictim, pTagger);
+							}
+							else
+							{
+								uint32 xp = CalculateXpToGive( pVictim, uTagger );
+								if( xp > 0 )
 								{
-									xp = CalculateXpToGive( pVictim, pTagger->GetSummon() );
-									if( xp > 0 )
-										pTagger->GetSummon()->GiveXP( xp );
+									pTagger->GiveXP( xp, victimGuid, true );
+									uTagger->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+									if(!sEventMgr.HasEvent(uTagger,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+										sEventMgr.AddEvent(uTagger,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+									else
+										sEventMgr.ModifyEventTimeLeft(uTagger,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
+
+									if( pTagger->GetSummon() && !pTagger->GetSummon()->IsSummon() )
+									{
+										xp = CalculateXpToGive( pVictim, pTagger->GetSummon() );
+										if( xp > 0 )
+											pTagger->GetSummon()->GiveXP( xp );
+									}
 								}
 							}
 							if( !pVictim->IsPlayer() )
@@ -2211,9 +2214,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 										}
 									}
 								}
-							}
-							if(pVictim->GetTypeId() != TYPEID_PLAYER)
+								if(pVictim->GetTypeId() != TYPEID_PLAYER)
 								sQuestMgr.OnPlayerKill( petOwner, static_cast< Creature* >( pVictim ) );
+							}
 						}
 					}
 				}
