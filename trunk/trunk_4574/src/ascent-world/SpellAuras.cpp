@@ -5860,16 +5860,13 @@ void Aura::SpellAuraDummyAura(bool apply)
 			}
 		break;
 		default:
-			sLog.outDetail( "[AURA] Unhandled DummyAura 226 used on spell %u!" , m_spellProto->Id );
+			if( apply )
+			{
+				SetPositive();
+				sEventMgr.AddEvent(this, &Aura::EventPeriodicDrink, uint32(float2int32(float(mod->m_amount)/5.0f)),
+				EVENT_AURA_PERIODIC_REGEN, 1000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+			}
 	}
-/*** some Brewfest drinks?
-	if( apply )
-	{
-		SetPositive();
-		sEventMgr.AddEvent(this, &Aura::EventPeriodicDrink, uint32(float2int32(float(mod->m_amount)/5.0f)),
-			EVENT_AURA_PERIODIC_REGEN, 1000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-	}
-*/
 }
 
 void Aura::EventPeriodicEnergizeVariable(uint32 amount,uint32 type)
