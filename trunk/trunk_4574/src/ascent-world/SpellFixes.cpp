@@ -17419,7 +17419,7 @@ void ApplyNormalFixes()
 		{
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
 			sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
-			sp->EffectImplicitTargetA[2] = 0;
+			sp->EffectImplicitTargetA[2] = EFF_TARGET_ALL_PARTY;
 			sp->EffectImplicitTargetB[0] = 0;
 			sp->EffectImplicitTargetB[1] = 0;
 			sp->EffectImplicitTargetB[2] = 0;
@@ -17433,7 +17433,7 @@ void ApplyNormalFixes()
 		{
 			sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
 			sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
-			sp->EffectImplicitTargetA[2] = 0;
+			sp->EffectImplicitTargetA[2] = EFF_TARGET_ALL_PARTY;
 			sp->EffectImplicitTargetB[0] = 0;
 			sp->EffectImplicitTargetB[1] = 0;
 			sp->EffectImplicitTargetB[2] = 0;

@@ -2853,7 +2853,7 @@ uint8 Spell::CanCast(bool tolerate)
  				case 26889:
 				case 45438:
  				{
-					if( p_caster->m_bg->GetType() == BATTLEGROUND_WARSUNG_GULCH ) {
+					if( p_caster->m_bg->GetType() == BATTLEGROUND_WARSONG_GULCH ) {
     						((WarsongGulch*)p_caster->m_bg)->DropFlag(p_caster);
 						p_caster->RemoveAura( 23333 + (p_caster->GetTeam() * 2) );
 					}
@@ -2868,7 +2868,7 @@ uint8 Spell::CanCast(bool tolerate)
 		// Arathi's Flags take by stealthed --> Remove stealth
 		if(p_caster->m_bg && p_caster->IsStealth())
 		{
-			switch(GetProto()->Id)
+			switch(m_spellInfo->Id)
 			{
 				// opening spell: arathi basin flags
 				// TODO: EoTS
@@ -2883,7 +2883,7 @@ uint8 Spell::CanCast(bool tolerate)
 		// check if BG Flags can take while bubbled
 		if(p_caster->HasAurasWithNameHash( SPELL_HASH_DIVINE_SHIELD ) || p_caster->HasAurasWithNameHash( SPELL_HASH_DIVINE_PROTECTION ))
 		{
-			switch(GetProto()->Id)
+			switch(m_spellInfo->Id)
 			{
 				// opening spell: arathi basin flags
 				// TODO: EoTS
@@ -2897,7 +2897,7 @@ uint8 Spell::CanCast(bool tolerate)
 		// check if BG Flags can takes while bubbled
 		if(p_caster->HasAurasWithNameHash( SPELL_HASH_DIVINE_SHIELD ) || p_caster->HasAurasWithNameHash( SPELL_HASH_DIVINE_PROTECTION ))
 		{
-			switch(GetProto()->Id)
+			switch(m_spellInfo->Id)
 			{
 				// opening spell: warsong/silverwing flag & arathi basin flags
 				case 23333:

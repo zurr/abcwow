@@ -5852,21 +5852,10 @@ void Aura::SpellAuraDummyAura(bool apply)
 			{
 				if( apply )
 				{
-					float regen, manaPct;
-					// http://www.wowwiki.com/Aspect_of_the_Viper
-					// MP5Viper = Intellect × 22/35 × ( 0.9 - Manacurrent / Manamax ) + Intellect × 0.11
-					
-					manaPct = (float)(p_target->GetManaPct() / 100);
-					if( manaPct <= 20.0f )
-						manaPct = 20.0f;
-					if( manaPct >= 90.0f )
-						manaPct = 90.0f;
+					SetPositive();
+					sEventMgr.AddEvent(this, &Aura::EventPeriodicEnergizeVariable,(uint32)mod->m_amount,(uint32)mod->m_miscValue,
+			EVENT_AURA_PERIODIC_ENERGIZE_VARIABLE,GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
-					regen = ( 22.0f / 35.0f * (0.9f - manaPct) + 0.11f ) * (float)p_target->GetUInt32Value( UNIT_FIELD_STAT3 );
-
-				SetPositive();
-				sEventMgr.AddEvent(this, &Aura::EventPeriodicManaPct,(float)regen,
-				EVENT_AURA_PERIOCIC_MANA,	GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 				}
 			}
 		break;
@@ -5883,6 +5872,47 @@ void Aura::SpellAuraDummyAura(bool apply)
 */
 }
 
+void Aura::EventPeriodicEnergizeVariable(uint32 amount,uint32 type)
+{
+	uint32 POWER_TYPE=UNIT_FIELD_POWER1+type;
+	
+	ASSERT(POWER_TYPE<=UNIT_FIELD_POWER5);
+	uint32 curEnergy = m_target->GetUInt32Value(POWER_TYPE);
+	uint32 maxEnergy = m_target->GetUInt32Value(POWER_TYPE+6);
+
+	switch( m_spellProto->NameHash )
+	{
+		case SPELL_HASH_ASPECT_OF_THE_VIPER:
+			float regen, manaPct;
+			// http://www.wowwiki.com/Aspect_of_the_Viper
+			// MP5Viper = Intellect × 22/35 × ( 0.9 - Manacurrent / Manamax ) + Intellect × 0.11 -- by wowwiki
+			// MP5Viper = Intellect × ( 0.55 - 22/35 × ( Manacurrent / Manamax - 0.2 ) -- by emsy... 55 is stored in DBC, maybe blizz changes it in future
+			// We're including also the Effect[1]:Dummy (35% of player's level) from the AotV in this
+			//   it's missing some values in dbc plus it saves one event this way
+							
+			manaPct = (float)curEnergy / (float)maxEnergy;
+			if( manaPct < 0.2f )
+				manaPct = 0.2f;
+			if( manaPct > 0.9f )
+				manaPct = 0.9f;
+
+			regen = ( (float)amount / 100 - 22.0f / 35.0f * (manaPct - 0.2f) ) * (float)p_target->GetUInt32Value( UNIT_FIELD_STAT3 ) + (float)p_target->getLevel()*m_spellProto->EffectBasePoints[1]/100;
+			amount = (int)regen;
+		break;
+		default:
+			//something
+			;
+	}					
+
+	uint32 totalEnergy = curEnergy+amount;
+	if(totalEnergy > maxEnergy)
+		m_target->SetUInt32Value(POWER_TYPE,maxEnergy);
+	else
+		m_target->SetUInt32Value(POWER_TYPE,totalEnergy);
+	
+	SendPeriodicAuraLog( m_casterGuid, m_target, m_spellProto->Id, m_spellProto->School, amount, 0, 0, FLAG_PERIODIC_ENERGIZE);
+
+}
 void Aura::EventPeriodicDrink(uint32 amount)
 {
 	uint32 v = m_target->GetUInt32Value(UNIT_FIELD_POWER1) + amount;
