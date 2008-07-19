@@ -1161,6 +1161,17 @@ void Spell::cast(bool check)
 
 	if(cancastresult == SPELL_CANCAST_OK)
 	{
+		if( p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_NOT_BREAK_STEALTH) && m_spellInfo->Id != 1 ) // <-- baaaad, baaad hackfix - for some reason some spells were triggering Spell ID #1 and stuffing up the spell system.
+		{
+			/* talents procing - don't remove stealth either */
+			if (!(m_spellInfo->Attributes & ATTRIBUTES_PASSIVE) && 
+				!( pSpellId && dbcSpell.LookupEntry(pSpellId)->Attributes & ATTRIBUTES_PASSIVE ) )
+			{
+				p_caster->RemoveAura(p_caster->m_stealth);
+				p_caster->m_stealth = 0;
+			}
+		}
+
 		if (p_caster && !m_triggeredSpell && p_caster->IsInWorld() && GET_TYPE_FROM_GUID(m_targets.m_unitTarget)==HIGHGUID_TYPE_UNIT)
 		{
 			sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,m_targets.m_unitTarget);
@@ -1232,17 +1243,6 @@ void Spell::cast(bool check)
 			else if( m_spellInfo->NameHash == SPELL_HASH_VICTORY_RUSH )
  			{
 				p_caster->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
-			}
-
-			if( p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_NOT_BREAK_STEALTH) && m_spellInfo->Id != 1 ) // <-- baaaad, baaad hackfix - for some reason some spells were triggering Spell ID #1 and stuffing up the spell system.
-			{
-				/* talents procing - don't remove stealth either */
-				if (!(m_spellInfo->Attributes & ATTRIBUTES_PASSIVE) && 
-					!( pSpellId && dbcSpell.LookupEntry(pSpellId)->Attributes & ATTRIBUTES_PASSIVE ) )
-				{
-					p_caster->RemoveAura(p_caster->m_stealth);
-					p_caster->m_stealth = 0;
-				}
 			}
 		}
 
