@@ -244,8 +244,6 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvPacket)
 			{
 				uint32 skill = pSpell->pLearnSpell->EffectMiscValue[i];
 				uint32 val = (pSpell->pLearnSpell->EffectBasePoints[i]+1) * 75;
-				if( val > 350 )
-					val = 350;
 
 				if( _player->_GetSkillLineMax(skill) >= val )
 					return;
