@@ -4560,7 +4560,7 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 
 	default:// Target immune to spell
 		{
-			*Duration = 0;
+			Dur = 0;
 			return;
 		}break;
 	}
@@ -4611,6 +4611,11 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_GOUGE:					// Gouge
 	case SPELL_HASH_REPENTANCE:			// Repentance
 	case SPELL_HASH_MAIM:
+	case SPELL_HASH_POLYMORPH:				// Polymorph
+	case SPELL_HASH_POLYMORPH__CHICKEN:		// Chicken
+	case SPELL_HASH_POLYMORPH__PIG:			// Pig
+	case SPELL_HASH_POLYMORPH__TURTLE:		// Turtle
+	case SPELL_HASH_POLYMORPH__SHEEP:		// Good ol' sheep
 		grp = 0;
 		break;
 
@@ -4632,15 +4637,17 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 
 	case SPELL_HASH_STUN:					// Stuns (all of them)
 	case SPELL_HASH_BASH:					// Bash
-		grp = 3;
-		break;
+		{
+			grp = 1;
+		}break;
 
 	case SPELL_HASH_FROST_NOVA:				// Frost Nova
 	case SPELL_HASH_FROSTBITE:				// Frostbite
 	case SPELL_HASH_ENTANGLING_ROOTS:		// Entangling Roots
 	case SPELL_HASH_IMPROVED_HAMSTRING:		// Improved Hamstring
-		grp = 4;
-		break;
+		{
+			grp = 2;
+		}break;
 
 	case SPELL_HASH_SEDUCTION:				// Seduction
  	case SPELL_HASH_FEAR:					// Fear
@@ -4648,52 +4655,48 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_DEATH_COIL:			// Death Coil
 	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
 	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
-		grp = 8;
-		break;
-
-	case SPELL_HASH_POLYMORPH:				// Polymorph
-	case SPELL_HASH_POLYMORPH__CHICKEN:		// Chicken
-	case SPELL_HASH_POLYMORPH__PIG:			// Pig
-	case SPELL_HASH_POLYMORPH__TURTLE:		// Turtle
-	case SPELL_HASH_POLYMORPH__SHEEP:		// Good ol' sheep
 		{
-			grp = 10;
-			pve = true;   
+			grp = 3;
 		}break;
+
 
 	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
 	case SPELL_HASH_MIND_CONTROL:			// Mind Control
-		grp = 12;
-		break;
-
-	//case SPELL_HASH_FROST_SHOCK:			// Frost Shock
-		//grp = 13;
-		//break;
+		{
+			grp = 4;
+		}break;
 
 	case SPELL_HASH_HIBERNATE:				// Hibernate
-		grp = 14;
-		break;
+	case SPELL_WYVERN_STING:				// Wyvern Sting
+		{
+			grp = 5;
+		}break;
 
 	case SPELL_HASH_CYCLONE:				// Cyclone
 	case SPELL_HASH_BLIND:					// Blind
 		{
-			grp = 15;
+			grp = 6;
 			pve = true;
 		}break;
 	case SPELL_HASH_BANISH:					// Banish
-		grp = 19;
-		break;
+		{
+			grp = 7;
+		}break;
 
 	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
-		grp = 20;
-		break;
+		{
+			grp = 8;
+		}break;
+
 	case SPELL_HASH_SLEEP:					// Sleep
 	case SPELL_HASH_RECKLESS_CHARGE:		// Reckless Charge
-		grp = 23;
-		break;
+		{
+			grp = 9;
+		}break;
 	case SPELL_HASH_RIPOSTE:
-		grp = 24;
-		break;
+		{
+			grp = 10;
+		}break;
 	}
 	uint32 ret;
 	if( pve )
