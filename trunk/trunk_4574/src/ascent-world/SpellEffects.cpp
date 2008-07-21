@@ -1709,7 +1709,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 
 		if(!Duration)
 		{
-			//maybe add some resist messege to client here ?
+			SendCastResult(SPELL_FAILED_IMMUNE);
 			return;
 		}
 		if(g_caster && g_caster->GetUInt32Value(OBJECT_FIELD_CREATED_BY) && g_caster->m_summoner)
