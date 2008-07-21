@@ -1290,7 +1290,7 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 		pUnit = m_Unit->GetMapMgr()->GetUnit(static_cast<Player *>(pUnit)->GetMisdirectionTarget());
 	}
 
-	if( m_AIState == STATE_IDLE || m_AIState == STATE_FOLLOWING )
+	if( (m_AIState == STATE_IDLE || m_AIState == STATE_FOLLOWING) && m_Unit->GetAIInterface()->GetAllowedToEnterCombat())
 	{
 		WipeTargetList();
 		
