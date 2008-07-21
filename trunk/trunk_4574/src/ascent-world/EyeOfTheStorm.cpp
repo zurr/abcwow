@@ -522,7 +522,8 @@ void EyeOfTheStorm::OnCreate()
 		}
 		m_bubbles[i]->SetFloatValue(OBJECT_FIELD_SCALE_X,0.1f);
 		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_STATE,1);
-		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_FLAGS,32);
+		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_FLAGS,33);
+		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_FACTION,114);
 
 		m_bubbles[i]->PushToWorld( m_mapMgr );
 	}
