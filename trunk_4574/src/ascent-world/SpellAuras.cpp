@@ -3334,12 +3334,12 @@ void Aura::SpellAuraModResistance(bool apply)
 	else 
 		amt = -mod->m_amount;  
 
+	if (!IsPositive() && GetUnitCaster() != NULL && m_target->GetTypeId() == TYPEID_UNIT)
+		m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, GetSpellId());
+
+
 	if( this->GetSpellProto() && ( this->GetSpellProto()->NameHash == SPELL_HASH_FAERIE_FIRE || this->GetSpellProto()->NameHash == SPELL_HASH_FAERIE_FIRE__FERAL_ ) )
-	{
 		m_target->m_can_stealth = !apply;
-		if (GetUnitCaster() != NULL && m_target->GetTypeId() == TYPEID_UNIT)
-			m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, GetSpellId());
-	}
 	
 	if( m_target->GetTypeId() == TYPEID_PLAYER )
 	{

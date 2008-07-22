@@ -4652,7 +4652,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_SEDUCTION:				// Seduction
  	case SPELL_HASH_FEAR:					// Fear
  	case SPELL_HASH_HOWL_OF_TERROR:			// Howl of Terror
-	case SPELL_HASH_DEATH_COIL:			// Death Coil
+	case SPELL_HASH_DEATH_COIL:				// Death Coil
 	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
 	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
 		{
