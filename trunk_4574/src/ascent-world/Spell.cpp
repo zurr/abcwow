@@ -4667,7 +4667,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		}break;
 
 	case SPELL_HASH_HIBERNATE:				// Hibernate
-	case SPELL_WYVERN_STING:				// Wyvern Sting
+	case SPELL_HASH_WYVERN_STING:				// Wyvern Sting
 		{
 			grp = 5;
 		}break;
