@@ -3666,20 +3666,14 @@ void Unit::AddAura(Aura *aur)
 								// no more checks on bad ptr
 								continue;
 							}
-						}					   
+						}
 					}
 					if( m_auras[x]->GetSpellId() == aur->GetSpellId() ) // not the best formula to test this I know, but it works until we find a solution
 					{
-						if( m_auras[x]->m_casterGuid != aur->m_casterGuid && !aur->m_spellProto->globalMaxstack)
+						if( !aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid && !aur->m_spellProto->globalMaxstack)
 							continue;
 
 						f++;
-
-						if(maxStack <= f)
-						{
-							deleteAur = true;
-							break;
-						}
 
 						//update duration,the same aura (update the whole stack whenever we cast a new one)
 						m_auras[x]->SetDuration(aur->GetDuration());
@@ -3696,6 +3690,12 @@ void Unit::AddAura(Aura *aur)
 							data.Initialize(SMSG_SET_AURA_SINGLE);
 							data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
 							SendMessageToSet(&data,false);
+						}
+
+						if(f >= maxStack)
+						{
+							deleteAur = true;
+							break;
 						}
 					}
 				}
