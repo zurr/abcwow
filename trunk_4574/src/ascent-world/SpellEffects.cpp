@@ -2041,7 +2041,7 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			if (strstr(m_itemProto->Name1, "Potion"))
 			{
 				if(p_caster->HasSpell(28675)) 
-					while (Rand(20) && item_count<10) item_count++;
+					while (Rand(20) && item_count<5) item_count++;
 
 				// Super Rejuvenation Potion
 				cast_chance = 2;
@@ -2051,7 +2051,7 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
 			{
 				if(p_caster->HasSpell(28677)) 
-					while (Rand(20) && item_count<10) item_count++;
+					while (Rand(20) && item_count<5) item_count++;
 
 				uint32 spList[] = {28590,28587,28588,28591,28589};
 				cast_chance = 2;
@@ -2060,8 +2060,16 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			//Transmutation Master
 			if (m_spellInfo->Category == 310)
 			{
-				if(p_caster->HasSpell(28672)) 
-					while (Rand(20) && item_count<10) item_count++;
+				if (m_spellInfo->Id == 29688) //rate for primal might is lower than for anything else
+				{
+					if(p_caster->HasSpell(28672))
+						while (Rand(40) && item_count<5) item_count++;
+				}
+				else
+				{
+					if(p_caster->HasSpell(28672))
+						while (Rand(20) && item_count<5) item_count++;
+				}
 
 				uint32 spList[] = {28581,28585,28585,28584,28582,28580};
 				cast_chance = 5;
