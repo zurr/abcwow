@@ -4616,8 +4616,9 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_POLYMORPH__PIG:			// Pig
 	case SPELL_HASH_POLYMORPH__TURTLE:		// Turtle
 	case SPELL_HASH_POLYMORPH__SHEEP:		// Good ol' sheep
-		grp = 0;
-		break;
+		{
+			grp = 0;
+		}break;
 
 	case SPELL_HASH_POUNCE:
  	case SPELL_HASH_CHEAP_SHOT:				// Cheap Shot
@@ -4638,7 +4639,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_STUN:					// Stuns (all of them)
 	case SPELL_HASH_BASH:					// Bash
 		{
-			grp = 1;
+			grp = 2;
 		}break;
 
 	case SPELL_HASH_FROST_NOVA:				// Frost Nova
@@ -4646,7 +4647,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_ENTANGLING_ROOTS:		// Entangling Roots
 	case SPELL_HASH_IMPROVED_HAMSTRING:		// Improved Hamstring
 		{
-			grp = 2;
+			grp = 3;
 		}break;
 
 	case SPELL_HASH_SEDUCTION:				// Seduction
@@ -4656,46 +4657,46 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
 	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
 		{
-			grp = 3;
+			grp = 4;
 		}break;
 
 
 	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
 	case SPELL_HASH_MIND_CONTROL:			// Mind Control
 		{
-			grp = 4;
+			grp = 5;
 		}break;
 
 	case SPELL_HASH_HIBERNATE:				// Hibernate
 	case SPELL_HASH_WYVERN_STING:				// Wyvern Sting
 		{
-			grp = 5;
+			grp = 6;
 		}break;
 
 	case SPELL_HASH_CYCLONE:				// Cyclone
 	case SPELL_HASH_BLIND:					// Blind
 		{
-			grp = 6;
+			grp = 7;
 			pve = true;
 		}break;
 	case SPELL_HASH_BANISH:					// Banish
 		{
-			grp = 7;
+			grp = 8;
 		}break;
 
 	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
 		{
-			grp = 8;
+			grp = 9;
 		}break;
 
 	case SPELL_HASH_SLEEP:					// Sleep
 	case SPELL_HASH_RECKLESS_CHARGE:		// Reckless Charge
 		{
-			grp = 9;
+			grp = 10;
 		}break;
 	case SPELL_HASH_RIPOSTE:
 		{
-			grp = 10;
+			grp = 11;
 		}break;
 	}
 	uint32 ret;
