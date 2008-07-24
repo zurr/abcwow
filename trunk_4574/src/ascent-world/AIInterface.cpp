@@ -1285,9 +1285,11 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 		return;
 	}
 
-	if (pUnit->GetTypeId() == TYPEID_PLAYER && m_Unit->GetMapMgr()->GetUnit(static_cast<Player *>(pUnit)->GetMisdirectionTarget()) != NULL)
+	if (pUnit->GetTypeId() == TYPEID_PLAYER && static_cast<Player *>(pUnit)->GetMisdirectionTarget() != 0)
 	{
-		pUnit = m_Unit->GetMapMgr()->GetUnit(static_cast<Player *>(pUnit)->GetMisdirectionTarget());
+		Unit *mTarget = m_Unit->GetMapMgr()->GetUnit(static_cast<Player *>(pUnit)->GetMisdirectionTarget());
+		if (mTarget != NULL)
+			pUnit = mTarget;
 	}
 
 	if( (m_AIState == STATE_IDLE || m_AIState == STATE_FOLLOWING) && m_Unit->GetAIInterface()->GetAllowedToEnterCombat())
