@@ -42,18 +42,6 @@ DynamicObject::DynamicObject(uint32 high, uint32 low)
 
 DynamicObject::~DynamicObject()
 {
-	// remove aura from all targets
-	DynamicObjectList::iterator jtr  = targets.begin();
-	DynamicObjectList::iterator jend = targets.end();
-	Unit * target;
-
-	while(jtr != jend)
-	{
-		target = *jtr;
-		++jtr;
-		target->RemoveAura(m_spellProto->Id);
-	}
-
 	if(u_caster->dynObj == this)
 		u_caster->dynObj = 0;
 }
@@ -65,7 +53,14 @@ void DynamicObject::Create(Unit * caster, Spell * pSpell, float x, float y, floa
 	{
 		m_parentSpell = pSpell;
 	}
-	p_caster = pSpell->p_caster;
+	if( pSpell->p_caster == NULL )
+	{
+		// try to find player caster here
+		if( caster->IsPlayer() )
+			p_caster = static_cast<Player*>( caster );
+	}
+	else
+		p_caster = pSpell->p_caster;
 
 	m_spellProto = pSpell->m_spellInfo;
 	SetUInt64Value(DYNAMICOBJECT_CASTER, caster->GetGUID());
@@ -83,19 +78,18 @@ void DynamicObject::Create(Unit * caster, Spell * pSpell, float x, float y, floa
 	u_caster = caster;
 	m_faction = caster->m_faction;
 	m_factionDBC = caster->m_factionDBC;
-	if(caster->dynObj != 0)
+
+	if(pSpell->g_caster)
+		PushToWorld(pSpell->g_caster->GetMapMgr());
+	else 
+		PushToWorld(caster->GetMapMgr());
+
+	if(caster->dynObj != NULL)
 	{
-		// expire next update
-		caster->dynObj->m_aliveDuration = 1;
-		caster->dynObj->UpdateTargets();
+		//expires
+		caster->dynObj->Remove();
 	}
 	caster->dynObj = this;
-	if(pSpell->g_caster)
-	{
-	   PushToWorld(pSpell->g_caster->GetMapMgr());
-	}else 
-		PushToWorld(caster->GetMapMgr());
-	
   
 	sEventMgr.AddEvent(this, &DynamicObject::UpdateTargets, EVENT_DYNAMICOBJECT_UPDATE, 100, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
@@ -197,8 +191,8 @@ void DynamicObject::UpdateTargets()
 
 			if(GetDistanceSq(target) > radius)
 			{
-				targets.erase(jtr2);
 				target->RemoveAura(m_spellProto->Id);
+				targets.erase(jtr2);
 			}
 		}
 
@@ -211,23 +205,25 @@ void DynamicObject::UpdateTargets()
 
 	if(m_aliveDuration == 0)
 	{
-		DynamicObjectList::iterator jtr  = targets.begin();
-		DynamicObjectList::iterator jend = targets.end();
-		Unit * target;
-
-		while(jtr != jend)
-		{
-			target = *jtr;
-			++jtr;
-			target->RemoveAura(m_spellProto->Id);
-		}
-
 		Remove();
 	}
 }
 
 void DynamicObject::Remove()
 {
+	// remove aura from all targets
+	DynamicObjectList::iterator jtr  = targets.begin();
+	DynamicObjectList::iterator jend = targets.end();
+	Unit * target;
+
+	while(jtr != jend)
+	{
+		target = *jtr;
+		++jtr;
+		if (target != NULL)
+			target->RemoveAura(m_spellProto->Id);
+	}
+
 	if(IsInWorld())
 		RemoveFromWorld(true);
 	delete this;
