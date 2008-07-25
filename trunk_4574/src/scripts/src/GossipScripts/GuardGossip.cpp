@@ -3591,9 +3591,9 @@ public:
     }
 };
 
-/************************************************************************/
-/* Shattrath Guards                                           by AeThIs */
-/************************************************************************/
+/*****************************************************************************************/
+/* Shattrath Guards   original structure by AeThIs. Translated, updated and  by Pepsi1x1 */
+/*****************************************************************************************/
 
 class SCRIPT_DECL ShattrathGuard : public GossipScript
 {
@@ -3602,28 +3602,28 @@ public:
 	{
 		delete this;
 	}
-   void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10524, Plr);
 
-        Menu->AddItem(0, "End of the world bar", 1);
-        Menu->AddItem(0, "Bank of Shattrath", 2);
-        Menu->AddItem(0, "The Inn", 3);
-        Menu->AddItem(0, "Gryphon Master", 4);
+        Menu->AddItem(0, "World's End Tavern", 1);
+        Menu->AddItem(0, "Bank", 2);
+        Menu->AddItem(0, "Inn", 3);
+        Menu->AddItem(0, "Flight Master", 4);
         Menu->AddItem(0, "Mailbox", 5);    
         Menu->AddItem(0, "Stable Master", 6);
         Menu->AddItem(0, "Battlemaster", 7);
         Menu->AddItem(0, "Profession Trainer", 8);
         Menu->AddItem(0, "Mana Loom", 9);
-        Menu->AddItem(0, "Alchemy laboratory", 10);
-        Menu->AddItem(0, "Gem merchant", 11);
+        Menu->AddItem(0, "Alchemy Lab", 10);
+        Menu->AddItem(0, "Gem Merchant", 11);
 
         if(AutoSend)
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
+   void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
@@ -3636,68 +3636,63 @@ public:
             // Menus
             /////
 
-        case 1:     // Taberna del fin del mundo
-            SendQuickMenu(3834);
-            Plr->Gossip_SendPOI(-1760.4, 5166.9, 6, 6, 0, "End of the world bar");
+        case 1:     // World's End Tavern
+            SendQuickMenu(10394);
+            Plr->Gossip_SendPOI(-1760.4, 5166.9, 6, 6, 0, "World's End Tavern");
             break;
 
-        case 2:     // Banco de Shattrath
+        case 2:     // Shattrath Banks
 			{
-            SendQuickMenu(764);
-                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10395, Plr);
                 Menu->AddItem( 0, "Aldor Bank"          , 12);
-                Menu->AddItem( 0, "Aruspice Bank"         , 13);
+                Menu->AddItem( 0, "Scryers Bank"         , 13);
                 Menu->SendTo(Plr);
             }break;
 
 
-        case 3:     // Posada
+        case 3:     // Inn's
 			{
-            SendQuickMenu(3813);
-                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10398, Plr);
                 Menu->AddItem( 0, "Aldor inn"          , 14);
-                Menu->AddItem( 0, "Aruspice inn"         , 15);
+                Menu->AddItem( 0, "Scryers inn"         , 15);
                 Menu->SendTo(Plr);
             }break;
 
-        case 4:     // Maestro de vuelo
-            SendQuickMenu(3860);
+        case 4:     // Gryphon Master
+            SendQuickMenu(10402);
             Plr->Gossip_SendPOI(-1831.9, 5298.2, 6, 6, 0, "Gryphon Master");
             break;
 
-        case 5:     // Buzon de correo
+        case 5:     // Mailboxes
 			{
-                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10403, Plr);
                 Menu->AddItem( 0, "Aldor inn"          , 16);
-                Menu->AddItem( 0, "Aruspice inn"         , 17);
+                Menu->AddItem( 0, "Scryers inn"         , 17);
 				Menu->AddItem( 0, "Aldor Bank"          , 18);
-                Menu->AddItem( 0, "Aruspice Bank"         , 19);
+                Menu->AddItem( 0, "Scryers Bank"         , 19);
                 Menu->SendTo(Plr);
             }break;
 
-        case 6:     // Maestro de establos
+        case 6:     // Stable Masters
 			{
-            SendQuickMenu(882);
-                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
-                Menu->AddItem( 0, "Aldor inn"          , 20);
-                Menu->AddItem( 0, "Aruspice inn"         , 21);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10404, Plr);
+                Menu->AddItem( 0, "Aldor Stable"          , 20);
+                Menu->AddItem( 0, "Scryers Stable"         , 21);
                 Menu->SendTo(Plr);
             }break;
 
-        case 7:     // Maestro de guerra
+        case 7:     // Battlemasters
 			{
-            SendQuickMenu(3518);
-                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
-                Menu->AddItem( 0, "Alliance Battlemaster"          , 22);
-                Menu->AddItem( 0, "Horde Battlemaster and Arena master"         , 23);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10405, Plr);
+                Menu->AddItem( 0, "Alliance Battlemasters"          , 22);
+                Menu->AddItem( 0, "Horde & Arena Battlemasters"         , 23);
                 Menu->SendTo(Plr);
             }break;
 
-        case 8:     // Instructor de Profesion
+        case 8:     // Proffesion Trainers
 			{
-            SendQuickMenu(5984);
-                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
-                Menu->AddItem( 0, "Alchemist"          , 24);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10391, Plr);
+                Menu->AddItem( 0, "Alchemy"          , 24);
                 Menu->AddItem( 0, "Blacksmithing"         , 25);
 				Menu->AddItem( 0, "Cooking"          , 26);
                 Menu->AddItem( 0, "Enchanting"         , 27);
@@ -3708,124 +3703,124 @@ public:
                 Menu->SendTo(Plr);
             }break;
 
-        case 9:     // Telar de mana
-            SendQuickMenu(4516);
+        case 9:     // Mana Loom
+            SendQuickMenu(10408);
             Plr->Gossip_SendPOI(-2073.9, 5265.7, 6, 6, 0, "Mana Loom");
             break;
 
-        case 10:    // Laboratorio de alquimia
-            SendQuickMenu(7047);
-            Plr->Gossip_SendPOI(-1648.1, 5537.3, 6, 6, 0, "Alchemy laboratory");
+        case 10:    // Alchemy Lab
+            SendQuickMenu(10409);
+            Plr->Gossip_SendPOI(-1648.1, 5537.3, 6, 6, 0, "Alchemy Lab");
             break;
 
-        case 11:    // Mercader de gemas
+        case 11:    // Gem Merchants
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
-                Menu->AddItem( 0, "Aldor gem merchant"          , 32);
-                Menu->AddItem( 0, "Aruspice gem merchant"         , 33);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10410, Plr);
+                Menu->AddItem( 0, "Aldor Gem Merchant"          , 32);
+                Menu->AddItem( 0, "Scryer Gem Merchant"         , 33);
                 Menu->SendTo(Plr);
             }break;
 
 
             //////////////////////
-            // Bancos
+            // Banks
             /////
 
 
-        case 12: //Banco Aldor
+        case 12: //Aldor Bank
             {
                 Plr->Gossip_SendPOI(-1730.8, 5496.2, 6, 6, 0, "Aldor Bank");
-                SendQuickMenu(902);
+                SendQuickMenu(10396);
             }break;
 
-        case 13: //Banco Aruspice
+        case 13: //Scryers Bank
             {
-                Plr->Gossip_SendPOI(-1999.6, 5362.0, 6, 6, 0, "Aruspice Bank");
-                SendQuickMenu(905);
+                Plr->Gossip_SendPOI(-1999.6, 5362.0, 6, 6, 0, "Scryers Bank");
+                SendQuickMenu(10397);
             }break;
 
 
             //////////////////////
-            // Posadas
+            // Inns
             /////
 
 
-        case 14: //Posada Aldor
+        case 14: //Aldor Inn
             {
                 Plr->Gossip_SendPOI(-1897.5, 5767.6, 6, 6, 0, "Aldor inn");
-                SendQuickMenu(902);
+                SendQuickMenu(10399);
             }break;
 
-        case 15: //Posada Aruspice
+        case 15: //Scryers Inn
             {
-                Plr->Gossip_SendPOI(-2180.6, 5403.9, 6, 6, 0, "Aruspice inn");
-                SendQuickMenu(905);
+                Plr->Gossip_SendPOI(-2180.6, 5403.9, 6, 6, 0, "Scryers inn");
+                SendQuickMenu(10401);
             }break;
 
 
             //////////////////////
-            // Buzon
+            // Mailboxes
             /////
 
 
-        case 16: //Posada Aldor
+        case 16: //Aldor Inn
             {
-                Plr->Gossip_SendPOI(-1886.9, 5761.5, 6, 6, 0, "Aldor Mailbox");
-                SendQuickMenu(902);
+                Plr->Gossip_SendPOI(-1886.9, 5761.5, 6, 6, 0, "Aldor Inn");
+                SendQuickMenu(10399);
             }break;
 
-        case 17: //Posada Aruspice
+        case 17: //Scryers Bank
             {
-                Plr->Gossip_SendPOI(-2175.0, 5411.7, 6, 6, 0, "Aruspice Mailbox");
-                SendQuickMenu(905);
+                Plr->Gossip_SendPOI(-2175.0, 5411.7, 6, 6, 0, "Scryers Bank");
+                SendQuickMenu(10397);
             }break;
 
-        case 18: //Banco Aldor
+        case 18: //Aldor Bank
             {
-                Plr->Gossip_SendPOI(-1695.5, 5521.8, 6, 6, 0, "Aldor Mailbox");
-                SendQuickMenu(902);
+                Plr->Gossip_SendPOI(-1695.5, 5521.8, 6, 6, 0, "Aldor Bank");
+                SendQuickMenu(10396);
             }break;
 
-        case 19: //Banco Aruspice
+        case 19: //Scryers Inn
             {
-                Plr->Gossip_SendPOI(-2033.0, 5336.1, 6, 6, 0, "Aruspice Mailbox");
-                SendQuickMenu(905);
+                Plr->Gossip_SendPOI(-2033.0, 5336.1, 6, 6, 0, "Scryers Inn");
+                SendQuickMenu(10401);
             }break;
 
 
             //////////////////////
-            // Maestro de establos
+            // Stable Masters
             /////
 
 
-        case 20: //Maestro Aldor
+        case 20: //Aldor Stable Master
             {
-                Plr->Gossip_SendPOI(-1889.6, 5761.5, 6, 6, 0, "Aldor Stable Master");
-                SendQuickMenu(902);
+                Plr->Gossip_SendPOI(-1889.6, 5761.5, 6, 6, 0, "Aldor Stable");
+                SendQuickMenu(10399);
             }break;
 
-        case 21: //Maestro Aruspice
+        case 21: //Scryers Stable Master
             {
-                Plr->Gossip_SendPOI(-2170.0, 5404.6, 6, 6, 0, "Aruspice Stable Master");
-                SendQuickMenu(905);
+                Plr->Gossip_SendPOI(-2170.0, 5404.6, 6, 6, 0, "Scryers Stable");
+                SendQuickMenu(10401);
             }break;
 
 
             //////////////////////
-            // Maestro de guerra
+            // Battlemasters
             /////
 
 
-        case 22: //Maestro Alianza
+        case 22: //Alliance Battlemaster
             {
-                Plr->Gossip_SendPOI(-1831.9, 5298.2, 6, 6, 0, "Alliance Battlemaster");
-                SendQuickMenu(902);
+                Plr->Gossip_SendPOI(-1831.9, 5298.2, 6, 6, 0, "Alliance Battlemasters");
+                SendQuickMenu(10406);
             }break;
 
-        case 23: //Maestro Horda y Arena
+        case 23: //Horde Battle Master and Arena Battle Master
             {
-                Plr->Gossip_SendPOI(-1968.7, 5262.2, 6, 6, 0, "Horde Battlemaster");
-                SendQuickMenu(905);
+                Plr->Gossip_SendPOI(-1968.7, 5262.2, 6, 6, 0, "Horde & Arena Battlemasters");
+                SendQuickMenu(10407);
             }break;
 
 
@@ -3834,80 +3829,79 @@ public:
 
 
             //////////////////////
-            // Instructores de Profesion
+            // Profession Trainers
             /////
 
 
-        case 24: //Alquimia
+        case 24: //Alchemy
             {
                 Plr->Gossip_SendPOI(-1661.0, 5538, 6, 6, 0, "Alchemy Trainer");
-                SendQuickMenu(902);
+                SendQuickMenu(10413);
             }break;
 
-        case 25: //Herreria
+        case 25: //Blacksmithing
             {
                 Plr->Gossip_SendPOI(-1847.7, 5230.3, 6, 6, 0, "Blacksmithing Trainer");
-                SendQuickMenu(905);
+                SendQuickMenu(10400);
             }break;
 
-        case 26: //Cocina
+        case 26: //Cooking
             {
                 Plr->Gossip_SendPOI(-2067.4, 5316.5, 6, 6, 0, "Cooking Trainer");
-                SendQuickMenu(902);
+                SendQuickMenu(10414);
             }break;
 
-        case 27: //Encantamiento
+        case 27: //Enchanting
             {
                 Plr->Gossip_SendPOI(-2278.5, 5567.7, 6, 6, 0, "Enchanting Trainer");
-                SendQuickMenu(905);
+                SendQuickMenu(10415);
             }break;
 
-        case 28: //Primeros Auxilios
+        case 28: //First Aid
             {
                 Plr->Gossip_SendPOI(-1592.0, 5263.7, 6, 6, 0, "First Aid Trainer");
-                SendQuickMenu(902);
+                SendQuickMenu(10416);
             }break;
 
-        case 29: //Joyeria
+        case 29: //Jewelcrafting
             {
                 Plr->Gossip_SendPOI(-1653.3, 5665.1, 6, 6, 0, "Jewelcrafting Trainer");
-                SendQuickMenu(905);
+                SendQuickMenu(10417);
             }break;
 
-        case 30: //Peleteria
+        case 30: //Leatherworking
             {
                 Plr->Gossip_SendPOI(-2060.9, 5256.6, 6, 6, 0, "Leatherworking Trainer");
-                SendQuickMenu(902);
+                SendQuickMenu(10418);
             }break;
 
-        case 31: //Desuello
+        case 31: //Skinning
             {
                 Plr->Gossip_SendPOI(-2047.9, 5299.6, 6, 6, 0, "Skinning Trainer");
-                SendQuickMenu(905);
+                SendQuickMenu(10419);
             }break;
 
 
             //////////////////////
-            // Mercader de gemas
+            // Gem Merchants
             /////
 
 
-        case 32: //Mercader de gemas Aldor
+        case 32: //Aldor gem merchant
             {
                 Plr->Gossip_SendPOI(-1649.3, 5668.6, 6, 6, 0, "Aldor gem merchant");
-                SendQuickMenu(902);
+                SendQuickMenu(10411);
             }break;
 
-        case 33: //Mercader de gemas Aruspice
+        case 33: //Scryers gem merchant
             {
-                Plr->Gossip_SendPOI(-2193.9, 5422.1, 6, 6, 0, "Aruspice gem merchant");
-                SendQuickMenu(905);
+                Plr->Gossip_SendPOI(-2193.9, 5422.1, 6, 6, 0, "Scryers gem merchant");
+                SendQuickMenu(10412);
             }break;
 
         }
     }
 };
-
 void SetupGuardGossip(ScriptMgr * mgr)
 {
 	GossipScript * gold = (GossipScript*) new GoldshireGuard();
@@ -3975,7 +3969,3 @@ void SetupGuardGossip(ScriptMgr * mgr)
 	// To do:
 	//	- Add (eventually) missing guards which should use one of those guard menus.
 	//	- Check all scripts + add guard text to DB and connect them with correct scripts.
-
-
-
-

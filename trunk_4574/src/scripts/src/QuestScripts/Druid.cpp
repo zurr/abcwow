@@ -21,7 +21,12 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-bool CenarionMoondust(uint32 i, Spell* pSpell) // Body And Heart (Alliance)
+
+
+/*--------------------------------------------------------------------------------------------------------*/
+// Body And Heart (Alliance)
+
+bool CenarionMoondust(uint32 i, Spell* pSpell) 
 {
   const float pos[] = {6348.540039f, 128.124176f, 22.024008f, 4.172032f}; // x, y, z, o
   Player *p_caster = pSpell->p_caster;
@@ -43,7 +48,12 @@ bool CenarionMoondust(uint32 i, Spell* pSpell) // Body And Heart (Alliance)
   return true;
 }
 
-bool CenarionLunardust(uint32 i, Spell* pSpell) // Body And Heart (Horde)
+
+
+/*--------------------------------------------------------------------------------------------------------*/
+// Body And Heart (Horde)
+
+bool CenarionLunardust(uint32 i, Spell* pSpell) 
 {
   const float pos[] = {-2449.117920f, -1627.319824f, 91.801430f, 0}; // x, y, z, o
   Player *p_caster = pSpell->p_caster;
@@ -113,7 +123,12 @@ public:
   }
 };
 
-bool CurativeAnimalSalve(uint32 i, Spell* pSpell) // Curing the Sick
+
+
+/*--------------------------------------------------------------------------------------------------------*/
+// Curing the Sick
+
+bool CurativeAnimalSalve(uint32 i, Spell* pSpell) 
 {
 	Player *caster = pSpell->p_caster;
 	if(caster == NULL)
@@ -154,6 +169,33 @@ bool CurativeAnimalSalve(uint32 i, Spell* pSpell) // Curing the Sick
 	return true;
 }
 
+
+
+/*--------------------------------------------------------------------------------------------------------*/
+// Vanquish the Raven God
+
+bool SwiftForm(uint32 i, Spell* pSpell)
+{	
+  	Player *p_caster = pSpell->p_caster;
+  	if(!p_caster)
+	  	return true;
+	 	
+	if(p_caster->GetMapMgr()->iInstanceMode != MODE_HEROIC)
+	{	
+		p_caster->BroadcastMessage("Heroic Mode required!");
+		return true;
+	}
+
+	GameObject* obj = 0;
+	obj = sEAS.SpawnGameobject(p_caster, 300154, -86.6862, 287.625, 26.4832, 0, 1);
+	sEAS.GameobjectDelete(obj, 20*60*1000);
+
+  	Creature *boss = sEAS.SpawnCreature(p_caster, 23035, -87.3546, 288.006, 26.4832, 0, 0);
+
+  	return true;
+}
+
+
 void SetupDruid(ScriptMgr * mgr)
 {
   QuestScript *Moonglade = (QuestScript*) new MoongladeQuest();
@@ -163,4 +205,5 @@ void SetupDruid(ScriptMgr * mgr)
   mgr->register_dummy_spell(19138, &CenarionLunardust);
   mgr->register_dummy_spell(18974, &CenarionMoondust);
   mgr->register_dummy_spell(19512, &CurativeAnimalSalve);
+  mgr->register_dummy_spell(40098, &SwiftForm);
 }

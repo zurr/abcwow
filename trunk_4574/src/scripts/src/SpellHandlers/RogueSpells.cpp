@@ -24,19 +24,9 @@ bool Preparation(uint32 i, Spell * pSpell)
     if( playerTarget == NULL ) 
 		return true;
 
-	uint32 ClearSpellId[11] = {5277,26669,2983,8696,11305,1856,1857,26889,14177,14183,36554};
-
-	for(i = 0; i < 11; ++i)
-	{
-		if( playerTarget->HasSpell( ClearSpellId[i] ) )
-			playerTarget->ClearCooldownForSpell( ClearSpellId[i] );
-	}
-
-	/*
-    playerTarget->ClearCooldownsOnLine(39, pSpell->m_spellInfo->Id); // line - subtlety
+	playerTarget->ClearCooldownsOnLine(39, pSpell->m_spellInfo->Id); // line - subtlety
     playerTarget->ClearCooldownsOnLine(38, pSpell->m_spellInfo->Id); // line - combat
     playerTarget->ClearCooldownsOnLine(253, pSpell->m_spellInfo->Id);// line - assassination
-	*/
     return true;
 }
 

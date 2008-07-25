@@ -82,7 +82,7 @@ public:
 					if(en && en->GetMobCount(1) < en->GetQuest()->required_mobcount[1])
 					{
 						en->SetMobCount(1, 1);
-						en->SendUpdateAddKill(0);
+						en->SendUpdateAddKill(1);
 						en->UpdatePlayerFields();
 					}
 

@@ -192,26 +192,32 @@ bool BanishExile(uint32 i, Spell * pSpell)
 bool ForemansBlackjack(uint32 i, Spell *pSpell)
 {
 	Unit* target = pSpell->GetUnitTarget();
-	if(!pSpell->p_caster || !target || target->GetTypeId() != TYPEID_UNIT) return true;
+	if(!pSpell->p_caster || !target || target->GetTypeId() != TYPEID_UNIT) 
+		return true;
+	
+	// check to see that we have the correct creature
+	Creature* c_target = (Creature*)target;
+	if(!c_target || c_target->GetEntry() != 10556 || !c_target->HasAura(18795)) 
+		return true;
 
-	// play sound and animation
-	WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 12);
-	data << uint32(6197) << target->GetGUID();
-	pSpell->p_caster->SendMessageToSet(&data, true);
+	// Start moving again
+	if(target->GetAIInterface())
+		target->GetAIInterface()->StopMovement(0);
+
+	// Remove Zzz aura
+	c_target->RemoveAllAuras();
 
 	// send chat message
 	char msg[100];
 	sprintf(msg, "Ow! Ok, I'll get back to work, %s", pSpell->p_caster->GetName());
 	target->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);
 
-	Creature* c_target = (Creature*)target;
-	if(!c_target) return true;
+	// Increment the quest log
+	sQuestMgr.OnPlayerKill( pSpell->p_caster, c_target );
 
-	uint32 creatureID = c_target->GetEntry();
-
-  // check to see that we have the correct creature and increment the quest log
-	if(creatureID == 10556)
-		sQuestMgr.OnPlayerKill(pSpell->p_caster, c_target);
+	// Add timed event to return lazy peon to Zzz after 5-10 minutes (spell 18795)
+	SpellEntry * pSpellEntry = dbcSpell.LookupEntry(18795);
+	sEventMgr.AddEvent( target ,&Unit::EventCastSpell , target , pSpellEntry , EVENT_UNK, 300000 + RandomUInt( 300000 ) , 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 
 	return true;
 }
