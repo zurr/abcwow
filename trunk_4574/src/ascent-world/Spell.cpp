@@ -1107,8 +1107,7 @@ void Spell::cancel()
 					DynamicObject* dynObj=m_caster->GetMapMgr()->GetDynamicObject(m_caster->GetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT));
 					if(dynObj)
 					{
-						dynObj->RemoveFromWorld(true);
-						delete dynObj;
+						dynObj->Remove();
 					}
 				}
 
@@ -2113,8 +2112,7 @@ void Spell::SendChannelUpdate(uint32 time)
 			DynamicObject* dynObj=u_caster->GetMapMgr()->GetDynamicObject(u_caster->GetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT));
 			if(dynObj)
 			{
-				dynObj->RemoveFromWorld(true);
-				delete dynObj;
+				dynObj->Remove();
 			}
 			u_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT,0);
 			u_caster->SetUInt32Value(UNIT_CHANNEL_SPELL,0);

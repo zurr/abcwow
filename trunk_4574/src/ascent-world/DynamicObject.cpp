@@ -211,18 +211,24 @@ void DynamicObject::UpdateTargets()
 
 void DynamicObject::Remove()
 {
-	// remove aura from all targets
-	DynamicObjectList::iterator jtr  = targets.begin();
-	DynamicObjectList::iterator jend = targets.end();
-	Unit * target;
-
-	while(jtr != jend)
+	if (!targets.empty())
 	{
-		target = *jtr;
-		++jtr;
-		if (target != NULL)
-			target->RemoveAura(m_spellProto->Id);
+		// remove aura from all targets
+		DynamicObjectList::iterator jtr  = targets.begin();
+		DynamicObjectList::iterator jend = targets.end();
+		Unit * target;
+
+		while(jtr != jend)
+		{
+			target = *jtr;
+			++jtr;
+			if (target != NULL)
+				target->RemoveAura(m_spellProto->Id);
+		}
 	}
+
+	if(u_caster != NULL && u_caster->dynObj == this)
+		u_caster->dynObj = 0;
 
 	if(IsInWorld())
 		RemoveFromWorld(true);
