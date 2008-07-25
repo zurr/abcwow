@@ -21,7 +21,10 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 	SetupZangarmarsh(mgr);
 	SetupUndercity(mgr);
 	SetupAzuremystIsle(mgr);
-	SetupMage(mgr);
+	SetupUnGoro(mgr);
+  SetupMage(mgr);
+  SetupBarrens(mgr);
+  SetupIsleOfQuelDanas(mgr);
 }
 
 #ifdef WIN32

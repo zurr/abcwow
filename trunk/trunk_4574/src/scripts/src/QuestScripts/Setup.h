@@ -13,5 +13,8 @@ void SetupZangarmarsh(ScriptMgr *mgr);
 void SetupUndercity(ScriptMgr * mgr);
 void SetupAzuremystIsle(ScriptMgr *mgr);
 void SetupMage(ScriptMgr *mgr);
+void SetupBarrens(ScriptMgr *mgr);
+void SetupUnGoro(ScriptMgr * mgr);
+void SetupIsleOfQuelDanas(ScriptMgr *mgr);
 
 #endif

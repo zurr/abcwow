@@ -98,7 +98,7 @@ bool FilledShimmeringVessel(uint32 i, Spell* pSpell) // Blood Elf ress. quest
   target->SetStandState(0);
   target->setDeathState(ALIVE);
 
-  target->Despawn(10*1000, 1*60*1000);
+  target->Despawn(30*1000, 1*60*1000);
 
   qle->SetMobCount(0, 1);
   qle->SendUpdateAddKill(0);
@@ -121,6 +121,62 @@ public:
   }
 };
 
+/*--------------------------------------------------------------------------------------------------------*/
+
+class GildedBrazier : public GameObjectAIScript
+{
+public:
+	GildedBrazier(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new GildedBrazier(GO); }
+
+	void OnActivate(Player * pPlayer)	
+	{
+		if(pPlayer->GetQuestLogForEntry(9678))
+		{
+			float SSX = pPlayer->GetPositionX();
+			float SSY = pPlayer->GetPositionY();
+			float SSZ = pPlayer->GetPositionZ();
+			float SSO = pPlayer->GetOrientation();
+			
+			GameObject* Brazier = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( SSX, SSY, SSZ, 181956);
+			if (Brazier)
+			{
+				Brazier->SetUInt32Value(GAMEOBJECT_STATE, 0);
+				pPlayer->GetMapMgr()->GetInterface()->SpawnCreature(17716, SSX, SSY, SSZ, SSO, true, false, 0, 0)->Despawn(600000, 0);
+			}
+		}
+		else
+		{
+			pPlayer->BroadcastMessage("Missing required quest : The First Trial");
+		}
+	}
+};
+
+class stillbladeQAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(stillbladeQAI);
+    	stillbladeQAI(Creature* pCreature) : CreatureAIScript(pCreature)  
+    	{
+    	
+	}
+	
+	void OnDied(Unit *mKiller) 
+	{
+		float SSX = mKiller->GetPositionX();
+		float SSY = mKiller->GetPositionY();
+		float SSZ = mKiller->GetPositionZ();
+		float SSO = mKiller->GetOrientation();
+			
+		GameObject* Brazier = mKiller->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( SSX, SSY, SSZ, 181956);
+		if (Brazier)
+		{
+			Brazier->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		}
+	}
+};
+
+
 void SetupPaladin(ScriptMgr * mgr)
 {
   mgr->register_dummy_spell(8593, &SymbolOfLife);
@@ -129,4 +185,6 @@ void SetupPaladin(ScriptMgr * mgr)
   mgr->register_creature_script(17542, &PaladinDeadNPC::Create);
   mgr->register_creature_script(6177, &PaladinDeadNPC::Create);
   mgr->register_creature_script(6172, &PaladinDeadNPC::Create);
+  mgr->register_gameobject_script(181956, &GildedBrazier::Create);
+  mgr->register_creature_script(17716, &stillbladeQAI::Create);
 }

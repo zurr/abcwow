@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="MiscScripts"
 	ProjectGUID="{44119036-1060-4EDC-9D54-8C74A723EA53}"
 	RootNamespace="ServerStatusPlugin"
@@ -201,7 +201,19 @@
 			Name="Scripts"
 			>
 			<File
+				RelativePath="..\src\MiscScripts\Creatures.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\MiscScripts\GameObjects.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\MiscScripts\QuelDanasPortal.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\MiscScripts\RandomScripts.cpp"
 				>
 			</File>
 		</Filter>

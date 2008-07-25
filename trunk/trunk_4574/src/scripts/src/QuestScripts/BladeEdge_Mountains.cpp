@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
+#include "EAS/EasyFunctions.h"
 
 // The Bladespire Threat Quest
 class BladespireQAI : public CreatureAIScript
@@ -44,6 +45,26 @@ public:
 	}
 };
 
+// Creating the Pendant Quest
+bool Quest_CreatingThePendant(uint32 i, Spell * pSpell)
+{
+  if(!pSpell->u_caster->IsPlayer())
+    return true;
+
+  Player *plr = (Player*)pSpell->u_caster;
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(10567);
+ 
+  if(qle == NULL)
+    return true;
+
+  uint32 entry = 21767;
+
+  Creature *creat = sEAS.SpawnCreature(plr, entry, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 5*60*1000);
+
+  return true;
+}
+
+
 void SetupBladeEdgeMountains(ScriptMgr * mgr)
 {
 	mgr->register_creature_script(19995, &BladespireQAI::Create);
@@ -51,4 +72,5 @@ void SetupBladeEdgeMountains(ScriptMgr * mgr)
 	mgr->register_creature_script(20765, &BladespireQAI::Create);
 	mgr->register_creature_script(20766, &BladespireQAI::Create);
 	mgr->register_creature_script(19998, &BladespireQAI::Create);
+	mgr->register_dummy_spell(37426, &Quest_CreatingThePendant);
 }

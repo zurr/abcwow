@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="QuestScripts"
 	ProjectGUID="{60406704-5136-447C-B34B-C5AD16A094FD}"
 	RootNamespace="QuestScripts"
@@ -215,7 +215,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\QuestScripts\Eastern_Plaguelands.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\QuestScripts\Hellfire_Peninsula.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Isle_of_QuelDanas.cpp"
 				>
 			</File>
 			<File
@@ -243,7 +251,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\QuestScripts\The_Barrens.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\QuestScripts\Undercity.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\QuestScripts\UnGoro.cpp"
 				>
 			</File>
 			<File

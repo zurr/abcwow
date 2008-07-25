@@ -190,7 +190,7 @@ public:
     pC->event_AddEvent(te);
   }
 
-  GameObject *SpawnGameobject(Player *plr, uint32 entry_id, float x, float y, float z, float o)
+  GameObject *SpawnGameobject(Player *plr, uint32 entry_id, float x, float y, float z, float o, float scale)
   {
     PrintMessage("Function call: SpawnGameobject()");
     if(plr == NULL)
@@ -201,8 +201,10 @@ public:
       return NULL;
 
     GameObject *pC = plr->GetMapMgr()->CreateGameObject(entry_id);
+    //pC->spawnid=0;
     pC->m_spawn=0;
     pC->CreateFromProto(entry_id, plr->GetMapId(), (float)x, (float)y, (float)z, (float)o);
+    pC->SetFloatValue(OBJECT_FIELD_SCALE_X, (float)scale);
     pC->SetMapId(plr->GetMapId());
     pC->SetInstanceID(plr->GetInstanceID());
     pC->PushToWorld(plr->GetMapMgr());

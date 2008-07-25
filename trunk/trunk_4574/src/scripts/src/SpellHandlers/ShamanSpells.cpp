@@ -91,7 +91,7 @@ bool RockbiterWeapon(uint32 i, Spell* pSpell)
         if(Slot < 0) return true;
     }
 
-    sLog.outDebug("ShamanSpells.cpp :: Rockbiter Weapon Rank %u, enchant %u, slot %u", pSpell->m_spellInfo->RankNumber,
+	sLog.outDebug("ShamanSpells.cpp :: Rockbiter Weapon Rank %u, enchant %u, slot %u", pSpell->m_spellInfo->RankNumber,
         enchantment_entry, Slot);
     
     return true;

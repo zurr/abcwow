@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="GossipScripts"
 	ProjectGUID="{25B8B9AE-2401-4F71-B946-26F6D3237443}"
 	RootNamespace="GossipScripts"
@@ -385,7 +385,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\src\GossipScripts\Gossip_Battlemaster.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\GossipScripts\Gossip_Innkeepers.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\GossipScripts\Gossip_Mulgore.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\GossipScripts\Gossip_Shattrath.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\GossipScripts\Gossip_Tanaris.cpp"
 				>
 			</File>
 			<File
@@ -394,6 +410,10 @@
 			</File>
 			<File
 				RelativePath="..\src\GossipScripts\Token_Vendor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\GossipScripts\TrainerGossip.cpp"
 				>
 			</File>
 		</Filter>

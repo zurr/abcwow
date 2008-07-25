@@ -75,14 +75,14 @@ bool SealOfRighteousness(uint32 i, Aura* pAura, bool apply)
 			break;
 	}
 
-	SpellEntry * m_spellInfo = dbcSpell.LookupEntry(applyId);
+	SpellEntry * entry = dbcSpell.LookupEntry(applyId);
 
 	if(apply == true)
 	{
 		int32 value = 0;
-		float randomPointsPerLevel = m_spellInfo->EffectDicePerLevel[2];
-		int32 basePoints = m_spellInfo->EffectBasePoints[2] + 1;
-		int32 randomPoints = m_spellInfo->EffectDieSides[2];
+		float randomPointsPerLevel = entry->EffectDicePerLevel[2];
+		int32 basePoints = entry->EffectBasePoints[2] + 1;
+		int32 randomPoints = entry->EffectDieSides[2];
 		if(u_caster)
 				randomPoints += u_caster->getLevel() * (int32)randomPointsPerLevel;
 
@@ -92,10 +92,10 @@ bool SealOfRighteousness(uint32 i, Aura* pAura, bool apply)
 				value = basePoints + rand()  %randomPoints;
 
 		//this may be dangerous but let it be
-		/*if(m_spellInfo->SpellGroupType)
+		/*if(entry->SpellGroupType)
 		{
-				SM_FIValue(u_caster->SM_FDummy,&value,m_spellInfo->SpellGroupType);
-				SM_PIValue(u_caster->SM_PDummy,&value,m_spellInfo->SpellGroupType);
+				SM_FIValue(u_caster->SM_FDummy,&value,entry->SpellGroupType);
+				SM_PIValue(u_caster->SM_PDummy,&value,entry)->SpellGroupType);
 		}*/
 
 		// add spell damage!
