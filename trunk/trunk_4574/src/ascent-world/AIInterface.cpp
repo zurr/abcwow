@@ -214,7 +214,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				{
 					m_Unit->SetUInt64Value(UNIT_FIELD_TARGET, pUnit->GetGUID());
 				}
-				if(m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
+				if(m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
 				{
 					if(m_Unit->GetTypeId() == TYPEID_UNIT)
 					{
@@ -231,7 +231,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 
 
 				Unit* target = NULL;
-				if (m_Unit->GetMapMgr()->GetMapInfo() != NULL)
+				if (m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo() != NULL)
 				{
 					switch (m_Unit->GetMapMgr()->GetMapInfo()->type)
 					{
@@ -336,7 +336,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 					CALL_SCRIPT_EVENT(m_Unit, OnCombatStop)(SavedFollow);
 				}
 
-				if(m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
+				if(m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
 				{
 					if(m_Unit->GetTypeId() == TYPEID_UNIT)
 					{
@@ -509,7 +509,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				HandleEvent(EVENT_FOLLOWOWNER, m_Unit, 0);
 			}*/
 
-			if(m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
+			if(m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
 			{
 				if(m_Unit->GetTypeId() == TYPEID_UNIT)
 				{
@@ -1378,7 +1378,7 @@ Unit* AIInterface::FindTarget()
 	#ifdef LOS_CHECKS
 	if ( CollideInterface.isCollitionMap(m_Unit->GetMapId()))
 	{
-		if( m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_NULL )
+		if(m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_NULL )
 			check_los = false;
 	}
 	#endif

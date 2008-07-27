@@ -9017,13 +9017,12 @@ void Player::UnPossess()
 				Unit *temp = itr->first;
 				if (temp->GetTypeId() == TYPEID_UNIT && temp->isAlive())
 				{
-					temp->GetAIInterface()->RemoveThreatByPtr(this);
+					temp->GetAIInterface()->RemoveThreatByPtr(pTarget);
 					if (temp->GetAIInterface()->GetNextTarget() == pTarget)
 						temp->GetAIInterface()->SetNextTarget(NULL);
 					if (pTarget->m_faction == temp->m_faction)
 					{
 						temp->GetAIInterface()->AttackReaction(this, 1, 0);
-						temp->GetAIInterface()->SetNextTarget(this);
 					}
 				}
 			}
@@ -9031,7 +9030,6 @@ void Player::UnPossess()
 
 		pTarget->GetAIInterface()->ClearHateList();
 		pTarget->GetAIInterface()->AttackReaction(this, (this->getLevel()*75), 0); // "When the spell ends, the MCed unit (if not a player) will have a large amount of threat on the priest who controlled it" no idea if (lvl*75) is right but it does his job
-		pTarget->GetAIInterface()->SetNextTarget(this);
 	}
 
 	if(pTarget->m_temp_summon)
