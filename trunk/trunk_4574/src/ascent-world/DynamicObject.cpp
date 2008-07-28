@@ -43,11 +43,14 @@ DynamicObject::DynamicObject(uint32 high, uint32 low)
 DynamicObject::~DynamicObject()
 {
 	if(u_caster->dynObj == this)
-		u_caster->dynObj = 0;
+		u_caster->dynObj = NULL;
 }
 
 void DynamicObject::Create(Unit * caster, Spell * pSpell, float x, float y, float z, uint32 duration, float radius)
 {
+	if (caster == NULL)
+		return;
+
 	Object::_Create(caster->GetMapId(),x, y, z, 0);
 	if(pSpell->g_caster)
 	{
@@ -227,8 +230,8 @@ void DynamicObject::Remove()
 		}
 	}
 
-	if(u_caster != NULL && u_caster->dynObj == this)
-		u_caster->dynObj = 0;
+	if(u_caster != NULL)
+		u_caster->dynObj = NULL;
 
 	if(IsInWorld())
 		RemoveFromWorld(true);
