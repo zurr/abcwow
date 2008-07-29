@@ -13,7 +13,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
     SetupInnkeepers(mgr);
     SetupGuardGossip(mgr);
     SetupTokenVendor(mgr);
-	//SetupTrainerScript(mgr);
+	SetupTrainerScript(mgr);
 	SetupMulgoreGossip(mgr);
 	SetupShattrathGossip(mgr);
 	SetupTanarisGossip(mgr);
