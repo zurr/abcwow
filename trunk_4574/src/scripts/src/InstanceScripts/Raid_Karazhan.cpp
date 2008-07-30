@@ -1310,7 +1310,7 @@ public:
 			else
 				Trigger();
 		}
-		else if(_unit->GetManaPct() > 94)
+		else if(_unit->GetManaPct() > 91)
 		{
 			_unit->Unroot();
 			evocation = false;
