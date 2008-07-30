@@ -1827,6 +1827,7 @@ public:
 			m_time_pyroblast--;
 			if(!m_time_pyroblast)
 			{
+				_unit->SetUInt32Value(UNIT_FIELD_POWER1, _unit->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 				_unit->SetStandState(0);
 				_unit->setEmoteState(0);
 				_unit->CastSpell(_unit, info_pyroblast, false);
@@ -3285,7 +3286,7 @@ public:
 		{
 			Unit *Target = _unit->GetMapMgr()->GetUnit(Enfeeble_Targets[i]);
 			if(Target && Target->isAlive())
-				Target->SetUInt64Value(UNIT_FIELD_HEALTH, Enfeeble_Health[i]);
+				Target->SetUInt32Value(UNIT_FIELD_HEALTH, Enfeeble_Health[i]);
 			Enfeeble_Targets[i] = 0;
 			Enfeeble_Health[i] = 0;
 		}
