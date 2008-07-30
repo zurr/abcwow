@@ -4558,7 +4558,7 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 
 	default:// Target immune to spell
 		{
-			Dur = 0;
+			*Duration = 0;
 			return;
 		}break;
 	}
@@ -4568,7 +4568,7 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 
 	// Reset the diminishing return counter, and add to the aura count (we don't decrease the timer till we
 	// have no auras of this type left.
-	++Target->m_diminishAuraCount[Grp];
+	//++Target->m_diminishAuraCount[Grp];
 	++Target->m_diminishCount[Grp];
 }
 
@@ -4577,6 +4577,7 @@ void UnapplyDiminishingReturnTimer(Unit * Target, SpellEntry * spell)
 	uint32 status = GetDiminishingGroup(spell->NameHash);
 	uint32 Grp = status & 0xFFFF;   // other bytes are if apply to pvp
 	uint32 PvE = (status >> 16) & 0xFFFF;
+	uint32 aura_grp;
 
 	// Make sure we have a group
 	if(Grp == 0xFFFF) return;
@@ -4585,7 +4586,21 @@ void UnapplyDiminishingReturnTimer(Unit * Target, SpellEntry * spell)
 	if(!PvE && Target->GetTypeId() != TYPEID_PLAYER && !Target->IsPet())
 		return;
 
-	Target->m_diminishAuraCount[Grp]--;
+	//Target->m_diminishAuraCount[Grp]--;
+	
+	/*There are cases in which you just refresh an aura duration instead of the whole aura,
+	causing corruption on the diminishAura counter and locking the entire diminishing group.
+	So it's better to check the active auras one by one*/
+	Target->m_diminishAuraCount[Grp] = 0;
+	for( uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; x++ )
+	{
+		if( Target->m_auras[x] )
+		{	
+			aura_grp = GetDiminishingGroup( Target->m_auras[x]->GetSpellProto()->NameHash );
+			if( aura_grp == status )
+				Target->m_diminishAuraCount[Grp]++;
+		}
+	}
 
 	// start timer decrease
 	if(!Target->m_diminishAuraCount[Grp])
@@ -4593,6 +4608,7 @@ void UnapplyDiminishingReturnTimer(Unit * Target, SpellEntry * spell)
 		Target->m_diminishActive = true;
 		Target->m_diminishTimer[Grp] = 15000;
 	}
+
 }
 
 /// Calculate the Diminishing Group. This is based on a name hash.
@@ -4637,7 +4653,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_STUN:					// Stuns (all of them)
 	case SPELL_HASH_BASH:					// Bash
 		{
-			grp = 2;
+			grp = 1;
 		}break;
 
 	case SPELL_HASH_FROST_NOVA:				// Frost Nova
@@ -4645,7 +4661,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_ENTANGLING_ROOTS:		// Entangling Roots
 	case SPELL_HASH_IMPROVED_HAMSTRING:		// Improved Hamstring
 		{
-			grp = 3;
+			grp = 2;
 		}break;
 
 	case SPELL_HASH_SEDUCTION:				// Seduction
@@ -4655,46 +4671,46 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
 	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
 		{
-			grp = 4;
+			grp = 3;
 		}break;
 
 
 	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
 	case SPELL_HASH_MIND_CONTROL:			// Mind Control
 		{
-			grp = 5;
+			grp = 4;
 		}break;
 
 	case SPELL_HASH_HIBERNATE:				// Hibernate
 	case SPELL_HASH_WYVERN_STING:				// Wyvern Sting
 		{
-			grp = 6;
+			grp = 5;
 		}break;
 
 	case SPELL_HASH_CYCLONE:				// Cyclone
 	case SPELL_HASH_BLIND:					// Blind
 		{
-			grp = 7;
+			grp = 6;
 			pve = true;
 		}break;
 	case SPELL_HASH_BANISH:					// Banish
 		{
-			grp = 8;
+			grp = 7;
 		}break;
 
 	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
 		{
-			grp = 9;
+			grp = 8;
 		}break;
 
 	case SPELL_HASH_SLEEP:					// Sleep
 	case SPELL_HASH_RECKLESS_CHARGE:		// Reckless Charge
 		{
-			grp = 10;
+			grp = 9;
 		}break;
 	case SPELL_HASH_RIPOSTE:
 		{
-			grp = 11;
+			grp = 10;
 		}break;
 	}
 	uint32 ret;
