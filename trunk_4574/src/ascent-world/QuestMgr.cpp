@@ -1118,11 +1118,8 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 		    if(qst->required_item[i]) plr->GetItemInterface()->RemoveItemAmt(qst->required_item[i],qst->required_itemcount[i]);
 	    }
 
-			for(uint32 i = 0; i < 4; ++i)
-			{
-				if(qst->required_money && (plr->GetUInt32Value(PLAYER_FIELD_COINAGE) >= qst->required_money))
-					plr->ModUnsigned32Value(PLAYER_FIELD_COINAGE, qst->required_money);
-			}
+	    if(qst->required_money && (plr->GetUInt32Value(PLAYER_FIELD_COINAGE) >= qst->required_money))
+	    	plr->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -qst->required_money);
 
 	    // Remove srcitem
 	    if(qst->srcitem && qst->srcitem != qst->receive_items[0])
