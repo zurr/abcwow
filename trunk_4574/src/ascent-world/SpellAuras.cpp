@@ -365,6 +365,7 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target,  It
 
 	//m_auraSlot = 0;
 	m_modcount = 0;
+	m_dmgdone = 0;
 	m_dynamicValue = 0;
 	m_areaAura = false;
 
@@ -1175,6 +1176,29 @@ void Aura::EventPeriodicDamage(uint32 amount)
 	int bonus = 0;
 	uint32 school = GetSpellProto()->School;
 	Unit * c = GetUnitCaster();
+
+	if(m_spellProto->NameHash == SPELL_HASH_SEED_OF_CORRUPTION)
+	{
+		m_dmgdone += float2int32(res);
+
+		uint32 procdmg = 0;
+		switch(m_spellProto->Id)
+		{
+		case 27243:
+			procdmg = 1044;
+			break;
+
+		default:
+			procdmg = 0;
+			break;
+		}
+
+		if(procdmg != 0 && m_dmgdone >= procdmg && c)
+		{
+			c->CastSpellAoF(m_target->GetPositionX(), m_target->GetPositionY(), m_target->GetPositionZ(), dbcSpell.LookupEntry(27285), true);
+			Remove();
+		}
+	}
 
 	if(m_target->GetGUID()!=m_casterGuid)//don't use resist when cast on self-- this is some internal stuff
 	{
@@ -4687,6 +4711,54 @@ void Aura::EventPeriodicLeech(uint32 amount)
 				amount = 0;
 			else
                 amount = dmg.full_damage - dmg.resisted_damage;
+		}
+
+		// Soul Siphon Fix -BlizzHackerD
+		if(m_caster->IsPlayer())
+		{
+			// Only Fire this if the spell is Drain Life
+			if(m_spellProto->NameHash == SPELL_HASH_DRAIN_LIFE)
+			{
+				bool HasSoulSiphon = false;
+				int MaxAff = 0;
+				float PerAff = 0.0f;
+				float BDmg = 0.0f;
+				// Only run the count if the warlock has Soul Siphon.  This is an expensive count and should be avoided if possible.
+				if(m_caster->HasAura(17804))
+				{
+					HasSoulSiphon = true;
+					MaxAff = 12;
+					PerAff = 0.02f;
+				}
+				if(m_caster->HasAura(17805))
+				{
+					HasSoulSiphon = true;
+					MaxAff = 15;
+					PerAff = 0.04f;
+				}
+				if(HasSoulSiphon)
+				{
+					float TotalSSPer = 0.0f;
+					int AffCount = 0;
+					// Count the number of affliction spells on the target, up to the maximum number.
+					for(int i = MAX_POSITIVE_AURAS; i <= MAX_AURAS; i++)
+					{
+						if(m_target->m_auras[i])
+						{
+							if(objmgr.GetSpellSkill(m_target->m_auras[i]->GetSpellId())->Id == SKILL_AFFLICTION)
+							{
+								AffCount++;
+								TotalSSPer += PerAff;
+								if(AffCount >= MaxAff)
+									break;
+							}
+						}
+					}
+					TotalSSPer += 1.0f;
+					BDmg = amount * TotalSSPer;
+					amount = float2int32(BDmg);
+				}
+			}
 		}
 
 		uint32 Amount = (uint32)min( amount, m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) );

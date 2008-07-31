@@ -7549,6 +7549,9 @@ float Player::CalcRating( uint32 index )
 	if( level > 100 )
 		level = 100;
 
+	if(level < 34 && (index == PLAYER_RATING_MODIFIER_BLOCK || index == PLAYER_RATING_MODIFIER_PARRY || index == PLAYER_RATING_MODIFIER_DEFENCE))
+		level = 34;
+
 	CombatRatingDBC * pDBCEntry = dbcCombatRating.LookupEntryForced( relative_index * 100 + level - 1 );
 	if( pDBCEntry == NULL )
 		return rating;
@@ -8347,6 +8350,9 @@ void Player::ModifyBonuses(uint32 type,int32 val)
 
 bool Player::CanSignCharter(Charter * charter, Player * requester)
 {
+	if(charter == NULL)
+		return false;
+
 	if(charter->CharterType >= CHARTER_TYPE_ARENA_2V2 && m_arenaTeams[charter->CharterType-1] != NULL)
 		return false;
 	

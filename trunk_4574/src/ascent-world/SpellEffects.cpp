@@ -3352,6 +3352,8 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 						break;
 				}
 				u_caster->SpellNonMeleeDamageLog(u_caster,31117,dmg,true,true);
+				Aura * pAura = new Aura(dbcSpell.LookupEntry(31117), 5, static_cast<Unit*>(objmgr.GetPlayer(aur->m_casterGuid)), u_caster);
+				u_caster->AddAura(pAura);
 			}
 		}
 	}
@@ -4699,9 +4701,45 @@ void Spell::SpellEffectSummonPlayer(uint32 i)
 	if(!playerTarget)
 		return;
 
+	/* --Old Checks.  Updated to 2.4.2 -BlizzHackerD
 	if(m_caster->GetMapMgr()->GetMapInfo() && m_caster->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL && m_caster->GetMapId() != playerTarget->GetMapId())
 		return;
-	
+	*/
+ 	
+	if(!m_caster->GetMapMgr()->GetMapInfo())
+		// MapInfo doesn't exist.
+		return;
+
+	if(!playerTarget->triggerpass_cheat)
+	// Only run requirement checks if player doesn't have the trigger cheat enabled.
+	{
+		if(playerTarget->getLevel() < m_caster->GetMapMgr()->GetMapInfo()->minlevel && m_caster->GetMapMgr()->GetMapInfo()->mapid != 530)
+			// Summoned Player doesn't meet the level requirements for the map, and the map isn't Outland.
+			return;
+
+		if(m_caster->GetMapMgr()->GetMapInfo()->required_quest && !playerTarget->HasFinishedQuest(m_caster->GetMapMgr()->GetMapInfo()->required_quest))
+			// The Map has a quest requirement and the target player has not completed it yet.
+			return;
+
+		if(m_caster->GetMapMgr()->GetMapInfo()->required_item && !playerTarget->GetItemInterface()->GetItemCount(m_caster->GetMapMgr()->GetMapInfo()->required_item, false))
+			// The Map has an item requirement and the target player doesn't have that item in their inventory.
+			return;
+
+		if(m_caster->GetMapMgr()->GetMapInfo()->heroic_key_1 || m_caster->GetMapMgr()->GetMapInfo()->heroic_key_2)
+		{
+			// The Map has one or more heroic keys.
+			if(m_caster->GetMapMgr()->GetMapInfo()->heroic_key_1 && playerTarget->GetItemInterface()->GetItemCount(m_caster->GetMapMgr()->GetMapInfo()->heroic_key_1, false) == 0)
+			{
+				// Player doesn't have a valid key for key 1.
+				if(m_caster->GetMapMgr()->GetMapInfo()->heroic_key_2 && playerTarget->GetItemInterface()->GetItemCount(m_caster->GetMapMgr()->GetMapInfo()->heroic_key_2, false) == 0)
+				{
+					// Player doesn't have a valid key for key 2.
+					return;
+				}
+			}
+		}			
+	}
+
 	playerTarget->SummonRequest(m_caster->GetLowGUID(), m_caster->GetZoneId(), m_caster->GetMapId(),
 		m_caster->GetInstanceID(), m_caster->GetPosition());
 }
