@@ -2753,7 +2753,15 @@ AddItemResult ItemInterface::AddItemToFreeBankSlot(Item *item)
 				{
 					bool result = static_cast< Container* >( m_pItems[i] )->AddItemToFreeSlot( item, NULL );
 					if( result )
+					{
+						// Interrupt Casting if the item is enabling the cast.
+						if(item->GetOwner()->isCasting())
+						{
+							if(item->GetOwner()->GetCurrentSpell()->castedItemId == item->GetEntry())
+								item->GetOwner()->InterruptSpell();
+						}
 						return ADD_ITEM_RESULT_OK;
+					}
 				}
 			}
 		}
@@ -2763,6 +2771,11 @@ AddItemResult ItemInterface::AddItemToFreeBankSlot(Item *item)
 	{
 		if( m_pItems[i] == NULL )
 		{
+			if(item->GetOwner()->isCasting())
+			{
+				if(item->GetOwner()->GetCurrentSpell()->castedItemId == item->GetEntry())
+					item->GetOwner()->InterruptSpell();
+			}
 			return SafeAddItem( item, INVENTORY_SLOT_NOT_SET, i );
 		}
 	}
@@ -2776,6 +2789,15 @@ AddItemResult ItemInterface::AddItemToFreeBankSlot(Item *item)
 				Item *item2 = static_cast< Container* >( m_pItems[i] )->GetItem(j);
 				if( item2 == NULL )
 				{
+					if(item->GetOwner()->isCasting())
+					{
+						uint32 CastingSpell = item->GetOwner()->GetCurrentSpell()->m_spellInfo->Id;
+						if(item->GetOwner()->isCasting())
+						{
+							if(item->GetOwner()->GetCurrentSpell()->castedItemId == item->GetEntry())
+								item->GetOwner()->InterruptSpell();
+						}
+					}
 					return SafeAddItem( item, i, j );
 				}
 			}

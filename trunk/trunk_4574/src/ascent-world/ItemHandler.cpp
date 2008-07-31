@@ -756,6 +756,9 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 
 	if(eitem && eitem->GetProto()->Bonding==ITEM_BIND_ON_EQUIP)
 		eitem->SoulBind();	   
+
+	if(_player->isCasting())
+		_player->InterruptSpell();
 }
 
 void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
