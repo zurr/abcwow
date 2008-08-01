@@ -4636,7 +4636,6 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 
 	case SPELL_HASH_POUNCE:
  	case SPELL_HASH_CHEAP_SHOT:				// Cheap Shot
-	case SPELL_HASH_KIDNEY_SHOT:			// Kidney Shot
 	case SPELL_HASH_HAMMER_OF_JUSTICE:		// Hammer of Justice
 	case SPELL_HASH_CHARGE:					// Charge
 	case SPELL_HASH_INTERCEPT :				// Intercept
@@ -4667,7 +4666,6 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_SEDUCTION:				// Seduction
  	case SPELL_HASH_FEAR:					// Fear
  	case SPELL_HASH_HOWL_OF_TERROR:			// Howl of Terror
-	case SPELL_HASH_DEATH_COIL:				// Death Coil
 	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
 	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
 		{
@@ -4683,6 +4681,8 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 
 	case SPELL_HASH_HIBERNATE:				// Hibernate
 	case SPELL_HASH_WYVERN_STING:				// Wyvern Sting
+	case SPELL_HASH_SLEEP:					// Sleep
+	case SPELL_HASH_RECKLESS_CHARGE:		// Reckless Charge
 		{
 			grp = 5;
 		}break;
@@ -4698,15 +4698,15 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			grp = 7;
 		}break;
 
-	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
+	case SPELL_HASH_DEATH_COIL:				// Death Coil
 		{
 			grp = 8;
 		}break;
 
-	case SPELL_HASH_SLEEP:					// Sleep
-	case SPELL_HASH_RECKLESS_CHARGE:		// Reckless Charge
+	case SPELL_HASH_KIDNEY_SHOT:			// Kidney Shot
 		{
 			grp = 9;
+			pve = true;
 		}break;
 	case SPELL_HASH_RIPOSTE:
 		{
