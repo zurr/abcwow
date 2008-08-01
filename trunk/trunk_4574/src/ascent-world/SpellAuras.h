@@ -655,7 +655,6 @@ public:
 
 	SpellEntry * m_spellProto;
 	Modifier * mod;
-	uint32 m_dmgdone;
 	AreaAuraList targets;//this is only used for AA
 	uint64 m_casterGuid;
 
