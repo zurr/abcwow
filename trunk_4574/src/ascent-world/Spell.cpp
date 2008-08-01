@@ -3407,7 +3407,7 @@ uint8 Spell::CanCast(bool tolerate)
 					}
 					else
 					{ // our spell is not a ranged spell
-						if( GetType() == SPELL_DMG_TYPE_MAGIC && m_spellInfo->in_front_status == 0 )
+						if( GetType() == SPELL_DMG_TYPE_MAGIC && m_spellInfo->in_front_status == 1 )
 						{
 							// must be in front
 							if(!u_caster->isInFront(target))
