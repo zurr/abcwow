@@ -870,6 +870,14 @@ void WorldSession::FullLogin(Player * plr)
 				data << uint8(0);
 			SendPacket(&data);
 
+			data.Initialize(SMSG_GUILD_EVENT);
+			data << uint8(GUILD_EVENT_HASCOMEONLINE);
+			data << uint8(0x01);
+			data << plr->GetName();
+			data << plr->GetGUID();
+
+			pGuild->SendPacket(&data);
+
 			pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 1, plr->GetName());
 		}
 	}
