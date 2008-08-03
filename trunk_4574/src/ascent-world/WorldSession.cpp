@@ -305,7 +305,7 @@ void WorldSession::LogoutPlayer(bool Save)
 
 				pGuild->SendPacket(&data);
 
-				pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 1, _player->GetName() );
+//				pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 2, _player->GetName(), _player->GetGUID() );
 			}
 		}
 
