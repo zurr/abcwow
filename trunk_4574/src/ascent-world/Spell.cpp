@@ -4708,7 +4708,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			grp = 9;
 			pve = true;
 		}break;
-	case SPELL_HASH_RIPOSTE:
+	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
 		{
 			grp = 10;
 		}break;
