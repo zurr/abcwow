@@ -5622,6 +5622,14 @@ Don't know why there is any weapon modifiers.
 				}
 			}
 		}
+
+		uint32 school_selector=1;
+		for (uint32 x=0;x<7;x++)
+		{
+			if(school_selector & mod->m_miscValue)
+				m_target->DamageDoneModPCT[x] += val;
+			school_selector = school_selector << 1;
+		}
 		// WEAPON MODIFIER PART DISABLED BY SUPALOSA: compile errors, WeaponModifier implementation changed.
 		/*else
 		
