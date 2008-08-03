@@ -878,7 +878,7 @@ void WorldSession::FullLogin(Player * plr)
 
 			pGuild->SendPacket(&data);
 
-			pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 1, plr->GetName());
+//			pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 2, plr->GetName(), plr->GetGUID());
 		}
 	}
 
