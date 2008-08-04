@@ -4537,6 +4537,11 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 		if ( ( Target->IsPlayer() || Target->IsPet() ) && Dur > 10000)
 		{
 			Dur = 10000;
+			// for group 10, only lower duration to 10s
+			if (status == 10) {
+				*Duration = FL2UINT(Dur);
+				return;
+			}
 		}
 		break;
 		
@@ -4708,9 +4713,16 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			grp = 9;
 			pve = true;
 		}break;
+	// group where only 10s limit is pvp is applied, not DR
 	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
+	case SPELL_HASH_HAMSTRING:	// Hamstring
 		{
 			grp = 10;
+		}break;
+	case SPELL_HASH_RIPOSTE:			// Riposte
+	case SPELL_HASH_DISARM:			// Disarm
+		{
+			grp = 11;
 		}break;
 	}
 	uint32 ret;
