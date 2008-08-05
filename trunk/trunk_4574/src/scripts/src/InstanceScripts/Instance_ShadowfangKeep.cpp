@@ -2,7 +2,7 @@
 #include "Setup.h"
 
 /*********************************************************************************/
-/* Instance_ShadowfangKeep.cpp Script   Made By Kazz  with M4ksiu's help         */
+/* Instance_ShadowfangKeep.cpp Script											*/
 /*********************************************************************************/
 
 // Commander Springvale 

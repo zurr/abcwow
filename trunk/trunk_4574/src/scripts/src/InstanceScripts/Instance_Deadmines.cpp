@@ -1,6 +1,10 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
+/************************************************************************/
+/* Instance_Deadmines.cpp Script										*/
+/************************************************************************/
+
 // Rhakzor 
 #define rhk_slam 6304
 class RhahkZorAI : public CreatureAIScript
@@ -300,7 +304,7 @@ public:
         char msg[200];
         if(mTarget->GetTypeId() == TYPEID_PLAYER)
             sprintf(msg, "And stay down, %s.", static_cast<Player*>(mTarget)->GetName());
-        else if (mTarget->IsPet())
+        else if (mTarget->GetTypeFromGUID() == HIGHGUID_TYPE_PET)
             sprintf(msg, "And stay down, %s.", static_cast<Pet*>(mTarget)->GetName().c_str());
 
         _unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);

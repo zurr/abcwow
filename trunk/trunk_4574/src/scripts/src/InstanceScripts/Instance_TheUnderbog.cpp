@@ -2379,7 +2379,7 @@ public:
 				} 
 			}
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();

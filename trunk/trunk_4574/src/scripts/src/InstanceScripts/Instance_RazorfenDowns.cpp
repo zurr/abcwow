@@ -2,7 +2,7 @@
 #include "Setup.h"
 
 /************************************************************************/
-/*  RazorfenDowns.cpp Script by jajcer								*/
+/*  Instance_RazorfenDowns.cpp Script									*/
 /************************************************************************/
 
 class AmnennarTheColdbringer : public CreatureAIScript

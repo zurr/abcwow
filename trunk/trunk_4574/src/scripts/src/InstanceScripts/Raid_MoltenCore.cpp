@@ -435,7 +435,7 @@ class LavaSurgerAI : public MoonScriptCreatureAI
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Flame Imp AI Script
 #define CN_FLAMEIMP			11669
-#define FLAMEIMP_FIRE_NOVA	23462	//wrong, fixme!
+#define FLAMEIMP_FIRE_NOVA	20602	//corrected http://www.wowhead.com/?npc=11669#abilities
 
 class FlameImpAI : public MoonScriptCreatureAI
 {
@@ -517,7 +517,7 @@ class FlameguardAI : public MoonScriptCreatureAI
 #define CN_FIREWALKER				11666
 #define FIREWALKER_MELT_ARMOR		19631
 #define FIREWALKER_INCITE_FLAMES	19635
-//Fire Blossom?
+#define FIREWALKER_FIRE_BLOSSOM		19636 //Added
 
 class FirewalkerAI : public MoonScriptCreatureAI
 {
@@ -526,6 +526,7 @@ class FirewalkerAI : public MoonScriptCreatureAI
     {
 		AddSpell(FIREWALKER_MELT_ARMOR, Target_Self, 10, 0, 0);
 		AddSpell(FIREWALKER_INCITE_FLAMES, Target_Self, 10, 0, 0);
+		AddSpell(FIREWALKER_FIRE_BLOSSOM, Target_Self, 10, 0, 0);
     }
 };
 
@@ -647,10 +648,12 @@ class FireswornAI : public MoonScriptCreatureAI
     MOONSCRIPT_FACTORY_FUNCTION(FireswornAI, MoonScriptCreatureAI);
 	FireswornAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
 	{
+		mGarr = NULL;
+
+		//Spells
 		AddSpell(FIRESWORN_IMMOLATE, Target_Current, 10, 0, 0, 0, 40);
 		mEruption = AddSpell(FIRESWORN_ERUPTION, Target_Self, 0, 0, 0);
-		mSeparationAnxiety = AddSpell(FIRESWORN_SEPARATION_ANXIETY, Target_Self, 0, 0, 5);
-		mGarr = NULL;
+		mSeparationAnxiety = AddSpell(FIRESWORN_SEPARATION_ANXIETY, Target_Self, 0, 5, 5);
 	}
 
 	void OnCombatStart(Unit* pTarget)
@@ -667,15 +670,15 @@ class FireswornAI : public MoonScriptCreatureAI
 
 	void AIUpdate()
 	{
-		if( mGarr && mGarr->IsAlive() && GetRange( mGarr ) > 100 )
+		if( mGarr && mGarr->IsAlive() && GetRange(mGarr) > 100 )
 		{
 			CastSpell(mSeparationAnxiety);
 		}
 		ParentClass::AIUpdate();
 	}
 
-	SpellDesc*	mEruption;
-	SpellDesc*	mSeparationAnxiety;
+	SpellDesc*			mEruption;
+	SpellDesc*			mSeparationAnxiety;
 	MoonScriptBossAI*	mGarr;
 };
 
