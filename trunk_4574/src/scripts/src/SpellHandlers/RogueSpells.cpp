@@ -21,22 +21,20 @@
 bool Preparation(uint32 i, Spell * pSpell)
 {
     Player * playerTarget = pSpell->p_caster;
-    if( playerTarget == NULL ) 
-		return true;
+    if(playerTarget == 0) return true;
 
-	uint32 ClearSpellId[11] = {5277,26669,2983,8696,11305,1856,1857,26889,14177,14183,36554};
-
-	for(i = 0; i < 11; ++i)
-	{
-		if( playerTarget->HasSpell( ClearSpellId[i] ) )
-			playerTarget->ClearCooldownForSpell( ClearSpellId[i] );
-	}
-
-	/*
-    playerTarget->ClearCooldownsOnLine(39, pSpell->m_spellInfo->Id); // line - subtlety
-    playerTarget->ClearCooldownsOnLine(38, pSpell->m_spellInfo->Id); // line - combat
-    playerTarget->ClearCooldownsOnLine(253, pSpell->m_spellInfo->Id);// line - assassination
-	*/
+    playerTarget->ClearCooldownForSpell( 5277 );	// Evasion Rank 1
+    playerTarget->ClearCooldownForSpell( 26669 );	// Evasion Rank 2
+    playerTarget->ClearCooldownForSpell( 2983 );	// Sprint Rank 1
+    playerTarget->ClearCooldownForSpell( 8696 );	// Sprint Rank 2
+    playerTarget->ClearCooldownForSpell( 11305 );	// Sprint Rank 3
+    playerTarget->ClearCooldownForSpell( 1856 );	// Vanish Rank 1
+    playerTarget->ClearCooldownForSpell( 1857 );	// Vanish Rank 2
+    playerTarget->ClearCooldownForSpell( 26889 );	// Vanish Rank 3
+    playerTarget->ClearCooldownForSpell( 14177 );	// Cold Blood
+    playerTarget->ClearCooldownForSpell( 14183 );	// Premeditation
+    playerTarget->ClearCooldownForSpell( 36554 );	// Shadowstep
+	
     return true;
 }
 

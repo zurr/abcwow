@@ -201,7 +201,9 @@ void SetupDruid(ScriptMgr * mgr)
   QuestScript *Moonglade = (QuestScript*) new MoongladeQuest();
   mgr->register_quest_script(5921, Moonglade);
   mgr->register_quest_script(5922, Moonglade);
+  
   mgr->register_creature_script(12138, &Lunaclaw::Create);
+  
   mgr->register_dummy_spell(19138, &CenarionLunardust);
   mgr->register_dummy_spell(18974, &CenarionMoondust);
   mgr->register_dummy_spell(19512, &CurativeAnimalSalve);

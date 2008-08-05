@@ -1,25 +1,28 @@
 /*
-* Moon++ Scripts for Ascent MMORPG Server
-* Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
-* Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.	If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.	If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "StdAfx.h"
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
+
+#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, plr); \
+	Menu->SendTo(plr);
 
 // Threat from Above
 class ThreatFromAboveQAI : public CreatureAIScript
@@ -72,12 +75,12 @@ public:
 };
 
 // Taken in the Night
-class Quest_TakenInTheNight : public CreatureAIScript
+class TakenInTheNight : public CreatureAIScript
 {
 public:
-	ADD_CREATURE_FACTORY_FUNCTION(Quest_TakenInTheNight);
+	ADD_CREATURE_FACTORY_FUNCTION(TakenInTheNight);
 
-	Quest_TakenInTheNight(Creature* pCreature) : CreatureAIScript(pCreature) {}
+	TakenInTheNight(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
 	void OnLoad()
 	{
@@ -140,7 +143,7 @@ public:
 };
 
 // Fumping
-bool Quest_Fumping(uint32 i, Aura* pAura, bool apply)
+bool Fumping(uint32 i, Aura* pAura, bool apply)
 {
   if(apply)
     return true;
@@ -177,7 +180,7 @@ bool Quest_Fumping(uint32 i, Aura* pAura, bool apply)
 }
 
 // The Big Bone Worm (Group)
-bool Quest_TheBigBoneWorm(uint32 i, Aura* pAura, bool apply)
+bool TheBigBoneWorm(uint32 i, Aura* pAura, bool apply)
 {
 	if(apply)
 		return true;
@@ -218,12 +221,12 @@ bool Quest_TheBigBoneWorm(uint32 i, Aura* pAura, bool apply)
 
 }
 // An Improper Burial
-class Quest_AnImproperBurial : public CreatureAIScript
+class AnImproperBurial : public CreatureAIScript
 {
 public:
-  ADD_CREATURE_FACTORY_FUNCTION(Quest_AnImproperBurial);
+  ADD_CREATURE_FACTORY_FUNCTION(AnImproperBurial);
 
-  Quest_AnImproperBurial(Creature* pCreature) : CreatureAIScript(pCreature) {}
+  AnImproperBurial(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
   void OnLoad()
   {
@@ -287,17 +290,94 @@ bool ShatariTorch(uint32 i, Spell* pSpell)
   return true;
 }
 
+class SCRIPT_DECL TheMomentofTruth : public GossipScript
+{
+public:
+	void GossipHello(Object* pObject, Player* plr, bool AutoSend)
+	{
+		if(!plr)
+			return;
+
+		GossipMenu *Menu;
+		Creature *doctor = (Creature*)(pObject);
+		if (doctor == NULL)
+			return;
+
+		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 1, plr);
+		if(plr->GetQuestLogForEntry(10201) && plr->GetItemInterface()->GetItemCount(28500, 0))
+			Menu->AddItem( 0, "Try this", 1);
+
+		if(AutoSend)
+			Menu->SendTo(plr);
+	}
+
+	void GossipSelectOption(Object* pObject, Player* plr, uint32 Id, uint32 IntId, const char * EnteredCode)
+	{
+		if(!plr)
+			return;
+
+		Creature *doctor = (Creature*)(pObject);
+		if (doctor == NULL)
+			return;
+
+		switch (IntId)
+		{
+			case 0:
+				GossipHello(pObject, plr, true);
+				break;
+
+			case 1:
+			{
+				plr->GetItemInterface()->RemoveItemAmt(2799, 1);
+				QuestLogEntry *qle = plr->GetQuestLogForEntry(10201);
+				if(qle && qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+				{
+					qle->SetMobCount(0, qle->GetMobCount(0)+1);
+					qle->SendUpdateAddKill(0);
+					qle->UpdatePlayerFields();
+				}
+			}break;
+		}
+	}
+
+	void Destroy()
+	{
+		delete this;
+	}
+};
+
+bool EvilDrawsNear(uint32 i, Spell * pSpell)
+{
+  if(!pSpell->u_caster->IsPlayer())
+    return true;
+
+  Player *plr = (Player*)pSpell->u_caster;
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(10923);
+  
+  if(qle == NULL)
+    return true;
+
+  uint32 entry = 22441;
+
+  Creature *creat = sEAS.SpawnCreature(plr, entry, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 5*60*1000);
+
+  return true;
+}
+
 void SetupTerrokarForest(ScriptMgr * mgr)
 {
-  mgr->register_creature_script(22144, &ThreatFromAboveQAI::Create);
-  mgr->register_creature_script(22143, &ThreatFromAboveQAI::Create);
-  mgr->register_creature_script(22148, &ThreatFromAboveQAI::Create);
-  mgr->register_creature_script(22355, &Quest_TakenInTheNight::Create);
-  mgr->register_dummy_aura(39238, &Quest_Fumping);
-  mgr->register_dummy_aura(39246, &Quest_TheBigBoneWorm);
-  mgr->register_creature_script(21859, &Quest_AnImproperBurial::Create);
-  mgr->register_creature_script(21846, &Quest_AnImproperBurial::Create);
-  mgr->register_dummy_spell(39189, &ShatariTorch);
-  mgr->register_creature_script(22307, &TheInfestedProtectorsQAI::Create);
-  mgr->register_creature_script(22095, &TheInfestedProtectorsQAI::Create);
+	mgr->register_creature_script(22144, &ThreatFromAboveQAI::Create);
+	mgr->register_creature_script(22143, &ThreatFromAboveQAI::Create);
+	mgr->register_creature_script(22148, &ThreatFromAboveQAI::Create);
+	mgr->register_creature_script(22355, &TakenInTheNight::Create);
+	mgr->register_creature_script(21859, &AnImproperBurial::Create);
+	mgr->register_creature_script(21846, &AnImproperBurial::Create);
+	mgr->register_creature_script(22307, &TheInfestedProtectorsQAI::Create);
+	mgr->register_creature_script(22095, &TheInfestedProtectorsQAI::Create);
+	mgr->register_dummy_aura(39238, &Fumping);
+	mgr->register_dummy_aura(39246, &TheBigBoneWorm);
+	mgr->register_dummy_spell(39189, &ShatariTorch);
+	mgr->register_dummy_spell(39239, &EvilDrawsNear);
+	GossipScript * gossip1 = (GossipScript*) new TheMomentofTruth();
+	mgr->register_gossip_script(19606, gossip1);
 }

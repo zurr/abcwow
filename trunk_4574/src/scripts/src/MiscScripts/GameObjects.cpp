@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
+#include "../QuestScripts/EAS/EasyFunctions.h"
 
 class OrbOfCommand : public GameObjectAIScript
 {
@@ -484,6 +485,589 @@ public:
 
 /*--------------------------------------------------------------------------------------------------------*/
 
+class CatFigurine : public GameObjectAIScript
+{
+public:
+	CatFigurine(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new CatFigurine(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		uint32 Chance = RandomUInt(100);
+
+		if(Chance <= 10)
+		{
+		float SSX = pPlayer->GetPositionX();
+		float SSY = pPlayer->GetPositionY();
+		float SSZ = pPlayer->GetPositionZ();
+		float SSO = pPlayer->GetOrientation();
+
+
+		pPlayer->GetMapMgr()->GetInterface()->SpawnCreature(3619, SSX, SSY+1, SSZ, SSO, true, false, 0, 0)->Despawn(600000, 0);
+		}
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class EthereumTransponderZeta : public GameObjectAIScript
+{
+public:
+	EthereumTransponderZeta(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new EthereumTransponderZeta(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		Creature *commander = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 20482);
+		if(commander)
+			return;
+
+		if(pPlayer->GetQuestLogForEntry(10339))
+		{
+		float SSX = 4017.96f;
+		float SSY = 2315.91f;
+		float SSZ = 116.418f;
+		float SSO = pPlayer->GetOrientation();
+		pPlayer->GetMapMgr()->GetInterface()->SpawnCreature(20482, SSX, SSY, SSZ, SSO, true, false, 0, 0)->Despawn(1*60*1000, 0);
+		}
+	}
+
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class BringMetheEgg : public GameObjectAIScript
+{
+public:
+	BringMetheEgg(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new BringMetheEgg(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10111);
+		if(qle == NULL)
+			return;
+
+		if(!pPlayer->HasAura(33382))
+			pPlayer->CastSpell(pPlayer, 33382, true);
+		return;
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class MysteriousEgg : public GameObjectAIScript
+{
+public:
+	MysteriousEgg(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new MysteriousEgg(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10111);
+		if(qle == NULL)
+			return;
+
+		if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+		{
+			qle->SetMobCount(0, qle->GetMobCount(0)+1);
+			qle->SendUpdateAddKill(0);
+			qle->UpdatePlayerFields();
+		}
+
+		Creature *bird = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 19055);
+		if(bird)
+			return;
+
+		bird = sEAS.SpawnCreature(pPlayer, 19055, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		bird->Despawn(5*60*1000, 0);
+		return;
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class AlterofTidalMastery : public GameObjectAIScript
+{
+public:
+	AlterofTidalMastery(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new AlterofTidalMastery(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		pPlayer->GetMapMgr()->GetInterface()->SpawnCreature(16292, 7934.343750f, -7637.020996f, 112.694130f, 3.098388f, true, false, 0, 0);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class ShrineOfDathRemar : public GameObjectAIScript
+{
+public:
+	ShrineOfDathRemar(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new ShrineOfDathRemar(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8345);
+		if(qle)
+			qle->SendQuestComplete();
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class FirewingPointUpper : public GameObjectAIScript
+{
+public:
+	FirewingPointUpper(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new FirewingPointUpper(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		pPlayer->SafeTeleport(530, 0, -2260, 3223.16f, 5.534f, 1.60f);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class FirewingPointLower : public GameObjectAIScript
+{
+public:
+	FirewingPointLower(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new FirewingPointLower(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		pPlayer->SafeTeleport(530, 0, -2263, 3111.45f, 136.35f, 3.65f);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class APlagueUponThee : public GameObjectAIScript
+{
+public:
+	APlagueUponThee(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new APlagueUponThee(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		GameObject *barel = sEAS.SpawnGameobject(pPlayer, 177491, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 1);
+		sEAS.GameobjectDelete(barel, 2*60*1000);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class SerpentStatue : public GameObjectAIScript
+{
+public:
+	SerpentStatue(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new SerpentStatue(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(6027);
+		if(qle == NULL)
+			  return;
+
+		Creature *naga = sEAS.SpawnCreature(pPlayer, 12369, 246.741, 2953.3, 5.8631, 1.078, 0);
+		naga->Despawn(6*60*1000, 0);
+		return;
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class CuregosGold : public GameObjectAIScript
+{
+public:
+	CuregosGold(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new CuregosGold(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(2882);
+		if(qle == NULL)
+			return;
+
+		Creature *pirate1 = sEAS.SpawnCreature(pPlayer, 7899, pPlayer->GetPositionX()+RandomFloat(5.0f), pPlayer->GetPositionY()+RandomFloat(5.0f), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		pirate1->Despawn(6*60*1000, 0);
+
+		Creature *pirate2 = sEAS.SpawnCreature(pPlayer, 7899, pPlayer->GetPositionX()-RandomFloat(5.0f), pPlayer->GetPositionY()+RandomFloat(5.0f), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		pirate2->Despawn(6*60*1000, 0);
+
+		Creature *pirate3 = sEAS.SpawnCreature(pPlayer, 7901, pPlayer->GetPositionX()+RandomFloat(5.0f), pPlayer->GetPositionY()-RandomFloat(5.0f), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		pirate3->Despawn(6*60*1000, 0);
+
+		Creature *pirate4 = sEAS.SpawnCreature(pPlayer, 7901, pPlayer->GetPositionX()+RandomFloat(5.0f), pPlayer->GetPositionY()+RandomFloat(5.0f), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		pirate4->Despawn(6*60*1000, 0);
+
+		Creature *pirate5 = sEAS.SpawnCreature(pPlayer, 7902, pPlayer->GetPositionX()-RandomFloat(5.0f), pPlayer->GetPositionY()-RandomFloat(5.0f), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		pirate5->Despawn(6*60*1000, 0);
+
+		GameObject *gobj = sEAS.SpawnGameobject(pPlayer, 142194, pPlayer->GetPositionX()+5, pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 1);
+		sEAS.GameobjectDelete(gobj, 10*60*1000);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class DreadmaulRock : public GameObjectAIScript
+{
+public:
+	DreadmaulRock(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new DreadmaulRock(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(3821);
+		if(qle == NULL)
+			return;
+
+		Creature *shaghost = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 9136);
+		if(shaghost)
+			return;
+
+		Creature *shaghostspawn = sEAS.SpawnCreature(pPlayer, 9136, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		shaghostspawn->Despawn(2*60*1000, 0);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class HandofIruxos : public GameObjectAIScript
+{
+public:
+	HandofIruxos(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new HandofIruxos(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(5381);
+		if(qle == NULL)
+			return;
+
+		Creature *demon = sEAS.SpawnCreature(pPlayer, 11876, -348.231, 1763.85, 138.371, 4.42728, 0);
+		demon->Despawn(6*60*1000, 0);
+			return;
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class LegionPortals : public GameObjectAIScript
+{
+public:
+	LegionPortals(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new LegionPortals(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(5581);
+		if(qle == NULL)
+			return;
+
+		if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+		{
+			qle->SetMobCount(0, qle->GetMobCount(0)+1);
+			qle->SendUpdateAddKill(0);
+			qle->UpdatePlayerFields();
+		}
+		return;
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class ProphecyofAkida : public GameObjectAIScript
+{
+public:
+	ProphecyofAkida(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new ProphecyofAkida(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(9544);
+		if(qle == NULL)
+			return;
+
+		if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+		{
+			qle->SetMobCount(0, qle->GetMobCount(0)+1);
+			qle->SendUpdateAddKill(0);
+			qle->UpdatePlayerFields();
+		}
+
+		Creature *prisoner = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 17375);
+		if(!prisoner)
+			return;
+
+		prisoner->Despawn(1, 6*60*1000);
+			return;
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class Razormaw : public GameObjectAIScript
+{
+public:
+	Razormaw(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new Razormaw(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(9689);
+		if(qle == NULL)
+			return;
+
+		Creature *razormaw = sEAS.SpawnCreature(pPlayer, 17592, -1203.8, -12424.7, 95.36, 4.7, 0);
+		razormaw->Despawn(6*60*1000, 0);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class TabletoftheSeven : public GameObjectAIScript
+{
+public:
+	TabletoftheSeven(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new TabletoftheSeven(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(4296);
+		if(qle == NULL)
+			return;
+
+		if(pPlayer->GetItemInterface()->GetItemCount(11470, 0) < 1)
+			sEAS.AddItem(11470, pPlayer);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class TestofEndurance : public GameObjectAIScript
+{
+public:
+	TestofEndurance(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new TestofEndurance(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(1150);
+		if(qle == NULL)
+			return;
+
+		Creature *grenka = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 4490);
+		if(grenka)
+		{
+			if(!grenka->isAlive())
+			{
+				grenka->Delete();
+			}
+			else
+				return;
+		}
+
+		Creature *grenkaspawn = sEAS.SpawnCreature(pPlayer, 4490, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		grenkaspawn->Despawn(6*60*1000, 0);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class TheFallenExarch : public GameObjectAIScript
+{
+public:
+	TheFallenExarch(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new TheFallenExarch(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10915);
+		if(qle == NULL)
+			return;
+
+		Creature *exarch = sEAS.SpawnCreature(pPlayer, 22452, -3365.9, 5143.19, -9.00132, 3.05, 0);
+		exarch->Despawn(6*60*1000, 0);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class TheFinalCode : public GameObjectAIScript
+{
+public:
+	TheFinalCode(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new TheFinalCode(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10447);
+		if(qle == NULL)
+			return;
+
+		if(qle->GetMobCount(1) < qle->GetQuest()->required_mobcount[1])
+		{
+			qle->SetMobCount(1, qle->GetMobCount(1)+1);
+			qle->SendUpdateAddKill(1);
+			qle->UpdatePlayerFields();
+		}
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class TheRootofAllEvil : public GameObjectAIScript
+{
+public:
+	TheRootofAllEvil(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new TheRootofAllEvil(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8481);
+		if(qle == NULL)
+			return;
+
+		Creature *xandivious = sEAS.SpawnCreature(pPlayer, 15623, pPlayer->GetPositionX()+5, pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
+		xandivious->Despawn(6*60*1000, 0);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class TheThunderspike : public GameObjectAIScript
+{
+public:
+	TheThunderspike(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new TheThunderspike(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		if(!pPlayer->GetQuestLogForEntry(10526))
+			return;
+
+		GameObject *gobj = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 184729);
+		if(!gobj)
+			return;
+
+		gobj->Despawn(6*60*1000);
+
+		Creature *spike = sEAS.SpawnCreature(pPlayer, 21319, 1315.54, 6688.33, -18, 0.001, 0);
+		spike->Despawn(5*60*1000, 0);
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class StrengthofOne : public GameObjectAIScript
+{
+public:
+	StrengthofOne(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new StrengthofOne(GO); }
+
+	void OnActivate(Player * pPlayer)
+	{
+		if(!pPlayer)
+			return;
+
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(9582);
+		if(qle == NULL)
+			return;
+
+		Creature *reaver = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 17556);
+		if(reaver)
+		{
+			Creature * reaver2 = pPlayer->GetMapMgr()->GetInterface()->SpawnCreature(17556, reaver->GetPositionX(), reaver->GetPositionY(), reaver->GetPositionZ(), reaver->GetOrientation(), true, false, 0, 0);
+			reaver2->Despawn(5*60*1000, 0);
+			reaver->Despawn(1, 5*60*1000);
+		}
+
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
+class Kindness : public GameObjectAIScript
+{
+public:
+	Kindness(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new Kindness(GO); }
+
+	void OnSpawn()
+	{
+		Player *plr = _gameobject->GetMapMgr()->GetInterface()->GetPlayerNearestCoords(_gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ());
+
+		Creature * netherdrake = _gameobject->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(_gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ(), 21648);
+		if(netherdrake)
+		{
+			netherdrake->SetPosition(_gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ(), _gameobject->GetOrientation(), false);
+			QuestLogEntry *qle = plr->GetQuestLogForEntry(10804);
+			if(qle && qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+			{
+				qle->SetMobCount(0, qle->GetMobCount(0)+1);
+				qle->SendUpdateAddKill(0);
+				qle->UpdatePlayerFields();
+			}
+		}
+		sEAS.GameobjectDelete(_gameobject, 30*1000);
+
+	}
+};
+
+/*--------------------------------------------------------------------------------------------------------*/
+
 void SetupGoHandlers(ScriptMgr * mgr)
 {
 	mgr->register_gameobject_script(179879, &OrbOfCommand::Create);
@@ -508,4 +1092,28 @@ void SetupGoHandlers(ScriptMgr * mgr)
 	mgr->register_gameobject_script(181699, &Telathion_the_Impure_Object::Create);
 	mgr->register_gameobject_script(104593, &UlagTheCleaver::Create);
 	mgr->register_gameobject_script(1571, &DustySpellbooks::Create);
+
+	mgr->register_gameobject_script(13873, &CatFigurine::Create);
+	mgr->register_gameobject_script(184383, &EthereumTransponderZeta::Create);
+	mgr->register_gameobject_script(183146, &BringMetheEgg::Create);
+	mgr->register_gameobject_script(183147, &MysteriousEgg::Create);
+	mgr->register_gameobject_script(180516, &ShrineOfDathRemar::Create);
+	mgr->register_gameobject_script(182546, &FirewingPointUpper::Create);
+	mgr->register_gameobject_script(182547, &FirewingPointLower::Create);
+	mgr->register_gameobject_script(177490, &APlagueUponThee::Create);
+	mgr->register_gameobject_script(177673, &SerpentStatue::Create);
+	mgr->register_gameobject_script(142189, &CuregosGold::Create);
+	mgr->register_gameobject_script(160445, &DreadmaulRock::Create);
+	mgr->register_gameobject_script(176581, &HandofIruxos::Create);
+	mgr->register_gameobject_script(177400, &LegionPortals::Create);
+	mgr->register_gameobject_script(181730, &ProphecyofAkida::Create);
+	mgr->register_gameobject_script(181988, &Razormaw::Create);
+	mgr->register_gameobject_script(169294, &TabletoftheSeven::Create);
+	mgr->register_gameobject_script(20447, &TestofEndurance::Create);
+	mgr->register_gameobject_script(184999, &TheFallenExarch::Create);
+	mgr->register_gameobject_script(184725, &TheFinalCode::Create);
+	mgr->register_gameobject_script(180672, &TheRootofAllEvil::Create);
+	mgr->register_gameobject_script(184729, &TheThunderspike::Create);
+	mgr->register_gameobject_script(181849, &StrengthofOne::Create);
+	mgr->register_gameobject_script(185155, &Kindness::Create);
 }

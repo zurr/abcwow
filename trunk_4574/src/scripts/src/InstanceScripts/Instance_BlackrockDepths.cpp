@@ -2,10 +2,8 @@
 #include "Setup.h"
 
 /************************************************************************/
-/*  Blackrock Depths.cpp Script by jajcer								*/
+/*  Blackrock Depths.cpp												*/
 /************************************************************************/
-//Big respect to M4ksiu.
-
 
 class AmbassadorFlamelash : public CreatureAIScript
 {

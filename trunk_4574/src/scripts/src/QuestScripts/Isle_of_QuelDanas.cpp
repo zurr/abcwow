@@ -80,9 +80,16 @@ bool ConvertingSentry(uint32 i, Spell* pSpell)
   if(!target->isAlive())
     return true;
 
-  QuestLogEntry *qle = caster->GetQuestLogForEntry(11524);
+  QuestLogEntry *qle = NULL;
+  qle = caster->GetQuestLogForEntry(11525);
   if(qle == NULL)
-    return true;
+  {
+	qle = caster->GetQuestLogForEntry(11524);
+	if(qle == NULL)
+	{
+       return true;
+    }
+  }
 
   if(qle->GetMobCount(0) == qle->GetQuest()->required_mobcount[0])
     return true;
@@ -96,8 +103,152 @@ bool ConvertingSentry(uint32 i, Spell* pSpell)
   return true;
 }
 
+bool OrbOfMurlocControl(uint32 i, Spell* pSpell)
+{
+  if(pSpell->u_caster->IsPlayer() == false)
+    return true;
+
+  Player *plr = (Player*)pSpell->u_caster;
+  Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  
+  if(unit_target == NULL)
+    return true;
+
+  if(!unit_target->IsCreature())
+    return true;
+
+  Creature *target = (Creature*)unit_target;
+
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(11541);
+  if(qle == NULL)
+    return true;
+  
+  if(target->GetEntry() == 25084)
+  {
+      if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+      {
+		uint32 newcount = qle->GetMobCount(0) + 1;
+		qle->SetMobCount(0, newcount);
+		qle->SendUpdateAddKill(0);		
+		Creature *FreedGreengill = sEAS.SpawnCreature(plr, 25085, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0);
+		FreedGreengill->Despawn(6*60*1000, 0);
+		target->Despawn(0, 6*60*1000);
+		qle->UpdatePlayerFields();
+        return true;
+      }  
+  }
+  return true;
+}
+
+#define GO_FIRE 183816
+
+struct Coords
+{
+	float x;
+	float y;
+	float z;
+	float o;
+};
+static Coords BloodoathFire[] =
+{
+	{13329.4f, -6994.70f, 14.5219f, 1.38938f},
+ 	{13315.4f, -6990.72f, 14.7647f, 1.25979f}
+};
+static Coords SinlorenFire[] =
+{
+	{13214.3f, -7059.19f, 17.5717f, 1.58573f},
+	{13204.2f, -7059.38f, 17.5717f, 1.57787f}
+};
+static Coords DawnchaserFire[] =
+{
+	{13284.1f, -7152.65f, 15.9774f, 1.44828f},
+	{13273.0f, -7151.21f, 15.9774f, 1.39723f}
+};
+
+bool ShipBombing(uint32 i, Spell* pSpell)
+{
+	Player *plr = (Player*)pSpell->u_caster;
+	if(!plr)
+		return true;
+
+	if(!pSpell->u_caster->IsPlayer())
+		return true;
+
+	QuestLogEntry *qle = NULL;
+	qle = plr->GetQuestLogForEntry(11542);
+	if(qle == NULL)
+	{
+		qle = plr->GetQuestLogForEntry(11543);
+		if(qle == NULL)
+		{
+			return true;
+		}
+	}
+	
+	GameObject *Sinloren = plr->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(13200.232422, -7049.176270, 3.838517, 550000);
+	GameObject *Bloodoath = plr->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(13319.419922, -6988.779785, 4.002993, 550000);
+	GameObject *Dawnchaser = plr->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(13274.51625, -7145.434570, 4.770292, 550000);
+	
+	GameObject *obj = NULL;
+
+	if(Sinloren != NULL)
+	{
+		if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+		{
+			if(plr->CalcDistance(plr, Sinloren) < 15)
+			{
+				qle->SetMobCount(0, qle->GetMobCount(0)+1);
+				qle->SendUpdateAddKill(0);
+				qle->UpdatePlayerFields();
+				for(uint8 i = 0; i < 2; i++)
+				{
+					obj = sEAS.SpawnGameobject(plr, GO_FIRE, SinlorenFire[i].x, SinlorenFire[i].y, SinlorenFire[i].z, SinlorenFire[i].o, 1);
+					sEAS.GameobjectDelete(obj, 2*60*1000);
+				}
+			}
+		}
+	}
+	if(Bloodoath != NULL)
+	{
+		if(qle->GetMobCount(1) < qle->GetQuest()->required_mobcount[1])
+		{
+			if(plr->CalcDistance(plr, Bloodoath) < 15)
+			{
+				qle->SetMobCount(1, qle->GetMobCount(1)+1);
+				qle->SendUpdateAddKill(1);
+				qle->UpdatePlayerFields();
+				for(uint8 i = 0; i < 2; i++)
+				{
+					obj = sEAS.SpawnGameobject(plr, GO_FIRE, BloodoathFire[i].x, BloodoathFire[i].y, BloodoathFire[i].z, BloodoathFire[i].o, 1);
+					sEAS.GameobjectDelete(obj, 2*60*1000);
+				}
+			}
+		}
+	}
+	if(Dawnchaser != NULL)
+	{
+		if(plr->CalcDistance(plr, Dawnchaser) < 15)
+		{
+			if(qle->GetMobCount(2) < qle->GetQuest()->required_mobcount[2])
+			{
+				qle->SetMobCount(2, qle->GetMobCount(2)+1);
+				qle->SendUpdateAddKill(2);
+				qle->UpdatePlayerFields();
+				for(uint8 i = 0; i < 2; i++)
+				{
+					obj = sEAS.SpawnGameobject(plr, GO_FIRE, DawnchaserFire[i].x, DawnchaserFire[i].y, DawnchaserFire[i].z, DawnchaserFire[i].o, 1);
+					sEAS.GameobjectDelete(obj, 2*60*1000);
+				}
+			}
+		}
+	}
+	return true;
+}
+
 void SetupIsleOfQuelDanas(ScriptMgr * mgr)
 {
+	mgr->register_dummy_spell(45109, &OrbOfMurlocControl);
 	mgr->register_gameobject_script(187578, &ScryingOrb::Create);
 	mgr->register_dummy_spell(44997, &ConvertingSentry);
+	mgr->register_dummy_spell(45115, &ShipBombing);
 }

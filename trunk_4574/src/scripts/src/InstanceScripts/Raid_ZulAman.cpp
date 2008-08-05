@@ -1,3 +1,22 @@
+/*
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "StdAfx.h"
 #include "Setup.h"
 
@@ -11,16 +30,16 @@
 #define CN_NALORAKK 23576
 
 // Troll Form spells
-#define MANGLE				44955
-#define SURGE				25787	// 42402 - correct spell hits creature casting spell
+#define NALORAKK_MANGLE				44955
+#define NALORAKK_SURGE				25787	// 42402 - correct spell hits creature casting spell
 // Bear Form spells
-#define LACERATING_SLASH	42395
-#define REND_FLESH			42397
-#define DEAFENING_ROAR		42398
+#define NALORAKK_LACERATING_SLASH	42395
+#define NALORAKK_REND_FLESH			42397
+#define NALORAKK_DEAFENING_ROAR		42398
 // Common spells
-#define BRUTAL_SWIPE		42384
+#define NALORAKK_BRUTAL_SWIPE		42384
 // Other spells
-#define BERSERK				41924
+#define NALORAKK_BERSERK				41924
 
 enum NalorakkForms
 {
@@ -43,14 +62,14 @@ public:
 			m_spellcheck[i] = false;
 		}
 
-		spells[0].info = dbcSpell.LookupEntry(MANGLE); 
+		spells[0].info = dbcSpell.LookupEntry(NALORAKK_MANGLE); 
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
 		spells[0].perctrigger = 12.0f;
 		spells[0].attackstoptimer = 1000;
 		spells[0].cooldown = 20;
 
-		spells[1].info = dbcSpell.LookupEntry(SURGE); 
+		spells[1].info = dbcSpell.LookupEntry(NALORAKK_SURGE); 
 		spells[1].targettype = TARGET_RANDOM_SINGLE;
 		spells[1].instant = true;
 		spells[1].perctrigger = 8.0f;
@@ -61,38 +80,38 @@ public:
 		spells[1].soundid = 12071;
 		spells[1].speech = "I bring da pain!";
 
-        spells[2].info = dbcSpell.LookupEntry(BRUTAL_SWIPE); 
+        spells[2].info = dbcSpell.LookupEntry(NALORAKK_BRUTAL_SWIPE); 
 		spells[2].targettype = TARGET_ATTACKING; 
 		spells[2].instant = true;
 		spells[2].perctrigger = 2.0f;
 		spells[2].attackstoptimer = 1000;
 		spells[2].cooldown = 35;
 
-		spells[3].info = dbcSpell.LookupEntry(LACERATING_SLASH);
+		spells[3].info = dbcSpell.LookupEntry(NALORAKK_LACERATING_SLASH);
 		spells[3].targettype = TARGET_ATTACKING;
 		spells[3].instant = true;
 		spells[3].perctrigger = 12.0f;
 		spells[3].attackstoptimer = 1000;
 		spells[3].cooldown = 20;
 
-		spells[4].info = dbcSpell.LookupEntry(REND_FLESH); 
+		spells[4].info = dbcSpell.LookupEntry(NALORAKK_REND_FLESH); 
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = true;
 		spells[4].perctrigger = 12.0f;
 		spells[4].attackstoptimer = 1000;
 		spells[4].cooldown = 12;
 
-		spells[5].info = dbcSpell.LookupEntry(DEAFENING_ROAR); 
+		spells[5].info = dbcSpell.LookupEntry(NALORAKK_DEAFENING_ROAR); 
 		spells[5].targettype = TARGET_VARIOUS;
 		spells[5].instant = true;
 		spells[5].perctrigger = 11.0f;
 		spells[5].attackstoptimer = 1000;
 		spells[5].cooldown = 12;
 
-		spells[6].info = dbcSpell.LookupEntry(BERSERK);
+		spells[6].info = dbcSpell.LookupEntry(NALORAKK_BERSERK);
 		spells[6].cooldown = 600;
 
-		_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 3.0f);
+		_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 1.0f);
 
 		Form = NALORAKK_FORM_TROLL;
 		FormTimer = 0;
@@ -141,7 +160,7 @@ public:
 		if (_unit->FindAura(42377))
 			_unit->RemoveAura(42377);
 
-		_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 3.0f);
+		_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 1.0f);
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 
@@ -167,7 +186,7 @@ public:
 				{
 					_unit->setAttackTimer(1500, false);
 					_unit->CastSpell(_unit, 42377, true);
-					_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 4.0f);
+					_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 1.0f);
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You call on da beast, you gonna get more dan you bargain for!");
 					_unit->PlaySoundToSet(12072);
 
@@ -182,7 +201,7 @@ public:
 						_unit->RemoveAura(42377);
 
 					_unit->setAttackTimer(1500, false);
-					_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 3.0f);
+					_unit->SetFloatValue(OBJECT_FIELD_SCALE_X , 1.0f);
 					_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Make way for Nalorakk!");
 					_unit->PlaySoundToSet(12073);
 
@@ -288,7 +307,7 @@ public:
 
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -316,13 +335,13 @@ protected:
 };
 
 //Akil'zon <Eagle Avatar>
-#define AKILZON 23574
+#define CN_AKILZON 23574
 
-#define STATIC_DISRUPTION 44008 //INSTANT
-#define CALL_LIGHTING 43661 //INSTANT 
-#define GUST_OF_WIND 43621 //INSTANT
-#define ELECTRICAL_STORM 43648
-#define SOARING_EAGLE 24858   //SUMMONS  Akil'zon <Eagle Avatar>
+#define AKILZON_STATIC_DISRUPTION 44008 //INSTANT
+#define AKILZON_CALL_LIGHTING 43661 //INSTANT 
+#define AKILZON_GUST_OF_WIND 43621 //INSTANT
+#define AKILZON_ELECTRICAL_STORM 43648
+#define AKILZON_SOARING_EAGLE 24858   //SUMMONS  Akil'zon <Eagle Avatar>
 
 
 class AKILZONAI : public CreatureAIScript
@@ -340,27 +359,27 @@ public:
 				m_spellcheck[i] = false;
 			}
 		
-        spells[0].info = dbcSpell.LookupEntry(STATIC_DISRUPTION); 
+        spells[0].info = dbcSpell.LookupEntry(AKILZON_STATIC_DISRUPTION); 
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = true;
 		spells[0].perctrigger = 2.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(CALL_LIGHTING); 
+		spells[1].info = dbcSpell.LookupEntry(AKILZON_CALL_LIGHTING); 
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
 		spells[1].perctrigger = 2.0f;
 		spells[1].attackstoptimer = 1000;
 
 
-		spells[2].info = dbcSpell.LookupEntry(GUST_OF_WIND); //crash
+		spells[2].info = dbcSpell.LookupEntry(AKILZON_GUST_OF_WIND); //crash
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = true;
 		spells[2].perctrigger = 0.0f;
 		spells[2].attackstoptimer = 1000;
 
 
-        spells[3].info = dbcSpell.LookupEntry(ELECTRICAL_STORM);
+        spells[3].info = dbcSpell.LookupEntry(AKILZON_ELECTRICAL_STORM);
 		spells[3].targettype = TARGET_VARIOUS;
 		spells[3].instant = true;
 		spells[3].perctrigger = 1.0f;
@@ -421,7 +440,7 @@ public:
 		if (timesummon > 300)
 			{
 				Creature *cre = NULL;
-				cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(SOARING_EAGLE, 
+				cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(AKILZON_SOARING_EAGLE, 
 				(_unit->GetPositionX()+RandomFloat(10)-10), (_unit->GetPositionY()+RandomFloat(10)-10),
 				_unit->GetPositionZ(), _unit->GetOrientation(),
 				true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
@@ -483,15 +502,15 @@ protected:
 
 //Halazzi <Lynx Avatar>
 
-#define HALAZZI 23577
-#define CORRUPTED_LIGHTING_TOTEM 24224 
-#define HALAZZY_ENRAGE 44779
+#define CN_HALAZZI 23577
+#define HALAZZI_CORRUPTED_LIGHTING_TOTEM 24224 
+#define HALAZZI_ENRAGE 44779
 
 //Phase 1
-#define SABER_LASH 43267 //43267 //43268 ///40810 //40816
+#define HALAZZI_SABER_LASH 43267 //43267 //43268 ///40810 //40816
 //Phase 2
-#define FLAME_SHOCK 43303
-#define EARTH_SHOCK 43305 //INSTANT , VARIOUS
+#define HALAZZI_FLAME_SHOCK 43303
+#define HALAZZI_EARTH_SHOCK 43305 //INSTANT , VARIOUS
 //Phase 3
 //Halazzi now drops his totems more frequently as well as doing more damage. 
 
@@ -512,19 +531,19 @@ public:
 				m_spellcheck[i] = false;
 			}
 		
-        spells[0].info = dbcSpell.LookupEntry(SABER_LASH);
+        spells[0].info = dbcSpell.LookupEntry(HALAZZI_SABER_LASH);
 		spells[0].targettype = TARGET_DESTINATION;
 		spells[0].instant = false;
 		spells[0].perctrigger = 0.5f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(FLAME_SHOCK);
+		spells[1].info = dbcSpell.LookupEntry(HALAZZI_FLAME_SHOCK);
 		spells[1].targettype = TARGET_ATTACKING; 
 		spells[1].instant = true;
 		spells[1].perctrigger = 2.0f;
 		spells[1].attackstoptimer = 1000;
 		
-		spells[2].info = dbcSpell.LookupEntry(EARTH_SHOCK);
+		spells[2].info = dbcSpell.LookupEntry(HALAZZI_EARTH_SHOCK);
 		spells[2].targettype = TARGET_ATTACKING; 
 		spells[2].instant = true;
 		spells[2].perctrigger = 2.0f;
@@ -586,7 +605,7 @@ public:
 	{
 		if (!enrage && timer == 600)
 		{
-		_unit->CastSpell(_unit, dbcSpell.LookupEntry(HALAZZY_ENRAGE), true);
+		_unit->CastSpell(_unit, dbcSpell.LookupEntry(HALAZZI_ENRAGE), true);
 		enrage = 1;
 		}
 		if (_unit->GetHealthPct() <= 75 && phase == 1) 
@@ -605,7 +624,7 @@ public:
 		if (timetotem > 300 && phase ==2)
 		{
 			Creature *cre = NULL;
-			cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CORRUPTED_LIGHTING_TOTEM, 
+			cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZI_CORRUPTED_LIGHTING_TOTEM, 
 			(_unit->GetPositionX()+RandomFloat(3)-3), (_unit->GetPositionY()+RandomFloat(3)-3),
 			_unit->GetPositionZ(), _unit->GetOrientation(),
 			true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
@@ -616,7 +635,7 @@ public:
 		if (timetotem > 150 && phase ==3)
 		{
 			Creature *cre = NULL;
-			cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CORRUPTED_LIGHTING_TOTEM, 
+			cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZI_CORRUPTED_LIGHTING_TOTEM, 
 			(_unit->GetPositionX()+RandomFloat(3)-3), (_unit->GetPositionY()+RandomFloat(3)-3),
 			_unit->GetPositionZ(), _unit->GetOrientation(),
 			true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
@@ -859,7 +878,7 @@ protected:
 
 //HEX_LORD_MALACRASS
 
-#define HEX_LORD_MALACRASS 24239
+#define CN_HEX_LORD_MALACRASS 24239
 //summons
 #define GAZAKROTH 24244
 #define THURG 24241 
@@ -871,8 +890,8 @@ protected:
 #define KORAGG 24247 
 
 //spells
-#define SOUL_DRAIN 41303
-#define SPIRIT_BOLTS 43382 //43383 
+#define HEX_LORD_MALACRASS_SOUL_DRAIN 41303
+#define HEX_LORD_MALACRASS_SPIRIT_BOLTS 43382 //43383 
 
 class HEXLORDMALACRASSAI : public CreatureAIScript
 {
@@ -889,13 +908,13 @@ public:
 				m_spellcheck[i] = false;
 			}
 		
-        spells[0].info = dbcSpell.LookupEntry(SOUL_DRAIN);
+        spells[0].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_SOUL_DRAIN);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 1.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(SPIRIT_BOLTS);
+		spells[1].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_SPIRIT_BOLTS);
 		spells[1].targettype = TARGET_DESTINATION; 
 		spells[1].instant = true;
 		spells[1].perctrigger = 3.0f;
@@ -949,6 +968,12 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Dis not da end for me..");
 		_unit->PlaySoundToSet(12051);
        RemoveAIUpdateEvent();
+
+	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(123.256f, 914.422f, 34.1441f, 186306);
+        if(pDoor == 0)
+            return;
+
+       pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0); // Open the door
     }
 
     void AIUpdate()
@@ -1053,29 +1078,29 @@ protected:
 
 //ZUL’JIN
 
-#define ZULJIN 23863
+#define CN_ZULJIN 23863
 
 //Phase 1 troll
-#define GRIEVOUS_THROW 43093 
-#define WHIRLWIND  44949 // 44949 - work,43442,41400, 41399,41195, 41194,41098,  // from dbc, untested
-#define MODEL_TROLL 21899 
+#define ZULJIN_GRIEVOUS_THROW 43093 
+#define ZULJIN_WHIRLWIND 17207 // 44949 - work,43442,41400, 41399,41195, 41194,41098,  // from dbc, untested
+#define ZULJIN_MODEL_TROLL 21899 
 //Phase2 bear
-#define CREEPING_PARALYSIS 43095 
-#define OVERPOWER 43456
-#define MODEL_BEAR 706 //not Blizzlike
+#define ZULJIN_CREEPING_PARALYSIS 43095 
+#define ZULJIN_OVERPOWER 43456
+#define ZULJIN_MODEL_BEAR 21736
 //phase3  eagle
-#define ENERGY_STORM 43983 //not Work
-#define MODEL_EAGLE 22255 //Not Blizzlike
-#define FEATHER_VORTEX 24136 //summons npc 4 begin phase
+#define ZULJIN_ENERGY_STORM 43983 //not Work
+#define ZULJIN_MODEL_EAGLE 22257
+#define ZULJIN_FEATHER_VORTEX 24136 //summons npc 4 begin phase
 //phase4  lynx
-#define CLAW_RAGE  43150 
-#define LYNX_RUSH 43153
-#define MODEL_LYNX 15506 //Not Blizzlike
+#define ZULJIN_CLAW_RAGE  43150 
+#define ZULJIN_LYNX_RUSH 43153
+#define ZULJIN_MODEL_LYNX 21907
 //phase5  dragonhawk
-#define FLAME_WHIRL 44090 //43208, 43213
-#define ZJ_FLAME_BREATH 43215 
-#define ZJ_FLAME_SHOCK 43303
-#define MODEL_DRAGONHAWK 17547 //Not Blizzlike
+#define ZULJIN_FLAME_WHIRL 43213 //43208, 43213
+#define ZULJIN_FLAME_BREATH 43215 
+#define ZULJIN_FLAME_SHOCK 43303
+#define ZULJIN_MODEL_DRAGONHAWK 21901
 
 
 
@@ -1094,64 +1119,64 @@ public:
 				m_spellcheck[i] = false;
 			}
 		
-        spells[0].info = dbcSpell.LookupEntry(GRIEVOUS_THROW);
-		spells[0].targettype = TARGET_DESTINATION;
+        spells[0].info = dbcSpell.LookupEntry(ZULJIN_GRIEVOUS_THROW);
+		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
-		spells[0].perctrigger = 1.0f;
+		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(WHIRLWIND); 
+		spells[1].info = dbcSpell.LookupEntry(ZULJIN_WHIRLWIND); 
 		spells[1].targettype = TARGET_ATTACKING; 
 		spells[1].instant = false;
-		spells[1].perctrigger = 1.0f;
+		spells[1].perctrigger = 25.0f;
 		spells[1].attackstoptimer = 1000;
 		
-        spells[2].info = dbcSpell.LookupEntry(CREEPING_PARALYSIS); 
+        spells[2].info = dbcSpell.LookupEntry(ZULJIN_CREEPING_PARALYSIS); 
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
-		spells[2].perctrigger = 3.0f;
+		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 1000;
 		
-        spells[3].info = dbcSpell.LookupEntry(OVERPOWER);
+        spells[3].info = dbcSpell.LookupEntry(ZULJIN_OVERPOWER);
 		spells[3].targettype = TARGET_VARIOUS; 
 		spells[3].instant = true;
-		spells[3].perctrigger = 3.0f;
+		spells[3].perctrigger = 10.0f;
 		spells[3].attackstoptimer = 1000;
 
-		spells[4].info = dbcSpell.LookupEntry(ENERGY_STORM); 
+		spells[4].info = dbcSpell.LookupEntry(ZULJIN_ENERGY_STORM); 
 		spells[4].targettype = TARGET_VARIOUS;  
 		spells[4].instant = true;
-		spells[4].perctrigger = 3.0f;
+		spells[4].perctrigger = 10.0f;
 		spells[4].attackstoptimer = 1000;
 		
-		spells[5].info = dbcSpell.LookupEntry(CLAW_RAGE);
+		spells[5].info = dbcSpell.LookupEntry(ZULJIN_CLAW_RAGE);
 		spells[5].targettype = TARGET_ATTACKING; 
 		spells[5].instant = true;
 		spells[5].perctrigger = 10.0f;
 		spells[5].attackstoptimer = 1000;
 		
-		spells[6].info = dbcSpell.LookupEntry(LYNX_RUSH);
+		spells[6].info = dbcSpell.LookupEntry(ZULJIN_LYNX_RUSH);
 		spells[6].targettype = TARGET_ATTACKING; 
 		spells[6].instant = true;
-		spells[6].perctrigger = 3.0f;
+		spells[6].perctrigger = 10.0f;
 		spells[6].attackstoptimer = 1000;
 		
-        spells[7].info = dbcSpell.LookupEntry(FLAME_WHIRL); 
+        spells[7].info = dbcSpell.LookupEntry(ZULJIN_FLAME_WHIRL); 
 		spells[7].targettype = TARGET_VARIOUS;
 		spells[7].instant = true;
-		spells[7].perctrigger = 4.0f;
+		spells[7].perctrigger = 3.0f;
 		spells[7].attackstoptimer = 1000;
 
-		spells[8].info = dbcSpell.LookupEntry(ZJ_FLAME_BREATH); 
+		spells[8].info = dbcSpell.LookupEntry(ZULJIN_FLAME_BREATH); 
 		spells[8].targettype = TARGET_ATTACKING; 
 		spells[8].instant = true;
-		spells[8].perctrigger = 3.0f;
+		spells[8].perctrigger = 5.0f;
 		spells[8].attackstoptimer = 1000;
 
-		spells[9].info = dbcSpell.LookupEntry(ZJ_FLAME_SHOCK);
+		spells[9].info = dbcSpell.LookupEntry(ZULJIN_FLAME_SHOCK);
 		spells[9].targettype = TARGET_ATTACKING; 
 		spells[9].instant = true;
-		spells[9].perctrigger = 2.0f;
+		spells[9].perctrigger = 5.0f;
 		spells[9].attackstoptimer = 1000;			
 
     }
@@ -1195,7 +1220,7 @@ public:
 		phase =1;
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-		_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , MODEL_TROLL);  //change to Troll
+		_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_TROLL);  //change to Troll
         RemoveAIUpdateEvent();
     }
 
@@ -1212,7 +1237,7 @@ public:
 			spmin = 2;
 			nrspells = 4;
 			phase = 2;
-			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , MODEL_BEAR);  //change to Bear
+			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_BEAR);  //change to Bear
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Got me some new tricks...like me bruddah bear!");
 			_unit->PlaySoundToSet(12092);
 		}
@@ -1224,13 +1249,13 @@ public:
 			for(int j=0;j<4;j++)
 			{
 				Creature *cre = NULL;
-				cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(FEATHER_VORTEX, 
+				cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(ZULJIN_FEATHER_VORTEX, 
 				(_unit->GetPositionX() + RandomFloat(10)-10), (_unit->GetPositionY() + RandomFloat(10)-10),
 				_unit->GetPositionZ(), _unit->GetOrientation(),
 				true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
 				cre->GetAIInterface()->setOutOfCombatRange(50000);
 			}
-			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , MODEL_EAGLE);  //change to Eagle
+			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_EAGLE);  //change to Eagle
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Dere be no hidin' from da eagle!");
 			_unit->PlaySoundToSet(12093);
 		}
@@ -1239,7 +1264,7 @@ public:
 			spmin = 5;
 			nrspells = 7;
 			phase = 4;
-			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , MODEL_LYNX);  //change to Lynx
+			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_LYNX);  //change to Lynx
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Let me introduce to you my new bruddahs: fang and claw!");
 			_unit->PlaySoundToSet(12094);
 		}
@@ -1248,14 +1273,14 @@ public:
 			spmin = 7;
 			nrspells = 10;
 			phase = 5;
-			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , MODEL_DRAGONHAWK);  //change to Dragonhawk
+			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_DRAGONHAWK);  //change to Dragonhawk
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ya don' have to look to da sky to see da dragonhawk!");
 			_unit->PlaySoundToSet(12095);
 		}
 		if (_unit->GetHealthPct() <= 1 && phase == 5) 
 		{
 			_unit->PlaySoundToSet(12100);
-			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , MODEL_TROLL);  //change to Troll
+			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_TROLL);  //change to Troll
 			phase = 6;
 		}
 		float val = (float)RandomFloat(100.0f);
@@ -2452,14 +2477,14 @@ protected:
 void SetupZulAman(ScriptMgr * mgr)
 {
 	mgr->register_creature_script(CN_NALORAKK, &NalorakkAI::Create);
-	mgr->register_creature_script(AKILZON, &AKILZONAI::Create);
-	mgr->register_creature_script(HALAZZI, &HALAZZIAI::Create);
+	mgr->register_creature_script(CN_AKILZON, &AKILZONAI::Create);
+	mgr->register_creature_script(CN_HALAZZI, &HALAZZIAI::Create);
 	mgr->register_creature_script(JANALAI, &JANALAIAI::Create);
-	mgr->register_creature_script(HEX_LORD_MALACRASS, &HEXLORDMALACRASSAI::Create);
-	mgr->register_creature_script(ZULJIN, &ZULJINAI::Create);
+	mgr->register_creature_script(CN_HEX_LORD_MALACRASS, &HEXLORDMALACRASSAI::Create);
+	mgr->register_creature_script(CN_ZULJIN, &ZULJINAI::Create);
 	//MOBS
-	mgr->register_creature_script(SOARING_EAGLE, &SOARINGEAGLEAI::Create);
-	mgr->register_creature_script(CORRUPTED_LIGHTING_TOTEM, &CLTOTEMAI::Create);
+	mgr->register_creature_script(AKILZON_SOARING_EAGLE, &SOARINGEAGLEAI::Create);
+	mgr->register_creature_script(HALAZZI_CORRUPTED_LIGHTING_TOTEM, &CLTOTEMAI::Create);
 	mgr->register_creature_script(GAZAKROTH, &GAZAKROTHAI::Create);
 	mgr->register_creature_script(LORD_RAADAN, &LORDRAADANAI::Create);
 	mgr->register_creature_script(SLITHER, &SLITHERAI::Create);
@@ -2468,5 +2493,5 @@ void SetupZulAman(ScriptMgr * mgr)
 	mgr->register_creature_script(FENSTALKER, &FENSTALKERAI::Create);
 	mgr->register_creature_script(ALYSON_ANTILLE, &ALYSONANTILLEAI::Create);
 	mgr->register_creature_script(KORAGG, &KORAGGAI::Create);
-	mgr->register_creature_script(FEATHER_VORTEX, &FEATHERVORTEXAI::Create);
+	mgr->register_creature_script(ZULJIN_FEATHER_VORTEX, &FEATHERVORTEXAI::Create);
 }

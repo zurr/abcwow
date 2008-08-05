@@ -19,6 +19,10 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
+#include "EAS/EasyFunctions.h"
+
+#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, Plr); \
+    Menu->SendTo(Plr);
 
 class SCRIPT_DECL AncientMarks : public GossipScript
 {
@@ -107,9 +111,53 @@ public:
 	}
 };
 
+class SCRIPT_DECL ElderKuruti : public GossipScript
+{
+public:
+	void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
+	{
+		GossipMenu *Menu;
+		if(!Plr->GetItemInterface()->GetItemCount(24573, true))
+		{
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9226, Plr);
+			Menu->AddItem( 0, "Offer treat", 1);
+			Menu->SendTo(Plr);
+		}
+	}
+
+	void GossipSelectOption(Object * pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
+	{
+		GossipMenu *Menu;
+		switch(IntId)
+		{
+		case 1:
+				objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9227, Plr);
+				Menu->AddItem( 0, "Im a messenger for Draenei", 2);
+				Menu->SendTo(Plr);
+				break;
+		case 2:
+				objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9229, Plr);
+				Menu->AddItem( 0, "Get message", 3);
+				Menu->SendTo(Plr);
+				break;
+		case 3:
+			if(!Plr->GetItemInterface()->GetItemCount(24573, true))
+			{
+				sEAS.AddItem(24573, Plr);
+				if(Plr->GetItemInterface()->GetItemCount(24573, true))
+					SendQuickMenu(9231);
+			}
+			else
+				SendQuickMenu(9231);
+			break;
+		}
+	}
+};
+
 void SetupZangarmarsh(ScriptMgr * mgr)
 {
 	GossipScript * AMark = (GossipScript*) new AncientMarks();
 	mgr->register_gossip_script(17900, AMark);	// Ashyen Ancient of Lore
 	mgr->register_gossip_script(17901, AMark);	// Keleth Ancient of War
+	mgr->register_gossip_script(18197, CREATE_GOSSIPSCRIPT(ElderKuruti));
 }

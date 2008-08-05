@@ -1,8 +1,27 @@
+/*
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "StdAfx.h"
 #include "Setup.h"
 
 /************************************************************************/
-/* Raid_OnyxiasLair.cpp Script by DK                                    */
+/* Raid_OnyxiasLair.cpp Script by DK			                        */
 /************************************************************************/
 
 /* 
@@ -19,14 +38,14 @@ This script covers Onyxia's mind
 //0 = walk, 256 = run, 768 = fly 
 
 //Phase 1,3 Spells
-#define FLAME_BREATH 23461 //self
-#define KNOCK_AWAY 10101 //Reduce thread script effect main target
+#define FLAME_BREATH 18435 //Corrected http://www.wowhead.com/?spell=18435
+#define KNOCK_AWAY 19633 //Reduce thread script effect main target
 #define WING_BUFFET 18500 // self
-#define CLEAVE 30495//15579,16044,19642,29832 //target
+#define CLEAVE 19983//15579,16044,19642,29832 //target Corrected 
 #define TAIL_SWEEP 15847
 
 //Phase 2 Spells
-#define SCRIPTABLE_FIREBALL 30691//Not sure find true one
+#define SCRIPTABLE_FIREBALL 18392 //Corrected http://www.wowhead.com/?spell=18392
 //Script it
 #define ENTANGLING_FLAMES 20019
 //Onyxia's Breath (Deep Breath)
