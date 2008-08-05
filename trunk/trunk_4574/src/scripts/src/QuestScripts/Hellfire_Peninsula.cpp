@@ -1,21 +1,21 @@
 /*
-* Moon++ Scripts for Ascent MMORPG Server
-* Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
-* Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "StdAfx.h"
 #include "Setup.h"
@@ -1000,6 +1000,82 @@ public:
   }
 };
 
+bool AnAmbitiousPlan(uint32 i, Spell* pSpell)
+{
+  if(pSpell->u_caster->IsPlayer() == false)
+    return true;
+
+  Player *plr = (Player*)pSpell->u_caster;
+  Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  
+  if(unit_target == NULL)
+    return true;
+
+  if(!unit_target->IsCreature())
+    return true;
+
+  Creature *target = (Creature*)unit_target;
+
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(9383);
+  if(qle == NULL)
+    return true;
+
+  if(target->GetEntry() == 16975)
+  {
+	float SSx = target->GetPositionX();
+	float SSy = target->GetPositionY();
+	float SSz = target->GetPositionZ();
+	target->GetAIInterface()->SetAllowedToEnterCombat(false);
+	target->GetAIInterface()->StopMovement(0);
+	target->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+	target->GetAIInterface()->SetAIState(STATE_IDLE);
+	target->Despawn(0, 0);
+
+	GameObject *obj = sEAS.SpawnGameobject(plr, 183816, SSx, SSy, SSz, 0, 1);
+	sEAS.GameobjectDelete(obj, 1*60*1000);
+  }
+  plr->UpdateNearbyGameObjects();
+
+  return true;
+}
+
+class DarkTidingsAlliance : public QuestScript 
+{ 
+public:
+  void OnQuestComplete(Player* mTarget, QuestLogEntry *qLogEntry)
+  {
+    if(!mTarget)
+		return;
+
+    Creature *creat = mTarget->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(mTarget->GetPositionX(), mTarget->GetPositionY(), mTarget->GetPositionZ(), 17479);
+    if(creat == NULL)
+      return;
+
+	char msg[100];
+	sprintf(msg, "Psst, %s, get over here.", mTarget->GetName());
+	mTarget->SendChatMessage(CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, msg);
+  }
+};
+
+class DarkTidingsHorde : public QuestScript 
+{ 
+public:
+  void OnQuestComplete(Player* mTarget, QuestLogEntry *qLogEntry)
+  {
+    if(!mTarget)
+		return;
+
+    Creature *creat = mTarget->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(mTarget->GetPositionX(), mTarget->GetPositionY(), mTarget->GetPositionZ(), 17558);
+    if(creat == NULL)
+      return;
+
+	char msg[100];
+	sprintf(msg, "Psst, %s, get over here.", mTarget->GetName());
+	mTarget->SendChatMessage(CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, msg);
+  }
+};
+
+
 void SetupHellfirePeninsula(ScriptMgr * mgr)
 {
 	/*-------------------------------------------------------------------*/
@@ -1028,6 +1104,7 @@ void SetupHellfirePeninsula(ScriptMgr * mgr)
 	mgr->register_dummy_spell(29297, &CleansingtheWater);
 	mgr->register_dummy_spell(30489, &TheSeersRelic);
 	mgr->register_dummy_spell(34387, &DisruptTheirReinforcements);
+	mgr->register_dummy_spell(29364, &AnAmbitiousPlan);
 	
 	GossipScript * Prisoner1Gossip = (GossipScript*) new Prisoner1();
 	mgr->register_gossip_script(20677, Prisoner1Gossip);
@@ -1050,4 +1127,9 @@ void SetupHellfirePeninsula(ScriptMgr * mgr)
 	mgr->register_creature_script(17405, &HellfireDeadNPC::Create);
 	mgr->register_creature_script(16852, &HellfireDeadNPC::Create);
 	mgr->register_creature_script(20158, &HellfireDeadNPC::Create);
+
+	QuestScript *DarkTidingsHordeQuest = (QuestScript*) new DarkTidingsHorde();
+	QuestScript *DarkTidingsAllianceQuest = (QuestScript*) new DarkTidingsAlliance();
+	mgr->register_quest_script(9587, DarkTidingsHordeQuest);
+	mgr->register_quest_script(9588, DarkTidingsHordeQuest);
 }

@@ -103,7 +103,7 @@ public:
   }
 };
 
-void SetupMage(ScriptMgr *mgr)
+void SetupMage(ScriptMgr * mgr)
 {
   mgr->register_creature_script(6193, &FragmentedMagic::Create);
   mgr->register_creature_script(6194, &FragmentedMagic::Create);

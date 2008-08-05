@@ -1930,7 +1930,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -2046,7 +2046,7 @@ public:
 
     MekgineerSteamriggerAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 2;
+		nrspells = 3;
 		for(int i = 0; i < nrspells; i++)
 		{
 			m_spellcheck[i] = false;
@@ -2061,20 +2061,20 @@ public:
 		spells[0].mindist2cast = 0.0f;
 		spells[0].maxdist2cast = 40.0f;
 
-		spells[1].info = dbcSpell.LookupEntry(ELECTRIFIED_NET);
-		spells[1].targettype = TARGET_RANDOM_SINGLE;
+		spells[1].info = dbcSpell.LookupEntry(SAW_BLADE);
+		spells[1].targettype = TARGET_RANDOM_SINGLE; // when killed with VARIOUS (because with that caster attacks also himself) server crashes
 		spells[1].instant = true;
 		spells[1].cooldown = 15;
-		spells[1].perctrigger = 8.0f;
+		spells[1].perctrigger = 10.0f;
 		spells[1].attackstoptimer = 1000;
 		spells[1].mindist2cast = 0.0f;
 		spells[1].maxdist2cast = 40.0f;
 
-		spells[2].info = dbcSpell.LookupEntry(SAW_BLADE);
-		spells[2].targettype = TARGET_RANDOM_SINGLE; // when killed with VARIOUS (because with that caster attacks also himself) server crashes
+		spells[2].info = dbcSpell.LookupEntry(ELECTRIFIED_NET);
+		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = true;
 		spells[2].cooldown = 15;
-		spells[2].perctrigger = 10.0f;
+		spells[2].perctrigger = 8.0f;
 		spells[2].attackstoptimer = 1000;
 		spells[2].mindist2cast = 0.0f;
 		spells[2].maxdist2cast = 40.0f;
@@ -2181,7 +2181,7 @@ public:
 			for (std::vector<Unit*>::iterator itr = Gnomes.begin(); itr < Gnomes.end(); itr++)
 			{
 				Gnome = (Unit*)(*itr);
-				if (Gnome == NULL || !Gnome->isAlive() || !Gnome->IsInWorld())
+				if (!Gnome->isAlive() || !Gnome->IsInWorld())
 				{
 					Gnomes.erase(itr);
 					continue;
@@ -2323,7 +2323,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -2721,7 +2721,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();

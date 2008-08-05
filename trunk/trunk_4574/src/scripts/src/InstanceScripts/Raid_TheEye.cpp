@@ -2163,13 +2163,6 @@ protected:
 // Other spells
 #define REBIRTH 34342
 
-struct Coords
-{
-    float x;
-    float y;
-    float z;
-    float o;
-};
 
 static Coords fly[] = 
 {
@@ -2322,7 +2315,7 @@ public:
 
 		if (_unit->isAlive()) {
 			if (_unit != NULL) _unit->SafeDelete();
-			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19514, fly[11].x, fly[11].y, fly[11].z, 0, false, false, 0, 0);
+			_unit->GetMapMgr()->GetInterface()->SpawnCreature(19514, fly[11].mX, fly[11].mY, fly[11].mZ, 0, false, false, 0, 0);
 		}
 
         RemoveAIUpdateEvent();
@@ -2419,10 +2412,10 @@ public:
 			//_unit->CastSpell(_unit, dbcSpell.LookupEntry(34229), true);
 			if (lasttime+11==timer)
 			{
-				_unit->CastSpellAoF(fly[1].x,fly[1].y,fly[1].z, spells[1].info, spells[1].instant); 
-				_unit->CastSpellAoF(fly[2].x,fly[2].y,fly[2].z, spells[1].info, spells[1].instant); 
-				_unit->CastSpellAoF(fly[3].x,fly[3].y,fly[3].z, spells[1].info, spells[1].instant); 
-				_unit->CastSpellAoF(fly[4].x,fly[4].y,fly[4].z, spells[1].info, spells[1].instant); 
+				_unit->CastSpellAoF(fly[1].mX,fly[1].mY,fly[1].mZ, spells[1].info, spells[1].instant); 
+				_unit->CastSpellAoF(fly[2].mX,fly[2].mY,fly[2].mZ, spells[1].info, spells[1].instant); 
+				_unit->CastSpellAoF(fly[3].mX,fly[3].mY,fly[3].mZ, spells[1].info, spells[1].instant); 
+				_unit->CastSpellAoF(fly[4].mX,fly[4].mY,fly[4].mZ, spells[1].info, spells[1].instant); 
 				_unit->GetAIInterface()->m_canMove = true;
 				_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
 				_unit->GetAIInterface()->setWaypointToMove(NextWP);
@@ -2590,10 +2583,10 @@ public:
     {
         WayPoint * wp = _unit->CreateWaypointStruct();
         wp->id = id;
-        wp->x = fly[id].x;
-        wp->y = fly[id].y;
-        wp->z = fly[id].z;
-        wp->o = fly[id].o;
+        wp->x = fly[id].mX;
+        wp->y = fly[id].mY;
+        wp->z = fly[id].mZ;
+        wp->o = fly[id].mO;
         wp->waittime = waittime;
         wp->flags = flags;
         wp->forwardemoteoneshot = 0;

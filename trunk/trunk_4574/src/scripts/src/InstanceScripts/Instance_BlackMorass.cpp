@@ -474,7 +474,7 @@ protected:
 	int nrspells;
 };
 
-void SetupBlackMorass(ScriptMgr * mgr)
+void SetupTheBlackMorass(ScriptMgr * mgr)
 {
 	mgr->register_creature_script(CN_CHRONO_LORD_DEJA, &CHRONOLORDDEJAAI::Create);
 	mgr->register_creature_script(CN_TEMPORUS, &TEMPORUSAI::Create);

@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Setup.h"
+#include "Base.h"
 
 /************************************************************************/
 /* Instance_HellfireRamparts.cpp Script		                            */
@@ -1574,7 +1575,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -1642,325 +1643,108 @@ protected:
 	int nrspells;
 };
 
-// Omor the UnscarredAI
+//Omor the Unscarred
+#define CN_OMOR_THE_UNSCARRED						17308
+#define OMOR_THE_UNSCARRED_DEMONIC_SHIELD			31901
+#define OMOR_THE_UNSCARRED_SUMMON_FIENDISH_HOUND	30707
+#define OMOR_THE_UNSCARRED_SHADOW_WHIP				30638
+#define OMOR_THE_UNSCARRED_SHADOW_BOLT				30686
+#define OMOR_THE_UNSCARRED_SHADOW_BOLT2				39297
+#define OMOR_THE_UNSCARRED_TREACHEROUS_AURA			30695
+#define OMOR_THE_UNSCARRED_BANE_OF_TREACHERY		37566
 
-#define CN_OMOR_THE_UNSCARRED 17308
-
-#define DEMONIC_SHIELD 31901
-#define SUMMON_FIENDISH_HOUND 30707 // lack of core support
-#define SHADOW_WIP 30638
-#define TREACHEROUS_AURA 30695
-#define BANE_OF_TREACHERY 37566 // it's heroic spell which replaces treacherous aura
-#define SHADOW_BOLT 30686 // 30686, 31627, 31618, 31627 and many other possibilities
-#define ORBITAL_STRIKE 30637 // Not sure here (if it uses this spell)
-// TO DO: Add sound *Knock1* with spell if needed (I think it's for Orbital Strike)
-// as it has knockdown effect
-
-class OMORTHEUNSCARREDAI : public CreatureAIScript
+class OmorTheUnscarredAI : public MoonScriptCreatureAI
 {
 public:
-    ADD_CREATURE_FACTORY_FUNCTION(OMORTHEUNSCARREDAI);
-	SP_AI_Spell spells[6];
-	bool m_spellcheck[6];
-
-    OMORTHEUNSCARREDAI(Creature* pCreature) : CreatureAIScript(pCreature)
-    {
-		nrspells = 6;
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-		}
-
-        spells[0].info = dbcSpell.LookupEntry(SUMMON_FIENDISH_HOUND);
-		spells[0].targettype = TARGET_SELF;
-		spells[0].instant = false;
-		spells[0].cooldown = 20;
-		spells[0].perctrigger = 8.0f;
-		spells[0].attackstoptimer = 1000;
-		spells[0].speech = "Achor-she-ki! Feast my pet! Eat your fill!";
-		spells[0].soundid = 10277;
-
-        spells[1].info = dbcSpell.LookupEntry(SHADOW_WIP);
-		spells[1].targettype = TARGET_RANDOM_SINGLE;
-		spells[1].instant = true;
-		spells[1].cooldown = 30;
-		spells[1].perctrigger = 10.0f;
-		spells[1].attackstoptimer = 1000;
-		spells[1].mindist2cast = 10.0f;
-		spells[1].maxdist2cast = 40.0f;
-
-        spells[2].info = dbcSpell.LookupEntry(TREACHEROUS_AURA);
-		spells[2].targettype = TARGET_RANDOM_SINGLE;
-		spells[2].instant = false;
-		spells[2].cooldown = 35;
-		spells[2].perctrigger = 8.0f;
-		spells[2].attackstoptimer = 1000;
-		spells[2].speech = "A-Kreesh!";
-		spells[2].soundid = 10278;
-		spells[2].mindist2cast = 0.0f;
-		spells[2].maxdist2cast = 40.0f;
-
-        spells[3].info = dbcSpell.LookupEntry(BANE_OF_TREACHERY);
-		spells[3].targettype = TARGET_RANDOM_SINGLE;
-		spells[3].instant = false;
-		spells[3].cooldown = 35;
-		spells[3].perctrigger = 0.0f;
-		spells[3].attackstoptimer = 1000;
-		spells[3].speech = "A-Kreesh!";
-		spells[3].soundid = 10278;
-		spells[3].mindist2cast = 0.0f;
-		spells[3].maxdist2cast = 40.0f;
-
-        spells[4].info = dbcSpell.LookupEntry(SHADOW_BOLT);
-		spells[4].targettype = TARGET_RANDOM_SINGLE;
-		spells[4].instant = false;
-		spells[4].cooldown = 15;
-		spells[4].perctrigger = 8.0f;
-		spells[4].attackstoptimer = 1000;
-		spells[4].mindist2cast = 10.0f;
-		spells[4].maxdist2cast = 40.0f;
-
-		spells[5].info = dbcSpell.LookupEntry(DEMONIC_SHIELD);
-		spells[5].targettype = TARGET_SELF;
-		spells[5].instant = true;
-		spells[5].cooldown = 30;
-		spells[5].perctrigger = 0.0f;
-		spells[5].attackstoptimer = 1000;
-    }
-    
-    void OnCombatStart(Unit* mTarget)
-    {
-		_unit->GetAIInterface()->m_canMove = false;
-		CastTime();
-		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		_unit->CastSpell(_unit, spells[0].info, spells[0].instant);
-		int RandomSpeach = rand()%3;
-		switch (RandomSpeach)
-		{
-		case 0:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I will not be... defeated!");
-			_unit->PlaySoundToSet(10279);
-			break;
-		case 1:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You dare stand against me?");	// ofc they need corrections ;)
-			_unit->PlaySoundToSet(10280);
-			break;
-		case 2:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your incidents will be your death!");
-			_unit->PlaySoundToSet(10281);
-			break;
-		}
-    }
-
-	void CastTime()
+	MOONSCRIPT_FACTORY_FUNCTION(OmorTheUnscarredAI, MoonScriptCreatureAI);
+	OmorTheUnscarredAI(Creature *pCreature) : MoonScriptCreatureAI(pCreature)
 	{
-		for(int i=0;i<nrspells;i++)
-			spells[i].casttime = 0;
+		SpellDesc *pShield = AddSpell(OMOR_THE_UNSCARRED_DEMONIC_SHIELD, Target_Self, 30, 0, 25);
+		pShield->mEnabled = false;
+		SpellDesc *pSummon = AddSpell(OMOR_THE_UNSCARRED_SUMMON_FIENDISH_HOUND, Target_Self, 8, 1, 20);
+		pSummon->AddEmote("Achor-she-ki! Feast my pet! Eat your fill!", Text_Yell, 10277);
+		AddSpell(OMOR_THE_UNSCARRED_SHADOW_WHIP, Target_RandomPlayer, 10, 0, 30);
+		if(_unit->GetMapMgr()->iInstanceMode != MODE_HEROIC)
+		{
+			AddSpell(OMOR_THE_UNSCARRED_SHADOW_BOLT, Target_RandomPlayer, 8, 3, 15, 10, 60, true);
+			SpellDesc *pAura = AddSpell(OMOR_THE_UNSCARRED_TREACHEROUS_AURA, Target_RandomPlayer, 8, 2, 35, 0, 60, true);
+			pAura->AddEmote("A-Kreesh!", Text_Yell, 10278);
+		}
+		else
+		{
+			AddSpell(OMOR_THE_UNSCARRED_SHADOW_BOLT2, Target_RandomPlayer, 8, 3, 15, 10, 60, true);
+			SpellDesc *pAura = AddSpell(OMOR_THE_UNSCARRED_BANE_OF_TREACHERY, Target_RandomPlayer, 8, 2, 35, 0, 60, true);
+			pAura->AddEmote("A-Kreesh!", Text_Yell, 10278);
+		}
+
+		AddEmote(Event_OnCombatStart, "I will not be defeated!", Text_Yell, 10279);
+		AddEmote(Event_OnCombatStart, "You dare stand against me?", Text_Yell, 10280);	// corrections
+		AddEmote(Event_OnCombatStart, "Your incidents will be your death!", Text_Yell, 10281);
+		AddEmote(Event_OnTargetDied, "Die weakling!", Text_Yell, 10282);
+		AddEmote(Event_OnDied, "It is... not over.", Text_Yell, 10284);
 	}
 
-	void OnTargetDied(Unit* mTarget)
-    {
-		if (_unit->GetHealthPct() > 0)	// Hack to prevent double yelling (OnDied and OnTargetDied when creature is dying)
+	void OnCombatStart(Unit *pTarget)
+	{
+		ParentClass::OnCombatStart(pTarget);
+		SetCanMove(false);
+	}
+
+	void OnCombatStop(Unit *pTarget)
+	{
+		ParentClass::OnCombatStop(pTarget);
+		if (IsAlive())
 		{
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Die weakling!");
-			_unit->PlaySoundToSet(10282);
+			Emote("I am victorious!", Text_Yell, 10283);
 		}
-    }
+	}
 
-    void OnCombatStop(Unit *mTarget)
-    {
-		_unit->GetAIInterface()->m_canMove = true;
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I am victorious!");
-		_unit->PlaySoundToSet(10283);
-
-		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-        
-        RemoveAIUpdateEvent();
-    }
-
-    void OnDied(Unit * mKiller)
-    {
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "It is... not over.");
-		_unit->PlaySoundToSet(10284);
-
-		RemoveAIUpdateEvent();
-    }
-
-    void AIUpdate()
-    {
-		if (_unit->GetAIInterface()->GetNextTarget() && _unit->GetDistance2dSq(_unit->GetAIInterface()->GetNextTarget()) >= 104.0f)
+	void AIUpdate()
+	{
+		SpellDesc *pShield = FindSpellById(OMOR_THE_UNSCARRED_DEMONIC_SHIELD);
+		if (GetHealthPercent() <= 20 && pShield != NULL && !pShield->mEnabled)
 		{
-			Unit *target = NULL;
-			target = FindTarget();
-			if (target)
-			{
-				_unit->CastSpell(target, spells[1].info, spells[1].instant);
-				_unit->ClearHateList();
-				_unit->GetAIInterface()->AttackReaction(target, 100, 0);
-			}
-
-			else
-			{
-				_unit->GetAIInterface()->m_canMove = true;
-				_unit->GetAIInterface()->WipeTargetList();
-				_unit->GetAIInterface()->WipeHateList();
-			}
+			pShield->mEnabled = true;
 		}
 
-		uint32 t = (uint32)time(NULL);
-		if (_unit->GetHealthPct() <= 20 && t > spells[5].casttime && _unit->GetAIInterface()->GetNextTarget())
+		Unit *pTarget = _unit->GetAIInterface()->GetNextTarget();
+		if (pTarget != NULL)
 		{
-			_unit->CastSpell(_unit, spells[5].info, spells[5].instant);
-			spells[5].casttime = t + 30;		// 30-60 sec?
-			return;
-		}
-
-		float val = (float)RandomFloat(100.0f);
-		SpellCast(val);
-    }
-
-	void SpellCast(float val)
-    {
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-			float comulativeperc = 0;
-		    Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
+			if (GetRangeToUnit(pTarget) > 10.0f)
 			{
-				if(!spells[i].perctrigger) continue;
-				
-				if(m_spellcheck[i])
+				pTarget = GetBestPlayerTarget(TargetFilter_Closest);
+				if (pTarget != NULL)
 				{
-					target = _unit->GetAIInterface()->GetNextTarget();
-					switch(spells[i].targettype)
+					if (GetRangeToUnit(pTarget) > 10.0f)
 					{
-						case TARGET_SELF:
-						case TARGET_VARIOUS:
-							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-						case TARGET_DESTINATION:
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
-						case TARGET_RANDOM_FRIEND:
-						case TARGET_RANDOM_SINGLE:
-						case TARGET_RANDOM_DESTINATION:
-							CastSpellOnRandomTarget(i, spells[i].mindist2cast, spells[i].maxdist2cast, spells[i].minhp2cast, spells[i].maxhp2cast); break;
+						pTarget = NULL;
 					}
+					else
+					{
+						ClearHateList();
+						_unit->GetAIInterface()->AttackReaction(pTarget, 500);
+						_unit->GetAIInterface()->SetNextTarget(pTarget);
+					}
+				}
+				else
+					return;
+			}
 
-					m_spellcheck[i] = false;
+			if (pTarget == NULL)
+			{
+				SpellDesc *pWhip = FindSpellById(OMOR_THE_UNSCARRED_SHADOW_WHIP);	// used for now
+				if (pWhip != NULL)
+				{
+					pWhip->mLastCastTime = 0;
+					CastSpellNowNoScheduling(pWhip);
 					return;
 				}
-
-				uint32 t = (uint32)time(NULL);
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
-					spells[i].casttime = t + spells[i].cooldown;
-					m_spellcheck[i] = true;
-				}
-				comulativeperc += spells[i].perctrigger;
 			}
-        }
-    }
-
-	void CastSpellOnRandomTarget(uint32 i, float mindist2cast, float maxdist2cast, int minhp2cast, int maxhp2cast)
-	{
-		if (!maxdist2cast) maxdist2cast = 100.0f;
-		if (!maxhp2cast) maxhp2cast = 100;
-
-		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
-			std::vector<Unit*> TargetTable;		/* From M4ksiu - Big THX to Capt who helped me with std stuff to make it simple and fully working <3 */
-												/* If anyone wants to use this function, then leave this note!										 */
-			for(set<Object*>::iterator itr = _unit->GetInRangeSetBegin(); itr != _unit->GetInRangeSetEnd(); ++itr) 
-			{ 
-				if (((spells[i].targettype == TARGET_RANDOM_FRIEND && isFriendly(_unit, (*itr))) || (spells[i].targettype != TARGET_RANDOM_FRIEND && isHostile(_unit, (*itr)) && (*itr) != _unit)) && ((*itr)->GetTypeId()== TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->GetInstanceID() == _unit->GetInstanceID()) // isAttackable(_unit, (*itr)) && 
-				{
-					Unit* RandomTarget = NULL;
-					RandomTarget = (Unit*)(*itr);
-
-					if (RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast && ((RandomTarget->GetHealthPct() >= minhp2cast && RandomTarget->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget))))
-					{
-						TargetTable.push_back(RandomTarget);
-					} 
-				} 
-			}
-
-			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
-				TargetTable.push_back(_unit);
-
-			if (TargetTable.empty())
-				return;
-
-			size_t RandTarget = rand()%TargetTable.size();
-
-			Unit * RTarget = TargetTable[RandTarget];
-
-			if (!RTarget)
-				return;
-
-			switch (spells[i].targettype)
-			{
-			case TARGET_RANDOM_FRIEND:
-			case TARGET_RANDOM_SINGLE:
-				_unit->CastSpell(RTarget, spells[i].info, spells[i].instant); break;
-			case TARGET_RANDOM_DESTINATION:
-				_unit->CastSpellAoF(RTarget->GetPositionX(), RTarget->GetPositionY(), RTarget->GetPositionZ(), spells[i].info, spells[i].instant); break;
-			}
-
-			TargetTable.clear();
-		}
-	}
-
-	// A bit rewritten FindTarget function
-	Unit* FindTarget()
-	{
-		Unit* target = NULL;
-		float distance = 40.0f;
-		float z_diff;
-
-		Unit *pUnit;
-		float dist;
-
-		for (std::set<Object*>::iterator itr = _unit->GetInRangeOppFactsSetBegin(); itr != _unit->GetInRangeOppFactsSetEnd(); itr++)
-		{
-			if((*itr)->GetTypeId() != TYPEID_UNIT && (*itr)->GetTypeId() != TYPEID_PLAYER)
-				continue;
-
-			pUnit = static_cast<Unit*>((*itr));
-
-			if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
-				continue;
-
-			z_diff = fabs(_unit->GetPositionZ() - pUnit->GetPositionZ());
-			if(z_diff > 2.5f)
-				continue;
-
-			if(pUnit->m_invisible)
-				continue;
-			
-			if(!pUnit->isAlive() || _unit == pUnit)
-				continue;
-
-			dist = _unit->GetDistance2dSq(pUnit);
-
-			if(dist > distance*distance)
-				continue;
-
-			if (dist < 3.0f)
-				continue;
-
-			distance = dist;
-			target = pUnit;
 		}
 
-		return target;
+		ParentClass::AIUpdate();
+		SetCanMove(false);
 	}
-
-protected:
-
-	int nrspells;
 };
 
 /*****************************/
@@ -2222,13 +2006,6 @@ protected:
 #define LIQUID_FLAME 1
 #define CONE_OF_FIRE 30926
 // FACE HIGHEST THREAT 30700
-struct Coords
-{
-    float x;
-    float y;
-    float z;
-    float o;
-};
 
 static Coords fly[] = 
 {
@@ -2670,10 +2447,10 @@ public:
     {
         WayPoint * wp = _unit->CreateWaypointStruct();
         wp->id = id;
-        wp->x = fly[id].x;
-        wp->y = fly[id].y;
-        wp->z = fly[id].z;
-        wp->o = fly[id].o;
+        wp->x = fly[id].mX;
+        wp->y = fly[id].mY;
+        wp->z = fly[id].mZ;
+        wp->o = fly[id].mO;
         wp->waittime = waittime;
         wp->flags = flags;
         wp->forwardemoteoneshot = 0;
@@ -2714,7 +2491,7 @@ void SetupHellfireRamparts(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_HELLFIRE_WATCHER, &HELLFIREWATCHERAI::Create);
 	mgr->register_creature_script(CN_SHATTERED_HAND_WARHOUND, &SHATTEREDHANDWARHOUNDAI::Create);
 	mgr->register_creature_script(CN_WATCHKEEPER_GARGOLMAR, &WATCHKEEPERGARGOLMARAI::Create);
-	mgr->register_creature_script(CN_OMOR_THE_UNSCARRED, &OMORTHEUNSCARREDAI::Create);
+	mgr->register_creature_script(CN_OMOR_THE_UNSCARRED, &OmorTheUnscarredAI::Create);
 	/*mgr->register_creature_script(CN_HELLFIRE_SENTRY, &HELLFIRESENTRYAI::Create);
 	mgr->register_creature_script(CN_VAZRUDEN, &VAZRUDENAI::Create);
 	mgr->register_creature_script(CN_NAZAN, &NAZANAI::Create);*/

@@ -176,6 +176,32 @@ public:
 	}
 };
 
+bool DouseEternalFlame(uint32 i, Spell* pSpell)
+{
+	Player *plr = (Player*)pSpell->u_caster;
+	if(!plr)
+		return true;
+
+	if(!pSpell->u_caster->IsPlayer())
+		return true;
+
+	QuestLogEntry *qle = plr->GetQuestLogForEntry(9737);
+	if(qle == NULL)
+		return true;
+
+	GameObject *Flame = plr->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(3678, -3640, 139, 182068);
+	if(Flame != NULL)
+	{
+		if(plr->CalcDistance(plr, Flame) < 30)
+			if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+			{
+				qle->SetMobCount(0, qle->GetMobCount(0)+1);
+				qle->SendUpdateAddKill(0);
+				qle->UpdatePlayerFields();
+			}
+	}
+	return true;
+}
 
 void SetupPaladin(ScriptMgr * mgr)
 {
@@ -187,4 +213,5 @@ void SetupPaladin(ScriptMgr * mgr)
   mgr->register_creature_script(6172, &PaladinDeadNPC::Create);
   mgr->register_gameobject_script(181956, &GildedBrazier::Create);
   mgr->register_creature_script(17716, &stillbladeQAI::Create);
+  mgr->register_dummy_spell(31497, &DouseEternalFlame);
 }

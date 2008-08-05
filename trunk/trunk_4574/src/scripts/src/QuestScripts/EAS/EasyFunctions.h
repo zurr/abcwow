@@ -280,6 +280,32 @@ public:
 
     return false;
   }
+  
+  void EventCreatureDelete(Creature* creat, uint32 time)  // Creature and time in ms
+  {
+	  sEventMgr.AddEvent(creat, &Creature::SafeDelete, EVENT_CREATURE_SAFE_DELETE, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+  }
+
+  void EventCastSpell(Unit* caster, Unit* target, uint32 spellid, uint32 time)
+  {
+	  sEventMgr.AddEvent(((Unit*)caster), &Unit::EventCastSpell, ((Unit*)target), dbcSpell.LookupEntry(spellid), EVENT_UNK, time, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+  }
+
+  void EventPlaySound(Creature* creat, uint32 id, uint32 time)
+  {
+	  sEventMgr.AddEvent(static_cast<Object*>(creat), &Object::PlaySoundToSet, id, EVENT_UNK, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+  }
+
+  void EventCreatureSay(Creature* creat, string say,  uint32 time)
+  {
+	  sEventMgr.AddEvent(static_cast<Unit*>(creat), &Unit::SendChatMessage, (uint8)CHAT_MSG_MONSTER_SAY, (uint32)LANG_UNIVERSAL, say.c_str(), EVENT_UNIT_CHAT_MSG, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+  }
+
+  void EventCreatureYell(Creature* creat, string say,  uint32 time)
+  {
+	  sEventMgr.AddEvent(static_cast<Unit*>(creat), &Unit::SendChatMessage, (uint8)CHAT_MSG_MONSTER_YELL, (uint32)LANG_UNIVERSAL, say.c_str(), EVENT_UNIT_CHAT_MSG, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+  }
+
 };
 
 #define sEAS EasyFunctions::GetInstance()

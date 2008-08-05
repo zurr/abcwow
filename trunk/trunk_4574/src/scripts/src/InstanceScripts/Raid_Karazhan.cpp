@@ -6,14 +6,6 @@
 /* Raid_Karazhan.cpp Script												*/
 /************************************************************************/
 
-struct Coords
-{
-	float x;
-	float y;
-	float z;
-	float o;
-};
-
 class SCRIPT_DECL Berthold : public GossipScript
 {
 public:
@@ -873,7 +865,7 @@ public:
 			case 2:
 				cleanStage();
 				WayStartBBW[_unit->GetInstanceID()] = 4;
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(19525, Barnes[2].x, Barnes[2].y, Barnes[2].z, Barnes[2].o, true, false, 0, 0)->Despawn(43000, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(19525, Barnes[2].mX, Barnes[2].mY, Barnes[2].mZ, Barnes[2].mO, true, false, 0, 0)->Despawn(43000, 0);
 				_unit->SetFacing(4.5f);
 				switch(eventRand)
 				{
@@ -1154,10 +1146,10 @@ public:
 	{
 		WayPoint * wp = _unit->CreateWaypointStruct();
 		wp->id = id;
-		wp->x = Barnes[id].x;
-		wp->y = Barnes[id].y;
-		wp->z = Barnes[id].z;
-		wp->o = Barnes[id].o;
+		wp->x = Barnes[id].mX;
+		wp->y = Barnes[id].mY;
+		wp->z = Barnes[id].mZ;
+		wp->o = Barnes[id].mO;
 		wp->waittime = waittime;
 		wp->flags = flags;
 		wp->forwardemoteoneshot = 0;
@@ -4018,10 +4010,10 @@ public:
 	{
 		WayPoint * wp = _unit->CreateWaypointStruct();
 		wp->id = id;
-		wp->x = coords[id].x;
-		wp->y = coords[id].y;
-		wp->z = coords[id].z;
-		wp->o = coords[id].o;
+		wp->x = coords[id].mX;
+		wp->y = coords[id].mY;
+		wp->z = coords[id].mZ;
+		wp->o = coords[id].mO;
 		wp->waittime = waittime;
 		wp->flags = flags;
 		wp->forwardemoteoneshot = 0;

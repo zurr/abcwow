@@ -29,6 +29,7 @@
 
 #define INVALIDATE_TIMER			-1
 #define DEFAULT_UPDATE_FREQUENCY	1000	//milliseconds
+#define DEFAULT_DESPAWN_TIMER		2000	//milliseconds
 
 #define MOONSCRIPT_FACTORY_FUNCTION(ClassName, ParentClassName)\
 public:\
@@ -39,10 +40,12 @@ enum TargetType
 {
 	Target_Self,						//Target self (Note: doesn't always mean self, also means the spell can choose various target)
 	Target_Current,						//Current highest aggro (attacking target)
+	Target_SecondMostHated,				//Second highest aggro
 	Target_Destination,					//Target is a destination coordinates (x, y, z)
 	Target_Predefined,					//Pre-defined target unit
 	Target_RandomPlayer,				//Random target player
 	Target_RandomPlayerNotCurrent,		//Random target player, but not the current highest aggro
+	Target_RandomPlayerApplyAura,		//Random target player to self cast aura
 	Target_RandomUnit,					//Random target unit (players, totems, pets, etc.)
 	Target_RandomUnitNotCurrent,		//Random target unit (players, totems, pets, etc.), but not the current highest aggro
 	Target_RandomDestination,			//Random destination coordinates (x, y, z)
@@ -54,7 +57,9 @@ enum TargetType
 	Target_ClosestPlayerNotCurrent,		//Closest target player, but not the current highest aggro
 	Target_ClosestUnit,					//Closest target unit (players, totems, pets, etc.)
 	Target_ClosestUnitNotCurrent,		//Closest target unit (players, totems, pets, etc.), but not the current highest aggro
-	Target_ClosestFriendly				//Closest friendly target unit
+	Target_ClosestFriendly,				//Closest friendly target unit
+	Target_ClosestCorpse,				//Closest unit corpse
+	Target_RandomCorpse					//Random unit corpse
 };
 
 enum TextType
@@ -82,6 +87,24 @@ enum BehaviorType
 	Behavior_CallForHelp
 };
 
+enum MoveType
+{
+	Move_None,
+	Move_RandomWP,
+	Move_CircleWP,
+	Move_WantedWP,
+	Move_DontMoveWP,
+	Move_Quest,
+	Move_ForwardThenStop
+};
+
+enum MoveFlag
+{
+	Flag_Walk = 0,
+	Flag_Run = 256,
+	Flag_Fly = 768
+};
+
 struct EmoteDesc
 {
 	EmoteDesc(const char* pText, TextType pType, uint32 pSoundId)
@@ -94,6 +117,15 @@ struct EmoteDesc
 	std::string	mText;
 	TextType	mType;
 	uint32		mSoundId;
+};
+
+struct Coords
+{
+	float mX;
+	float mY;
+	float mZ;
+	float mO;
+	uint32 mAddition;
 };
 
 class SpellDesc;
@@ -152,15 +184,17 @@ public:
 	void					SetCanMove(bool pCanMove);
 	void					MoveTo(MoonScriptCreatureAI* pCreature);
 	void					MoveTo(Unit* pUnit);
-	void					MoveTo(float pX, float pY, float pZ);
+	void					MoveTo(float pX, float pY, float pZ, bool pRun=true);
 	void					MoveToSpawnOrigin();
 	void					StopMovement();
+	void					SetFlyMode(bool pValue);
 
 	//Attack and Combat State
 	bool					GetCanEnterCombat();
 	void					SetCanEnterCombat(bool pCanEnterCombat);
 	bool					IsInCombat();
 	void					DelayNextAttack(int32 pMilliseconds);
+	void					SetDespawnWhenInactive(bool pValue);
 
 	//Behavior
 	void					SetBehavior(BehaviorType pBehavior);
@@ -173,10 +207,14 @@ public:
 	bool					GetAllowSpell();
 	void					SetAllowTargeting(bool pAllow);
 	bool					GetAllowTargeting();
-	void					AggroNearestUnit();
+	void					AggroNearestUnit(int pInitialThreat=1);
+	void					AggroRandomUnit(int pInitialThreat=1);
+	void					AggroNearestPlayer(int pInitialThreat=1);
+	void					AggroRandomPlayer(int pInitialThreat=1);
 
 	//Status
 	void					ClearHateList();
+	void					WipeHateList();
 	int32					GetHealthPercent();
 	int32					GetManaPercent();
 	void					Regenerate();
@@ -184,6 +222,9 @@ public:
 	void					SetScale(float pScale);
 	float					GetScale();
 	void					SetDisplayId(uint32 pDisplayId);
+	void					SetWieldWeapon(bool pValue);
+	void					SetDisplayWeapon(bool pMainHand, bool pOffHand);
+	void					SetDisplayWeaponIds(uint32 pItem1Id, uint32 pItem1Info, uint32 pItem1Slot, uint32 pItem2Id, uint32 pItem2Info, uint32 pItem2Slot);
 
 	//Environment
 	float					GetRange(MoonScriptCreatureAI* pCreature);
@@ -192,6 +233,7 @@ public:
 	MoonScriptCreatureAI*	GetNearestCreature(uint32 pCreatureId=0);
 	MoonScriptCreatureAI*	SpawnCreature(uint32 pCreatureId, bool pForceSameFaction=false);
 	MoonScriptCreatureAI*	SpawnCreature(uint32 pCreatureId, float pX, float pY, float pZ, float pO=0, bool pForceSameFaction=false);
+	Unit*					ForceCreatureFind(uint32 pCreatureId, float pX=0, float pY=0, float pZ=0, bool pCurrentPosition=true);
 	void					Despawn(uint32 pDelay=0, uint32 pRespawnTime=0);
 
 	//Spells
@@ -206,6 +248,8 @@ public:
 	void					RemoveAura(uint32 pSpellId);
 	void					RemoveAuraOnPlayers(uint32 pSpellId);
 	void					RemoveAllAuras();
+	void					TriggerCooldownOnAllSpells();
+	void					CancelAllCooldowns();
 
 	//Emotes
 	EmoteDesc*				AddEmote(EventType pEventType, const char* pText, TextType pType, uint32 pSoundId=0);
@@ -216,10 +260,26 @@ public:
 
 	//Timers
 	uint32					AddTimer(int32 pDurationMillisec);
+	int32					GetTimer(int32 pTimerId);
 	void					RemoveTimer(int32& pTimerId);
 	void					ResetTimer(int32 pTimerId, int32 pDurationMillisec);
 	bool					IsTimerFinished(int32 pTimerId);
 	void					CancelAllTimers();
+
+	//Waypoints
+	WayPoint*				CreateWaypoint(int pId, uint32 pWaittime, uint32 pMoveFlag, Coords pCoords);
+	void					AddWaypoint(WayPoint* pWayPoint);
+	void					ForceWaypointMove(uint32 pWaypointId);
+	void					SetWaypointToMove(uint32 pWaypointId);
+	void					StopWaypointMovement();
+	void					SetMoveType(MoveType pMoveType);
+	uint32					GetCurrentWaypoint();
+	size_t					GetWaypointCount();
+	MoveType				GetMoveType();
+
+	//Others
+	void					SetTargetToChannel(Unit* pTarget, uint32 pSpellId);
+	Unit*					GetTargetToChannel();
 
 	//Options
 	void					SetAIUpdateFreq(uint32 pUpdateFreq);
@@ -233,7 +293,7 @@ public:
 	virtual void			AIUpdate();
 
 protected:
-	enum					TargetFilter {TargetFilter_None=0, TargetFilter_Closest=1<<0, TargetFilter_Friendly=1<<1, TargetFilter_NotCurrent=1<<2, TargetFilter_Wounded=1<<3};
+	enum					TargetFilter {TargetFilter_None=0, TargetFilter_Closest=1<<0, TargetFilter_Friendly=1<<1, TargetFilter_NotCurrent=1<<2, TargetFilter_Wounded=1<<3, TargetFilter_SecondMostHated=1<<4, TargetFilter_Aggroed=1<<5, TargetFilter_Corpse=1<<6};
 
 	bool					IsSpellScheduled(SpellDesc* pSpell);
 	bool					CastSpellInternal(SpellDesc* pSpell, uint32 pCurrentTime=0);
@@ -247,6 +307,7 @@ protected:
 	Unit*					GetBestUnitTarget(TargetFilter pFilter=TargetFilter_None);
 	Unit*					ChooseBestTargetInArray(UnitArray& pTargetArray, TargetFilter pFilter);
 	Unit*					GetNearestTargetInArray(UnitArray& pTargetArray);
+	Unit*					GetSecondMostHatedTargetInArray(UnitArray& pTargetArray);
 	bool					IsValidUnitTarget(Object* pObject, TargetFilter pFilter);
 	void					PushRunToTargetCache(Unit* pTarget, SpellDesc* pSpell);
 	void					PopRunToTargetCache();
@@ -269,6 +330,7 @@ protected:
 	int32					mTimerIdCounter;
 	uint32					mAIUpdateFrequency;
 	uint32					mBaseAttackTime;
+	bool					mDespawnWhenInactive;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +345,7 @@ public:
 	SpellDesc*		AddPhaseSpell(int32 pPhase, SpellDesc* pSpell);
 	int32			GetPhase();
 	void			SetPhase(int32 pPhase, SpellDesc* pPhaseChangeSpell=NULL);
-	void			SetEnrageInfo(int32 pPhase, SpellDesc* pSpell, int32 pTriggerMilliseconds);
+	void			SetEnrageInfo(SpellDesc* pSpell, int32 pTriggerMilliseconds);
 
 	//Reimplemented Events
 	virtual void	OnCombatStart(Unit* pTarget);
@@ -293,7 +355,6 @@ public:
 protected:
 	int32			mPhaseIndex;
 	PhaseSpellArray	mPhaseSpells;
-	int32			mEnragePhase;
 	SpellDesc*		mEnrageSpell;
 	int32			mEnrageTimerDuration;
 	int32			mEnrageTimer;
