@@ -146,8 +146,8 @@ public:
 // Rage WinterchillAI
 #define CN_RAGE_WINTERCHILL 17767
 
-#define FROSTBOLT 41486			// it's not correct spell for sure (not sure to others too :P)
-#define DEATCH_AND_DECAY 39658
+#define FROSTBOLT 31249			// it's not correct spell for sure (not sure to others too :P)
+#define DEATCH_AND_DECAY 31258
 #define FROST_NOVA 31250
 #define FROST_ARMOR 31256
 
@@ -372,7 +372,7 @@ protected:
 #define CARRION_SWARM	31306
 #define VAMPIRIC_AURA	38196	// 31317
 #define INFERNO			31299	// doesn't summon infernal - core bug
-#define SLEEP			31292	// 12098
+#define SLEEP			31298	// 12098
 #define BERSERK			26662
 
 class AnetheronAI : public CreatureAIScript
@@ -515,7 +515,10 @@ public:
 					if (i == 1)
 					{
 						Aura *aura = new Aura(spells[1].info, 5000, _unit, _unit);
-						_unit->AddAura(aura);
+						if (aura != NULL)
+						{
+							_unit->AddAura(aura);
+						}
 					}
 
 					else
@@ -612,7 +615,7 @@ protected:
 #define CN_KAZROGAL 17888
 
 #define K_CLEAVE			31345
-#define WAR_STOMP			31408
+#define WAR_STOMP			31480
 #define MARK_OF_KAZROGAL	31447
 #define MARK_OF_KAZROGAL2	31463	// should it be scripted to attack friends?
 
@@ -1054,7 +1057,10 @@ public:
 			if (i == 3)
 			{
 				Aura *aura = new Aura(spells[3].info, 20000, _unit, RTarget);
-				RTarget->AddAura(aura);
+				if (aura != NULL)
+				{
+					RTarget->AddAura(aura);
+				}
 
 				TargetTable.clear();
 				return;
@@ -1365,15 +1371,15 @@ public:
 			{
 			case 0:
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your soul will languish for eternity.");
-				_unit->PlaySoundToSet(10993);
+				_unit->PlaySoundToSet(10991);
 				break;
 			case 1:
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "All creation will be devoured!");
-				_unit->PlaySoundToSet(10994);
+				_unit->PlaySoundToSet(11044);
 				break;
 			case 2:
 				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "I am the coming of the end!");
-				_unit->PlaySoundToSet(10995);
+				_unit->PlaySoundToSet(11045);
 				break;
 			}
 

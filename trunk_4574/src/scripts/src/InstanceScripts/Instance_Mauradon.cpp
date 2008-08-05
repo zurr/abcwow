@@ -2,9 +2,8 @@
 #include "Setup.h"
 
 /************************************************************************/
-/*  Mauradon.cpp Script by jajcer								*/
+/*  Mauradon.cpp Script													*/
 /************************************************************************/
-
 
 class CelebrasTheCursed : public CreatureAIScript
 {

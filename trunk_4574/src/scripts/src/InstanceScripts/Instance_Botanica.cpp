@@ -497,7 +497,7 @@ public:
 		GuardAdds = false;
 		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Step forward! I will see that you are appropriate welcomed.");	// needs checks!
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Step forward! I will see that you are appropriately welcomed.");	// needs checks!
 		_unit->PlaySoundToSet(11071);
     }
 
@@ -526,7 +526,7 @@ public:
 			switch (RandomSpeach)
 			{
 			case 0:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Oh, stop your <missing_word>!");	// :|
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Oh stop your whimpering.");	// :|
 				_unit->PlaySoundToSet(11072);
 				break;
 			case 1:
@@ -565,11 +565,11 @@ public:
 		switch (RandomArcane)
 		{
 		case 0:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You are no longer dealing with some <missing_word>.");
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You are no longer dealing with some underling.");
 			_unit->PlaySoundToSet(11076);
 			break;
 		case 1:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "<missing_text>!");
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Band'or shorel'aran!");
 			_unit->PlaySoundToSet(11077);
 			break;
 		}

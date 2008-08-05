@@ -1,6 +1,10 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
+/************************************************************************/
+/* Instance_ZulFarrak.cpp Script										*/
+/************************************************************************/
+
 //Theka the Martyr
 
 // casts the spell Theka Transform 11089 at %30  hp

@@ -2,9 +2,8 @@
 #include "Setup.h"
 
 /************************************************************************/
-/*  Dire Maul.cpp Script by jajcer								*/
+/* Instance_DireMaul.cpp Script											*/
 /************************************************************************/
-//Big respect to Big respect to M4ksiu.
 
 class AlzzinTheWildshaper : public CreatureAIScript
 {

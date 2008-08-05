@@ -1989,7 +1989,7 @@ public:
 				_unit->PlaySoundToSet(11102);
 				break;
 			case 1:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Yes, the only magical outcome!");	// magical outcome?
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Yes, the only logical outcome!");	// magical outcome? // Logical Outcome
 				_unit->PlaySoundToSet(11103);
 				break;
 			}
@@ -2021,7 +2021,7 @@ public:
 			_unit->PlaySoundToSet(11104);
 			break;
 		case 1:
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "If my devision is correct, you should be quiet dead!");	// needs checks
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "If my division is correct, you should be quiet dead!");	// corrected
 			_unit->PlaySoundToSet(11105);
 			break;
 		}
@@ -2138,7 +2138,7 @@ public:
     {
 		CastTime();
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You have approximately 5 seconds to live!");	// needs checks!
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You have approximately five seconds to live!");	// corrected
 		_unit->PlaySoundToSet(11109);
     }
 
@@ -2166,11 +2166,11 @@ public:
 			switch (RandomSpeach)
 			{
 			case 0:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Afford gun conclusion!");
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "A foregone conclusion!"); // fixed 
 				_unit->PlaySoundToSet(11110);
 				break;
 			case 1:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The processing will continue a schedule!");
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The processing will continue as scheduled!"); // fixed
 				_unit->PlaySoundToSet(11111);
 				break;
 			}
@@ -2181,7 +2181,7 @@ public:
     {
 		CastTime();
        RemoveAIUpdateEvent();
-		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "My calculations... did not...");	// ??
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "My calculations... did not...");	// Verified
 		_unit->PlaySoundToSet(11114);
     }
 
@@ -2199,7 +2199,7 @@ public:
 		{
 		case 0:
 			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "With the precise <missing_rest_of_text>");	// !!
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "With the precise angle and velocity...");	// Corrected
 				_unit->PlaySoundToSet(11112);
 			}break;
 		case 1:
@@ -2535,11 +2535,11 @@ public:
 			switch (RandomSpeach)
 			{
 			case 0:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "And don't come back!");	// checks here
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "And don't come back!");	// Verified
 				_unit->PlaySoundToSet(11187);
 				break;
 			case 1:
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "<missing_text>");	// ? ? ! !
+				_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Endala finel endal!");	// Added
 				_unit->PlaySoundToSet(11188);
 				break;
 			}

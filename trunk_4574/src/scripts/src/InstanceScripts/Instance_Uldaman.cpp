@@ -2,8 +2,9 @@
 #include "Setup.h"
 
 /************************************************************************/
-/*  Uldaman.cpp Script by jajcer								*/
+/* Instance_Uldaman.cpp Script											*/
 /************************************************************************/
+
 class Archaedas : public CreatureAIScript
 {
 public:

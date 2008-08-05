@@ -2,9 +2,9 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
-//Instance_Ragefire_Chasm.cpp created by HamtaroFreak
-
-// Ragefire Shaman AI by Soulshifter
+/************************************************************************/
+/* Instance_RagefireChasm.cpp Script									*/
+/************************************************************************/
 
 #define CN_RAGEFIRE_SHAMAN			11319
 
@@ -33,7 +33,7 @@ public:
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
         spells[0].info = dbcSpell.LookupEntry(SPELL_HEALING_WAVE);
 		spells[0].targettype = TARGET_SELF;
-		spells[0].instant = false;
+		spells[0].instant = true;
 		spells[0].perctrigger = 15.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
 

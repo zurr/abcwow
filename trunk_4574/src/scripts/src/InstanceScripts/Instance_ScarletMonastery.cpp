@@ -1,15 +1,9 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
-/**********************
-*					  *
-*   Scarlet Monastery * 
-*       Boss AI       *
-*					  *
-*     Written By      *
-*	 Darkened Fate	  *
-*					  *	
-***********************/
+/************************************************************************/
+/* Instance_ScarletMonastery.cpp Script									*/
+/************************************************************************/
 
 //Houndmaster Loksey
 
@@ -651,11 +645,17 @@ void OnCombatStop(Unit *mTarget)
         RemoveAIUpdateEvent();
     } 
 
-void OnDied(Unit * mKiller)
-    {
-      
-RemoveAIUpdateEvent();
-    }
+	void OnDied(Unit * mKiller)
+     {
+   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(1173.01f, 1389.91f, 31.9723f, 104600);
+   if(pDoor == 0)
+   return;
+
+   // Open the door
+   pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0);
+       
+   RemoveAIUpdateEvent();
+     }
 
 
 void AIUpdate()

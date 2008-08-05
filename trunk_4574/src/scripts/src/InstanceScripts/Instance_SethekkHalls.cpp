@@ -1780,7 +1780,7 @@ public:
 			if (_unit->GetCurrentSpell())
 				_unit->GetCurrentSpell()->cancel();
 
-			//_unit->CastSpell(_unit, spells[3].info, spells[3].instant); disabled atm cause of no LOS
+			_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
 
 			Blink = false;
 			return;
@@ -1869,7 +1869,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -1909,7 +1909,7 @@ public:
 			} 
 		}
 
-		if (TargetTable.empty())
+		if (!TargetTable.size())
 		{
 			TargetTable.clear();
 			return;
