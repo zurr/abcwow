@@ -3353,7 +3353,7 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 						break;
 				}
 				u_caster->SpellNonMeleeDamageLog(u_caster,31117,dmg,true,true);
-				Aura * pAura = new Aura(dbcSpell.LookupEntry(31117), 5, static_cast<Unit*>(objmgr.GetPlayer(aur->m_casterGuid)), u_caster);
+				Aura * pAura = new Aura(dbcSpell.LookupEntry(31117), 5, static_cast<Unit*>(objmgr.GetPlayer((uint32)aur->m_casterGuid)), u_caster);
 				u_caster->AddAura(pAura);
 			}
 		}
