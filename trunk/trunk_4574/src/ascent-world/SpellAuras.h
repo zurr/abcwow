@@ -246,7 +246,7 @@ enum MOD_TYPES
     SPELL_AURA_DUMMY_AURA =226 ,  // Used by Aspect of the Viper
     SPELL_AURA_INCREASE_MAX_HEALTH=230,//Used by Commanding Shout
 	SPELL_AURA_MODIFY_AXE_SKILL=240,
-    TOTAL_SPELL_AURAS = 241,
+    TOTAL_SPELL_AURAS = 252,
 };
 enum AuraTickFlags
 {
@@ -584,6 +584,7 @@ public:
 	void SpellAuraModPossessPet(bool apply);
 	void SpellAuraMeleeHaste(bool apply);
 	void EventPeriodicDrink(uint32 amount);
+	void SpellAuraAddHealth(bool apply);
 
 	void SendModifierLog(int32 ** m,int32 v,uint64 mask,uint8 type,bool pct = false);
 	void SendDummyModifierLog(std::map<SpellEntry*,uint32> * m,SpellEntry * spellInfo,uint32 i,bool apply,bool pct = false);

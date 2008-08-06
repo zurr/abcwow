@@ -46,8 +46,74 @@ public:
 	}
 }; 
 
+bool TheArchmageStaff(uint32 i, Spell * pSpell)
+{
+	if(!pSpell->u_caster->IsPlayer())
+		return true;
+
+	Player *plr = (Player*)pSpell->u_caster;
+	
+	QuestLogEntry *qle = plr->GetQuestLogForEntry(10173);
+	if(!qle)
+		return true;
+
+	sEAS.SpawnCreature(plr, 19493, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(),0, 0);
+	return true;
+}
+
+bool FindingTheKeymaster(uint32 i, Spell * pSpell)
+{
+	if(!pSpell->u_caster->IsPlayer())
+		return true;
+
+	Player *plr = (Player*)pSpell->u_caster;
+
+	QuestLogEntry *qle = plr->GetQuestLogForEntry(10256);
+	if(!qle)
+		return true;
+
+	qle->SetMobCount(0, qle->GetMobCount(0)+1);
+	qle->SendUpdateAddKill(0);
+	qle->UpdatePlayerFields();
+	return true;
+}
+
+bool TheFleshLies(uint32 i, Spell * pSpell)
+{
+	if(!pSpell->u_caster->IsPlayer())
+	return true;
+
+	Player *plr = (Player*)pSpell->u_caster;
+	Creature *target = (Creature*)plr->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(plr->GetPositionX(), plr->GetPositionY() , plr->GetPositionZ(), 20561);
+
+	if(target == NULL)
+		return true;
+
+	QuestLogEntry *qle = plr->GetQuestLogForEntry(10345);
+  
+	if(qle == NULL)
+		return true;
+
+	GameObject *obj = NULL;
+
+	if(qle && qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+	{
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		
+		obj = sEAS.SpawnGameobject(plr, 183816, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 1);
+		sEAS.GameobjectDelete(obj, 1*30*1000);
+	}
+	target->Despawn(2000, 60*1000);
+	plr->UpdateNearbyGameObjects();
+	qle->UpdatePlayerFields();
+	return true;
+}
+
 void SetupNetherstorm(ScriptMgr* mgr)
 {
 	mgr->register_gossip_script(20162, CREATE_GOSSIPSCRIPT(Veronia));
-	//mgr->register_dummy_spell(34219, &RechargingTheBatteries);
+	mgr->register_dummy_spell(34992, &TheArchmageStaff);
+	mgr->register_dummy_spell(34717, &FindingTheKeymaster);
+	mgr->register_dummy_spell(35372, &TheFleshLies);
 }

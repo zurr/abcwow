@@ -261,6 +261,17 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraDamageByAttackPowerPct,//238 Mental Quickness http://www.wowhead.com/?spell=30813 increases your healing by an amount equal to XX% of your attack power.
 		&Aura::SpellAuraNULL,//239
 		&Aura::SpellAuraModExpertise,//240 Increase Expertise
+		&Aura::SpellAuraNULL,//241
+		&Aura::SpellAuraNULL,//242
+		&Aura::SpellAuraNULL,//243
+		&Aura::SpellAuraNULL,//244
+		&Aura::SpellAuraNULL,//245
+		&Aura::SpellAuraNULL,//246
+		&Aura::SpellAuraNULL,//247
+		&Aura::SpellAuraNULL,//248
+		&Aura::SpellAuraNULL,//249
+		&Aura::SpellAuraAddHealth,//250
+		&Aura::SpellAuraNULL,//251
 };
 /*
 ASCENT_INLINE void ApplyFloatSM(float ** m,float v,uint32 mask, float def)
@@ -8674,5 +8685,22 @@ void Aura::SpellAuraModPossessPet(bool apply)
 			data << pCaster->GetNewGUID() << uint8(1);
 			pCaster->GetSession()->SendPacket(&data);
 		}
+	}
+}
+
+void Aura::SpellAuraAddHealth(bool apply)
+{
+	if (apply)
+	{
+		SetPositive();
+		m_target->ModUnsigned32Value(UNIT_FIELD_MAXHEALTH, mod->m_amount);
+		m_target->ModUnsigned32Value(UNIT_FIELD_HEALTH, mod->m_amount);
+	}
+	else
+	{
+		m_target->ModUnsigned32Value(UNIT_FIELD_MAXHEALTH, -mod->m_amount);
+		uint32 maxHealth = m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+		if(m_target->GetUInt32Value(UNIT_FIELD_HEALTH) > maxHealth)
+			m_target->SetUInt32Value(UNIT_FIELD_MAXHEALTH, maxHealth);
 	}
 }
