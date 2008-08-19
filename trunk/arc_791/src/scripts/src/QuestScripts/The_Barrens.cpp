@@ -1,6 +1,7 @@
 /*
- * WEmu Scripts for WEmu MMORPG Server
- * Copyright (C) 2008 WEmu Team
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +19,50 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
-#include "../EAS/EasyFunctions.h"
+#include "EAS/EasyFunctions.h"
+
+#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, plr); \
+    Menu->SendTo(plr);
+
+class SCRIPT_DECL BeatenCorpse : public GossipScript
+{
+public:
+  void GossipHello(Object * pObject, Player * plr, bool AutoSend)
+  {
+    GossipMenu *Menu;
+    objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3557, plr);
+
+    if(plr->GetQuestLogForEntry(4921) != NULL)
+      Menu->AddItem(0, "I inspect the body further.", 1);
+    
+    if(AutoSend)
+      Menu->SendTo(plr);
+  }
+
+  void GossipSelectOption(Object * pObject, Player * plr, uint32 Id, uint32 IntId, const char * Code)
+  {      
+    GossipMenu *Menu;
+
+    switch(IntId)	
+		{
+			case 1:
+      {
+         SendQuickMenu(3558);
+
+         QuestLogEntry *qle = plr->GetQuestLogForEntry(4921);
+         if(qle == NULL)
+           return;
+           
+         if(qle->GetMobCount(0) != 0)
+           return;
+
+         qle->SetMobCount(0, 1);
+         qle->SendUpdateAddKill(0);
+         qle->UpdatePlayerFields();
+		  }break;
+    }
+  }
+};
 
 class SCRIPT_DECL TheEscape : public QuestScript 
 { 
@@ -419,46 +463,6 @@ public:
 #define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, plr); \
     Menu->SendTo(plr);
 
-class SCRIPT_DECL BeatenCorpse : public GossipScript
-{
-public:
-  void GossipHello(Object * pObject, Player * plr, bool AutoSend)
-  {
-    GossipMenu *Menu;
-    objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3557, plr);
-
-    if(plr->GetQuestLogForEntry(4921) != NULL)
-      Menu->AddItem(0, "I inspect the body further.", 1);
-    
-    if(AutoSend)
-      Menu->SendTo(plr);
-  }
-
-  void GossipSelectOption(Object * pObject, Player * plr, uint32 Id, uint32 IntId, const char * Code)
-  {      
-    GossipMenu *Menu;
-
-    switch(IntId)	
-		{
-			case 1:
-      {
-         SendQuickMenu(3558);
-
-         QuestLogEntry *qle = plr->GetQuestLogForEntry(4921);
-         if(qle == NULL)
-           return;
-
-         if(qle->GetMobCount(0) != 0)
-           return;
-
-         qle->SetMobCount(0, 1);
-         qle->SendUpdateAddKill(0);
-         qle->UpdatePlayerFields();
-		  }break;
-    }
-  }
-};
-
 int kolkarskilled = 0;
 class VerogtheDervish : public CreatureAIScript
 {
@@ -483,7 +487,7 @@ public:
 
 };
 
-void SetupBarrens(ScriptMgr * mgr)
+void SetupBarrens(ScriptMgr *mgr)
 {
 	GossipScript *gos = (GossipScript*) new BeatenCorpse;
 	mgr->register_gossip_script(10668, gos);

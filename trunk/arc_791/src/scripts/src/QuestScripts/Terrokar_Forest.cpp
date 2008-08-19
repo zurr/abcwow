@@ -1,6 +1,7 @@
 /*
- * WEmu Scripts for WEmu MMORPG Server
- * Copyright (C) 2008 WEmu Team
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,16 +10,19 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.	If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "StdAfx.h"
 #include "Setup.h"
-#include "../EAS/EasyFunctions.h"
+#include "EAS/EasyFunctions.h"
+
+#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, plr); \
+	Menu->SendTo(plr);
 
 // Threat from Above
 class ThreatFromAboveQAI : public CreatureAIScript
@@ -29,7 +33,7 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		if (mKiller->IsPlayer())
+		if (mKiller->IsPlayer()) 
 		{
 			QuestLogEntry *en = ((Player*)mKiller)->GetQuestLogForEntry(11096);
 			if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
@@ -49,41 +53,41 @@ class TheInfestedProtectorsQAI : public CreatureAIScript
 {
 public:
 
-	ADD_CREATURE_FACTORY_FUNCTION(TheInfestedProtectorsQAI);
-	TheInfestedProtectorsQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
-
-	void OnDied(Unit * mKiller)
-	{
-		if(!mKiller->IsPlayer())
-			return;
-
-		Player *plr = (Player*)mKiller;
-
-		if(!plr->GetQuestLogForEntry(10896))
-			return;
-
+  ADD_CREATURE_FACTORY_FUNCTION(TheInfestedProtectorsQAI);
+  TheInfestedProtectorsQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
+      
+  void OnDied(Unit * mKiller)
+  {
+  	if(!mKiller->IsPlayer())
+	  return;
+	  
+  	Player *plr = (Player*)mKiller;
+	
+	if(!plr->GetQuestLogForEntry(10896))
+	  return;
+	
 	sEAS.SpawnCreature(plr, 22419, _unit->GetPositionX()+RandomFloat(3.0f), _unit->GetPositionY()+RandomFloat(3.0f), _unit->GetPositionZ(), RandomFloat(1.0f), 60*200);
 	sEAS.SpawnCreature(plr, 22419, _unit->GetPositionX()+RandomFloat(3.0f), _unit->GetPositionY()+RandomFloat(3.0f), _unit->GetPositionZ(), RandomFloat(1.0f), 60*200);
 	sEAS.SpawnCreature(plr, 22419, _unit->GetPositionX()+RandomFloat(3.0f), _unit->GetPositionY()+RandomFloat(3.0f), _unit->GetPositionZ(), RandomFloat(1.0f), 60*200);
 	sEAS.SpawnCreature(plr, 22419, _unit->GetPositionX()+RandomFloat(3.0f), _unit->GetPositionY()+RandomFloat(3.0f), _unit->GetPositionZ(), RandomFloat(1.0f), 60*200);
 	sEAS.SpawnCreature(plr, 22419, _unit->GetPositionX()+RandomFloat(3.0f), _unit->GetPositionY()+RandomFloat(3.0f), _unit->GetPositionZ(), RandomFloat(1.0f), 60*200);
-	}
+  }
 };
 
 // Taken in the Night
-class Quest_TakenInTheNight : public CreatureAIScript
+class TakenInTheNight : public CreatureAIScript
 {
 public:
-	ADD_CREATURE_FACTORY_FUNCTION(Quest_TakenInTheNight);
+	ADD_CREATURE_FACTORY_FUNCTION(TakenInTheNight);
 
-	Quest_TakenInTheNight(Creature* pCreature) : CreatureAIScript(pCreature) {}
+	TakenInTheNight(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
 	void OnLoad()
 	{
 		_unit->GetAIInterface()->m_canMove = false;
 		_unit->GetAIInterface()->disable_combat = true;
 	}
-
+	
 	void OnDied(Unit *mKiller)
 	{
 		if(!mKiller->IsPlayer())
@@ -92,29 +96,29 @@ public:
 		Player *plr = (Player*)mKiller;
 		uint8 chance = (uint8)RandomUInt(5);
 		uint32 spawn = 0;
-
+		
 		switch(chance)
 		{
-			case 0:
-			case 1:
-				spawn = 22459; //Freed Shat'ar Warrior
-				break;
+		case 0:
+		case 1:
+			spawn = 22459; //Freed Shat'ar Warrior
+			break; 
 
-			case 2:
-				spawn = 21661; //Cabal Skirmisher
-				break;
+		case 2:
+			spawn = 21661; //Cabal Skirmisher
+			break;
 
-			case 3:
-				spawn = 16805; //Broken Skeleton
-				break;
+		case 3:
+			spawn = 16805; //Broken Skeleton
+			break;
 
-			case 4:
-				spawn = 18470; //Bonelasher
-				break;
+		case 4:
+			spawn = 18470; //Bonelasher
+			break;
 
-			case 5:
-				spawn = 22045; //Vengeful Husk
-				break;
+		case 5:
+			spawn = 22045; //Vengeful Husk
+			break;
 		}
 
 		Creature *creat = sEAS.SpawnCreature(plr, spawn, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 1*60*1000);
@@ -139,7 +143,44 @@ public:
 };
 
 // Fumping
-bool Quest_Fumping(uint32 i, Aura* pAura, bool apply)
+bool Fumping(uint32 i, Aura* pAura, bool apply)
+{
+  if(apply)
+    return true;
+
+  if(!pAura->GetUnitCaster()->IsPlayer())
+    return true;
+
+  Player *plr = (Player*)pAura->GetUnitCaster();
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(10929);
+  
+  if(qle == NULL)
+    return true;
+
+  uint8 chance = RandomUInt(1);
+  uint32 entry = 0;
+
+  switch(chance)
+  {
+    case 0:
+      entry = 22482;
+      break;
+      
+    case 1:
+      entry = 22483;
+      break;
+  }
+
+  Creature *creat = sEAS.SpawnCreature(plr, entry, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 5*60*1000);
+  
+  if(entry == 22483) //Sand Gnomes ;)
+    creat->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "YIEEEEEEEAA!");
+
+  return true;
+}
+
+// The Big Bone Worm (Group)
+bool TheBigBoneWorm(uint32 i, Aura* pAura, bool apply)
 {
 	if(apply)
 		return true;
@@ -148,23 +189,27 @@ bool Quest_Fumping(uint32 i, Aura* pAura, bool apply)
 		return true;
 
 	Player *plr = (Player*)pAura->GetUnitCaster();
-	QuestLogEntry *qle = plr->GetQuestLogForEntry(10929);
+	QuestLogEntry *qle = plr->GetQuestLogForEntry(10930);
 
 	if(qle == NULL)
 		return true;
 
-	uint8 chance = RandomUInt(1);
+	uint8 chance = RandomUInt(2);
 	uint32 entry = 0;
 
 	switch(chance)
 	{
-		case 0:
-			entry = 22482;
-			break;
+	case 0:
+		entry = 22038;
+		break;
 
-		case 1:
-			entry = 22483;
-			break;
+	case 1:
+		entry = 22483;
+		break;
+
+	case 2:
+		entry = 22482;
+		break;
 	}
 
 	Creature *creat = sEAS.SpawnCreature(plr, entry, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 5*60*1000);
@@ -173,85 +218,77 @@ bool Quest_Fumping(uint32 i, Aura* pAura, bool apply)
 		creat->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "YIEEEEEEEAA!");
 
 	return true;
-}
 
+}
 // An Improper Burial
-class Quest_AnImproperBurial : public CreatureAIScript
+class AnImproperBurial : public CreatureAIScript
 {
 public:
-	ADD_CREATURE_FACTORY_FUNCTION(Quest_AnImproperBurial);
+  ADD_CREATURE_FACTORY_FUNCTION(AnImproperBurial);
 
-	Quest_AnImproperBurial(Creature* pCreature) : CreatureAIScript(pCreature) {}
+  AnImproperBurial(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-	void OnLoad()
-	{
-		_unit->SetStandState(7);
-		_unit->setDeathState(CORPSE);
-		_unit->GetAIInterface()->m_canMove = false;
-	}
+  void OnLoad()
+  {
+    _unit->SetStandState(7);
+    _unit->setDeathState(CORPSE);
+    _unit->GetAIInterface()->m_canMove = false;
+  }
 };
 
 bool ShatariTorch(uint32 i, Spell* pSpell)
 {
-	if(pSpell->u_caster->IsPlayer() == false)
-		return true;
+  if(pSpell->u_caster->IsPlayer() == false)
+    return true;
 
-	Player *plr = (Player*)pSpell->u_caster;
+  Player *plr = (Player*)pSpell->u_caster;
+  Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  
+  if(unit_target == NULL)
+    return true;
 
-	Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  if(!unit_target->IsCreature())
+    return true;
 
-	if(unit_target == NULL)
-		return true;
+  Creature *target = (Creature*)unit_target;
 
-	if(!unit_target->IsCreature())
-		return true;
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(10913);
+  if(qle == NULL)
+    return true;
+  
+  GameObject *obj = NULL;
 
-	Creature *target = (Creature*)unit_target;
+  if(target->GetEntry() == 21859)
+  {
+    if(qle->GetMobCount(0) == qle->GetQuest()->required_mobcount[0])
+      return true;
 
-	QuestLogEntry *qle = plr->GetQuestLogForEntry(10913);
-	if(qle == NULL)
-		return true;
+    qle->SetMobCount(0, qle->GetMobCount(0)+1);
+    qle->SendUpdateAddKill(0);
 
-	GameObject *obj = NULL;
+    obj = sEAS.SpawnGameobject(plr, 183816, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 1);
+    sEAS.GameobjectDelete(obj, 1*60*1000);
+  } 
+  else if(target->GetEntry() == 21846)
+  {
+    if(qle->GetMobCount(1) == qle->GetQuest()->required_mobcount[1])
+      return true;
 
-	if(target->GetEntry() == 21859)
-	{
-		if(qle->GetMobCount(0) == qle->GetQuest()->required_mobcount[0])
-		return true;
+    qle->SetMobCount(1, qle->GetMobCount(1)+1);
+    qle->SendUpdateAddKill(1);
 
-		qle->SetMobCount(0, qle->GetMobCount(0)+1);
-		qle->SendUpdateAddKill(0);
+    obj = sEAS.SpawnGameobject(plr, 183816, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 1);
+    sEAS.GameobjectDelete(obj, 1*60*1000);
+  }
+  else 
+    return true; 
 
-		obj = sEAS.SpawnGameobject(plr, 183816, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 4);
-		sEAS.GameobjectDelete(obj, 1*60*1000);
+  target->Despawn(0, 1*60*1000);
+  qle->UpdatePlayerFields();
+  plr->UpdateNearbyGameObjects();
 
-
-	}
-	else if(target->GetEntry() == 21846)
-	{
-		if(qle->GetMobCount(1) == qle->GetQuest()->required_mobcount[1])
-			return true;
-
-		qle->SetMobCount(1, qle->GetMobCount(1)+1);
-		qle->SendUpdateAddKill(1);
-
-		obj = sEAS.SpawnGameobject(plr, 183816, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 4);
-		sEAS.GameobjectDelete(obj, 1*60*1000);
-	}
-	else
-		return true;
-
-	target->Despawn(0, 1*60*1000);
-	qle->UpdatePlayerFields();
-
-	plr->UpdateNearbyGameObjects();
-
-	return true;
+  return true;
 }
-
-#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, plr); \
-	Menu->SendTo(plr);
-
 
 class SCRIPT_DECL TheMomentofTruth : public GossipScript
 {
@@ -309,19 +346,38 @@ public:
 	}
 };
 
+bool EvilDrawsNear(uint32 i, Spell * pSpell)
+{
+  if(!pSpell->u_caster->IsPlayer())
+    return true;
+
+  Player *plr = (Player*)pSpell->u_caster;
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(10923);
+  
+  if(qle == NULL)
+    return true;
+
+  uint32 entry = 22441;
+
+  Creature *creat = sEAS.SpawnCreature(plr, entry, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 5*60*1000);
+
+  return true;
+}
+
 void SetupTerrokarForest(ScriptMgr * mgr)
 {
 	mgr->register_creature_script(22144, &ThreatFromAboveQAI::Create);
 	mgr->register_creature_script(22143, &ThreatFromAboveQAI::Create);
 	mgr->register_creature_script(22148, &ThreatFromAboveQAI::Create);
-	mgr->register_creature_script(22355, &Quest_TakenInTheNight::Create);
-	mgr->register_dummy_aura(39238, &Quest_Fumping);
-	mgr->register_creature_script(21859, &Quest_AnImproperBurial::Create);
-	mgr->register_creature_script(21846, &Quest_AnImproperBurial::Create);
-	mgr->register_dummy_spell(39189, &ShatariTorch);
+	mgr->register_creature_script(22355, &TakenInTheNight::Create);
+	mgr->register_creature_script(21859, &AnImproperBurial::Create);
+	mgr->register_creature_script(21846, &AnImproperBurial::Create);
 	mgr->register_creature_script(22307, &TheInfestedProtectorsQAI::Create);
 	mgr->register_creature_script(22095, &TheInfestedProtectorsQAI::Create);
-
+	mgr->register_dummy_aura(39238, &Fumping);
+	mgr->register_dummy_aura(39246, &TheBigBoneWorm);
+	mgr->register_dummy_spell(39189, &ShatariTorch);
+	mgr->register_dummy_spell(39239, &EvilDrawsNear);
 	GossipScript * gossip1 = (GossipScript*) new TheMomentofTruth();
 	mgr->register_gossip_script(19606, gossip1);
 }

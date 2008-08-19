@@ -1,9 +1,7 @@
 /*
- * WEmu Scripts for WEmu MMORPG Server
- * Copyright (C) 2008 WEmu Team
- * Based on Moon++ Scripts for arcemu MMORPG Server
- * Copyright (C) 2005-2007 arcemu Team
- * Copyright (C) 2007-2008 Moon++ Team
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,29 +31,33 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 {
 //	###		Classes Quests	###
 	SetupDruid(mgr);
-	SetupPaladin(mgr);
 	SetupMage(mgr);
+	SetupPaladin(mgr);
 	SetupWarrior(mgr);
-//	### 	Professions Quests	###
+
+//	###		Proffessions Quests	###
 	SetupFirstAid(mgr);
+
 //	###		Zones Quests	###
 	SetupArathiHighlands(mgr);
 	SetupAzshara(mgr);
 	SetupAzuremystIsle(mgr);
-	SetupBarrens(mgr);
 	SetupBladeEdgeMountains(mgr);
 	SetupBlastedLands(mgr);
 	SetupBloodmystIsle(mgr);
+	//SetupDarkshore(mgr);
 	SetupDesolace(mgr);
 	SetupDustwallowMarsh(mgr);
 	SetupEasternPlaguelands(mgr);
 	SetupGhostlands(mgr);
 	SetupHellfirePeninsula(mgr);
 	SetupHillsbradFoothills(mgr);
+	SetupIsleOfQuelDanas(mgr);
 	SetupLochModan(mgr);
 	SetupMulgore(mgr);
 	SetupNagrand(mgr);
 	SetupNetherstorm(mgr);
+	SetupOldHillsbrad(mgr);
 	SetupRedrigeMountains(mgr);
 	SetupShadowmoon(mgr);
 	SetupSilvermoonCity(mgr);
@@ -67,9 +69,10 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 	SetupThousandNeedles(mgr);
 	SetupTirisfalGlades(mgr);
 	SetupUndercity(mgr);
-	SetupUngoro(mgr);
+	SetupUnGoro(mgr);
 	SetupWestfall(mgr);
 	SetupZangarmarsh(mgr);
+	SetupZenn_Foulhoof(mgr);
 //	###		Misc		###
 	SetupQuestGossip(mgr);
 	SetupQuestHooks(mgr);
@@ -80,7 +83,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 
 BOOL APIENTRY DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
 {
-	return TRUE;
+    return TRUE;
 }
 
 #endif

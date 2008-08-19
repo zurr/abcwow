@@ -1,6 +1,11 @@
 /*
- * WEmu Scripts for WEmu MMORPG Server
- * Copyright (C) 2008 WEmu Team
+ * Modifyed on 20 July 2008 by Angelis, from SUN++ Community.
+ * Copyright (C) 2008 Sun++ Team <http://sunplusplus.info/>
+ *
+ * --------------------------------------------------------------------
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,55 +23,42 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
-#include "../EAS/EasyFunctions.h"
+#include "EAS/EasyFunctions.h"
 
-// Giselda The Crone Quest Horde
-class GiseldaHordeQAI : public CreatureAIScript
+// Giselda The Crone Quest
+class GiseldaTheCroneQAI : public CreatureAIScript
 {
 public:
-	ADD_CREATURE_FACTORY_FUNCTION(GiseldaHordeQAI);
-	GiseldaHordeQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
+	ADD_CREATURE_FACTORY_FUNCTION(GiseldaTheCroneQAI);
+    GiseldaTheCroneQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
 
 	void OnDied(Unit * mKiller)
 	{
 		if (mKiller->IsPlayer())
 		{
-
-			QuestLogEntry *en = ((Player*)mKiller)->GetQuestLogForEntry(9935);
-
-			if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
+			if (((Player*)mKiller)->GetTeam() == 0)
 			{
-				uint32 newcount = en->GetMobCount(0) + 1;
-				en->SetMobCount(0, newcount);
-				en->SendUpdateAddKill(0);
-				en->UpdatePlayerFields();
-				return;
+				QuestLogEntry *en = ((Player*)mKiller)->GetQuestLogForEntry(9936);
+				if(en && en->GetMobCount(1) < en->GetQuest()->required_mobcount[1])
+				{
+					uint32 newcount = en->GetMobCount(1) + 1;
+					en->SetMobCount(1, newcount);
+					en->SendUpdateAddKill(1);
+					en->UpdatePlayerFields();
+					return;
+				}
 			}
-		}
-	}
-};
-
-// Giselda The Crone Quest Alliance
-class GiseldaTheCroneAllianceQAI : public CreatureAIScript
-{
-public:
-	ADD_CREATURE_FACTORY_FUNCTION(GiseldaTheCroneAllianceQAI);
-	GiseldaTheCroneAllianceQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
-
-	void OnDied(Unit * mKiller)
-	{
-		if (mKiller->IsPlayer())
-		{
-
-			QuestLogEntry *en = ((Player*)mKiller)->GetQuestLogForEntry(9936);
-
-			if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
+			else
 			{
-				uint32 newcount = en->GetMobCount(0) + 1;
-				en->SetMobCount(0, newcount);
-				en->SendUpdateAddKill(0);
-				en->UpdatePlayerFields();
-				return;
+				QuestLogEntry *en = ((Player*)mKiller)->GetQuestLogForEntry(9935);
+				if(en && en->GetMobCount(1) < en->GetQuest()->required_mobcount[1])
+				{
+					uint32 newcount = en->GetMobCount(1) + 1;
+					en->SetMobCount(1, newcount);
+					en->SendUpdateAddKill(1);
+					en->UpdatePlayerFields();
+					return;
+				}
 			}
 		}
 	}
@@ -109,7 +101,7 @@ public:
 				mogor->SetUInt64Value(UNIT_FIELD_FLAGS, 0);
 				mogor->GetAIInterface()->SetAllowedToEnterCombat(true);
 				mogor->GetAIInterface()->MoveTo(-704.669f, 7871.08f, 45.0387f, 1.59531f);
-				mogor->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 11);
+				mogor->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 14);
 			}
 		}
 
@@ -389,6 +381,7 @@ public:
 	void OnCombatStart(Unit* mTarget)
 	{
 		RegisterAIUpdateEvent(1000);
+        _unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "In Nagrand, food hunt ogre!");   
 	}
 
 	void OnCombatStop()
@@ -418,98 +411,141 @@ public:
 			_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 35);
 			_unit->GetAIInterface()->WipeHateList();
 			_unit->GetAIInterface()->WipeTargetList();
+			_unit->_setFaction();
+			_unit->SetStandState(STANDSTATE_SIT);
+			_unit->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+
+			_unit->Despawn(180000, 0);
+
 			RemoveAIUpdateEvent();
 		}
 	}
 
 };
 
-
-class SCRIPT_DECL LumpGossip : public GossipScript
+class SCRIPT_DECL LumpGossipScript : public GossipScript
 {
 public:
-	void GossipHello(Object* pObject, Player* plr, bool AutoSend)
+	void GossipHello(Object * pObject, Player* Plr, bool AutoSend)
 	{
-		if(!plr)
-			return;
-
 		GossipMenu *Menu;
-		Creature *LumpGossip = (Creature*)(pObject);
-		if (LumpGossip == NULL)
-			return;
-
-		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 1, plr);
-		if(plr->GetQuestLogForEntry(9918))
-			Menu->AddItem( 0, "Speak with Him", 1);
-
-		if(AutoSend)
-			Menu->SendTo(plr);
+		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 1, Plr);
+		Menu->AddItem(0, "Why are Boulderfist out this far? You know this is Kurenai territory!", 1); 
+		Menu->SendTo(Plr);
 	}
 
 	void GossipSelectOption(Object* pObject, Player* plr, uint32 Id, uint32 IntId, const char * EnteredCode)
-	{
-		if(!plr)
-			return;
-
-		Creature *LumpGossip = (Creature*)(pObject);
-		if (LumpGossip == NULL)
+    {
+		Creature *Lump = (Creature*)(pObject);
+		if (Lump == NULL)
 			return;
 
 		switch (IntId)
 		{
-			case 0:
-				GossipHello(pObject, plr, true);
-				break;
-
-			case 1:
+		case 0:
+			GossipHello(pObject, plr, true);
+			break;
+		case 1:
+			if(plr->GetQuestLogForEntry(9918))
 			{
-			QuestLogEntry *en = plr->GetQuestLogForEntry(9918);
-			if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
-			{
-				en->SetMobCount(0, en->GetMobCount(0) + 1);
-				en->SendUpdateAddKill(0);
-				en->UpdatePlayerFields();
-
-				if(!LumpGossip)
-					return;
-
-				LumpGossip->Despawn(2000, 60*1000);
-				return;
-			}break;
+				QuestLogEntry *en = plr->GetQuestLogForEntry(9918);
+				if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
+				{
+					uint32 newcount = en->GetMobCount(0) + 1;
+					en->SetMobCount(0, newcount);
+					en->SendUpdateAddKill(0);
+					en->UpdatePlayerFields();
+				}
 			}
+			break;
 		}
 	}
-
-	void Destroy()
-	{
-		delete this;
+ 
+    void Destroy()
+    {
+        delete this;
 	}
+
 };
+
+
+// Stopping the Spread
+bool StoppingTheSpread(uint32 i, Spell* pSpell)
+{
+  if(!pSpell->u_caster->IsPlayer())
+	return true;
+
+  Player *plr = (Player*)pSpell->u_caster;
+  Creature *target = (Creature*)plr->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(plr->GetPositionX(), plr->GetPositionY() , plr->GetPositionZ(), 18240);
+
+  if(target == NULL)
+	  return true;
+
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(9874);
+  
+  if(qle == NULL)
+    return true;
+ 
+  GameObject *obj = NULL;
+ 
+  if(qle && qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+  {
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		
+		obj = sEAS.SpawnGameobject(plr, 183816, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 1);
+		sEAS.GameobjectDelete(obj, 1*30*1000);
+  }
+  target->Despawn(2000, 60*1000);
+  plr->UpdateNearbyGameObjects();
+  qle->UpdatePlayerFields();
+  return true;
+}
+
+//Ruthless Cunning
+bool RuthlessCunning(uint32 i, Spell * pSpell)
+{
+	if(!pSpell->u_caster->IsPlayer())
+		return true;
+	
+	Player *plr = (Player*)pSpell->u_caster;
+	Creature * kilsorrow = plr->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(plr->GetPositionX(), plr->GetPositionY() , plr->GetPositionZ());
+
+	if(!kilsorrow || kilsorrow->isAlive())
+		return true;
+
+	QuestLogEntry *qle = plr->GetQuestLogForEntry(9927);
+
+	if(qle && qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+	{
+		kilsorrow->Despawn(0, 60000);
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+	return true;
+}
 
 void SetupNagrand(ScriptMgr * mgr)
 {
-	mgr->register_creature_script(17147, &GiseldaHordeQAI::Create);
-	mgr->register_creature_script(17148, &GiseldaHordeQAI::Create);
-	mgr->register_creature_script(18397, &GiseldaHordeQAI::Create);
-	mgr->register_creature_script(18658, &GiseldaHordeQAI::Create);
-	mgr->register_creature_script(17146, &GiseldaHordeQAI::Create);
-
-	mgr->register_creature_script(17147, &GiseldaTheCroneAllianceQAI::Create);
-	mgr->register_creature_script(17148, &GiseldaTheCroneAllianceQAI::Create);
-	mgr->register_creature_script(18397, &GiseldaTheCroneAllianceQAI::Create);
-	mgr->register_creature_script(18658, &GiseldaTheCroneAllianceQAI::Create);
-	mgr->register_creature_script(17146, &GiseldaTheCroneAllianceQAI::Create);
-
+	mgr->register_creature_script(17147, &GiseldaTheCroneQAI::Create);
+	mgr->register_creature_script(17148, &GiseldaTheCroneQAI::Create);
+	mgr->register_creature_script(18397, &GiseldaTheCroneQAI::Create);
+	mgr->register_creature_script(18658, &GiseldaTheCroneQAI::Create);
+	mgr->register_creature_script(17146, &GiseldaTheCroneQAI::Create);
+	mgr->register_creature_script(18351, &NotOnMyWatch::Create);
+	mgr->register_creature_script(18069, &mogorQAI::Create);
+	
 	mgr->register_quest_script(9977, CREATE_QUESTSCRIPT(Quest_The_Ring_of_Blood_The_Final_Challenge));
 	mgr->register_quest_script(9973, CREATE_QUESTSCRIPT(Quest_The_Ring_of_Blood_The_Warmaul_Champion));
 	mgr->register_quest_script(9972, CREATE_QUESTSCRIPT(Quest_The_Ring_of_Blood_Skragath));
 	mgr->register_quest_script(9970, CREATE_QUESTSCRIPT(Quest_The_Ring_of_Blood_Rokdar_the_Sundered_Lord));
 	mgr->register_quest_script(9967, CREATE_QUESTSCRIPT(Quest_The_Ring_of_Blood_The_Blue_Brothers));
 	mgr->register_quest_script(9962, CREATE_QUESTSCRIPT(Quest_The_Ring_of_Blood_Brokentoe));
-	mgr->register_creature_script(18069, &mogorQAI::Create);
 
-	mgr->register_creature_script(18351, &NotOnMyWatch::Create);
-
-	GossipScript * Lump = (GossipScript*) new LumpGossip();
-	mgr->register_gossip_script(18351, Lump);
+	GossipScript * LumpGossip = (GossipScript*) new LumpGossipScript;
+	mgr->register_gossip_script(18351, LumpGossip);
+	mgr->register_dummy_spell(32146, &StoppingTheSpread);
+	mgr->register_dummy_spell(32307, &RuthlessCunning);
 }
+

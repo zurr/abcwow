@@ -1,6 +1,7 @@
 /*
- * WEmu Scripts for WEmu MMORPG Server
- * Copyright (C) 2008 WEmu Team
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +19,7 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
-#include "../EAS/EasyFunctions.h"
+#include "EAS/EasyFunctions.h"
 
 // The Bladespire Threat Quest
 class BladespireQAI : public CreatureAIScript
@@ -209,6 +210,111 @@ public:
 	}
 };
 
+// Creating the Pendant Quest
+bool CreatingThePendant(uint32 i, Spell * pSpell)
+{
+  if(!pSpell->u_caster->IsPlayer())
+    return true;
+
+  Player *plr = (Player*)pSpell->u_caster;
+  QuestLogEntry *qle = plr->GetQuestLogForEntry(10567);
+  
+  if(qle == NULL)
+    return true;
+
+  uint32 entry = 21767;
+
+  Creature *creat = sEAS.SpawnCreature(plr, entry, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 5*60*1000);
+
+  return true;
+}
+
+class BloodmaulQAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(BloodmaulQAI);
+    BloodmaulQAI(Creature* pCreature) : CreatureAIScript(pCreature)  {}
+
+	void OnDied(Unit * mKiller)
+	{
+		if(!mKiller)
+			return;
+		QuestLogEntry *qle = NULL;
+		qle = ((Player*)mKiller)->GetQuestLogForEntry(10502);
+		if (qle == NULL)
+		{
+			qle = ((Player*)mKiller)->GetQuestLogForEntry(10505);
+			if (qle == NULL)
+			{
+				return;
+			}
+		}
+		if (mKiller->IsPlayer()) 
+		{
+			
+			if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+			{
+				uint32 newcount = qle->GetMobCount(0) + 1;
+				qle->SetMobCount(0, newcount);
+				qle->SendUpdateAddKill(0);
+				qle->UpdatePlayerFields();
+				return;
+			}
+		}
+	};
+};
+class Thuk_the_DefiantAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(Thuk_the_DefiantAI);
+	
+	Thuk_the_DefiantAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+	}
+	void OnLoad()
+	{ 	
+		_unit->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.4f);
+	}
+    void OnDied(Unit * mKiller)
+    {
+       RemoveAIUpdateEvent();
+    }
+	void OnTargetDied(Unit* mTarget)
+    {		
+		_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 35);
+		_unit->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.4f);
+		_unit->_setFaction();
+    }
+};
+
+class Stasis_Chamber_Alpha : public GameObjectAIScript
+{
+public:
+	Stasis_Chamber_Alpha(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) {
+		return new Stasis_Chamber_Alpha(GO);
+	}
+
+	void OnActivate(Player * pPlayer)	
+	{
+		if(pPlayer->GetQuestLogForEntry(10974))
+		{
+			
+			Creature * pCreature = NULL;
+			pCreature = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(3989.094482f, 6071.562500f, 266.416656f, 22920);			
+			pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 14);
+			pCreature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1);
+			pCreature->GetAIInterface()->SetNextTarget(pPlayer);
+			pCreature->GetAIInterface()->AttackReaction(pPlayer, 1);
+			pCreature->_setFaction();
+		}
+		else
+		{
+			pPlayer->BroadcastMessage("Missing required quest : Stasis Chambers of Bash'ir");
+		}
+	}
+};
+
 void SetupBladeEdgeMountains(ScriptMgr * mgr)
 {
 	mgr->register_creature_script(19995, &BladespireQAI::Create);
@@ -216,15 +322,31 @@ void SetupBladeEdgeMountains(ScriptMgr * mgr)
 	mgr->register_creature_script(20765, &BladespireQAI::Create);
 	mgr->register_creature_script(20766, &BladespireQAI::Create);
 	mgr->register_creature_script(19998, &BladespireQAI::Create);
-	mgr->register_quest_script(11000, CREATE_QUESTSCRIPT(IntotheSoulgrinder));
-	mgr->register_gameobject_script(184906, &powerconv::Create);
 	mgr->register_creature_script(21731, &MagnetoAura::Create);
-	mgr->register_gameobject_script(184867, &NetherEgg::Create);
 	mgr->register_creature_script(21823, &FunnyDragon::Create);
+	mgr->register_creature_script(19957, &BloodmaulQAI::Create);
+	mgr->register_creature_script(19991, &BloodmaulQAI::Create);
+	mgr->register_creature_script(21238, &BloodmaulQAI::Create);
+	mgr->register_creature_script(19952, &BloodmaulQAI::Create);
+	mgr->register_creature_script(21294, &BloodmaulQAI::Create);
+	mgr->register_creature_script(19956, &BloodmaulQAI::Create);
+	mgr->register_creature_script(19993, &BloodmaulQAI::Create);
+	mgr->register_creature_script(19992, &BloodmaulQAI::Create);
+	mgr->register_creature_script(19948, &BloodmaulQAI::Create);
+	mgr->register_creature_script(22384, &BloodmaulQAI::Create);
+	mgr->register_creature_script(22160, &BloodmaulQAI::Create);
+	mgr->register_creature_script(19994, &BloodmaulQAI::Create);
+	mgr->register_creature_script(22920, &Thuk_the_DefiantAI::Create);
+	mgr->register_quest_script(11000, CREATE_QUESTSCRIPT(IntotheSoulgrinder));
 
+	mgr->register_gameobject_script(184867, &NetherEgg::Create);
+	mgr->register_gameobject_script(184906, &powerconv::Create);
 	mgr->register_gameobject_script( 185198, &LegionObelisk::Create);
 	mgr->register_gameobject_script( 185197, &LegionObelisk::Create);
 	mgr->register_gameobject_script( 185196, &LegionObelisk::Create);
 	mgr->register_gameobject_script( 185195, &LegionObelisk::Create);
 	mgr->register_gameobject_script( 185193, &LegionObelisk::Create);
+	mgr->register_gameobject_script(185512, &Stasis_Chamber_Alpha::Create);
+
+	mgr->register_dummy_spell(37426, &CreatingThePendant);
 }

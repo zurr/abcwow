@@ -1,9 +1,7 @@
 /*
- * WEmu Scripts for WEmu MMORPG Server
- * Copyright (C) 2008 WEmu Team
- * Based on Moon++ Scripts for arcemu MMORPG Server
- * Copyright (C) 2005-2008 arcemu Team
- * Copyright (C) 2007-2008 Moon++ Team
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +19,7 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
-#include "../EAS/EasyFunctions.h"
+#include "EAS/EasyFunctions.h"
 
 #define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, Plr); \
     Menu->SendTo(Plr);
@@ -40,13 +38,13 @@ public:
 		{
 			text = "Grant me your mark, wise ancient.";
 			TextId = 9176;
-		}
+		} 
 		else if(entry == 17901)
 		{
 			text = "Grant me your mark, mighty ancient.";
 			TextId = 9177;
 		}
-
+		
 		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), TextId, Plr);
 
 		if(Plr->HasFinishedQuest(9785) || Plr->GetQuestLogForEntry(9785))
@@ -72,27 +70,15 @@ public:
 						en->SendUpdateAddKill(0);
 						en->UpdatePlayerFields();
 					}
-
+					
 					if(Plr->GetStandingRank(942) == 4)
-					{
-						casta->CastSpell(Plr, dbcSpell.LookupEntry(31808), true);
-						casta->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You have my blessing");
-					}
+						casta->CastSpell(Plr, 31808, true);
 					else if(Plr->GetStandingRank(942) == 5)
-					{
-						casta->CastSpell(Plr, dbcSpell.LookupEntry(31810), true);
-						casta->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You have my blessing");
-					}
+						casta->CastSpell(Plr, 31810, true);
 					else if(Plr->GetStandingRank(942) == 6)
-					{
-						casta->CastSpell(Plr, dbcSpell.LookupEntry(31811), true);
-						casta->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You have my blessing");
-					}
+						casta->CastSpell(Plr, 31811, true);
 					else if(Plr->GetStandingRank(942) == 7)
-					{
-						casta->CastSpell(Plr, dbcSpell.LookupEntry(31815), true);
-						casta->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You have my blessing");
-					}
+						casta->CastSpell(Plr, 31815, true);
 
 				}break;
 			case 17901:
@@ -106,25 +92,13 @@ public:
 
 					Creature *casta = ((Creature*)pObject);
 					if(Plr->GetStandingRank(942) == 4)
-					{
-						casta->CastSpell(Plr, dbcSpell.LookupEntry(31807), true);
-						casta->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You have my blessing");
-					}
+						casta->CastSpell(Plr, 31807, true);
 					else if(Plr->GetStandingRank(942) == 5)
-					{
-						casta->CastSpell(Plr, dbcSpell.LookupEntry(31814), true);
-						casta->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You have my blessing");
-					}
+						casta->CastSpell(Plr, 31814, true);
 					else if(Plr->GetStandingRank(942) == 6)
-					{
-						casta->CastSpell(Plr, dbcSpell.LookupEntry(31813), true);
-						casta->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You have my blessing");
-					}
+						casta->CastSpell(Plr, 31813, true);
 					else if(Plr->GetStandingRank(942) == 7)
-					{
-						casta->CastSpell(Plr, dbcSpell.LookupEntry(31812), true);
-						casta->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You have my blessing");
-					}
+						casta->CastSpell(Plr, 31812, true);
 
 				}break;
 			}
@@ -179,7 +153,6 @@ public:
 		}
 	}
 };
-
 
 void SetupZangarmarsh(ScriptMgr * mgr)
 {
