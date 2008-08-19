@@ -18,7 +18,7 @@
 
 #include "StdAfx.h"
 #include "Setup.h"
-#include "../EAS/EasyFunctions.h"
+#include "EAS/EasyFunctions.h"
 
 #define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, plr); \
 	Menu->SendTo(plr);
@@ -262,6 +262,91 @@ public:
 		}
 	}
 };
+
+#define GO_MEAT 181291
+#define GO_BOTTLE 2687
+#define GO_BREAD 2562
+
+
+struct Coords
+{
+	float x;
+	float y;
+	float z;
+	float o;
+};
+static Coords MeatSpawnPoints[] =
+{
+	{-14655.1f, 148.229f, 3.01744f, 3.45635f},
+ 	{-14655.6f, 146.111f, 2.29463f, 1.43766f},
+	{-14655.1f, 147.721f, 2.64111f, 3.99435f},
+	{-14654.3f, 147.015f, 2.21427f, 2.44821f},
+	{-14655.8f, 147.092f, 2.36460f, 0.66155f},
+	{-14654.3f, 147.866f, 2.90964f, 0.05732f},
+	{-14653.5f, 147.004f, 2.36253f, 2.80556f},
+	{-14652.2f, 146.926f, 3.63756f, 6.06693f},
+	{-14653.0f, 145.274f, 2.76439f, 6.06279f}
+};
+static Coords BottleSpawnPoints[] =
+{
+	{-14653.5f, 145.711f, 2.01005f, 1.14750f},
+	{-14656.7f, 147.404f, 3.05695f, 1.44181f},
+	{-14657.1f, 147.068f, 2.94368f, 1.40036f},
+	{-14657.5f, 147.567f, 2.83560f, 2.14234f},
+	{-14655.9f, 148.848f, 3.93732f, 2.79728f}
+};
+static Coords BreadSpawnPoints[] =
+{
+	{-14654.6f, 146.299f, 2.04134f, 5.47387f},
+	{-14656.5f, 148.372f, 3.50805f, 5.76817f},
+	{-14652.6f, 146.079f, 3.35855f, 2.89231f}
+};
+
+class FacingNegolash : public QuestScript
+{
+	void OnQuestComplete(Player* pPlayer, QuestLogEntry *qLogEntry)
+	{
+		if (!pPlayer)
+			return;
+		
+		GameObject *obj = NULL;
+
+		for(uint8 i = 0; i < 9; i++)
+		{
+			obj = sEAS.SpawnGameobject(pPlayer, GO_MEAT, MeatSpawnPoints[i].x, MeatSpawnPoints[i].y, MeatSpawnPoints[i].z, MeatSpawnPoints[i].o, 1);
+			sEAS.GameobjectDelete(obj, 2*60*1000);
+		}
+		for(uint8 i = 0; i < 5; i++)
+		{
+			obj = sEAS.SpawnGameobject(pPlayer, GO_BOTTLE, BottleSpawnPoints[i].x, BottleSpawnPoints[i].y, BottleSpawnPoints[i].z, BottleSpawnPoints[i].o, 1);
+			sEAS.GameobjectDelete(obj, 2*60*1000);
+		}
+		for(uint8 i = 0; i < 3; i++)
+		{
+			obj = sEAS.SpawnGameobject(pPlayer, GO_BREAD, BreadSpawnPoints[i].x, BreadSpawnPoints[i].y, BreadSpawnPoints[i].z, BreadSpawnPoints[i].o, 1);
+			sEAS.GameobjectDelete(obj, 2*60*1000);
+		}	
+     	
+		Creature *Negolash = sEAS.SpawnCreature(pPlayer, 1494, -14657.400391, 155.115997, 4.081050, 0.353429);
+		Negolash->GetAIInterface()->MoveTo(-14647.526367, 143.710052, 1.164550, 1.909);
+	}
+};
+
+class NegolashAI : public CreatureAIScript
+{
+public:
+    ADD_CREATURE_FACTORY_FUNCTION(NegolashAI);
+	
+	NegolashAI(Creature* pCreature) : CreatureAIScript(pCreature)
+    {
+	}
+    void OnDied(Unit * mKiller)
+    {
+      _unit->Despawn(180000, 0);
+       RemoveAIUpdateEvent();
+    }
+};
+
 
 void SetupStranglethornVale(ScriptMgr * mgr)
 {

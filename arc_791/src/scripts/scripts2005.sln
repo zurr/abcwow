@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LUAScripting", "projects\LU
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuestScripts", "projects\Quest2005.vcproj", "{60406704-5136-447C-B34B-C5AD16A094FD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscScripts", "projects\Misc2005.vcproj", "{44119036-1060-4EDC-9D54-8C74A723EA53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -57,13 +59,20 @@ Global
 		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Debug|x64.ActiveCfg = Debug|Win32
 		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Release|Win32.ActiveCfg = Release|Win32
 		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Release|Win32.Build.0 = Release|Win32
-		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Release|x64.ActiveCfg = Release|Win32
+		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Release|x64.ActiveCfg = Release|x64
+		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Release|x64.Build.0 = Release|x64
 		{60406704-5136-447C-B34B-C5AD16A094FD}.Debug|Win32.ActiveCfg = Debug|Win32
 		{60406704-5136-447C-B34B-C5AD16A094FD}.Debug|Win32.Build.0 = Debug|Win32
 		{60406704-5136-447C-B34B-C5AD16A094FD}.Debug|x64.ActiveCfg = Debug|Win32
 		{60406704-5136-447C-B34B-C5AD16A094FD}.Release|Win32.ActiveCfg = Release|Win32
 		{60406704-5136-447C-B34B-C5AD16A094FD}.Release|Win32.Build.0 = Release|Win32
 		{60406704-5136-447C-B34B-C5AD16A094FD}.Release|x64.ActiveCfg = Release|Win32
+		{44119036-1060-4EDC-9D54-8C74A723EA53}.Debug|Win32.ActiveCfg = Debug|Win32
+		{44119036-1060-4EDC-9D54-8C74A723EA53}.Debug|Win32.Build.0 = Debug|Win32
+		{44119036-1060-4EDC-9D54-8C74A723EA53}.Debug|x64.ActiveCfg = Debug|Win32
+		{44119036-1060-4EDC-9D54-8C74A723EA53}.Release|Win32.ActiveCfg = Release|Win32
+		{44119036-1060-4EDC-9D54-8C74A723EA53}.Release|Win32.Build.0 = Release|Win32
+		{44119036-1060-4EDC-9D54-8C74A723EA53}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

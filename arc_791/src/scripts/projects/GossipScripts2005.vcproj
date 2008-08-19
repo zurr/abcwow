@@ -393,7 +393,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\GossipScripts\Gossip_Mulgore.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\GossipScripts\Gossip_Shattrath.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\GossipScripts\Gossip_Tanaris.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\GossipScripts\GuardGossip.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\GossipScripts\Token_Vendor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\GossipScripts\TrainerGossip.cpp"
 				>
 			</File>
 		</Filter>
