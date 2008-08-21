@@ -1165,7 +1165,7 @@ public:
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
 				knockback(temp);
@@ -1204,7 +1204,7 @@ public:
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if ( temp != NULL && temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 				temp->CastSpell(temp, STONED, true);
 		}
@@ -1219,10 +1219,10 @@ public:
 
 		for ( TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++ )
 		{
-			if ( itr->first == NULL || itr->first->GetTypeId() != TYPEID_PLAYER || itr->first->isDead() )
+			if ( _unit->GetMapMgr()->GetUnit(itr->first) == NULL || _unit->GetMapMgr()->GetUnit(itr->first)->GetTypeId() != TYPEID_PLAYER || _unit->GetMapMgr()->GetUnit(itr->first)->isDead() )
 				continue;
 
-			Player* _plr = (Player*)(itr->first);
+			Player* _plr = (Player*)(_unit->GetMapMgr()->GetUnit(itr->first));
 
 			for(set<Player*>::iterator itr2 = _plr->GetInRangePlayerSetBegin(); itr2 != _plr->GetInRangePlayerSetEnd(); ++itr2)
 			{
@@ -1263,12 +1263,12 @@ public:
 			itr = it2;
 			++it2;
 
-			if( itr->first == NULL || itr->first->GetTypeId() != TYPEID_PLAYER || !itr->first->isAlive() || _unit->GetDistance2dSq(itr->first) >= 100.0f )
+			if( _unit->GetMapMgr()->GetUnit(itr->first) == NULL || _unit->GetMapMgr()->GetUnit(itr->first)->GetTypeId() != TYPEID_PLAYER || !_unit->GetMapMgr()->GetUnit(itr->first)->isAlive() || _unit->GetDistance2dSq(_unit->GetMapMgr()->GetUnit(itr->first)) >= 100.0f )
 				continue;
 
-			if( itr->second > currentTarget.second && itr->first != mUnit )
+			if( itr->second > currentTarget.second && _unit->GetMapMgr()->GetUnit(itr->first) != mUnit )
 			{
-				currentTarget.first = itr->first;
+				currentTarget.first = _unit->GetMapMgr()->GetUnit(itr->first);
 				currentTarget.second = itr->second;
 			}
 		}
@@ -1289,7 +1289,7 @@ public:
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if (_unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))

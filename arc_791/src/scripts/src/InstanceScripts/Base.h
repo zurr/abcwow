@@ -44,7 +44,8 @@ enum TargetType
 	Target_Destination,					//Target is a destination coordinates (x, y, z)
 	Target_Predefined,					//Pre-defined target unit
 	Target_RandomPlayer,				//Random target player
-	Target_RandomPlayerNotCurrent,		//Random target player, but not the current highest aggro
+	Target_RandomPlayerNotCurrent,		//Random target player, but not the current highest 
+	Target_RandomPlayerDestination,		//Random player destination coordinates (x, y, z)
 	Target_RandomPlayerApplyAura,		//Random target player to self cast aura
 	Target_RandomUnit,					//Random target unit (players, totems, pets, etc.)
 	Target_RandomUnitNotCurrent,		//Random target unit (players, totems, pets, etc.), but not the current highest aggro
@@ -128,6 +129,15 @@ struct Coords
 	uint32 mAddition;
 };
 
+struct LootDesc
+{
+	uint32 mItemID;
+	uint32 mChance;
+	uint32 mMinCount;
+	uint32 mMaxCount;
+	uint32 mFFA;
+};
+
 class SpellDesc;
 class MoonScriptCreatureAI;
 class MoonScriptBossAI;
@@ -142,6 +152,7 @@ typedef std::pair<int32, SpellDesc*> PhaseSpellPair;
 typedef std::vector<PhaseSpellPair> PhaseSpellArray;
 typedef std::pair<int32, int32> TimerPair;
 typedef std::vector<TimerPair> TimerArray;
+typedef std::vector<LootDesc> LootTable;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Class SpellDesc
@@ -284,6 +295,14 @@ public:
 	//Options
 	void					SetAIUpdateFreq(uint32 pUpdateFreq);
 	uint32					GetAIUpdateFreq();
+
+	//Loot
+	void					AddLootToTable(LootTable* pTable, uint32 pItemID, uint32 pChance, uint32 pMinCount, uint32 pMaxCount, uint32 pFFA);
+	void					ClearLoot(Unit* pTarget);
+	void					AddLootFromTable(Unit* pTarget, LootTable* pTable, uint32 pCount = 1);
+	void					SetGoldLoot(Unit* pTarget, uint32 pMinGold, uint32 pMaxGold);
+	void					AddLoot(Unit* pTarget, uint32 pItemID, uint32 pMinCount, uint32 pMaxCount, uint32 pFFA);
+	void					AddRareLoot(Unit* pTarget, uint32 pItemID, float pPercentChance);
 
 	//Reimplemented Events
 	virtual void			OnCombatStart(Unit* pTarget);

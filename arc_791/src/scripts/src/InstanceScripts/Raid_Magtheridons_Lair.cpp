@@ -184,8 +184,12 @@ public:
 						{
 							if (channelers[x]->isAlive() && (channelers[i] != channelers[x]))
 							{
-								Aura *aura = new Aura( dbcSpell.LookupEntry(SOUL_TRANSFER), -1, channelers[x], channelers[x]);
+								Aura *aura = new Aura();
+								if (aura)
+								{
+									aura->Init(dbcSpell.LookupEntry(SOUL_TRANSFER), -1, channelers[x], channelers[x]);
 								channelers[x]->AddAura(aura);
+								}
 							}
 						}
 					}
@@ -462,7 +466,7 @@ public:
 		TargetMap::iterator itr;
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if (_unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
@@ -684,7 +688,7 @@ public:
 		TargetMap::iterator itr;
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if (_unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
@@ -852,7 +856,7 @@ public:
 		TargetMap::iterator itr;
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if (_unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
@@ -983,7 +987,7 @@ public:
 		TargetMap::iterator itr;
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if (_unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
@@ -1035,9 +1039,11 @@ public:
 		if (Channeler != NULL || myTrigger == NULL)
 			return;
 
-		aura = new Aura(dbcSpell.LookupEntry(MINDEXHAUSTION), 90000, magtheridon, pPlayer);
+		aura = new Aura();
 		if ( aura == NULL )
 			return;
+
+		aura->Init(dbcSpell.LookupEntry(MINDEXHAUSTION), 90000, magtheridon, pPlayer);
 
 		pPlayer->AddAura(aura);
 		pPlayer->CastSpell(pPlayer, SHADOWGRASP2, false);

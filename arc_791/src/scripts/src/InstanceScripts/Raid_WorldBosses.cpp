@@ -1613,7 +1613,7 @@ public:
 		TargetMap::iterator itr;
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if (_unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
@@ -1876,8 +1876,12 @@ public:
 			}
 			if (mTarget != NULL)
 			{
-				Aura *aur = new Aura(dbcSpell.LookupEntry(MARK_OF_DEATH), 900000, _unit, mTarget);
-				mTarget->AddAura(aur);
+				Aura *aur = new Aura();
+				if (aur)
+				{
+					aur->Init(dbcSpell.LookupEntry(MARK_OF_DEATH), 900000, _unit, mTarget);
+					mTarget->AddAura(aur);
+				}
 			}
 		}
 	}
