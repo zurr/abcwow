@@ -1,3 +1,22 @@
+/*
+ * Moon++ Scripts for Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2007-2008 Moon++ Team <http://www.moonplusplus.info/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "StdAfx.h"
 #include "Setup.h"
 
@@ -41,7 +60,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL JainaProudmooreGS : public GossipScript
+class JainaProudmooreGS : public GossipScript
 {
 public:
 	void GossipHello(Object * pObject, Player* Plr, bool AutoSend)
@@ -101,7 +120,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL ThrallGS : public GossipScript
+class ThrallGS : public GossipScript
 {
 public:
 	void GossipHello(Object * pObject, Player* Plr, bool AutoSend)
@@ -337,7 +356,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -514,9 +533,10 @@ public:
 				{
 					if (i == 1)
 					{
-						Aura *aura = new Aura(spells[1].info, 5000, _unit, _unit);
+						Aura *aura = new Aura();
 						if (aura != NULL)
 						{
+							aura->Init(spells[1].info, 5000, _unit, _unit);
 							_unit->AddAura(aura);
 						}
 					}
@@ -582,7 +602,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -820,7 +840,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -1044,7 +1064,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();
@@ -1056,9 +1076,10 @@ public:
 
 			if (i == 3)
 			{
-				Aura *aura = new Aura(spells[3].info, 20000, _unit, RTarget);
+				Aura *aura = new Aura();
 				if (aura != NULL)
 				{
+					aura->Init(spells[3].info, 20000, _unit, RTarget);
 					RTarget->AddAura(aura);
 				}
 
@@ -1534,7 +1555,7 @@ public:
 			if (_unit->GetHealthPct() >= minhp2cast && _unit->GetHealthPct() <= maxhp2cast && spells[i].targettype == TARGET_RANDOM_FRIEND)
 				TargetTable.push_back(_unit);
 
-			if (TargetTable.empty())
+			if (!TargetTable.size())
 				return;
 
 			size_t RandTarget = rand()%TargetTable.size();

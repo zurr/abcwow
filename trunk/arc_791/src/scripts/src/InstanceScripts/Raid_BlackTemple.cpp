@@ -81,9 +81,10 @@ class MutantWarHoundAI : public MoonScriptCreatureAI
 	{
 		ParentClass::OnDied(pKiller);
 
-		Aura *pAura = new Aura(dbcSpell.LookupEntry(MUTANT_WAR_HOUND_CLOUD_OF_DISEASE), 20000, _unit, _unit);
+		Aura *pAura = new Aura();
 		if (pAura != NULL)
 		{
+			pAura->Init(dbcSpell.LookupEntry(MUTANT_WAR_HOUND_CLOUD_OF_DISEASE), 20000, _unit, _unit);
 			_unit->AddAura(pAura);
 		}
 	}
@@ -280,7 +281,7 @@ class IllidariFearbringerAI : public MoonScriptCreatureAI
 	IllidariFearbringerAI(Creature *pCreature) : MoonScriptCreatureAI(pCreature)
 	{
 		AddSpell(ILLIDARI_FEARBRINGER_ILLIDARI_FLAMES, Target_Current, 8, 2, 25, 0, 10);
-		AddSpell(ILLIDARI_FEARBRINGER_RAIN_OF_CHAOS, Target_RandomDestination, 7, 0, 35);
+		AddSpell(ILLIDARI_FEARBRINGER_RAIN_OF_CHAOS, Target_RandomPlayerDestination, 7, 0, 35);
 		AddSpell(ILLIDARI_FEARBRINGER_WAR_STOMP, Target_Self, 8, 0, 35);
 	}
 };
@@ -299,7 +300,7 @@ class IllidariDefilerAI : public MoonScriptCreatureAI
 		AddSpell(ILLIDARI_DEFILER_BANISH, Target_RandomPlayer, 8, 1, 30);
 		AddSpell(ILLIDARI_DEFILER_CURSE_OF_AGONY, Target_RandomPlayer, 7, 0, 45);
 		AddSpell(ILLIDARI_DEFILER_FEL_IMMOLATE, Target_RandomPlayer, 8, 2, 25);
-		AddSpell(ILLIDARI_DEFILER_RAIN_OF_CHAOS, Target_RandomDestination, 7, 6, 35);
+		AddSpell(ILLIDARI_DEFILER_RAIN_OF_CHAOS, Target_RandomPlayerDestination, 7, 6, 35);
 	}
 };
 
@@ -399,7 +400,7 @@ class AshtongueElementalistAI : public MoonScriptCreatureAI
 	AshtongueElementalistAI(Creature *pCreature) : MoonScriptCreatureAI(pCreature)
 	{
 		AddSpell(ASHTONGUE_ELEMENTALIST_LIGHTNING_BOLT, Target_Current, 8, 1, 20, 0, 50);	// Random?
-		AddSpell(ASHTONGUE_ELEMENTALIST_RAID_OF_FIRE, Target_RandomDestination, 6, 0, 25);
+		AddSpell(ASHTONGUE_ELEMENTALIST_RAID_OF_FIRE, Target_RandomPlayerDestination, 6, 0, 25);
 	}
 };
 // TO DO: Add Totem AIs
@@ -572,8 +573,8 @@ class BonechewerBehemothAI : public MoonScriptCreatureAI
 		AddSpell(BONECHEWER_BEHEMOTH_BEHEMOTH_CHARGE, Target_Current, 0, 0, 20);	// Mechanics are like charge on random target?
 		AddSpell(BONECHEWER_BEHEMOTH_ENRAGE, Target_Self, 5, 0, 45);
 		AddSpell(BONECHEWER_BEHEMOTH_FEL_STOMP, Target_Self, 7, 0, 30);
-		AddSpell(BONECHEWER_BEHEMOTH_FIERY_COMET, Target_RandomDestination, 6, 1, 30);
-		AddSpell(BONECHEWER_BEHEMOTH_METEOR, Target_RandomDestination, 5, 2, 40);
+		AddSpell(BONECHEWER_BEHEMOTH_FIERY_COMET, Target_RandomPlayerDestination, 6, 1, 30);
+		AddSpell(BONECHEWER_BEHEMOTH_METEOR, Target_RandomPlayerDestination, 5, 2, 40);
 	}
 
 	void OnCombatStart(Unit *pTarget)
@@ -795,7 +796,7 @@ class CoilskarSeacallerAI : public MoonScriptCreatureAI
 	CoilskarSeacallerAI(Creature *pCreature) : MoonScriptCreatureAI(pCreature)
 	{
 		AddSpell(COILSKAR_SEACALLER_FORKED_LIGHTNING, Target_Self, 8, 2, 20);
-		AddSpell(COILSKAR_SEACALLER_HURRICANE, Target_RandomDestination, 8, 20, 35);
+		AddSpell(COILSKAR_SEACALLER_HURRICANE, Target_RandomPlayerDestination, 8, 20, 35);
 		AddSpell(COILSKAR_SEACALLER_SUMMON_GEYSER, Target_RandomPlayer, 7, 2, 25);			// Npc to add to DB + AI
 	}
 };
@@ -818,8 +819,6 @@ class CoilskarSoothsayerAI : public MoonScriptCreatureAI
 #define COILSKAR_WRANGLER_CLEAVE				15284
 #define COILSKAR_WRANGLER_ELECTRIC_SPUR			40076
 #define COILSKAR_WRANGLER_LIGHTNING_PROD		40066
-
-void SpellFunc_ElecticSpur(SpellDesc* pThis, MoonScriptCreatureAI* pCreatureAI, Unit* pTarget, TargetType pType);
 
 class CoilskarWranglerAI : public MoonScriptCreatureAI
 {
@@ -1082,12 +1081,12 @@ class IllidariBattlemageAI : public MoonScriptCreatureAI
 		switch (RandomUInt(1))
 		{
 		case 0:
-			AddSpell(ILLIDARI_BATTLEMAGE_BLIZZARD, Target_RandomDestination, 8, 8, 35);
+			AddSpell(ILLIDARI_BATTLEMAGE_BLIZZARD, Target_RandomPlayerDestination, 8, 8, 35);
 			AddSpell(ILLIDARI_BATTLEMAGE_FROSTBOLT, Target_Current, 15, 0, 10, 0, 40);
 			break;
 		case 1:
 			AddSpell(ILLIDARI_BATTLEMAGE_FIREBALL, Target_Current, 15, 0, 10, 0, 40);
-			AddSpell(ILLIDARI_BATTLEMAGE_FLAMESTRIKE, Target_RandomDestination, 8, 0, 40);
+			AddSpell(ILLIDARI_BATTLEMAGE_FLAMESTRIKE, Target_RandomPlayerDestination, 8, 0, 40);
 			break;
 		}
 	}
@@ -1257,12 +1256,12 @@ class ShadowmoonHoundmasterAI : public MoonScriptCreatureAI
 	MOONSCRIPT_FACTORY_FUNCTION(ShadowmoonHoundmasterAI, MoonScriptCreatureAI);
 	ShadowmoonHoundmasterAI(Creature *pCreature) : MoonScriptCreatureAI(pCreature)
 	{
-		AddSpell(SHADOWMOON_HOUNDMASTER_FLARE, Target_RandomDestination, 5, 0, 30);
+		AddSpell(SHADOWMOON_HOUNDMASTER_FLARE, Target_RandomPlayerDestination, 5, 0, 30);
 		AddSpell(SHADOWMOON_HOUNDMASTER_FREEZING_TRAP, Target_Self, 5, 0, 30);
 		AddSpell(SHADOWMOON_HOUNDMASTER_SHOOT, Target_Current, 70, 0, 1, 0, 30);
 		AddSpell(SHADOWMOON_HOUNDMASTER_SILENCING_SHOT, Target_RandomPlayer, 6, 0, 35);
 		AddSpell(SHADOWMOON_HOUNDMASTER_SUMMON_RIDING_WARHOUND, Target_Self, 5, 0, 45);
-		AddSpell(SHADOWMOON_HOUNDMASTER_VOLLEY, Target_RandomDestination, 5, 1, 25);
+		AddSpell(SHADOWMOON_HOUNDMASTER_VOLLEY, Target_RandomPlayerDestination, 5, 1, 25);
 		AddSpell(SHADOWMOON_HOUNDMASTER_WING_CLIP, Target_Current, 5, 0, 20, 0, 10, true);
 	}
 
@@ -3197,9 +3196,10 @@ public:
 			}
 
 			//_unit->CastSpell(_unit, SpellId, true);
-			Aura *aura = new Aura(dbcSpell.LookupEntry(SpellId), 15000, _unit, _unit);
+			Aura *aura = new Aura();
 			if (aura)
 			{
+				aura->Init(dbcSpell.LookupEntry(SpellId), 15000, _unit, _unit);
 				_unit->AddAura(aura);
 			}
 
@@ -5249,7 +5249,7 @@ protected:
 #define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), textid, plr); \
     Menu->SendTo(plr);
  
-class SCRIPT_DECL AkamaGossip : public GossipScript
+class AkamaGossip : public GossipScript
 {
 public:
     void GossipHello(Object* pObject, Player* plr, bool AutoSend)

@@ -333,8 +333,8 @@ void MoonScriptCreatureAI::SetWieldWeapon(bool pValue)
 
 void MoonScriptCreatureAI::SetDisplayWeapon(bool pMainHand, bool pOffHand)
 {
-	SetDisplayWeaponIds(pMainHand ? _unit->proto->Item1SlotDisplay : 0, pMainHand ? _unit->proto->Item1Info1 : 0, pMainHand ? _unit->proto->Item1Info2 : 0,
-		pOffHand ? _unit->proto->Item2SlotDisplay : 0, pOffHand ? _unit->proto->Item2Info1 : 0, pOffHand ? _unit->proto->Item2Info2 : 0);
+	SetDisplayWeaponIds(pMainHand ? _unit->GetProto()->Item1SlotDisplay : 0, pMainHand ? _unit->GetProto()->Item1Info1 : 0, pMainHand ? _unit->GetProto()->Item1Info2 : 0,
+		pOffHand ? _unit->GetProto()->Item2SlotDisplay : 0, pOffHand ? _unit->GetProto()->Item2Info1 : 0, pOffHand ? _unit->GetProto()->Item2Info2 : 0);
 }
 
 void MoonScriptCreatureAI::SetDisplayWeaponIds(uint32 pItem1Id, uint32 pItem1Info, uint32 pItem1Slot, uint32 pItem2Id, uint32 pItem2Info, uint32 pItem2Slot)
@@ -690,6 +690,60 @@ uint32 MoonScriptCreatureAI::GetAIUpdateFreq()
 	return mAIUpdateFrequency;
 }
 
+void MoonScriptCreatureAI::AddLootToTable(LootTable* pTable, uint32 pItemID, uint32 pChance, uint32 pMinCount, uint32 pMaxCount, uint32 pFFA)
+{
+	LootDesc loot;
+	loot.mItemID = pItemID;
+	loot.mChance = pChance;
+	loot.mMinCount = pMinCount;
+	loot.mMaxCount = pMaxCount;
+	loot.mFFA = pFFA;
+	pTable->push_back(loot);
+}
+
+void MoonScriptCreatureAI::ClearLoot(Unit* pTarget)
+{
+	pTarget->loot.items.clear();
+	pTarget->loot.gold = 0;
+}
+
+void MoonScriptCreatureAI::AddLootFromTable(Unit* pTarget, LootTable* pTable, uint32 pCount)
+{
+	uint32 total = 0;
+	for (LootTable::iterator it = pTable->begin(); it != pTable->end(); ++it) total += (*it).mChance;
+	for (uint32 count = 0; count < pCount; ++count)
+	{
+		uint32 result = RandomUInt(total);
+		uint32 sum = 0;
+		for (LootTable::iterator it = pTable->begin(); it != pTable->end(); ++it)
+		{
+			sum += (*it).mChance;
+			if (result <= sum)
+			{
+				LootMgr::getSingleton().AddLoot(&pTarget->loot, (*it).mItemID, (*it).mMinCount, (*it).mMaxCount, (*it).mFFA);
+				break;
+			}
+		}
+	}
+}
+
+void MoonScriptCreatureAI::SetGoldLoot(Unit* pTarget, uint32 pMinGold, uint32 pMaxGold)
+{
+	pTarget->loot.gold = RandomUInt(pMaxGold - pMinGold) + pMinGold;
+}
+
+void MoonScriptCreatureAI::AddLoot(Unit* pTarget, uint32 pItemID, uint32 pMinCount, uint32 pMaxCount, uint32 pFFA)
+{
+	LootMgr::getSingleton().AddLoot(&pTarget->loot, pItemID, pMinCount, pMaxCount, pFFA);
+}
+
+void MoonScriptCreatureAI::AddRareLoot(Unit* pTarget, uint32 pItemID, float pPercentChance)
+{
+	float result = RandomFloat(100.0f);
+	if (result <= pPercentChance)
+		LootMgr::getSingleton().AddLoot(&pTarget->loot, pItemID, 1, 1, 0);
+}
+
 WayPoint* MoonScriptCreatureAI::CreateWaypoint(int pId, uint32 pWaittime, uint32 pMoveFlag, Coords pCoords)
 {
 	WayPoint * wp = _unit->CreateWaypointStruct();
@@ -843,11 +897,11 @@ void MoonScriptCreatureAI::AIUpdate()
 	if( !IsCasting() && !mRunToTargetCache )
 	{
 		//Check if have queued spells that needs to be scheduled before we go back to random casting
-		for( SpellDescList::iterator SpellIter = mQueuedSpells.begin(); SpellIter != mQueuedSpells.end(); ++SpellIter )
+		if( !mQueuedSpells.empty() )
 		{
-			Spell = (*SpellIter);
+			Spell = mQueuedSpells.front();
 			mScheduledSpells.push_back(Spell);
-			mQueuedSpells.erase(SpellIter);
+			mQueuedSpells.pop_front();
 
 			//Stop melee attack for a short while for scheduled spell cast
 			if( Spell->mCastTime >= 0 )
@@ -987,6 +1041,7 @@ void MoonScriptCreatureAI::CastSpellOnTarget(Unit* pTarget, TargetType pType, Sp
 
 		case Target_Destination:
 		case Target_RandomDestination:
+		case Target_RandomPlayerDestination:
 			_unit->CastSpellAoF(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), pEntry, pInstant);
 			break;
 
@@ -1045,14 +1100,15 @@ Unit* MoonScriptCreatureAI::GetTargetForSpell(SpellDesc* pSpell)
 			return pSpell->mPredefinedTarget;
 
 		case Target_RandomPlayer:
-		case Target_RandomDestination:
 		case Target_RandomPlayerApplyAura:
+		case Target_RandomPlayerDestination:
 			return GetBestPlayerTarget();
 
 		case Target_RandomPlayerNotCurrent:
 			return GetBestPlayerTarget(TargetFilter_NotCurrent);
 
 		case Target_RandomUnit:
+		case Target_RandomDestination:
 			return GetBestUnitTarget();
 
 		case Target_RandomUnitNotCurrent:
@@ -1195,7 +1251,7 @@ bool MoonScriptCreatureAI::IsValidUnitTarget(Object* pObject, TargetFilter pFilt
 	//Skip dead (if not required), feign death or invisible targets
 	if( !UnitTarget->isAlive() )
 	{
-		if( (pFilter & TargetFilter_Corpse) && UnitTarget->IsCreature() && static_cast<Creature*>(UnitTarget)->GetCreatureName()->Rank != ELITE_WORLDBOSS )
+		if( (pFilter & TargetFilter_Corpse) && UnitTarget->IsCreature() && static_cast<Creature*>(UnitTarget)->GetCreatureInfo()->Rank != ELITE_WORLDBOSS )
 			return true;
 		else
 			return false;
