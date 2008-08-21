@@ -24,7 +24,7 @@
 	Menu->SendTo(plr);
 
 
-class SCRIPT_DECL StrFever : public GossipScript
+class StrFever : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)
@@ -164,7 +164,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL BloodscalpClanHeads : public QuestScript 
+class BloodscalpClanHeads : public QuestScript 
 { 
 public:
 
@@ -217,7 +217,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL BacktoBootyBay : public QuestScript 
+class BacktoBootyBay : public QuestScript 
 { 
 public:
 
@@ -240,7 +240,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL VoodooDues : public QuestScript 
+class VoodooDues : public QuestScript 
 { 
 public:
 

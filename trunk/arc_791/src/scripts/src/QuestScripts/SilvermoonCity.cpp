@@ -41,7 +41,7 @@ public:
 };
 
 
-class SCRIPT_DECL PathoftheAdept : public GossipScript
+class PathoftheAdept : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)

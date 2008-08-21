@@ -26,7 +26,7 @@
 /*										  Arximag Teleport  Azshara													*/
 /************************************************************************/
 
-class SCRIPT_DECL ArximagTeleportDown : public GossipScript
+class ArximagTeleportDown : public GossipScript
 {
 public:
 	void Destroy()
@@ -45,11 +45,12 @@ public:
 	}
 	void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
 	{
-	Creature * pCreature = (pObject->GetTypeId()==TYPEID_UNIT)?((Creature*)pObject):NULL;
-	if(pCreature==NULL)
-	{
-		return;
+		Creature * pCreature = (pObject->GetTypeId()==TYPEID_UNIT)?((Creature*)pObject):NULL;
+		if(pCreature==NULL)
+		{
+			return;
 		}
+
 		GossipMenu * Menu;
 		switch(IntId)
 		{
@@ -57,15 +58,14 @@ public:
 			GossipHello(pObject, Plr, true);
 			break;
 		case 1:
-			{
-				objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 1994, Plr);
-				 Plr->EventTeleport(1, 3649.567627, -4705.155762, 120.966309);
-			}break;
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 1994, Plr);
+			 Plr->EventTeleport(1, 3649.567627, -4705.155762, 120.966309);
+			break;
 		}
 	}
 };
 
-class SCRIPT_DECL ArximagTeleportUp : public GossipScript
+class ArximagTeleportUp : public GossipScript
 {
 public:
 	void Destroy()
@@ -79,16 +79,16 @@ public:
 
 		Menu->AddItem(0, "[i am, ready]", 1);
 
-
 		if(AutoSend)
 			Menu->SendTo(Plr);
 	}
+
 	void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
 	{
-	Creature * pCreature = (pObject->GetTypeId()==TYPEID_UNIT)?((Creature*)pObject):NULL;
-	if(pCreature==NULL)
-	{
-		return;
+		Creature * pCreature = (pObject->GetTypeId()==TYPEID_UNIT)?((Creature*)pObject):NULL;
+		if(pCreature==NULL)
+		{
+			return;
 		}
 
 		GossipMenu * Menu;
@@ -98,10 +98,9 @@ public:
 			GossipHello(pObject, Plr, true);
 			break;
 		case 1:
-			{
-				objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
-				 Plr->EventTeleport(1, 3778.438721, -4612.299805, 227.253922);
-			}break;
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
+			 Plr->EventTeleport(1, 3778.438721, -4612.299805, 227.253922);
+			break;
 		}
 	}
 };
@@ -113,5 +112,4 @@ void SetupAzshara(ScriptMgr * mgr)
 
 	mgr->register_gossip_script(8399, axtd); 
 	mgr->register_gossip_script(8395, axtu); 
-
 }

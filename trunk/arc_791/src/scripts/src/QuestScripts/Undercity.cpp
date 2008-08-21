@@ -2,7 +2,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL Quest_JourneytoUndercity : public QuestScript 
+class Quest_JourneytoUndercity : public QuestScript 
 { 
 public:
   void CanSelect(Creature *creat)

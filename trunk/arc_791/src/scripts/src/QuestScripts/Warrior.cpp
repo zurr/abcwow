@@ -25,7 +25,7 @@
     Menu->SendTo(plr);
 
 
-class SCRIPT_DECL TheSummoning : public GossipScript
+class TheSummoning : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)
@@ -136,7 +136,7 @@ public:
 
 };
 
-class SCRIPT_DECL BeatBartleby : public QuestScript 
+class BeatBartleby : public QuestScript 
 { 
 public:
 

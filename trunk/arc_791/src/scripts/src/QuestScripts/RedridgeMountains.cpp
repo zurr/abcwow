@@ -20,7 +20,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL MissingInAction : public QuestScript
+class MissingInAction : public QuestScript
 {
 public:
 

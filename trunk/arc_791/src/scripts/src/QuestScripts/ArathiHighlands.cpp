@@ -20,7 +20,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL SunkenTreasure : public QuestScript 
+class SunkenTreasure : public QuestScript 
 { 
 public:
 

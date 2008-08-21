@@ -24,7 +24,7 @@
 
 
 
-class SCRIPT_DECL SpiritScreeches : public GossipScript
+class SpiritScreeches : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)
@@ -112,7 +112,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL StewardOfTime : public GossipScript
+class StewardOfTime : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* Plr, bool AutoSend)

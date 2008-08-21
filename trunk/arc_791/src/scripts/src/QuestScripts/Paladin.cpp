@@ -26,7 +26,7 @@ bool SymbolOfLife(uint32 i, Spell* pSpell) // Alliance ress. quests
     return true;
 
   Player *plr = (Player*)pSpell->u_caster;
-  Creature *target = plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  Creature *target = plr->GetMapMgr()->GetCreature(GET_LOWGUID_PART(plr->GetSelection()));
   
   if(target == NULL)
     return true;
@@ -84,7 +84,7 @@ bool FilledShimmeringVessel(uint32 i, Spell* pSpell) // Blood Elf ress. quest
 
   Player *plr = (Player*)pSpell->u_caster;
   
-  Creature *target = plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  Creature *target = plr->GetMapMgr()->GetCreature(GET_LOWGUID_PART(plr->GetSelection()));
   if(target == NULL)
     return true;
 
@@ -178,13 +178,10 @@ public:
 
 bool DouseEternalFlame(uint32 i, Spell* pSpell)
 {
-	Player *plr = (Player*)pSpell->u_caster;
-	if(!plr)
+	if (pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer())
 		return true;
 
-	if(!pSpell->u_caster->IsPlayer())
-		return true;
-
+	Player *plr = static_cast<Player*>(pSpell->u_caster);
 	QuestLogEntry *qle = plr->GetQuestLogForEntry(9737);
 	if(qle == NULL)
 		return true;

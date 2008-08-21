@@ -86,7 +86,7 @@ protected:
    short friendlyTimer;
 };
 
-class SCRIPT_DECL Cleansing_of_the_Orb_of_Orahil : public QuestScript 
+class Cleansing_of_the_Orb_of_Orahil : public QuestScript 
 { 
 public:
 
@@ -177,7 +177,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL ChallengeOverlordMokMorokk : public QuestScript 
+class ChallengeOverlordMokMorokk : public QuestScript 
 { 
 public:
 
@@ -247,7 +247,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL TheMissingDiplomat2 : public QuestScript 
+class TheMissingDiplomat2 : public QuestScript 
 { 
 public:
 

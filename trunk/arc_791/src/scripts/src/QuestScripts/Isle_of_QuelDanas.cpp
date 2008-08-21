@@ -109,7 +109,7 @@ bool OrbOfMurlocControl(uint32 i, Spell* pSpell)
     return true;
 
   Player *plr = (Player*)pSpell->u_caster;
-  Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature(GET_LOWGUID_PART(plr->GetSelection()));
   
   if(unit_target == NULL)
     return true;

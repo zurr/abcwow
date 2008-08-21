@@ -23,7 +23,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL DraeneiFishingNet : public GossipScript
+class DraeneiFishingNet : public GossipScript
 {
 public:
   void GossipHello(Object * pObject, Player* Plr, bool AutoSend)
@@ -54,7 +54,7 @@ public:
   }
 };
 
-class SCRIPT_DECL TotemofCoo : public QuestScript 
+class TotemofCoo : public QuestScript 
 { 
 public:
 

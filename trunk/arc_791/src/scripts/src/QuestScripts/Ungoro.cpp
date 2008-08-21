@@ -33,7 +33,7 @@ bool SpragglesCanteen(uint32 i, Spell* pSpell)
 
   Player *plr = (Player*)pSpell->u_caster;
   
-  Creature *target = plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  Creature *target = plr->GetMapMgr()->GetCreature(GET_LOWGUID_PART(plr->GetSelection()));
   if(target == NULL)
     return true;
 
@@ -211,7 +211,7 @@ bool TheBaitforLarkorwi2(uint32 i, Spell* pSpell)
   	return true;
 }
 
-class SCRIPT_DECL ChasingAMe01 : public QuestScript
+class ChasingAMe01 : public QuestScript
 {
 public:
 

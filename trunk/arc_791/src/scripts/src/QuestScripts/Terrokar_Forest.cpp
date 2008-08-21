@@ -242,7 +242,7 @@ bool ShatariTorch(uint32 i, Spell* pSpell)
     return true;
 
   Player *plr = (Player*)pSpell->u_caster;
-  Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
+  Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature(GET_LOWGUID_PART(plr->GetSelection()));
   
   if(unit_target == NULL)
     return true;
@@ -290,7 +290,7 @@ bool ShatariTorch(uint32 i, Spell* pSpell)
   return true;
 }
 
-class SCRIPT_DECL TheMomentofTruth : public GossipScript
+class TheMomentofTruth : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)

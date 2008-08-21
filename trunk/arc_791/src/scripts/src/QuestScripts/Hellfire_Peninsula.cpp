@@ -32,16 +32,14 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		if (mKiller->IsPlayer())
+		if ( mKiller->IsPlayer() )
 		{
-			QuestLogEntry *en = NULL;
-			en = static_cast<Player*>(mKiller)->GetQuestLogForEntry(10482);
-			if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
+			QuestLogEntry *pQuest = static_cast< Player* >( mKiller )->GetQuestLogForEntry( 10482 );
+			if ( pQuest != NULL && pQuest->GetMobCount( 0 ) < pQuest->GetQuest()->required_mobcount[0] )
 			{
-				uint32 newcount = en->GetMobCount(0) + 1;
-				en->SetMobCount(0, newcount);
-				en->SendUpdateAddKill(0);
-				en->UpdatePlayerFields();
+				pQuest->SetMobCount( 0, pQuest->GetMobCount( 0 ) + 1 );
+				pQuest->SendUpdateAddKill( 0 );
+				pQuest->UpdatePlayerFields();
 			}
 		}
 	}
@@ -58,17 +56,15 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		if(mKiller->GetTypeId() != TYPEID_PLAYER)
+		if ( !mKiller->IsPlayer() )
 			return;
 
-		QuestLogEntry *en = NULL;
-		en = static_cast<Player*>(mKiller)->GetQuestLogForEntry(10864);
-		if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
+		QuestLogEntry *pQuest = static_cast< Player* >( mKiller )->GetQuestLogForEntry( 10864 );
+		if ( pQuest != NULL && pQuest->GetMobCount( 0 ) < pQuest->GetQuest()->required_mobcount[0] )
 		{
-			uint32 newcount = en->GetMobCount(0) + 1;
-			en->SetMobCount(0, newcount);
-			en->SendUpdateAddKill(0);
-			en->UpdatePlayerFields();
+			pQuest->SetMobCount( 0, pQuest->GetMobCount( 0 ) + 1 );
+			pQuest->SendUpdateAddKill( 0 );
+			pQuest->UpdatePlayerFields();
 		}
 	}
 };
@@ -107,16 +103,15 @@ public:
 	Dreadtusk(Creature* pCreature) : CreatureAIScript(pCreature) { }
 	void OnDied(Unit *mKiller)
 	{
-		if(mKiller->GetTypeId() != TYPEID_PLAYER)
+		if ( !mKiller->IsPlayer() )
 			return;
 
-		QuestLogEntry *qle = NULL;
-		qle = static_cast<Player*>(mKiller)->GetQuestLogForEntry(10255);
-		if(qle)
+		QuestLogEntry *pQuest = static_cast< Player* >( mKiller )->GetQuestLogForEntry( 10255 );
+		if ( pQuest != NULL && pQuest->GetMobCount( 0 ) < pQuest->GetQuest()->required_mobcount[0] )
 		{
-			qle->SetMobCount(0,1);
-			qle->SendUpdateAddKill(0);
-			qle->UpdatePlayerFields();
+			pQuest->SetMobCount( 0, pQuest->GetMobCount( 0 ) + 1 );
+			pQuest->SendUpdateAddKill( 0 );
+			pQuest->UpdatePlayerFields();
 		}
 	}
 };
@@ -124,119 +119,116 @@ public:
 /*--------------------------------------------------------------------------------------------------------*/
 // Zeth'Gor Must Burn!
 
-class ZethGorMustBurnAllianz : public GameObjectAIScript
+class ZethGorMustBurnAlliance : public GameObjectAIScript
 {
 public:
-	ZethGorMustBurnAllianz(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
-	static GameObjectAIScript *Create(GameObject * GO) { return new ZethGorMustBurnAllianz(GO); }
+	ZethGorMustBurnAlliance(GameObject* goinstance) : GameObjectAIScript(goinstance) {}
+	static GameObjectAIScript *Create(GameObject * GO) { return new ZethGorMustBurnAlliance(GO); }
 
 	void OnActivate(Player * pPlayer)
 	{
-		float SSX = pPlayer->GetPositionX();
-		float SSY = pPlayer->GetPositionY();
-		float SSZ = pPlayer->GetPositionZ();
-
-		GameObject *nothern = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-820, 2029, 55, 300150);
-		GameObject *southern = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-1150, 2110, 84, 300150);
-		GameObject *forge = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-893, 1919, 82, 300150);
-		GameObject *foothill = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-978, 1879, 111, 300150);
-		GameObject *Beacon = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( SSX, SSY, SSZ, 184661);
-
-		if(Beacon)
+		QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 10895 );
+		if ( pQuest != NULL )
 		{
-			Beacon->SetUInt32Value(GAMEOBJECT_FLAGS, (Beacon->GetUInt32Value(GAMEOBJECT_FLAGS)-1));
-		}
+			// M4ksiu - WTF IS THIS FOR? :|
+			float SSX = pPlayer->GetPositionX();
+			float SSY = pPlayer->GetPositionY();
+			float SSZ = pPlayer->GetPositionZ();
 
-		if(pPlayer->GetQuestLogForEntry(10895))
-		{
+			GameObject *pBeacon = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( SSX, SSY, SSZ, 184661 );
+			if ( pBeacon != NULL && pBeacon->GetUInt32Value( GAMEOBJECT_FLAGS ) > 0 )
+			{
+				pBeacon->SetUInt32Value( GAMEOBJECT_FLAGS, ( pBeacon->GetUInt32Value( GAMEOBJECT_FLAGS ) - 1 ) );
+			}
+
 			// Northern Zeth'Gor Tower
-			if (nothern != NULL)
-                        {
-                        	if(pPlayer->CalcDistance(pPlayer, nothern) < 40) // if reduced the server will crash when out of range
-                        	{
-					QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10895);
+			if ( pQuest->GetMobCount( 0 ) < pQuest->GetQuest()->required_mobcount[0] )
+			{
+				GameObject *pNorthern = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -820.0f, 2029.0f, 55.0f, 300150 );
+				if ( pNorthern != NULL && pPlayer->CalcDistance( pPlayer, pNorthern ) < 40 ) // if reduced the server will crash when out of range
+				{
+      				pQuest->SetMobCount( 0, pQuest->GetMobCount( 0 ) + 1 );
+					pQuest->SendUpdateAddKill( 0 );
+					pQuest->UpdatePlayerFields();
 
-	      				qle->SetMobCount(0, qle->GetMobCount(0)+1);
-					qle->SendUpdateAddKill(0);
-					qle->UpdatePlayerFields();
-
-					GameObject* obj = 0;
-
-					obj = sEAS.SpawnGameobject(pPlayer, 183816, -819.77, 2029.09, 55.6082, 0, 4);
-     					sEAS.GameobjectDelete(obj, 1*60*1000);
+					GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -819.77f, 2029.09f, 55.6082f, 0, 4 );
+     				if ( pGameobject != NULL )
+					{
+						sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+					}
 
 					return;
 				}
 			}
 
 			// Southern Zeth'Gor Tower
-			if (southern != NULL)
-                        {
-                        	if(pPlayer->CalcDistance(pPlayer, southern) < 40)
-                        	{
-					QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10895);
+			if ( pQuest->GetMobCount( 1 ) < pQuest->GetQuest()->required_mobcount[1] )
+			{
+				GameObject *pSouthern = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -1150.0f, 2110.0f, 84.0f, 300150 );
+                if ( pSouthern != NULL && pPlayer->CalcDistance( pPlayer, pSouthern ) < 40 )
+				{
+					pQuest->SetMobCount( 1, pQuest->GetMobCount( 1 ) + 1 );
+					pQuest->SendUpdateAddKill( 1 );
+					pQuest->UpdatePlayerFields();
 	
-					qle->SetMobCount(1, qle->GetMobCount(1)+1);
-					qle->SendUpdateAddKill(1);
-					qle->UpdatePlayerFields();
-	
-					GameObject* obj = 0;
-	
-					obj = sEAS.SpawnGameobject(pPlayer, 183816, -1150.53, 2109.92, 84.4204, 0, 4);
-	     				sEAS.GameobjectDelete(obj, 1*60*1000);
-	
+					GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1150.53f, 2109.92f, 84.4204f, 0, 4 );
+	     			if ( pGameobject != NULL )
+					{
+						sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+					}
+
 					return;
 				}
 			}
 
 			// Forge Zeth'Gor Tower
-			if (forge)
-                        {
-                        	if(pPlayer->CalcDistance(pPlayer, forge) < 40)
-                        	{
-					QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10895);
+			if ( pQuest->GetMobCount( 2 ) < pQuest->GetQuest()->required_mobcount[2] )
+			{
+				GameObject *pForge = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -893.0f, 1919.0f, 82.0f, 300150 );
+				if ( pForge != NULL && pPlayer->CalcDistance( pPlayer, pForge ) < 40 )
+				{
+					pQuest->SetMobCount( 2, pQuest->GetMobCount( 2 ) + 1 );
+					pQuest->SendUpdateAddKill( 2 );
+					pQuest->UpdatePlayerFields();
 	
-					qle->SetMobCount(2, qle->GetMobCount(2)+1);
-					qle->SendUpdateAddKill(2);
-					qle->UpdatePlayerFields();
-	
-					GameObject* obj = 0;
-	
-					obj = sEAS.SpawnGameobject(pPlayer, 183816, -893.499, 1919.27, 81.6449, 0, 4);
-	     				sEAS.GameobjectDelete(obj, 1*60*1000);
+					GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -893.499f, 1919.27f, 81.6449f, 0, 4 );
+	     			if ( pGameobject != NULL )
+					{
+						sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+					}
 	
 					return;
 				}
 			}
 
 			// Foothill Zeth'Gor Tower
-			if (foothill)
-                        {
-                        	if(pPlayer->CalcDistance(pPlayer, foothill) < 40)
-                        	{
-					QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10895);
+			if ( pQuest->GetMobCount( 3 ) < pQuest->GetQuest()->required_mobcount[3] )
+			{
+				GameObject *pFoothill = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -978.0f, 1879.0f, 111.0f, 300150 );
+				if ( pFoothill != NULL && pPlayer->CalcDistance( pPlayer, pFoothill ) < 40 )
+				{
+					pQuest->SetMobCount( 3, pQuest->GetMobCount( 3 ) + 1 );
+					pQuest->SendUpdateAddKill( 3 );
+					pQuest->UpdatePlayerFields();
 	
-					qle->SetMobCount(3, qle->GetMobCount(3)+1);
-					qle->SendUpdateAddKill(3);
-					qle->UpdatePlayerFields();
-	
-					GameObject* obj = 0;
-	
-					obj = sEAS.SpawnGameobject(pPlayer, 183816, -977.713, 1879.500, 110.892, 0, 4);
-	     				sEAS.GameobjectDelete(obj, 1*60*1000);
+					GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -977.713f, 1879.500f, 110.892f, 0, 4 );
+	     			if ( pGameobject != NULL )
+					{
+						sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+					}
 	
 					return;
 				}
 			}
 			else
 			{
-				pPlayer->BroadcastMessage("You are to far away!");
+				pPlayer->BroadcastMessage( "You are to far away!" );
 			}
 
 		}
 		else
 		{
-				pPlayer->BroadcastMessage("Missing required quest : Zeth'Gor Must Burn");
+			pPlayer->BroadcastMessage( "Missing required quest : Zeth'Gor Must Burn" );
 		}
 	}
 };
@@ -246,110 +238,127 @@ public:
 
 bool ZethGorMustBurnHorde(uint32 i, Spell* pSpell)
 {
-	Player *caster = pSpell->p_caster;
-	if(caster == NULL)
+	Player *pPlayer = pSpell->p_caster;
+	if ( pPlayer == NULL )
 		return true;
-	
-	GameObject *barracks = caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-1137, 1970, 74, 300151);
-	GameObject *eastern = caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-940, 1920, 69, 300151);
-	GameObject *western = caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-1155, 2061, 68, 300151);
-	GameObject *stable = caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-1052, 2007, 66, 300151);
 
-	if(caster->GetQuestLogForEntry(10792))
+	QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 10792 );
+	if ( pQuest != NULL )
 	{
 		// Barracks
-		if (barracks)
+		if ( pQuest->GetMobCount( 0 ) < pQuest->GetQuest()->required_mobcount[0] )
         {
-            if(caster->CalcDistance(caster, barracks) < 30)
+			GameObject *pBarracks = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -1137.0f, 1970.0f, 74.0f, 300151 );
+            if ( pBarracks != NULL && pPlayer->CalcDistance( pPlayer, pBarracks ) < 30 )
             {
-				QuestLogEntry *qle = caster->GetQuestLogForEntry(10792);
+      			pQuest->SetMobCount( 0, pQuest->GetMobCount( 0 ) + 1 );
+				pQuest->SendUpdateAddKill( 0 );
+				pQuest->UpdatePlayerFields();
 	
-	      			qle->SetMobCount(0, qle->GetMobCount(0)+1);
-				qle->SendUpdateAddKill(0);
-				qle->UpdatePlayerFields();
-	
-				GameObject* obj = 0;
-	
-				obj = sEAS.SpawnGameobject(caster, 183816, -1129.08, 1921.77, 94.0074, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-	     			obj = sEAS.SpawnGameobject(caster, 183816, -1135.00, 1944.05, 84.7084, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-	     			obj = sEAS.SpawnGameobject(caster, 183816, -1152.01, 1945.00, 102.901, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-	     			obj = sEAS.SpawnGameobject(caster, 183816, -1159.60, 1958.76, 83.0412, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-	     			obj = sEAS.SpawnGameobject(caster, 183816, -1126.17, 1880.96, 95.065, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-	     			obj = sEAS.SpawnGameobject(caster, 183816, -1185.79, 1968.29, 90.931, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-			}
+				GameObject *pGameobject = NULL;
+				pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1129.08f, 1921.77f, 94.0074f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
 
-			return true;
+	     		pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1135.00f, 1944.05f, 84.7084f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
+
+	     		pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1152.01f, 1945.00f, 102.901f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
+
+	     		pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1159.60f, 1958.76f, 83.0412f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
+
+	     		pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1126.17f, 1880.96f, 95.065f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
+
+	     		pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1185.79f, 1968.29f, 90.931f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
+
+				return true;
+			}
 		}
 
 		// Eastern Hovel
-		if (eastern)
+		if ( pQuest->GetMobCount( 1 ) < pQuest->GetQuest()->required_mobcount[1] )
         {
-            if(caster->CalcDistance(caster, eastern) < 30)
+			GameObject *pEasternHovel = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -940.0f, 1920.0f, 69.0f, 300151 );
+            if ( pEasternHovel != NULL && pPlayer->CalcDistance( pPlayer, pEasternHovel ) < 30 )
             {
-				QuestLogEntry *qle = caster->GetQuestLogForEntry(10792);
+      			pQuest->SetMobCount( 1, pQuest->GetMobCount( 1 ) + 1 );
+				pQuest->SendUpdateAddKill( 1 );
+				pQuest->UpdatePlayerFields();
 	
-	      			qle->SetMobCount(1, qle->GetMobCount(1)+1);
-				qle->SendUpdateAddKill(1);
-				qle->UpdatePlayerFields();
-	
-				GameObject* obj = 0;
-	
-				obj = sEAS.SpawnGameobject(caster, 183816, -938.034, 1924.153, 73.590, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-			}
+				GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -938.034f, 1924.153f, 73.590f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
 
-			return true;
+				return true;
+			}
 		}
 
 		// Western Hovel
-		if (western)
+		if ( pQuest->GetMobCount( 2 ) < pQuest->GetQuest()->required_mobcount[2] )
         {
-            if(caster->CalcDistance(caster, western) < 30)
+			GameObject *pWesternHovel = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -1155.0f, 2061.0f, 68.0f, 300151 );
+            if ( pWesternHovel != NULL && pPlayer->CalcDistance( pPlayer, pWesternHovel ) < 30 )
             {
-				QuestLogEntry *qle = caster->GetQuestLogForEntry(10792);
+      			pQuest->SetMobCount( 2, pQuest->GetMobCount( 2 ) + 1 );
+				pQuest->SendUpdateAddKill( 2 );
+				pQuest->UpdatePlayerFields();
 	
-	      			qle->SetMobCount(2, qle->GetMobCount(2)+1);
-				qle->SendUpdateAddKill(2);
-				qle->UpdatePlayerFields();
-	
-				GameObject* obj = 0;
-	
-				obj = sEAS.SpawnGameobject(caster, 183816, -1152.10, 2066.20, 72.959, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-			}
+				GameObject * pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1152.10f, 2066.20f, 72.959f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
 
-			return true;
+				return true;
+			}
 		}
 
 		// Stable
-		if (stable)
+		if ( pQuest->GetMobCount( 3 ) < pQuest->GetQuest()->required_mobcount[3] )
         {
-            if(caster->CalcDistance(caster, stable) < 30)
+			GameObject *pStable = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -1052.0f, 2007.0f, 66.0f, 300151 );
+            if ( pStable != NULL && pPlayer->CalcDistance( pPlayer, pStable ) < 30 )
             {
-				QuestLogEntry *qle = caster->GetQuestLogForEntry(10792);
+	      		pQuest->SetMobCount( 3, pQuest->GetMobCount( 3 ) + 1 );
+				pQuest->SendUpdateAddKill( 3 );
+				pQuest->UpdatePlayerFields();
 	
-	      			qle->SetMobCount(3, qle->GetMobCount(3)+1);
-				qle->SendUpdateAddKill(3);
-				qle->UpdatePlayerFields();
-	
-				GameObject* obj = 0;
-	
-				obj = sEAS.SpawnGameobject(caster, 183816, -1058.85, 2010.95, 68.776, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-			}
+				GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -1058.85f, 2010.95f, 68.776f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
 
-			return true;
+				return true;
+			}
 		}
 	}
 	else
 	{
-		caster->BroadcastMessage("Missing required quest : Zeth'Gor Must Burn");
+		pPlayer->BroadcastMessage( "Missing required quest : Zeth'Gor Must Burn" );
 	}
 
 	return true;
@@ -358,102 +367,98 @@ bool ZethGorMustBurnHorde(uint32 i, Spell* pSpell)
 /*--------------------------------------------------------------------------------------------------------*/
 // Laying Waste to the Unwanted
 
-bool LayingWasteToTheUnwantedAllianz(uint32 i, Spell* pSpell)
+bool LayingWasteToTheUnwantedAlliance(uint32 i, Spell* pSpell)
 {
-	Player *caster = pSpell->p_caster;
-	if(caster == NULL)
+	Player *pPlayer = pSpell->p_caster;
+	if ( pPlayer == NULL )
 		return true;
-	
-	GameObject *eastern = caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-155, 2517, 43, 300152);
-	GameObject *ceastern = caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-152, 2661, 44, 300152);
-	GameObject *cwestern = caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-174, 2772, 32, 300152);
-	GameObject *western = caster->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-166, 2818, 29, 300152);
 
-	if(caster->GetQuestLogForEntry(10078))
+	QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 10078 );
+	if ( pQuest != NULL )
 	{
 		// Eastern Thrower
-		if (eastern)
+		if ( pQuest->GetMobCount( 0 ) < pQuest->GetQuest()->required_mobcount[0] )
 		{
-			if(caster->CalcDistance(caster, eastern) < 30)
+			GameObject *pEasternTower = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-155.0f, 2517.0f, 43.0f, 300152);
+			if ( pEasternTower != NULL && pPlayer->CalcDistance( pPlayer, pEasternTower ) < 30 )
             {
-				QuestLogEntry *qle = caster->GetQuestLogForEntry(10078);
+      			pQuest->SetMobCount( 0, pQuest->GetMobCount( 0 ) + 1 );
+				pQuest->SendUpdateAddKill( 0 );
+				pQuest->UpdatePlayerFields();
 	
-	      			qle->SetMobCount(0, qle->GetMobCount(0)+1);
-				qle->SendUpdateAddKill(0);
-				qle->UpdatePlayerFields();
-	
-				GameObject* obj = 0;
-	
-				obj = sEAS.SpawnGameobject(caster, 183816, -157.916, 2517.71, 58.5508, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-			}
+				GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -157.916f, 2517.71f, 58.5508f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
 
-			return true;
+				return true;
+			}
 		}
 
 		// Central Eastern Thrower
-		if (ceastern)
+		if ( pQuest->GetMobCount( 1 ) < pQuest->GetQuest()->required_mobcount[1] )
 		{
-			if(caster->CalcDistance(caster, ceastern) < 30)
+			GameObject *pCentralEasternTower = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -152.0f, 2661.0f, 44.0f, 300152 );
+			if ( pCentralEasternTower != NULL && pPlayer->CalcDistance( pPlayer, pCentralEasternTower ) < 30 )
 			{
-				QuestLogEntry *qle = caster->GetQuestLogForEntry(10078);
+      			pQuest->SetMobCount( 1, pQuest->GetMobCount( 1 ) + 1 );
+				pQuest->SendUpdateAddKill( 1 );
+				pQuest->UpdatePlayerFields();
 	
-	      			qle->SetMobCount(1, qle->GetMobCount(1)+1);
-				qle->SendUpdateAddKill(1);
-				qle->UpdatePlayerFields();
-	
-				GameObject* obj = 0;
-	
-				obj = sEAS.SpawnGameobject(caster, 183816, -152.527, 2661.99, 60.8123, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-			}
+				GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -152.527f, 2661.99f, 60.8123f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
 
-			return true;
+				return true;
+			}
 		}
 
 		// Central Western Thrower
-		if (cwestern)
+		if ( pQuest->GetMobCount( 2 ) < pQuest->GetQuest()->required_mobcount[2] )
 		{
-			if(caster->CalcDistance(caster, cwestern) < 30)
+			GameObject *pCentralWesternTower = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -174.0f, 2772.0f, 32.0f, 300152 );
+			if ( pCentralWesternTower != NULL && pPlayer->CalcDistance( pPlayer, pCentralWesternTower ) < 30 )
 			{
-				QuestLogEntry *qle = caster->GetQuestLogForEntry(10078);
+      			pQuest->SetMobCount( 2, pQuest->GetMobCount( 2 ) + 1 );
+				pQuest->SendUpdateAddKill( 2 );
+				pQuest->UpdatePlayerFields();
 	
-	      			qle->SetMobCount(2, qle->GetMobCount(2)+1);
-				qle->SendUpdateAddKill(2);
-				qle->UpdatePlayerFields();
-	
-				GameObject* obj = 0;
-	
-				obj = sEAS.SpawnGameobject(caster, 183816, -177.916, 2773.75, 48.636, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-			}
+				GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -177.916f, 2773.75f, 48.636f, 0, 4 );
+				if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
 
-			return true;
+				return true;
+			}
 		}
 
 		// Western Thrower
-		if (western)
+		if ( pQuest->GetMobCount( 3 ) < pQuest->GetQuest()->required_mobcount[3] )
 		{
-			if(caster->CalcDistance(caster, western) < 30)
+			GameObject *pWesternTower = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -166.0f, 2818.0f, 29.0f, 300152 );
+			if ( pWesternTower != NULL && pPlayer->CalcDistance( pPlayer, pWesternTower ) < 30 )
 			{
-				QuestLogEntry *qle = caster->GetQuestLogForEntry(10078);
+      			pQuest->SetMobCount( 3, pQuest->GetMobCount( 3 ) + 1 );
+				pQuest->SendUpdateAddKill( 3 );
+				pQuest->UpdatePlayerFields();
 	
-	      			qle->SetMobCount(3, qle->GetMobCount(3)+1);
-				qle->SendUpdateAddKill(3);
-				qle->UpdatePlayerFields();
-	
-				GameObject* obj = 0;
-	
-				obj = sEAS.SpawnGameobject(caster, 183816, -166, 2818, 29, 0, 4);
-	     			sEAS.GameobjectDelete(obj, 1*60*1000);
-			}
+				GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -166.0f, 2818.0f, 29.0f, 0, 4 );
+	     		if ( pGameobject != NULL )
+				{
+	     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+				}
 
-			return true;
+				return true;
+			}
 		}
 	}
 	else
 	{
-		caster->BroadcastMessage("Missing required quest : Laying Waste to the Unwanted");
+		pPlayer->BroadcastMessage( "Missing required quest : Laying Waste to the Unwanted" );
 	}
 
 	return true;
@@ -465,56 +470,53 @@ bool LayingWasteToTheUnwantedAllianz(uint32 i, Spell* pSpell)
 
 bool BurnItUp(uint32 i, Spell* pSpell)
 {
-	Player *pPlayer = (Player*)pSpell->u_caster;
-	if(!pPlayer)
+	if ( pSpell == NULL || pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer() )
 		return true;
 
-	if(!pSpell->u_caster->IsPlayer())
+	Player *pPlayer = static_cast< Player* >( pSpell->u_caster );
+
+	QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 10087 );
+	if ( pQuest == NULL )
 		return true;
 
-	QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10087);
-	if(qle == NULL)
-		return true;
-
-	GameObject *east = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-300, 2407, 50, 185122);
-	GameObject *west = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-350, 2708, 35, 185122);
-
-
-	if(east)
+	if ( pQuest->GetMobCount( 0 ) < pQuest->GetQuest()->required_mobcount[0] )
 	{
-		if(pPlayer->CalcDistance(pPlayer, east) < 30)
-		if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+		GameObject *pEastern = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -300.0f, 2407.0f, 50.0f, 185122 );
+		if ( pEastern != NULL && pPlayer->CalcDistance( pPlayer, pEastern ) < 30 )
 		{
-			qle->SetMobCount(0, qle->GetMobCount(0)+1);
-			qle->SendUpdateAddKill(0);
-			qle->UpdatePlayerFields();
+			pQuest->SetMobCount( 0, pQuest->GetMobCount( 0 ) + 1 );
+			pQuest->SendUpdateAddKill( 0 );
+			pQuest->UpdatePlayerFields();
 			
-			GameObject* obj = 0;
-
-			obj = sEAS.SpawnGameobject(pPlayer, 183816, -300, 2407, 50, 0, 4);
-     			sEAS.GameobjectDelete(obj, 1*60*1000);
+			GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, -300.0f, 2407.0f, 50.0f, 0, 4 );
+			if ( pGameobject != NULL )
+			{
+     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+			}
 
 			return true;
 		}
 	}
 
-	if(west)
+	if ( pQuest->GetMobCount( 1 ) < pQuest->GetQuest()->required_mobcount[1] )
 	{
-		if(pPlayer->CalcDistance(pPlayer, west) < 30)
-		if(qle->GetMobCount(1) < qle->GetQuest()->required_mobcount[1])
+		GameObject *pWestern = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -350.0f, 2708.0f, 35.0f, 185122 );
+		if ( pWestern != NULL && pPlayer->CalcDistance( pPlayer, pWestern ) < 30 )
 		{
-			qle->SetMobCount(1, qle->GetMobCount(1)+1);
-			qle->SendUpdateAddKill(1);
-			qle->UpdatePlayerFields();
+			pQuest->SetMobCount( 1, pQuest->GetMobCount( 1 ) + 1 );
+			pQuest->SendUpdateAddKill( 1 );
+			pQuest->UpdatePlayerFields();
 			
-			GameObject* obj = 0;
-
-			obj = sEAS.SpawnGameobject(pPlayer, 183816, -350, 2708, 35, 0, 4);
-     			sEAS.GameobjectDelete(obj, 1*60*1000);
+			GameObject *pGameobject = sEAS.SpawnGameobject(pPlayer, 183816, -350.0f, 2708.0f, 35.0f, 0, 4);
+			if ( pGameobject != NULL )
+			{
+     			sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+			}
 
 			return true;
 		}
 	}
+
 	return true;
 }
 
@@ -525,21 +527,23 @@ bool BurnItUp(uint32 i, Spell* pSpell)
 
 bool CleansingtheWater(uint32 i, Spell* pSpell) 
 {
-  Player *pPlayer = (Player*)pSpell->u_caster;
-  if(!pPlayer)
-	  return true;
-  if(!pSpell->u_caster->IsPlayer())
-    return true;
+	if ( pSpell == NULL || pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer() )
+		return true;
 
-  QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(9427);
-  if(qle == NULL)
-    return true;
+	Player *pPlayer = static_cast< Player* >( pSpell->u_caster );
 
-  Creature *agg = sEAS.SpawnCreature(pPlayer, 17000, 428.15, 3461.73, 63.40, 0, 0);
-  agg->Despawn(6*60*1000, 0);
-  return true;
+	QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 9427 );
+	if ( pQuest == NULL )
+		return true;
+
+	Creature *pAggonis = sEAS.SpawnCreature( pPlayer, 17000, 428.15f, 3461.73f, 63.40f, 0, 0 );
+	if ( pAggonis != NULL )
+	{
+		pAggonis->Despawn( 6 * 60 * 1000, 0 );
+	}
+
+	return true;
 }
-
 
 
 /*--------------------------------------------------------------------------------------------------------*/
@@ -548,214 +552,104 @@ bool CleansingtheWater(uint32 i, Spell* pSpell)
 #define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, pPlayer); \
     Menu->SendTo(pPlayer);
 
-
-class SCRIPT_DECL Prisoner1 : public GossipScript
+class PrisonerGossip : public GossipScript
 {
 public:
-    	void GossipHello(Object* pObject, Player* pPlayer, bool AutoSend)
-    	{
-		if(!pPlayer)
+	void GossipHello(Object* pObject, Player* pPlayer, bool AutoSend)
+	{
+		if ( pPlayer == NULL )			// useless, but who knows
 			return;
 
-        	GossipMenu *Menu;
-		Creature *Prisoner1 = (Creature*)(pObject);
-		
-		if (Prisoner1 == NULL)
-			return;
-		
-		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10104, pPlayer);
-		
-		QuestLogEntry *en = pPlayer->GetQuestLogForEntry(10368);
-		if(en && en->GetMobCount(0) == en->GetQuest()->required_mobcount[0])
+		if ( !pObject->IsCreature() )	// can't imagine to get this null lol
 			return;
 
-		if(pPlayer->GetQuestLogForEntry(10368) && pPlayer->GetItemInterface()->GetItemCount(29501) > 0)
-			Menu->AddItem( 0, "Walk free, Elder. Bring the spirits back to your tribe.", 1);
-	 
-		if(AutoSend)
-			Menu->SendTo(pPlayer);
-    	}
- 
-	void GossipSelectOption(Object* pObject, Player* pPlayer, uint32 Id, uint32 IntId, const char * EnteredCode)
-    	{
-		if(!pPlayer)
-			return;
-
-		Creature *Prisoner1 = (Creature*)(pObject);
-		if (Prisoner1 == NULL)
-			return;
-
-		switch (IntId)
+		int32 i = -1;
+		Creature *pPrisoner = static_cast< Creature* >( pObject );
+		switch ( pPrisoner->GetEntry() )
 		{
-			case 0:
-				GossipHello(pObject, pPlayer, true);
-				break;
- 
-			case 1:
-			{
-			QuestLogEntry *en = pPlayer->GetQuestLogForEntry(10368);
-			if(en && en->GetMobCount(0) < en->GetQuest()->required_mobcount[0])
-			{
-				en->SetMobCount(0, en->GetMobCount(0) + 1);
-				en->SendUpdateAddKill(0);
-				en->UpdatePlayerFields();
+		case 20677:
+			i = 0;
+			break;
+		case 20678:
+			i = 1;
+			break;
+		case 20679:
+			i = 2;
+			break;
+		}
 
-				if(!Prisoner1)
-					return;
+		if ( i == -1 )
+			return;
 
-				Prisoner1->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You've freed me! The winds speak to my people one again and grant us their strength. I thank you, stranger.");
-				Prisoner1->Despawn(5000, 6*60*1000);
-				Prisoner1->SetStandState(STANDSTATE_STAND);
-				return;
-			}break;
+		QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 10368 );
+		if ( pQuest != NULL && pQuest->GetMobCount( i ) < pQuest->GetQuest()->required_mobcount[i] )
+		{
+			if ( pPlayer->GetItemInterface()->GetItemCount( 29501 ) > 0 )
+			{
+				GossipMenu *Menu;
+				objmgr.CreateGossipMenuForPlayer( &Menu, pObject->GetGUID(), 10104, pPlayer );
+				Menu->AddItem( 0, "Walk free, Elder. Bring the spirits back to your tribe.", 1 );
+				if ( AutoSend )
+					Menu->SendTo( pPlayer );
 			}
 		}
-	}
- 
-    	void Destroy()
-    	{
-       		delete this;
-    	}
-};
-
-
-class SCRIPT_DECL Prisoner2 : public GossipScript
-{
-public:
-    	void GossipHello(Object* pObject, Player* pPlayer, bool AutoSend)
-    	{
-		if(!pPlayer)
-			return;
-
-        GossipMenu *Menu;
-		Creature *Prisoner2 = (Creature*)(pObject);
-		if (Prisoner2 == NULL)
-			return;
-			
-		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10105, pPlayer);
-
-		QuestLogEntry *en = pPlayer->GetQuestLogForEntry(10368);
-		if(en && en->GetMobCount(0) == en->GetQuest()->required_mobcount[0])
-			return;
-
-		if(pPlayer->GetQuestLogForEntry(10368) && pPlayer->GetItemInterface()->GetItemCount(29501) > 0)
-			Menu->AddItem( 0, "Walk free, Elder. Bring the spirits back to your tribe.", 1);
-	 
-		if(AutoSend)
-			Menu->SendTo(pPlayer);
-    	}
+   	}
  
 	void GossipSelectOption(Object* pObject, Player* pPlayer, uint32 Id, uint32 IntId, const char * EnteredCode)
-    	{
-		if(!pPlayer)
+    {
+		if ( pPlayer == NULL )
 			return;
 
-		Creature *Prisoner2 = (Creature*)(pObject);
-		if (Prisoner2 == NULL)
+		if ( !pObject->IsCreature() )
 			return;
 
-		switch (IntId)
+		switch ( IntId )
 		{
-			case 0:
-				GossipHello(pObject, pPlayer, true);
+		case 0:
+			GossipHello( pObject, pPlayer, true );
+			break;
+		case 1:
+		{
+			int32 i = -1;
+			Creature *pPrisoner = static_cast< Creature* >( pObject );
+			switch ( pPrisoner->GetEntry() )
+			{
+			case 20677:
+				i = 0;
 				break;
- 
-			case 1:
-			{
-			QuestLogEntry *en = pPlayer->GetQuestLogForEntry(10368);
-			if(en && en->GetMobCount(1) < en->GetQuest()->required_mobcount[1])
-			{
-				en->SetMobCount(1, en->GetMobCount(1) + 1);
-				en->SendUpdateAddKill(1);
-				en->UpdatePlayerFields();
-
-				if(!Prisoner2)
-					return;
-
-				Prisoner2->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "I am free! I will ask the spirit of fire to return to us so that my people may have the courage to fight their masters! I thank you.");
-				Prisoner2->Despawn(5000, 6*60*1000);
-				Prisoner2->SetStandState(STANDSTATE_STAND);
-				return;
-			}break;
+			case 20678:
+				i = 1;
+				break;
+			case 20679:
+				i = 2;
+				break;
 			}
+
+			if ( i == -1 )
+				return;
+
+			QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 10368 );
+			if ( pQuest != NULL && pQuest->GetMobCount( i ) < pQuest->GetQuest()->required_mobcount[i] )
+			{
+				pQuest->SetMobCount( i, pQuest->GetMobCount( i ) + 1 );
+				pQuest->SendUpdateAddKill( i );
+				pQuest->UpdatePlayerFields();
+
+				pPrisoner->SendChatMessage( CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "You've freed me! The winds speak to my people one again and grant us their strength. I thank you, stranger." );
+				pPrisoner->Despawn( 5000, 6 * 60 * 1000 );
+				pPrisoner->SetStandState( STANDSTATE_STAND );
+			}
+		}break;
 		}
 	}
- 
-    	void Destroy()
-    	{
-        	delete this;
-    	}
+
+    void Destroy()
+    {
+    	delete this;
+    }
 };
 
-
-class SCRIPT_DECL Prisoner3 : public GossipScript
-{
-public:
-    	void GossipHello(Object* pObject, Player* pPlayer, bool AutoSend)
-    	{
-		if(!pPlayer)
-			return;
-
-        GossipMenu *Menu;
-		Creature *Prisoner3 = (Creature*)(pObject);
-		if (Prisoner3 == NULL)
-			return;
-
-		objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 10103, pPlayer);
-
-		QuestLogEntry *en = pPlayer->GetQuestLogForEntry(10368);
-		if(en && en->GetMobCount(0) == en->GetQuest()->required_mobcount[0])
-			return;
-
-		if(pPlayer->GetQuestLogForEntry(10368) && pPlayer->GetItemInterface()->GetItemCount(29501) > 0)
-			Menu->AddItem( 0, "Walk free, Elder. Bring the spirits back to your tribe.", 1);
-	 
-		if(AutoSend)
-			Menu->SendTo(pPlayer);
-    	}
- 
-	void GossipSelectOption(Object* pObject, Player* pPlayer, uint32 Id, uint32 IntId, const char * EnteredCode)
-    	{
-		if(!pPlayer)
-			return;
-
-		Creature *Prisoner3 = (Creature*)(pObject);
-		if (Prisoner3 == NULL)
-			return;
-
-		switch (IntId)
-		{
-			case 0:
-				GossipHello(pObject, pPlayer, true);
-				break;
- 
-			case 1:
-			{
-			QuestLogEntry *en = pPlayer->GetQuestLogForEntry(10368);
-			if(en && en->GetMobCount(2) < en->GetQuest()->required_mobcount[2])
-			{
-				en->SetMobCount(2, en->GetMobCount(2) + 1);
-				en->SendUpdateAddKill(2);
-				en->UpdatePlayerFields();
-
-				if(!Prisoner3)
-					return;
-
-				Prisoner3->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "I'm free! The spirit of water returns to my people. It will bring us the wisdom we need to survive in this harsh land. I am in your debt.");
-				Prisoner3->Despawn(5000, 6*60*1000);
-				Prisoner3->SetStandState(STANDSTATE_STAND);
-				return;
-			}break;
-			}
-		}
-	}
- 
-    	void Destroy()
-    	{
-        	delete this;
-    	}
-};
-
+// Limbo state?
 class PrisonersDreghoodElders : public CreatureAIScript
 {
 public:
@@ -764,12 +658,11 @@ public:
 
   	void OnLoad()
   	{
-    		_unit->SetStandState(STANDSTATE_SIT);
-    		_unit->setDeathState(CORPSE);
-    		_unit->GetAIInterface()->m_canMove = false;
+    	_unit->SetStandState( STANDSTATE_SIT );
+    	_unit->setDeathState( CORPSE );
+    	_unit->GetAIInterface()->m_canMove = false;
   	}
 };
-
 
 
 /*--------------------------------------------------------------------------------------------------------*/
@@ -777,153 +670,128 @@ public:
 
 bool TheSeersRelic(uint32 i, Spell* pSpell)
 {
-  if(!pSpell->u_caster->IsPlayer())
-    return true;
+	if ( pSpell == NULL || pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer() )
+		return true;
 
-  Player *plr = (Player*)pSpell->u_caster;
+	Player *pPlayer = static_cast< Player* >( pSpell->u_caster );
+	QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 9545 );
+	if ( pQuest == NULL || pQuest->GetMobCount( 0 ) >= pQuest->GetQuest()->required_mobcount[0] )
+		return true;
+
+	Creature *pTarget = pPlayer->GetMapMgr()->GetCreature( GET_LOWGUID_PART( pPlayer->GetSelection() ) );
+	if ( pTarget == NULL )
+		return true;
+
+	if ( pTarget->GetEntry() != 16852 )
+		return true;
+
+	pTarget->SetStandState( 0 );
+	pTarget->setDeathState( ALIVE );
+	pTarget->Despawn( 30 * 1000, 1 * 60 * 1000 );
   
-  Creature *target = plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
-  if(target == NULL)
-    return true;
+	pQuest->SetMobCount( 0, 1 );
+	pQuest->SendUpdateAddKill( 0 );
+	pQuest->UpdatePlayerFields();
 
-  if(target->GetEntry() != 16852)
-    return true;
-
-  QuestLogEntry *qle = plr->GetQuestLogForEntry(9545);
-  if(qle == NULL)
-    return true;
-
-  target->SetStandState(0);
-  target->setDeathState(ALIVE);
-
-  target->Despawn(30*1000, 1*60*1000);
-
-  qle->SetMobCount(0, 1);
-  qle->SendUpdateAddKill(0);
-  qle->UpdatePlayerFields();
-
-  return true;
+	return true;
 }
 
 
 /*--------------------------------------------------------------------------------------------------------*/
 // Disrupt Their Reinforcements
 
-
 bool DisruptTheirReinforcements(uint32 i, Spell* pSpell)
 {
-	Player *pPlayer = (Player*)pSpell->u_caster;
-	if(!pPlayer)
+	if ( pSpell == NULL || pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer() )
 		return true;
 
-	if(!pSpell->u_caster->IsPlayer())
-		return true;
-	
-	//Alliace
-	GameObject *grimh = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-419, 1847, 80, 184414);
-	GameObject *kaalez = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-548, 1782, 58, 184415);
-	//Horde
-	GameObject *xilus = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(-85, 1880, 74, 184290);	
-	GameObject *kruul = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(147, 1717, 38, 184289);
+	Player *pPlayer = static_cast< Player* >( pSpell->u_caster );
+	QuestLogEntry *pQuestA = pPlayer->GetQuestLogForEntry( 10144 );
+	QuestLogEntry *pQuestH = pPlayer->GetQuestLogForEntry( 10208 );
 
-
-	QuestLogEntry *qleA = pPlayer->GetQuestLogForEntry(10144);
-	QuestLogEntry *qleH = pPlayer->GetQuestLogForEntry(10208);
-
-	if(qleA)
+	if ( pQuestA != NULL )
 	{
-		if(grimh)
+		bool SendMsg = false;
+		if ( pQuestA->GetMobCount( 0 ) < pQuestA->GetQuest()->required_mobcount[0] )
 		{
-			if(pPlayer->CalcDistance(pPlayer, grimh) < 10)
+			GameObject *pGrimh = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -419.0f, 1847.0f, 80.0f, 184414 );
+			if ( pGrimh != NULL && pPlayer->CalcDistance( pPlayer, pGrimh ) < 10 )
 			{
-				if(qleA->GetMobCount(0) < qleA->GetQuest()->required_mobcount[0])
-				{
-					qleA->SetMobCount(0, qleA->GetMobCount(0)+1);
-					qleA->SendUpdateAddKill(0);
-					qleA->UpdatePlayerFields();
-
-					return true;
-				}
+				pQuestA->SetMobCount( 0, pQuestA->GetMobCount( 0 ) + 1 );
+				pQuestA->SendUpdateAddKill( 0 );
+				pQuestA->UpdatePlayerFields();
+				return true;
 			}
 			else
 			{
-				pPlayer->BroadcastMessage("Go to the Port of the Dark Legion!");
+				SendMsg = true;
 			}
 		}
-
-		if(kaalez)
+		if ( pQuestA->GetMobCount( 1 ) < pQuestA->GetQuest()->required_mobcount[1] )
 		{
-			if(pPlayer->CalcDistance(pPlayer, kaalez) < 10)
+			GameObject *pKaalez = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -548.0f, 1782.0f, 58.0f, 184415 );
+			if ( pKaalez != NULL && pPlayer->CalcDistance( pPlayer, pKaalez ) < 10 )
 			{
-				if(qleA->GetMobCount(1) < qleA->GetQuest()->required_mobcount[1])
-				{
-					qleA->SetMobCount(1, qleA->GetMobCount(1)+1);
-					qleA->SendUpdateAddKill(1);
-					qleA->UpdatePlayerFields();
-		
-					return true;
-				}
+				pQuestA->SetMobCount( 1, pQuestA->GetMobCount( 1 ) + 1 );
+				pQuestA->SendUpdateAddKill( 1 );
+				pQuestA->UpdatePlayerFields();
+				return true;
 			}
 			else
 			{
-				pPlayer->BroadcastMessage("Go to the Port of the Dark Legion!");
+				SendMsg = true;
 			}
 		}
-		else
+
+		if ( SendMsg )
 		{
-			pPlayer->BroadcastMessage("Go to the Port of the Dark Legion!");
+			pPlayer->BroadcastMessage( "Go to the Port of the Dark Legion!" );
 		}
 	}
-
-	if(qleH)
+	else if ( pQuestH != NULL )
 	{
-		if(xilus)
+		bool SendMsg = false;
+		if ( pQuestH->GetMobCount( 0 ) < pQuestH->GetQuest()->required_mobcount[0] )
 		{
-			if(pPlayer->CalcDistance(pPlayer, xilus) < 10)
+			GameObject *pXilus = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( -85.0f, 1880.0f, 74.0f, 184290 );
+			if ( pXilus != NULL && pPlayer->CalcDistance( pPlayer, pXilus ) < 10 )
 			{
-				if(qleH->GetMobCount(0) < qleH->GetQuest()->required_mobcount[0])
-				{
-					qleH->SetMobCount(0, qleH->GetMobCount(0)+1);
-					qleH->SendUpdateAddKill(0);
-					qleH->UpdatePlayerFields();
-
-					return true;
-				}
+				pQuestH->SetMobCount( 0, pQuestH->GetMobCount( 0 ) + 1 );
+				pQuestH->SendUpdateAddKill( 0 );
+				pQuestH->UpdatePlayerFields();
+				return true;
 			}
 			else
 			{
-				pPlayer->BroadcastMessage("Go to the Port of the Dark Legion!");
+				SendMsg = true;
 			}
 		}
-
-		if(kruul)
+		if ( pQuestH->GetMobCount( 1 ) < pQuestH->GetQuest()->required_mobcount[1] )
 		{
-			if(pPlayer->CalcDistance(pPlayer, kruul) < 10)
+			GameObject *pKruul = pPlayer->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords( 147.0f, 1717.0f, 38.0f, 184289 );
+			if ( pKruul != NULL && pPlayer->CalcDistance( pPlayer, pKruul ) < 10 )
 			{
-				if(qleH->GetMobCount(1) < qleH->GetQuest()->required_mobcount[1])
-				{
-					qleH->SetMobCount(1, qleH->GetMobCount(1)+1);
-					qleH->SendUpdateAddKill(1);
-					qleH->UpdatePlayerFields();
-		
-					return true;
-				}
+				pQuestH->SetMobCount( 1, pQuestH->GetMobCount( 1 ) + 1 );
+				pQuestH->SendUpdateAddKill( 1 );
+				pQuestH->UpdatePlayerFields();
+				return true;
 			}
 			else
 			{
-				pPlayer->BroadcastMessage("Go to the Port of the Dark Legion!");
+				SendMsg = true;
 			}
 		}
-		else
+
+		if ( SendMsg )
 		{
-			pPlayer->BroadcastMessage("Go to the Port of the Dark Legion!");
+			pPlayer->BroadcastMessage( "Go to the Port of the Dark Legion!" );
 		}
 	}
-	
 	else
 	{
-		pPlayer->BroadcastMessage("Missing required quest : Disrupt Their Reinforcements");
+		pPlayer->BroadcastMessage( "Missing required quest : Disrupt Their Reinforcements" );
 	}
+
 	return true;
 }
 
@@ -931,31 +799,23 @@ bool DisruptTheirReinforcements(uint32 i, Spell* pSpell)
 /*--------------------------------------------------------------------------------------------------------*/
 //Arzeth's Demise
 
-bool FuryoftheDreghoodElders(uint32 i, Spell* pSpell)
+bool FuryOfTheDreghoodElders(uint32 i, Spell* pSpell)
 {
-	
-	Player *caster = pSpell->p_caster;
-	if(caster == NULL)
+	if ( pSpell == NULL || pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer() )
 		return true;
 
-	if(!pSpell->GetUnitTarget()->IsCreature())
-		return true;
-		
-	Creature* target = static_cast<Creature*>(pSpell->GetUnitTarget());
-	uint32 entry = target->GetEntry();
+	Player *pPlayer = static_cast< Player* >( pSpell->u_caster );
 
-	if(entry == 19354)
-	{
-		caster->BroadcastMessage("blaah");
-
-		target->Despawn(0, 3*60*1000);
-		sEAS.SpawnCreature(caster, 20680, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 5*60*1000);
-		
+	Unit *pUnit = pSpell->GetUnitTarget();
+	if ( pUnit == NULL || !pUnit->IsCreature() || static_cast< Creature* >( pUnit )->GetEntry() != 19354 )
 		return true;
-	}
+
+	//pPlayer->BroadcastMessage("blaah");	// Really blizzlike?
+	static_cast< Creature* >( pUnit )->Despawn( 0, 3 * 60 * 1000 );
+	sEAS.SpawnCreature( pPlayer, 20680, pUnit->GetPositionX(), pUnit->GetPositionY(), pUnit->GetPositionZ(), pUnit->GetOrientation(), 5 * 60 * 1000 );
+
 	return true;
 }
-
 
 
 /*--------------------------------------------------------------------------------------------------------*/
@@ -963,25 +823,24 @@ bool FuryoftheDreghoodElders(uint32 i, Spell* pSpell)
 
 bool ASpiritGuide(uint32 i, Spell* pSpell)
 {
-  	Player *pPlayer = (Player*)pSpell->u_caster;
-  	if(!pPlayer)
-	  	return true;
+	if ( pSpell == NULL || pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer() )
+		return true;
 
-  	if(!pSpell->u_caster->IsPlayer())
-    		return true;
+	Player *pPlayer = static_cast< Player* >( pSpell->u_caster );
 
-  	QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(9410);
-  	if(qle == NULL)
-    		return true;
+  	QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 9410 );
+  	if ( pQuest == NULL )
+    	return true;
   
-  	Creature *spiritwolf = sEAS.SpawnCreature(pPlayer, 17077, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0);
-  	spiritwolf->Despawn(10*1000, 0);
+  	Creature *pSpiritWolf = sEAS.SpawnCreature( pPlayer, 17077, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), 0 );
+  	if ( pSpiritWolf == NULL )
+		return true;
 
-  	pPlayer->CastSpell(pPlayer, 29938, false);
-  	
+	pSpiritWolf->Despawn( 10 * 1000, 0 );
+  	pPlayer->CastSpell( pPlayer, 29938, false );
+
   	return true;
 }
-
 
 
 /*--------------------------------------------------------------------------------------------------------*/
@@ -989,90 +848,84 @@ bool ASpiritGuide(uint32 i, Spell* pSpell)
 class HellfireDeadNPC : public CreatureAIScript
 {
 public:
-  ADD_CREATURE_FACTORY_FUNCTION(HellfireDeadNPC);
-  HellfireDeadNPC(Creature* pCreature) : CreatureAIScript(pCreature) {}
+	ADD_CREATURE_FACTORY_FUNCTION(HellfireDeadNPC);
+	HellfireDeadNPC(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-  void OnLoad()
-  {
-    _unit->SetStandState(7);
-    _unit->setDeathState(CORPSE);
-    _unit->GetAIInterface()->m_canMove = false;
-  }
+	void OnLoad()
+	{
+		_unit->SetStandState( 7 );
+		_unit->setDeathState( CORPSE );
+		_unit->GetAIInterface()->m_canMove = false;
+	}
 };
 
 bool AnAmbitiousPlan(uint32 i, Spell* pSpell)
 {
-  if(pSpell->u_caster->IsPlayer() == false)
-    return true;
+	if ( pSpell == NULL || pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer() )
+		return true;
 
-  Player *plr = (Player*)pSpell->u_caster;
-  Unit *unit_target = (Unit*)plr->GetMapMgr()->GetCreature((uint32)plr->GetSelection());
-  
-  if(unit_target == NULL)
-    return true;
+	Player *pPlayer = static_cast< Player* >( pSpell->u_caster );
+	QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 9383 );
+	if ( pQuest == NULL )
+		return true;
 
-  if(!unit_target->IsCreature())
-    return true;
+	Creature *pTarget = pPlayer->GetMapMgr()->GetCreature( GET_LOWGUID_PART( pPlayer->GetSelection() ) );
+	if ( pTarget == NULL || pTarget->GetEntry() != 16975 )
+		return true;
 
-  Creature *target = (Creature*)unit_target;
+	float SSx = pTarget->GetPositionX();
+	float SSy = pTarget->GetPositionY();
+	float SSz = pTarget->GetPositionZ();
+	pTarget->GetAIInterface()->SetAllowedToEnterCombat( false );
+	pTarget->GetAIInterface()->StopMovement( 0 );
+	pTarget->GetAIInterface()->setCurrentAgent( AGENT_NULL );
+	pTarget->GetAIInterface()->SetAIState( STATE_IDLE );
+	pTarget->Despawn( 0, 0 );
 
-  QuestLogEntry *qle = plr->GetQuestLogForEntry(9383);
-  if(qle == NULL)
-    return true;
+	GameObject *pGameobject = sEAS.SpawnGameobject( pPlayer, 183816, SSx, SSy, SSz, 0, 1 );
+	if ( pGameobject != NULL )
+	{
+		sEAS.GameobjectDelete( pGameobject, 1 * 60 * 1000 );
+		pPlayer->UpdateNearbyGameObjects();
+	}
 
-  if(target->GetEntry() == 16975)
-  {
-	float SSx = target->GetPositionX();
-	float SSy = target->GetPositionY();
-	float SSz = target->GetPositionZ();
-	target->GetAIInterface()->SetAllowedToEnterCombat(false);
-	target->GetAIInterface()->StopMovement(0);
-	target->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-	target->GetAIInterface()->SetAIState(STATE_IDLE);
-	target->Despawn(0, 0);
-
-	GameObject *obj = sEAS.SpawnGameobject(plr, 183816, SSx, SSy, SSz, 0, 1);
-	sEAS.GameobjectDelete(obj, 1*60*1000);
-  }
-  plr->UpdateNearbyGameObjects();
-
-  return true;
+	return true;
 }
 
 class DarkTidingsAlliance : public QuestScript 
 { 
 public:
-  void OnQuestComplete(Player* mTarget, QuestLogEntry *qLogEntry)
-  {
-    if(!mTarget)
-		return;
+	void OnQuestComplete(Player* pPlayer, QuestLogEntry *qLogEntry)
+	{
+		if ( pPlayer == NULL )
+			return;
 
-    Creature *creat = mTarget->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(mTarget->GetPositionX(), mTarget->GetPositionY(), mTarget->GetPositionZ(), 17479);
-    if(creat == NULL)
-      return;
+		Creature *pCreature = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords( pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 17479 );
+		if ( pCreature == NULL )
+			return;
 
-	char msg[100];
-	sprintf(msg, "Psst, %s, get over here.", mTarget->GetName());
-	mTarget->SendChatMessage(CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, msg);
-  }
+		char msg[100];
+		sprintf( msg, "Psst, %s, get over here.", pPlayer->GetName() );
+		pCreature->SendChatMessage( CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, msg );	// Changed Player to Creature. I wonder if it was blizzlike
+	}
 };
 
 class DarkTidingsHorde : public QuestScript 
 { 
 public:
-  void OnQuestComplete(Player* mTarget, QuestLogEntry *qLogEntry)
-  {
-    if(!mTarget)
-		return;
+	void OnQuestComplete(Player* pPlayer, QuestLogEntry *qLogEntry)
+	{
+		if ( pPlayer == NULL )
+			return;
 
-    Creature *creat = mTarget->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(mTarget->GetPositionX(), mTarget->GetPositionY(), mTarget->GetPositionZ(), 17558);
-    if(creat == NULL)
-      return;
+		Creature *pCreature = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords( pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 17558 );
+		if ( pCreature == NULL )
+			return;
 
-	char msg[100];
-	sprintf(msg, "Psst, %s, get over here.", mTarget->GetName());
-	mTarget->SendChatMessage(CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, msg);
-  }
+		char msg[100];
+		sprintf( msg, "Psst, %s, get over here.", pPlayer->GetName() );
+		pCreature->SendChatMessage( CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, msg );
+	}
 };
 
 
@@ -1097,25 +950,23 @@ void SetupHellfirePeninsula(ScriptMgr * mgr)
 	mgr->register_dummy_spell(34665, &TestingTheAntidote);
 	mgr->register_creature_script(16992, &Dreadtusk::Create);
 	
-	mgr->register_gameobject_script(184661, &ZethGorMustBurnAllianz::Create);
+	mgr->register_gameobject_script(184661, &ZethGorMustBurnAlliance::Create);
 	mgr->register_dummy_spell(35724, &ZethGorMustBurnHorde);
-	mgr->register_dummy_spell(32979, &LayingWasteToTheUnwantedAllianz);
+	mgr->register_dummy_spell(32979, &LayingWasteToTheUnwantedAlliance);
 	mgr->register_dummy_spell(33067, &BurnItUp);
 	mgr->register_dummy_spell(29297, &CleansingtheWater);
 	mgr->register_dummy_spell(30489, &TheSeersRelic);
 	mgr->register_dummy_spell(34387, &DisruptTheirReinforcements);
 	mgr->register_dummy_spell(29364, &AnAmbitiousPlan);
 	
-	GossipScript * Prisoner1Gossip = (GossipScript*) new Prisoner1();
-	mgr->register_gossip_script(20677, Prisoner1Gossip);
-	GossipScript * Prisoner2Gossip = (GossipScript*) new Prisoner2();
-	mgr->register_gossip_script(20678, Prisoner2Gossip);
-	GossipScript * Prisoner3Gossip = (GossipScript*) new Prisoner3();
-	mgr->register_gossip_script(20679, Prisoner3Gossip);
+	GossipScript *pPrisonerGossip = (GossipScript*) new PrisonerGossip();
+	mgr->register_gossip_script(20677, pPrisonerGossip);
+	mgr->register_gossip_script(20678, pPrisonerGossip);
+	mgr->register_gossip_script(20679, pPrisonerGossip);
 	
 	/*-------------------------------------------------------------------*/
 	// TODO
-	//mgr->register_dummy_spell(35460, &FuryoftheDreghoodElders);
+	//mgr->register_dummy_spell(35460, &FuryOfTheDreghoodElders);
 	//mgr->register_dummy_spell(29731, &ASpiritGuide);
 	
 	

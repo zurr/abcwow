@@ -20,7 +20,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL TheDormantShade : public QuestScript
+class TheDormantShade : public QuestScript
 {
 public:
 	void OnQuestComplete( Player * mTarget, QuestLogEntry * qLogEntry)
@@ -84,7 +84,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL ARoguesDeal  : public QuestScript 
+class ARoguesDeal  : public QuestScript 
 { 
 public:
 
@@ -107,7 +107,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL FieldsofGrief : public QuestScript 
+class FieldsofGrief : public QuestScript 
 { 
 public:
 
