@@ -62,20 +62,6 @@ public:
 	}
 };
 
-/*
-void OnAreaTrigger(Player * pPlayer, uint32 AreaTrigger)
-{
-
-	if (AreaTrigger == 4560)
-	{	
-		QuestLogEntry *en = pPlayer->GetQuestLogForEntry(10766);
-		if(en == NULL)
-			return;
-		pPlayer->SafeTeleport(530, 0, -2723.674561f, 1952.664673f, 146.939743f, 3.185559f);
-	}
-};
-*/
-
 class KneepadsQAI : public CreatureAIScript
 {
 public:
@@ -114,40 +100,56 @@ public:
 
 bool ToLegionHold(uint32 i, Aura* pAura, bool apply)
 {
-	if(!pAura->GetUnitCaster()->IsPlayer())
+	if ( pAura == NULL || pAura->GetUnitCaster() == NULL || !pAura->GetUnitCaster()->IsPlayer() )
 		return true;
 
-	Player *plr = (Player*)pAura->GetUnitCaster();
+	Player *pPlayer = static_cast< Player* >( pAura->GetUnitCaster() );
 
-	QuestLogEntry *qle = plr->GetQuestLogForEntry(10563);
-	if(qle == NULL)
+	QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 10563 );
+	if ( pQuest == NULL )
 	{
-		QuestLogEntry *qle = plr->GetQuestLogForEntry(10596);
-		if(qle == NULL)
+		pQuest = pPlayer->GetQuestLogForEntry( 10596 );
+		if ( pQuest == NULL )
 			return true;
 	}
 
-	if(apply)
+	if ( apply )
 	{
 
-		plr->SetUInt32Value(UNIT_FIELD_DISPLAYID, 20366);
-		plr->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,1194);
-		plr->_setFaction();
-		Creature *Jovaan = sEAS.SpawnCreature(plr, 21633, -3306.26f, 2933.84f, 170.934f, 5.47423f, 52000);
-		Creature *Razuun = sEAS.SpawnCreature(plr, 21502, -3300.47f, 2927.22f, 173.870f, 2.42924f, 52000);
+		pPlayer->SetUInt32Value( UNIT_FIELD_DISPLAYID, 20366 );
+		pPlayer->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, 1194 );
+		pPlayer->_setFaction();
+		Creature *pJovaan = sEAS.SpawnCreature( pPlayer, 21633, -3306.26f, 2933.84f, 170.934f, 5.47423f, 52000 );	// Jovaan
+		Creature *pRazuun = sEAS.SpawnCreature( pPlayer, 21502, -3300.47f, 2927.22f, 173.870f, 2.42924f, 52000 );	// Razuun
+		if ( pJovaan != NULL )
+		{
+			pJovaan->SetUInt64Value( UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2 );
+			if ( pJovaan->GetAIInterface() != NULL )
+			{
+				pJovaan->GetAIInterface()->SetAllowedToEnterCombat( false );
+			}
+		}
+		if ( pRazuun != NULL )
+		{
+			pRazuun->SetUInt64Value( UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_2 );
+			if ( pRazuun->GetAIInterface() != NULL )
+			{
+				pRazuun->GetAIInterface()->SetAllowedToEnterCombat( false );
+			}
+		}
 	}
 	else
 	{
-		if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
+		if ( pQuest->GetMobCount( 2 ) < pQuest->GetQuest()->required_mobcount[2] )
 		{
-			qle->SetMobCount(0, qle->GetMobCount(0)+1);
-			qle->SendUpdateAddKill(0);
-			qle->UpdatePlayerFields();
+			pQuest->SetMobCount( 2, pQuest->GetMobCount( 2 ) + 1 );
+			pQuest->SendUpdateAddKill( 2 );
+			pQuest->UpdatePlayerFields();
 		}
 	
-		plr->SetUInt32Value(UNIT_FIELD_DISPLAYID, plr->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
-		plr->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 0); //reset faction?
-		plr->_setFaction();
+		pPlayer->SetUInt32Value( UNIT_FIELD_DISPLAYID, pPlayer->GetUInt32Value( UNIT_FIELD_NATIVEDISPLAYID ) );
+		pPlayer->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, 0 ); //reset faction?
+		pPlayer->_setFaction();
 	}
 
 	return true;
@@ -262,6 +264,4 @@ void SetupShadowmoon(ScriptMgr * mgr)
 	mgr->register_dummy_aura(37097, &ToLegionHold);
 	
 	mgr->register_dummy_spell(39094, &CrystalOfDeepShadows);
-
-	//mgr->register_hook(SERVER_HOOK_EVENT_ON_AREATRIGGER, (void *)&OnAreaTrigger);
 }

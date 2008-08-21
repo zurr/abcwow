@@ -52,7 +52,7 @@ public:
    }
 };
 
-class SCRIPT_DECL Darrowshire_Spirit : public GossipScript
+class Darrowshire_Spirit : public GossipScript
 {
 public:
    void DeleteDelay(Creature *creat)

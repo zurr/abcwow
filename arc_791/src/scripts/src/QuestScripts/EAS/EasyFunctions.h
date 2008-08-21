@@ -280,7 +280,7 @@ public:
 
     return false;
   }
-
+  
   void EventCreatureDelete(Creature* creat, uint32 time)  // Creature and time in ms
   {
 	  sEventMgr.AddEvent(creat, &Creature::SafeDelete, EVENT_CREATURE_SAFE_DELETE, time, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);

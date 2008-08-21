@@ -37,7 +37,7 @@ public:
 
 
 
-class SCRIPT_DECL TheKesselRun1 : public GossipScript
+class TheKesselRun1 : public GossipScript
 {
 public:
     void GossipHello(Object* pObject, Player* plr, bool AutoSend)
@@ -94,7 +94,7 @@ public:
 };
 
 
-class SCRIPT_DECL TheKesselRun2 : public GossipScript
+class TheKesselRun2 : public GossipScript
 {
 public:
     void GossipHello(Object* pObject, Player* plr, bool AutoSend)
@@ -151,7 +151,7 @@ public:
 };
 
 
-class SCRIPT_DECL TheKesselRun3 : public GossipScript
+class TheKesselRun3 : public GossipScript
 {
 public:
     void GossipHello(Object* pObject, Player* plr, bool AutoSend)

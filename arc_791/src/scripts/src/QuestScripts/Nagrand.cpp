@@ -69,7 +69,7 @@ public:
 //*********************************************************************************************
 
 
-class SCRIPT_DECL Quest_The_Ring_of_Blood_The_Final_Challenge : public QuestScript
+class Quest_The_Ring_of_Blood_The_Final_Challenge : public QuestScript
 {
 public:
 		void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -121,7 +121,7 @@ public:
 		}
 };
 
-class SCRIPT_DECL Quest_The_Ring_of_Blood_The_Warmaul_Champion : public QuestScript
+class Quest_The_Ring_of_Blood_The_Warmaul_Champion : public QuestScript
 {
 public:
 		void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -169,7 +169,7 @@ public:
 
 };
 
-class SCRIPT_DECL Quest_The_Ring_of_Blood_Skragath : public QuestScript
+class Quest_The_Ring_of_Blood_Skragath : public QuestScript
 {
 public:
 		void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -216,7 +216,7 @@ public:
 	  }
 };
 
-class SCRIPT_DECL Quest_The_Ring_of_Blood_Rokdar_the_Sundered_Lord : public QuestScript
+class Quest_The_Ring_of_Blood_Rokdar_the_Sundered_Lord : public QuestScript
 {
 public:
 	  void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -262,7 +262,7 @@ public:
    }
 };
 
-class SCRIPT_DECL Quest_The_Ring_of_Blood_The_Blue_Brothers : public QuestScript
+class Quest_The_Ring_of_Blood_The_Blue_Brothers : public QuestScript
 {
 public:
 	  void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -317,7 +317,7 @@ public:
    }
 };
 
-class SCRIPT_DECL Quest_The_Ring_of_Blood_Brokentoe : public QuestScript
+class Quest_The_Ring_of_Blood_Brokentoe : public QuestScript
 {
 public:
 	  void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -423,7 +423,7 @@ public:
 
 };
 
-class SCRIPT_DECL LumpGossipScript : public GossipScript
+class LumpGossipScript : public GossipScript
 {
 public:
 	void GossipHello(Object * pObject, Player* Plr, bool AutoSend)

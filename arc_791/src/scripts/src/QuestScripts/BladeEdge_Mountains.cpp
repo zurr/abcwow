@@ -45,7 +45,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL IntotheSoulgrinder : public QuestScript
+class IntotheSoulgrinder : public QuestScript
 {   
 public:
 	void OnQuestComplete(Player* mTarget, QuestLogEntry *qLogEntry)
@@ -85,7 +85,10 @@ public:
 			return;
 
 		Creature *magneto = sEAS.SpawnCreature(pPlayer, 21729, _gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ(), 0, 0);
-		magneto->Despawn(5*60*1000, 0);
+		if (magneto != NULL)
+		{
+			magneto->Despawn(5*60*1000, 0);
+		}
 
 		_gameobject->Despawn(300000);
 	}
@@ -107,7 +110,10 @@ public:
 			return;
 
 		Creature *whelp = sEAS.SpawnCreature(pPlayer, 20021, _gameobject->GetPositionX(), _gameobject->GetPositionY(), _gameobject->GetPositionZ(), 0, 0);
-		whelp->Despawn(5*60*1000, 0);
+		if (whelp != NULL)
+		{
+			whelp->Despawn(5*60*1000, 0);
+		}
 
 		_gameobject->Despawn(300000);
 	}
@@ -138,28 +144,23 @@ public:
 		switch(i)
 		{
 		case 1:
-			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Muahahahahaha! You fool! you've released me from my banishment in the interstices between space and time!");
-			}
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Muahahahahaha! You fool! you've released me from my banishment in the interstices between space and time!");
+			break;
 		case 2:
-			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "All of Draenor shall quake beneath my feet! i Will destroy this world and reshape it in my immage!");
-			}
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "All of Draenor shall quake beneath my feet! i Will destroy this world and reshape it in my immage!");
+			break;
 		case 3:
-			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Where shall i Begin? i cannot bother myself with a worm such as yourself. Theres a World to be Conquered!");
-			}
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Where shall i Begin? i cannot bother myself with a worm such as yourself. Theres a World to be Conquered!");
+			break;
 		case 4:
-			{
-				_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "No doubt the fools that banished me are long dead. i shall take the wing and survey my new demense, Pray to whatever gods you hold dear that we do not meet again.");
-				_unit->Despawn(5000, 0);
-			}
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "No doubt the fools that banished me are long dead. i shall take the wing and survey my new demense, Pray to whatever gods you hold dear that we do not meet again.");
+			_unit->Despawn(5000, 0);
+			break;
 		}
 
-		i++;
+		++i;
 	}
 
-protected:
 	uint32 i;
 };
 
@@ -202,31 +203,35 @@ public:
 		GameObject* obelisk4 = plr->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(2923.37, 4840.36, 278.45, 185195);
 		GameObject* obelisk5 = plr->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(2965.75, 4835.25, 277.949, 185193);
 
-		obelisk1->SetUInt32Value(GAMEOBJECT_STATE, 1);
-		obelisk2->SetUInt32Value(GAMEOBJECT_STATE, 1);
-		obelisk3->SetUInt32Value(GAMEOBJECT_STATE, 1);
-		obelisk4->SetUInt32Value(GAMEOBJECT_STATE, 1);
-		obelisk5->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		if (obelisk1 != NULL)
+			obelisk1->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		if (obelisk2 != NULL)
+			obelisk2->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		if (obelisk3 != NULL)
+			obelisk3->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		if (obelisk4 != NULL)
+			obelisk4->SetUInt32Value(GAMEOBJECT_STATE, 1);
+		if (obelisk5 != NULL)
+			obelisk5->SetUInt32Value(GAMEOBJECT_STATE, 1);
 	}
 };
 
 // Creating the Pendant Quest
 bool CreatingThePendant(uint32 i, Spell * pSpell)
 {
-  if(!pSpell->u_caster->IsPlayer())
-    return true;
+	if(pSpell->u_caster == NULL || !pSpell->u_caster->IsPlayer())
+		return true;
 
-  Player *plr = (Player*)pSpell->u_caster;
-  QuestLogEntry *qle = plr->GetQuestLogForEntry(10567);
+	Player *plr = (Player*)pSpell->u_caster;
+	QuestLogEntry *qle = plr->GetQuestLogForEntry(10567);
   
-  if(qle == NULL)
-    return true;
+	if(qle == NULL)
+		return true;
 
-  uint32 entry = 21767;
+	uint32 entry = 21767;
+	sEAS.SpawnCreature(plr, entry, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 5*60*1000);
 
-  Creature *creat = sEAS.SpawnCreature(plr, entry, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 5*60*1000);
-
-  return true;
+	return true;
 }
 
 class BloodmaulQAI : public CreatureAIScript
@@ -237,32 +242,30 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		if(!mKiller)
+		if ( mKiller == NULL || !mKiller->IsPlayer() )
 			return;
-		QuestLogEntry *qle = NULL;
-		qle = ((Player*)mKiller)->GetQuestLogForEntry(10502);
-		if (qle == NULL)
+
+		Player *pPlayer = static_cast< Player* >( mKiller );
+		QuestLogEntry *pQuest = pPlayer->GetQuestLogForEntry( 10502 );
+		if ( pQuest == NULL )
 		{
-			qle = ((Player*)mKiller)->GetQuestLogForEntry(10505);
-			if (qle == NULL)
+			pQuest = pPlayer->GetQuestLogForEntry( 10505 );
+			if ( pQuest == NULL )
 			{
 				return;
 			}
 		}
-		if (mKiller->IsPlayer()) 
+
+		if ( pQuest->GetMobCount( 0 ) < pQuest->GetQuest()->required_mobcount[0] )
 		{
-			
-			if(qle->GetMobCount(0) < qle->GetQuest()->required_mobcount[0])
-			{
-				uint32 newcount = qle->GetMobCount(0) + 1;
-				qle->SetMobCount(0, newcount);
-				qle->SendUpdateAddKill(0);
-				qle->UpdatePlayerFields();
-				return;
-			}
+			uint32 NewCount = pQuest->GetMobCount( 0 ) + 1;
+			pQuest->SetMobCount( 0, NewCount );
+			pQuest->SendUpdateAddKill( 0 );
+			pQuest->UpdatePlayerFields();
 		}
-	};
+	}
 };
+
 class Thuk_the_DefiantAI : public CreatureAIScript
 {
 public:
@@ -299,14 +302,16 @@ public:
 	{
 		if(pPlayer->GetQuestLogForEntry(10974))
 		{
-			
 			Creature * pCreature = NULL;
 			pCreature = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(3989.094482f, 6071.562500f, 266.416656f, 22920);			
-			pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 14);
-			pCreature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1);
-			pCreature->GetAIInterface()->SetNextTarget(pPlayer);
-			pCreature->GetAIInterface()->AttackReaction(pPlayer, 1);
-			pCreature->_setFaction();
+			if (pCreature != NULL)
+			{
+				pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 14);
+				pCreature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1);
+				pCreature->GetAIInterface()->SetNextTarget(pPlayer);
+				pCreature->GetAIInterface()->AttackReaction(pPlayer, 1);
+				pCreature->_setFaction();
+			}
 		}
 		else
 		{

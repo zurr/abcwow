@@ -51,7 +51,7 @@ public:
 
 
 
-class SCRIPT_DECL HeroesofOld1 : public GossipScript
+class HeroesofOld1 : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)

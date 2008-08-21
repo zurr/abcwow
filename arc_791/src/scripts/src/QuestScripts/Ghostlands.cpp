@@ -24,7 +24,7 @@
 	Menu->SendTo(plr);
 
 
-class SCRIPT_DECL Prisoner12 : public GossipScript
+class Prisoner12 : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)
@@ -87,7 +87,7 @@ public:
 };
 
 
-class SCRIPT_DECL Prisoner22 : public GossipScript
+class Prisoner22 : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)
@@ -151,7 +151,7 @@ public:
 };
 
 
-class SCRIPT_DECL Prisoner32 : public GossipScript
+class Prisoner32 : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* plr, bool AutoSend)

@@ -21,7 +21,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL Quest_Grimoire_Business : public QuestScript
+class Quest_Grimoire_Business : public QuestScript
 {
 public:
 	void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -33,7 +33,7 @@ public:
 
 };
 
-class SCRIPT_DECL Quest_Maggocs_Treasure_Chest : public QuestScript
+class Quest_Maggocs_Treasure_Chest : public QuestScript
 {
 public:
 	void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -45,7 +45,7 @@ public:
 
 };
 
-class SCRIPT_DECL Quest_Grulloc_Has_Two_Skulls : public QuestScript
+class Quest_Grulloc_Has_Two_Skulls : public QuestScript
 {
 public:
 	void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -57,7 +57,7 @@ public:
 
 };
 
-class SCRIPT_DECL Quest_Zuluhed_the_Whacked : public QuestScript
+class Quest_Zuluhed_the_Whacked : public QuestScript
 {
 public:
 	void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
@@ -92,6 +92,19 @@ public:
 	}
 };
 
+class Kaliri : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(Kaliri);
+	Kaliri(Creature* pCreature) : CreatureAIScript(pCreature) {}
+
+	void OnLoad()
+	{
+		_unit->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 35);
+		_unit->_setFaction();
+	}
+};
+
 void SetupUnsorted(ScriptMgr * mgr)
 {
 	mgr->register_quest_script(10998, CREATE_QUESTSCRIPT(Quest_Grimoire_Business));
@@ -99,4 +112,5 @@ void SetupUnsorted(ScriptMgr * mgr)
 	mgr->register_quest_script(10995, CREATE_QUESTSCRIPT(Quest_Grulloc_Has_Two_Skulls));
 	mgr->register_quest_script(10866, CREATE_QUESTSCRIPT(Quest_Zuluhed_the_Whacked));
 	mgr->register_creature_script(620, &Chicken::Create);
+	mgr->register_creature_script(21468, &Kaliri::Create);
 }

@@ -20,7 +20,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL Veronia : public GossipScript
+class Veronia : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player* Plr, bool AutoSend)

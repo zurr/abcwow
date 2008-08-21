@@ -20,7 +20,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL Lady_Jaina : public GossipScript
+class Lady_Jaina : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player * plr, bool AutoSend)
@@ -61,7 +61,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL Cairne : public GossipScript
+class Cairne : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player * plr, bool AutoSend)

@@ -24,7 +24,7 @@
 #define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, Plr); \
     Menu->SendTo(Plr);
 
-class SCRIPT_DECL AncientMarks : public GossipScript
+class AncientMarks : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
@@ -111,7 +111,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL ElderKuruti : public GossipScript
+class ElderKuruti : public GossipScript
 {
 public:
 	void GossipHello(Object* pObject, Player * Plr, bool AutoSend)

@@ -29,7 +29,7 @@
 								ON QUEST ACCEPT
 **************************************************************************************
 **************************************************************************************/
-/*
+
 
 void Hanazua(Player * pPlayer, Object * pObject)
 {
@@ -90,8 +90,9 @@ void OntoGoldshireComplete(Player* pPlayer, Object* pObject)
 
 void OnQuestAccept(Player * pPlayer, Quest * pQuest, Object * pObject)
 {
-	if(!pPlayer || !pObject || !pQuest)
+	if ( pPlayer == NULL || pQuest == NULL || pObject == NULL || !pObject->IsCreature() )
 		return;
+
 	switch(pQuest->id)
 	{
 	case 790:
@@ -129,14 +130,12 @@ void OnQuestAccept(Player * pPlayer, Quest * pQuest, Object * pObject)
 
 //===============================================================================================
 
-
-
 /*************************************************************************************
 **************************************************************************************
 							   ON QUEST FINISHED
 **************************************************************************************
 **************************************************************************************/
-/*
+
 
 void Hanazua_II(Player * pPlayer, Object * pObject)
 {
@@ -179,8 +178,9 @@ void MaybellComplete(Player* pPlayer, Object* pObject)
 
 void OnQuestFinished(Player * pPlayer, Quest * pQuest, Object * pObject)
 {
-	if(!pPlayer || !pObject || !pQuest)
+	if ( pPlayer == NULL || pQuest == NULL || pObject == NULL || !pObject->IsCreature() )
 		return;
+
 	switch(pQuest->id)
 	{
 	case 790:
@@ -203,10 +203,195 @@ void OnQuestFinished(Player * pPlayer, Quest * pQuest, Object * pObject)
 		break;
 	}
 }
+
 //=========================================================================================
-*/
+
+/*************************************************************************************
+**************************************************************************************
+							   ON EMOTE
+**************************************************************************************
+**************************************************************************************/
+
+
+void InnkeeperFlex(Player * pPlayer, Unit * pUnit)
+{
+	if(pUnit->GetEntry() == 6740)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8356);
+		if(qle == NULL)
+			return;
+
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+	else if(pUnit->GetEntry() == 6929)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8359);
+		if(qle == NULL)
+			return;
+
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+}
+
+void InnkeeperDance(Player * pPlayer, Unit * pUnit)
+{
+	if(pUnit->GetEntry() == 6735)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8357);
+		if(qle == NULL)
+			return;
+
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+	else if(pUnit->GetEntry() == 6746)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8360);
+		if(qle == NULL)
+			return;
+
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+}
+
+void InnkeeperTrain(Player * pPlayer, Unit * pUnit)
+{
+	if(pUnit->GetEntry() == 6826)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8355);
+		if(qle == NULL)
+			return;
+
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+	else if(pUnit->GetEntry() == 11814)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8358);
+		if(qle == NULL)
+			return;
+
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+}
+
+void InnkeeperChicken(Player * pPlayer, Unit * pUnit)
+{
+	if(pUnit->GetEntry() == 5111)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8353);
+		if(qle == NULL)
+			return;
+
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+	else if(pUnit->GetEntry() == 6741)
+	{
+		QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(8354);
+		if(qle == NULL)
+			return;
+
+		qle->SetMobCount(0, qle->GetMobCount(0)+1);
+		qle->SendUpdateAddKill(0);
+		qle->UpdatePlayerFields();
+	}
+}
+//=========================================================================================
+
+void OnEmote(Player * pPlayer, uint32 Emote, Unit * pUnit)
+{
+	pUnit = pPlayer->GetMapMgr()->GetUnit(pPlayer->GetSelection());
+	if (!pUnit || !pUnit->isAlive() || pUnit->GetAIInterface()->GetNextTarget())
+		return;
+
+	switch(Emote)
+	{
+	case EMOTE_ONESHOT_FLEX:
+		InnkeeperFlex(pPlayer, pUnit);
+		break;
+
+	case EMOTE_STATE_DANCE:
+		InnkeeperDance(pPlayer, pUnit);
+		break;
+
+	case EMOTE_ONESHOT_TRAIN:
+		InnkeeperTrain(pPlayer, pUnit);
+		break;
+
+	case EMOTE_ONESHOT_CHICKEN:
+		InnkeeperChicken(pPlayer, pUnit);
+		break;
+	}
+}
+
+//=========================================================================================
+
+/*************************************************************************************
+**************************************************************************************
+							   ON AREATRIGGER
+**************************************************************************************
+**************************************************************************************/
+
+
+void InvasionPointCataclysm(Player * pPlayer, uint32 AreaTrigger)
+{
+	QuestLogEntry *en = pPlayer->GetQuestLogForEntry(10766);
+	if(en == NULL)
+		return;
+	pPlayer->SafeTeleport(530, 0, -2723.674561f, 1952.664673f, 146.939743f, 3.185559f);
+}
+
+void Scratches(Player * pPlayer, uint32 AreaTrigger)
+{
+	QuestLogEntry *qle = pPlayer->GetQuestLogForEntry(10556);
+	if(qle == NULL)
+		return;
+
+	Creature * Kaliri = pPlayer->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 21468);
+	if(Kaliri == NULL)
+		return;
+
+	Kaliri->Despawn(0, 0);
+	qle->SetMobCount(0, qle->GetMobCount(0)+1);
+	qle->SendUpdateAddKill(0);
+	qle->UpdatePlayerFields();
+}
+
+//=========================================================================================
+
+void OnAreaTrigger(Player * pPlayer, uint32 AreaTrigger)
+{
+	switch(AreaTrigger)
+	{
+	case 4546:
+		{	
+			Scratches(pPlayer, 4546);
+		} break;
+	case 4560:
+		{
+			InvasionPointCataclysm(pPlayer, 4560);
+		} break;
+	}	
+}
+
+//=========================================================================================
+
 void SetupQuestHooks(ScriptMgr * mgr)
 {
-	//mgr->register_hook(SERVER_HOOK_EVENT_ON_QUEST_ACCEPT, (void *)&OnQuestAccept);
-	//mgr->register_hook(SERVER_HOOK_EVENT_ON_QUEST_FINISHED, (void *)&OnQuestFinished);
+	mgr->register_hook(SERVER_HOOK_EVENT_ON_QUEST_ACCEPT, (void *)&OnQuestAccept);
+	mgr->register_hook(SERVER_HOOK_EVENT_ON_QUEST_FINISHED, (void *)&OnQuestFinished);
+	mgr->register_hook(SERVER_HOOK_EVENT_ON_EMOTE, (void *)&OnEmote);
+	mgr->register_hook(SERVER_HOOK_EVENT_ON_AREATRIGGER, (void *)&OnAreaTrigger);
 }

@@ -72,7 +72,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL TheMissingDiplomat : public QuestScript 
+class TheMissingDiplomat : public QuestScript 
 { 
 public:
 

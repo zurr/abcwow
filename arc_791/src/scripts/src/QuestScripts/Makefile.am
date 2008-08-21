@@ -1,47 +1,53 @@
-INCLUDES += -I$(srcdir) -I$(srcdir)/../../../../dep/include -I$(srcdir)/../../../arcemu-shared
-INCLUDES += -I$(srcdir)/../../../arcemu-world -I$(srcdir)/../../../../dep/src
+INCLUDES = -I$(top_srcdir)/src/arcemu-logonserver \
+   -I$(top_srcdir)/src/arcemu-realmserver -I$(top_srcdir)/src/arcemu-shared -I$(top_srcdir)/src/arcemu-voicechat \
+   -I$(top_srcdir)/src/arcemu-world -I$(srcdir) -I$(srcdir)/../../../../dep/include \
+   -I$(srcdir)/../../../../dep/src -I$(srcdir)/../../../../src
 
 AM_CXXFLAGS = -DSCRIPTLIB
 
-lib_LTLIBRARIES = libQuestScripts.la
+lib_LTLIBRARIES = libSunQuestScripts.la
 
-libQuestScripts_la_SOURCES = Druid.cpp \
-	Paladin.cpp \
-	Mage.cpp \
-	Shadowmoon.cpp \
-	Hellfire_Peninsula.cpp \
-	Silverpine_Forest.cpp \
-	Nagrand.cpp \
-	BladeEdge_Mountains.cpp \
-	Terrokar_Forest.cpp \
-	Zangarmarsh.cpp \
-	Undercity.cpp \
-	Azshara.cpp \
-	Azuremyst_Isle.cpp \
-	QuestGossip.cpp \
-	Unsorted.cpp \
-	QuestHooks.cpp \
-	Ungoro.cpp \
-	Dustwallow_Marsh.cpp \
-	Warrior.cpp \
-	Barrens.cpp \
-	Mulgore.cpp \
-	Westfall.cpp \
-	TirisfalGlades.cpp \
-	HillsbradFoothills.cpp \
-	ThousandNeedles.cpp \
-	RedridgeMountains.cpp \
-	LochModan.cpp \
-	Desolace.cpp \
-	ArathiHighlands.cpp \
-	Ghostlands.cpp \
-	EasternPlaguelands.cpp \
-	BlastedLands.cpp \
-	BloodmystIsle.cpp \
-	Tanaris.cpp \
-	StranglethornVale.cpp \
-	SilvermoonCity.cpp \
-	FirstAid.cpp \
-	Stormwind.cpp \
-	Netherstorm.cpp \
-	Setup.cpp
+libSunQuestScripts_la_SOURCES = Setup.cpp \
+ArathiHighlands.cpp \
+Azshara.cpp \
+Azuremyst_Isle.cpp \
+BladeEdge_Mountains.cpp \
+BlastedLands.cpp \
+BloodmystIsle.cpp \
+Darkshore.cpp \
+Desolace.cpp \
+Druid.cpp \
+Dustwallow_Marsh.cpp \
+Eastern_Plaguelands.cpp \
+FirstAid.cpp \
+Ghostlands.cpp \
+Hellfire_Peninsula.cpp \
+HillsbradFoothills.cpp \
+Isle_of_QuelDanas.cpp \
+LochModan.cpp \
+Mage.cpp \
+Mulgore.cpp \
+Nagrand.cpp \
+Netherstorm.cpp \
+Old_Hillsbrad.cpp \
+Paladin.cpp \
+QuestGossip.cpp \
+QuestHooks.cpp \
+RedridgeMountains.cpp \
+Shadowmoon.cpp \
+SilvermoonCity.cpp \
+Silverpine_Forest.cpp \
+Stormwind.cpp \
+StranglethornVale.cpp \
+Tanaris.cpp \
+Terrokar_Forest.cpp \
+The_Barrens.cpp \
+ThousandNeedles.cpp \
+TirisfalGlades.cpp \
+Undercity.cpp \
+UnGoro.cpp \
+Unsorted.cpp \
+Warrior.cpp \
+Westfall.cpp \
+Zangarmarsh.cpp \
+Zenn_Foulhoof.cpp

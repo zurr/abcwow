@@ -45,7 +45,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL EscortingErland : public QuestScript
+class EscortingErland : public QuestScript
 {
 public:
 

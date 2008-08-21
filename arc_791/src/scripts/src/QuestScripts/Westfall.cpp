@@ -20,7 +20,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL TheDefiasBrotherhood : public QuestScript
+class TheDefiasBrotherhood : public QuestScript
 {
 public:
 

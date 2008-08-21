@@ -20,7 +20,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL HomewardBound : public QuestScript
+class HomewardBound : public QuestScript
 {
 public:
 
@@ -140,7 +140,7 @@ public:
 	}
 };
 
-class SCRIPT_DECL RumorsforKravel : public QuestScript
+class RumorsforKravel : public QuestScript
 {
 public:
 

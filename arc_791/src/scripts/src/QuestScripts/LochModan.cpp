@@ -20,7 +20,7 @@
 #include "Setup.h"
 #include "EAS/EasyFunctions.h"
 
-class SCRIPT_DECL ProtectingtheShipment : public QuestScript 
+class ProtectingtheShipment : public QuestScript 
 { 
 public:
 

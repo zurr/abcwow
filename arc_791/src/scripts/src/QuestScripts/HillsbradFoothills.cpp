@@ -23,7 +23,7 @@
 
 bool BaronVardusAllowSpawn = true;
 
-class SCRIPT_DECL WantedBaronVardus : public QuestScript 
+class WantedBaronVardus : public QuestScript 
 { 
 public:
 

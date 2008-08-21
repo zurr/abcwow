@@ -28,24 +28,24 @@
 
 bool CenarionMoondust(uint32 i, Spell* pSpell) 
 {
-  const float pos[] = {6348.540039f, 128.124176f, 22.024008f, 4.172032f}; // x, y, z, o
-  Player *p_caster = pSpell->p_caster;
+	  const float pos[] = {6348.540039f, 128.124176f, 22.024008f, 4.172032f}; // x, y, z, o
+	  Player *p_caster = pSpell->p_caster;
 
-  Creature *lunaclaw = p_caster->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pos[0], pos[1], pos[2], 12138);
-  if(lunaclaw != NULL)
-  {
-    if(!lunaclaw->isAlive())
-      lunaclaw->Delete();
-    else
-      return true;
-  }
+	  Creature *lunaclaw = p_caster->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pos[0], pos[1], pos[2], 12138);
+	  if(lunaclaw != NULL)
+	  {
+		if(!lunaclaw->isAlive())
+			lunaclaw->Delete();
+		else
+			return true;
+	  }
 
-  lunaclaw = sEAS.SpawnCreature(p_caster, 12138, pos[0], pos[1], pos[2], pos[3], 0);
-  lunaclaw->GetAIInterface()->SetNextTarget(p_caster);
+	  lunaclaw = sEAS.SpawnCreature(p_caster, 12138, pos[0], pos[1], pos[2], pos[3], 0);
+	  lunaclaw->GetAIInterface()->SetNextTarget(p_caster);
 
-  sEAS.MoveToPlayer(p_caster, lunaclaw);
+	  sEAS.MoveToPlayer(p_caster, lunaclaw);
 
-  return true;
+	  return true;
 }
 
 
@@ -55,72 +55,71 @@ bool CenarionMoondust(uint32 i, Spell* pSpell)
 
 bool CenarionLunardust(uint32 i, Spell* pSpell) 
 {
-  const float pos[] = {-2449.117920f, -1627.319824f, 91.801430f, 0}; // x, y, z, o
-  Player *p_caster = pSpell->p_caster;
+	  const float pos[] = {-2449.117920f, -1627.319824f, 91.801430f, 0}; // x, y, z, o
+	  Player *p_caster = pSpell->p_caster;
 
-  Creature *lunaclaw = p_caster->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pos[0], pos[1], pos[2], 12138);
-  if(lunaclaw != NULL)
-  {
-    if(!lunaclaw->isAlive())
-      lunaclaw->Delete();
-    else
-      return true;
-  }
+	  Creature *lunaclaw = p_caster->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(pos[0], pos[1], pos[2], 12138);
+	  if(lunaclaw != NULL)
+	  {
+		if(!lunaclaw->isAlive())
+			lunaclaw->Delete();
+		else
+			return true;
+	  }
 
-  lunaclaw = sEAS.SpawnCreature(p_caster, 12138, pos[0], pos[1], pos[2], pos[3], 0);
-  lunaclaw->GetAIInterface()->SetNextTarget(p_caster);
+	  lunaclaw = sEAS.SpawnCreature(p_caster, 12138, pos[0], pos[1], pos[2], pos[3], 0);
+	  lunaclaw->GetAIInterface()->SetNextTarget(p_caster);
 
-  sEAS.MoveToPlayer(p_caster, lunaclaw);
+	  sEAS.MoveToPlayer(p_caster, lunaclaw);
 
-  return true;
+	  return true;
 }
 
 class Lunaclaw : public CreatureAIScript
 {
 public:
-  ADD_CREATURE_FACTORY_FUNCTION(Lunaclaw);
+	ADD_CREATURE_FACTORY_FUNCTION(Lunaclaw);
+	Lunaclaw(Creature* pCreature) : CreatureAIScript(pCreature) {}
 
-  Lunaclaw(Creature* pCreature) : CreatureAIScript(pCreature) {}
+	void OnDied(Unit *mKiller)
+	{
+		if(!mKiller->IsPlayer())
+			return;
 
-  void OnDied(Unit *mKiller)
-  {
-    if(!mKiller->IsPlayer())
-      return;
+		Player *plr = static_cast<Player*>(mKiller);
+		const uint32 quests[] = {6001, 6002};
+		QuestLogEntry *qle;
+		bool questOk = false;
 
-    Player *plr = static_cast<Player*>(mKiller);
-    const uint32 quests[] = {6001, 6002};
-    QuestLogEntry *qle;
-    bool questOk = false;
+		for(int i = 0; i<2; i++)
+		{
+			if(plr->GetQuestLogForEntry(quests[i]) != NULL)
+			{
+				questOk = true;
+				qle = plr->GetQuestLogForEntry(quests[i]);
 
-    for(int i = 0; i<2; i++)
-    {
-      if(plr->GetQuestLogForEntry(quests[i]) != NULL)
-      {
-        questOk = true;
-        qle = plr->GetQuestLogForEntry(quests[i]);
+				break;
+			}
+		}
 
-        break;
-      }
-    }
+		if(!questOk)
+			return;
 
-    if(!questOk)
-      return;
+		sEAS.SpawnCreature(plr, 12144, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0, 1*60*1000);
 
-    sEAS.SpawnCreature(plr, 12144, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0, 1*60*1000);
-
-    qle->SendQuestComplete();
-    qle->UpdatePlayerFields();
-  }
+		qle->SendQuestComplete();
+		qle->UpdatePlayerFields();
+	}
 };
 
 class MoongladeQuest : public QuestScript
 {	
 public:
-  void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
-  {
-    if(!mTarget->HasSpell(19027))
-      mTarget->CastSpell(mTarget, 19027, true);
-  }
+	void OnQuestStart(Player * mTarget, QuestLogEntry * qLogEntry)
+	{
+		if(!mTarget->HasSpell(19027))
+			mTarget->CastSpell(mTarget, 19027, true);
+	}
 };
 
 
