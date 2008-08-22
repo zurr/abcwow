@@ -239,8 +239,14 @@ void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)
 	Player * pTarget = _player->GetMapMgr()->GetPlayer( _player->mTradeTarget );
 
 	Item * pItem = _player->GetItemInterface()->GetInventoryItem(SourceBag, SourceSlot);
-	if( pTarget == NULL || pItem == 0 || TradeSlot > 6 )
+
+	if( pTarget == NULL || pItem == 0 || TradeSlot > 6 || ( TradeSlot < 6 && pItem->IsSoulbound() ) )
+ 		return;
+	if( pItem->IsContainer() )
+	{
+		if(_player->GetItemInterface()->IsBagSlot(SourceSlot))
 		return;
+	}
 
 	if( pItem->IsContainer() && ((Container*)pItem)->HasItems() )
 	{
@@ -264,6 +270,13 @@ void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)
 			Disconnect();
 			return;
 		}
+	}
+
+	if(SourceSlot >= INVENTORY_SLOT_BAG_START && SourceSlot < INVENTORY_SLOT_BAG_END)
+	{
+		//More duping woohoo
+		sCheatLog.writefromsession(this, "tried to cheat trade a soulbound item");
+		Disconnect();
 	}
 
 	_player->mTradeItems[TradeSlot] = pItem;

@@ -29,8 +29,10 @@
 MySQLDatabase::~MySQLDatabase()
 {
 	for(int32 i = 0; i < mConnectionCount; ++i)
+	{
+	mysql_close(((MySQLDatabaseConnection*)Connections[i])->MySql);
 		delete Connections[i];
-
+	}
 	delete [] Connections;
 }
 
@@ -52,7 +54,8 @@ void MySQLDatabase::_EndTransaction(DatabaseConnection * conn)
 bool MySQLDatabase::Initialize(const char* Hostname, unsigned int port, const char* Username, const char* Password, const char* DatabaseName, uint32 ConnectionCount, uint32 BufferSize)
 {
 	uint32 i;
-	MYSQL * temp, * temp2;
+	MYSQL * temp = NULL;
+	MYSQL * temp2 = NULL;
 	MySQLDatabaseConnection ** conns;
 	my_bool my_true = true;
 
@@ -69,16 +72,21 @@ bool MySQLDatabase::Initialize(const char* Hostname, unsigned int port, const ch
 	for( i = 0; i < ConnectionCount; ++i )
 	{
 		temp = mysql_init( NULL );
+		if( temp == NULL )
+			continue;
+
 		if(mysql_options(temp, MYSQL_SET_CHARSET_NAME, "utf8"))
 			Log.Error("MySQLDatabase", "Could not set utf8 character set.");
 
 		if (mysql_options(temp, MYSQL_OPT_RECONNECT, &my_true))
 			Log.Error("MySQLDatabase", "MYSQL_OPT_RECONNECT could not be set, connection drops may occur but will be counteracted.");
 
-		temp2 = mysql_real_connect( temp, Hostname, Username, Password, DatabaseName, port, NULL, 0 );
+		//temp2 = mysql_real_connect( temp, Hostname, Username, Password, DatabaseName, port, NULL, 0 );
+		MYSQL* temp2 = mysql_real_connect( temp, Hostname, Username, Password, DatabaseName, port, NULL, 0 );
 		if( temp2 == NULL )
 		{
 			Log.Error("MySQLDatabase", "Connection failed due to: `%s`", mysql_error( temp ) );
+			mysql_close(temp);
 			return false;
 		}
 
