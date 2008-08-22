@@ -159,6 +159,7 @@ class SERVER_DECL CommandTableStorage : public Singleton<CommandTableStorage>
 	ChatCommand* _banCommandTable;
 	ChatCommand* _unbanCommandTable;
 	ChatCommand* _instanceCommandTable;
+	ChatCommand* _arenaCommandTable;
 	ChatCommand* _commandTable;
 
 	ChatCommand * GetSubCommandTable(const char * name);
@@ -519,7 +520,9 @@ protected:
 	bool HandleAIAgentDebugContinue(const char * args, WorldSession * m_session);
 	bool HandleAIAgentDebugSkip(const char * args, WorldSession * m_session);
 
-	bool HandleCreateArenaTeamCommands(const char * args, WorldSession * m_session);
+	bool HandleArenaCreateTeamCommand(const char * args, WorldSession * m_session);
+	bool HandleArenaSetTeamLeaderCommand(const char * args, WorldSession * m_session);
+	bool HandleArenaResetAllRatingsCommand(const char * args, WorldSession * m_session);
 	bool HandleNpcSelectCommand(const char * args, WorldSession * m_session);
 	bool HandleWaypointAddFlyCommand(const char * args, WorldSession * m_session);
 	bool HandleWhisperBlockCommand(const char * args, WorldSession * m_session);

@@ -279,7 +279,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				if(m_Unit->GetTypeId() == TYPEID_UNIT)
 				{
 					if( static_cast< Creature* >( m_Unit )->has_combat_text )
-					objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_COMBAT_STOP );
+						objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_COMBAT_STOP );
 
 					if(static_cast<Creature*>(m_Unit)->original_emotestate)
 						m_Unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, static_cast< Creature* >( m_Unit )->original_emotestate);
@@ -377,7 +377,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				if( pUnit == NULL ) return;
 
 				if( static_cast< Creature* >( m_Unit )->has_combat_text )
-				objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DAMAGE_TAKEN );
+					objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DAMAGE_TAKEN );
 
 				CALL_SCRIPT_EVENT(m_Unit, OnDamageTaken)(pUnit, float(misc1));
 				if(!modThreatByPtr(pUnit, misc1))
@@ -502,7 +502,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			if( pUnit == NULL ) return;
 
 			if( static_cast< Creature* >( m_Unit )->has_combat_text )
-			objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DIED );
+				objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DIED );
 
 			CALL_SCRIPT_EVENT(m_Unit, OnDied)(pUnit);
 			m_AIState = STATE_IDLE;
@@ -580,8 +580,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}
 
 			//remove negative auras
-			if( m_Unit->IsCreature() )
-				m_Unit->RemoveNegativeAuras();
+			//if( m_Unit->IsCreature() )
+			//	m_Unit->RemoveNegativeAuras();
 
 		}break;
 	}
@@ -970,7 +970,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 #endif
 
 #ifdef COLLISION
-	/*float target_land_z=0.0f;
+	float target_land_z=0.0f;
 	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL )
 	{
 
@@ -996,7 +996,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				}
 			}
 		}
-	}*/
+	}
 #endif
 
 	if ( GetNextTarget() != NULL && GetNextTarget()->GetTypeId() == TYPEID_UNIT && m_AIState == STATE_EVADE)
@@ -1433,8 +1433,11 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 	if( m_AIState == STATE_EVADE || !pUnit || !pUnit->isAlive() || m_Unit->isDead() || m_Unit == pUnit )
 		return;
 
+	
 #ifdef COLLISION
-	/*float target_land_z=0.0f;
+	if( pUnit->IsPlayer() )
+	{
+	float target_land_z=0.0f;
 	if ( m_Unit->GetMapMgr() != NULL )
 	{
 
@@ -1457,7 +1460,8 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 				}
 			}
 		}
-	}*/
+	}
+	}
 #endif
 
 	if (pUnit->GetTypeId() == TYPEID_PLAYER && static_cast<Player *>(pUnit)->GetMisdirectionTarget() != 0)
@@ -2842,13 +2846,17 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 					if(m_moveFly != true)
 					{
 						target_land_z = CollideInterface.GetHeight(m_Unit->GetMapId(), x, y, z + 2.0f);
-						if( target_land_z == NO_WMO_HEIGHT )
+						if ( target_land_z == NO_WMO_HEIGHT )
+						{
 							target_land_z = m_Unit->GetMapMgr()->GetLandHeight(x, y);
+							if ( target_land_z == 999999.0f )
+								target_land_z = z;
+						}
 					}
 				}
 
-				if (z > m_Unit->GetMapMgr()->GetWaterHeight(m_nextPosX, m_nextPosY) && target_land_z != 0.0f)
-					z=target_land_z;
+				if ( z > m_Unit->GetMapMgr()->GetWaterHeight( m_nextPosX, m_nextPosY ) && target_land_z != 0.0f )
+					z = target_land_z;
 #endif
 
 				m_Unit->SetPosition(x, y, z, m_Unit->GetOrientation());
@@ -3025,8 +3033,16 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			float dist = m_Unit->CalcDistance(UnitToFear);
 			if(dist > 30.0f || (Rand(25) && dist > 10.0f))	// not too far or too close
 			{
-				Fx = m_Unit->GetPositionX() - (RandomFloat(15.f)+5.0f)*cosf(Fo);
-				Fy = m_Unit->GetPositionY() - (RandomFloat(15.f)+5.0f)*sinf(Fo);
+					if( m_Unit->GetMapId() == 572 || m_Unit->GetMapId() == 562 || m_Unit->GetMapId() == 559 ) //GET MAP ID
+					{
+						Fx = m_Unit->GetPositionX();
+						Fy = m_Unit->GetPositionY();
+					}
+					else 
+					{
+						Fx = m_Unit->GetPositionX() - (RandomFloat(15.f)+5.0f)*cosf(Fo);
+						Fy = m_Unit->GetPositionY() - (RandomFloat(15.f)+5.0f)*sinf(Fo);
+					}
 			}
 			else
 			{

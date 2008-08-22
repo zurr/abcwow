@@ -66,17 +66,18 @@
       <Button name="Done" text="Done">
         <!--<FrameSkin skinid="dcb143e1-a4ab-4e7c-b934-1efa40101d21" frameid="2d508884-59c2-4f83-ae10-27aaad48391b" />-->
         <Size>
-          <AbsDimension x="90" y="19" />
+          <AbsDimension x="102" y="19" />
         </Size>
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="48" y="-159" />
+              <AbsDimension x="45" y="-159" />
             </Offset>
           </Anchor>
         </Anchors>
         <Scripts>
-          <OnClick>PlayerForm:Hide(); OpenMain();</OnClick>
+          <OnClick>PlayerForm:Hide(); OpenMain(); PlayerLevel:SetText(""); GuildName:SetText("");
+</OnClick>
         </Scripts>
         <NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
           <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />

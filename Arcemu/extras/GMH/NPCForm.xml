@@ -3,7 +3,7 @@
   <Frame name="NPCForm" hidden="true" movable="true" resizable="true" enableMouse="true">
     <!--<FrameSkin skinid="dcb143e1-a4ab-4e7c-b934-1efa40101d21" frameid="2d508883-59c2-4f83-ae10-27aaad48391b" />-->
     <Size>
-      <AbsDimension x="180" y="498" />
+      <AbsDimension x="180" y="438" />
     </Size>
     <Anchors>
       <Anchor point="RIGHT" relativeTo="UIParent">
@@ -71,7 +71,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-424" />
+              <AbsDimension x="19" y="-362" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -141,7 +141,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-393" />
+              <AbsDimension x="19" y="-331" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -211,7 +211,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-307" />
+              <AbsDimension x="19" y="-245" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -244,12 +244,12 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="43" y="-455" />
+              <AbsDimension x="40" y="-393" />
             </Offset>
           </Anchor>
         </Anchors>
         <Scripts>
-          <OnClick>NPCForm:Hide(); OpenMain();
+          <OnClick>NPCForm:Hide(); OpenMain(); NPCNumber:SetText(""); NPCItemNumber:SetText("");
 </OnClick>
         </Scripts>
         <NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
@@ -347,7 +347,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-272" />
+              <AbsDimension x="19" y="-210" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -417,7 +417,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-241" />
+              <AbsDimension x="19" y="-179" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -487,7 +487,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-203" />
+              <AbsDimension x="19" y="-141" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -550,7 +550,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-179" />
+              <AbsDimension x="19" y="-117" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -575,76 +575,6 @@
           </Layer>
         </Layers>
       </Frame>
-      <Button name="$parentComponent12" text="Add Spirit Healer">
-        <!--<FrameSkin skinid="dcb143e1-a4ab-4e7c-b934-1efa40101d21" frameid="2d508884-59c2-4f83-ae10-27aaad48391b" />-->
-        <Size>
-          <AbsDimension x="144" y="25" />
-        </Size>
-        <Anchors>
-          <Anchor point="TOPLEFT">
-            <Offset>
-              <AbsDimension x="19" y="-117" />
-            </Offset>
-          </Anchor>
-        </Anchors>
-        <Scripts>
-          <OnClick>AddSH()
-</OnClick>
-        </Scripts>
-        <NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
-          <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
-        </NormalTexture>
-        <PushedTexture file="Interface\Buttons\UI-Panel-Button-Down">
-          <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
-        </PushedTexture>
-        <DisabledTexture file="Interface\Buttons\UI-Panel-Button-Disabled">
-          <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
-        </DisabledTexture>
-        <HighlightTexture file="Interface\Buttons\UI-Panel-Button-Highlight" alphaMode="ADD">
-          <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
-        </HighlightTexture>
-        <ButtonText name="$parentText">
-          <FontHeight>
-            <AbsValue val="10" />
-          </FontHeight>
-        </ButtonText>
-        <NormalFont inherits="GameFontNormal" font="Fonts\FRIZQT__.TTF">
-          <FontHeight>
-            <AbsValue val="12" />
-          </FontHeight>
-          <Color r="1" g="0.8196079" b="0" />
-          <Shadow>
-            <Color r="0" g="0" b="0" />
-            <Offset>
-              <AbsDimension x="1" y="-1" />
-            </Offset>
-          </Shadow>
-        </NormalFont>
-        <HighlightFont inherits="GameFontHighlight" font="Fonts\FRIZQT__.TTF">
-          <FontHeight>
-            <AbsValue val="12" />
-          </FontHeight>
-          <Color r="1" g="1" b="1" />
-          <Shadow>
-            <Color r="0" g="0" b="0" />
-            <Offset>
-              <AbsDimension x="1" y="-1" />
-            </Offset>
-          </Shadow>
-        </HighlightFont>
-        <DisabledFont inherits="GameFontDisable" font="Fonts\FRIZQT__.TTF">
-          <FontHeight>
-            <AbsValue val="12" />
-          </FontHeight>
-          <Color r="0.4980392" g="0.4980392" b="0.4980392" />
-          <Shadow>
-            <Color r="0" g="0" b="0" />
-            <Offset>
-              <AbsDimension x="1" y="-1" />
-            </Offset>
-          </Shadow>
-        </DisabledFont>
-      </Button>
       <Button name="$parentComponent13" text="Spawn NPC">
         <!--<FrameSkin skinid="dcb143e1-a4ab-4e7c-b934-1efa40101d21" frameid="2d508884-59c2-4f83-ae10-27aaad48391b" />-->
         <Size>
@@ -786,7 +716,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-331" />
+              <AbsDimension x="19" y="-269" />
             </Offset>
           </Anchor>
         </Anchors>
@@ -794,72 +724,6 @@
           <OnClick>NPCInfo()
 </OnClick>
         </Scripts>
-        <NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
-          <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
-        </NormalTexture>
-        <PushedTexture file="Interface\Buttons\UI-Panel-Button-Down">
-          <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
-        </PushedTexture>
-        <DisabledTexture file="Interface\Buttons\UI-Panel-Button-Disabled">
-          <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
-        </DisabledTexture>
-        <HighlightTexture file="Interface\Buttons\UI-Panel-Button-Highlight" alphaMode="ADD">
-          <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
-        </HighlightTexture>
-        <ButtonText name="$parentText">
-          <FontHeight>
-            <AbsValue val="10" />
-          </FontHeight>
-        </ButtonText>
-        <NormalFont inherits="GameFontNormal" font="Fonts\FRIZQT__.TTF">
-          <FontHeight>
-            <AbsValue val="12" />
-          </FontHeight>
-          <Color r="1" g="0.8196079" b="0" />
-          <Shadow>
-            <Color r="0" g="0" b="0" />
-            <Offset>
-              <AbsDimension x="1" y="-1" />
-            </Offset>
-          </Shadow>
-        </NormalFont>
-        <HighlightFont inherits="GameFontHighlight" font="Fonts\FRIZQT__.TTF">
-          <FontHeight>
-            <AbsValue val="12" />
-          </FontHeight>
-          <Color r="1" g="1" b="1" />
-          <Shadow>
-            <Color r="0" g="0" b="0" />
-            <Offset>
-              <AbsDimension x="1" y="-1" />
-            </Offset>
-          </Shadow>
-        </HighlightFont>
-        <DisabledFont inherits="GameFontDisable" font="Fonts\FRIZQT__.TTF">
-          <FontHeight>
-            <AbsValue val="12" />
-          </FontHeight>
-          <Color r="0.4980392" g="0.4980392" b="0.4980392" />
-          <Shadow>
-            <Color r="0" g="0" b="0" />
-            <Offset>
-              <AbsDimension x="1" y="-1" />
-            </Offset>
-          </Shadow>
-        </DisabledFont>
-      </Button>
-      <Button name="$parentComponent1" hidden="true" text="GM Only NPCs">
-        <!--<FrameSkin skinid="dcb143e1-a4ab-4e7c-b934-1efa40101d21" frameid="2d508884-59c2-4f83-ae10-27aaad48391b" />-->
-        <Size>
-          <AbsDimension x="144" y="25" />
-        </Size>
-        <Anchors>
-          <Anchor point="TOPLEFT">
-            <Offset>
-              <AbsDimension x="19" y="-148" />
-            </Offset>
-          </Anchor>
-        </Anchors>
         <NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
           <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
         </NormalTexture>
@@ -922,7 +786,7 @@
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset>
-              <AbsDimension x="19" y="-362" />
+              <AbsDimension x="19" y="-300" />
             </Offset>
           </Anchor>
         </Anchors>
