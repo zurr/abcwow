@@ -2579,18 +2579,9 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	// remove movement impeding auras
 	u_caster->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN);
 
-#ifndef COLLISION
-	if(!p_caster) return;
-
-	WorldPacket data(SMSG_MOVE_KNOCK_BACK, 50);
-	data << p_caster->GetNewGUID();
-	data << getMSTime();
-	data << cosf(p_caster->GetOrientation()) << sinf(p_caster->GetOrientation());
-	data << radius;
-	data << float(-10.0f);
-	p_caster->GetSession()->SendPacket(&data);
-	//m_caster->SendMessageToSet(&data, true);
-#else
+#ifdef COLLISION
+	if (CollideInterface.isCollitionMap(m_caster->GetMapId()))
+	{
 	float ori = m_caster->GetOrientation();				
 	float posX = m_caster->GetPositionX()+(radius*(cosf(ori)));
 	float posY = m_caster->GetPositionY()+(radius*(sinf(ori)));
@@ -2624,6 +2615,30 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	{
 		u_caster->SetPosition(dest, true);
 	}
+
+	}
+	else
+	{	if(!p_caster) return;
+
+		WorldPacket data(SMSG_MOVE_KNOCK_BACK, 50);
+		data << p_caster->GetNewGUID();
+		data << getMSTime();
+		data << cosf(p_caster->GetOrientation()) << sinf(p_caster->GetOrientation());
+		data << radius;
+		data << float(-10.0f);
+		p_caster->GetSession()->SendPacket(&data);
+		//m_caster->SendMessageToSet(&data, true);
+	}
+	#else
+		p_caster->blinked = true;
+
+		WorldPacket data(SMSG_MOVE_KNOCK_BACK, 50);
+		data << p_caster->GetNewGUID();
+		data << getMSTime();
+		data << cosf(p_caster->GetOrientation()) << sinf(p_caster->GetOrientation());
+		data << radius;
+		data << float(-10.0f);
+		m_caster->SendMessageToSet(&data, true);
 #endif
 }
 

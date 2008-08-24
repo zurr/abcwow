@@ -2912,6 +2912,8 @@ uint8 Spell::CanCast(bool tolerate)
 	if( p_caster != NULL )
 	{
 #ifdef COLLISION
+		if (CollideInterface.isCollitionMap(p_caster->GetMapId()))
+		{
 		if (GetProto()->MechanicsType == MECHANIC_MOUNTED)
 		{
 			if (CollideInterface.IsIndoor( p_caster->GetMapId(), p_caster->GetPositionNC() ))
@@ -2921,6 +2923,7 @@ uint8 Spell::CanCast(bool tolerate)
 		{
 			if( !CollideInterface.IsOutdoor( p_caster->GetMapId(), p_caster->GetPositionNC() ) )
 				return SPELL_FAILED_ONLY_OUTDOORS;
+		}
 		}
 #endif
 		//are we in an arena and the spell cooldown is longer then 15mins?
@@ -3464,8 +3467,9 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_NO_AMMO;
 				}
 #ifdef COLLISION
-				if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
-					return SPELL_FAILED_LINE_OF_SIGHT;
+				if (CollideInterface.isCollitionMap(p_caster->GetMapId()))
+					if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
+						return SPELL_FAILED_LINE_OF_SIGHT;
 #endif
 
 				// check aurastate
