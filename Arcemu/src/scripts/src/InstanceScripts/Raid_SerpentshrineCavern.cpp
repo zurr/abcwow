@@ -3295,35 +3295,35 @@ public:
 	}
 
 	void SpellCast(float val)
-    {
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
 			float comulativeperc = 0;
-		    Unit *target = NULL;
+			Unit *target = NULL;
 			for(int i=0;i<nrspells;i++)
 			{
 				if(!spells[i].perctrigger) continue;
-				
+
 				if(m_spellcheck[i])
 				{
 					target = _unit->GetAIInterface()->GetNextTarget();
 					switch(spells[i].targettype)
 					{
-						case TARGET_SELF:
-						case TARGET_VARIOUS:
-							_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
-						case TARGET_ATTACKING:
-							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
-						case TARGET_DESTINATION:
-							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					case TARGET_SELF:
+					case TARGET_VARIOUS:
+						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+					case TARGET_ATTACKING:
+						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+					case TARGET_DESTINATION:
+						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 
-						case TARGET_RANDOM_SINGLE:
-							target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
-							if (target)
-							{
-								_unit->GetAIInterface()->SetNextTarget(target);
-								_unit->CastSpell(target, spells[i].info, spells[i].instant);
-							}
+					case TARGET_RANDOM_SINGLE:
+						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
+						if (target)
+						{
+							_unit->GetAIInterface()->SetNextTarget(target);
+							_unit->CastSpell(target, spells[i].info, spells[i].instant);
+						}
 						break;
 					}
 					m_spellcheck[i] = false;
@@ -3339,8 +3339,8 @@ public:
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
-        }
-    }
+		}
+	}
 
 	void CastTime()
 	{
@@ -3702,6 +3702,12 @@ public:
 		{
 			//if something wents wrong directly to vashj plz
 			_unit->GetAIInterface()->setWaypointToMove(3);
+		}
+
+		nrspells = 1;
+		for(int i=0; i<nrspells; i++)
+		{
+			m_spellcheck[i] = false;
 		}
 
 		spells[0].info = dbcSpell.LookupEntry(COILFANGSTRIDER_MINDBLAST);
