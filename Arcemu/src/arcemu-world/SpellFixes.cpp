@@ -15585,8 +15585,19 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->procChance = 5;
 
+		// Deadly Throw Interrupt
+		sp = dbcSpell.LookupEntryForced( 32748 );
+		if( sp != NULL )
+		{
+			sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_ON_CAST_SPELL;
+		}
 
-
+		//Weakened Soul Reduction ( arena set bonus )
+		sp = dbcSpell.LookupEntry( 33333 ); 
+		if( sp != NULL )
+		{
+			sp->EffectSpellGroupRelation[0] = 0x20000000;
+		}
 
 		//////////////////////////////////////////
 		// BOSSES								//
