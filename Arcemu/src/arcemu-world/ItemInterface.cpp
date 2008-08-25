@@ -2489,7 +2489,7 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 		{
 			DstItem->ModUnsigned32Value( ITEM_FIELD_STACK_COUNT, SrcItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) );
 			SafeFullRemoveItemFromSlot( INVENTORY_SLOT_NOT_SET, srcslot );
-			DstItem->m_isDirty = true;
+			SrcItem->m_isDirty = DstItem->m_isDirty = true;
 			return;
 		}
 		else
