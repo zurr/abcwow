@@ -2166,19 +2166,24 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		pVictim->SetUInt32Value(UNIT_FIELD_HEALTH, 0);
 		if(pVictim->IsPlayer())
 		{
-			uint32 self_res_spell = static_cast< Player* >( pVictim )->SoulStone;
-			static_cast< Player* >( pVictim )->SoulStone = static_cast< Player* >( pVictim )->SoulStoneReceiver = 0;
-
-			if( !self_res_spell && static_cast< Player* >( pVictim )->bReincarnation )
+			uint32 self_res_spell = 0;
+			if ( GetMapMgr()->GetMapId() != 572 && GetMapMgr()->GetMapId() != 562 && GetMapMgr()->GetMapId() != 559)
 			{
-				SpellEntry* m_reincarnSpellInfo = dbcSpell.LookupEntry( 20608 );
-				if( static_cast< Player* >( pVictim )->Cooldown_CanCast( m_reincarnSpellInfo ) )
+				self_res_spell = static_cast< Player* >( pVictim )->SoulStone;
+				static_cast< Player* >( pVictim )->SoulStone = static_cast< Player* >( pVictim )->SoulStoneReceiver = 0;
+
+				if( !self_res_spell && static_cast< Player* >( pVictim )->bReincarnation )
 				{
-					uint32 ankh_count = static_cast< Player* >( pVictim )->GetItemInterface()->GetItemCount( 17030 );
-					if( ankh_count )
-						self_res_spell = 21169;
+					SpellEntry* m_reincarnSpellInfo = dbcSpell.LookupEntry( 20608 );
+					if( static_cast< Player* >( pVictim )->Cooldown_CanCast( m_reincarnSpellInfo ) )
+					{
+						uint32 ankh_count = static_cast< Player* >( pVictim )->GetItemInterface()->GetItemCount( 17030 );
+						if( ankh_count )
+							self_res_spell = 21169;
+					}
 				}
 			}
+
 			pVictim->SetUInt32Value( PLAYER_SELF_RES_SPELL, self_res_spell );
 			pVictim->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0 );
 			//pVictim->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
