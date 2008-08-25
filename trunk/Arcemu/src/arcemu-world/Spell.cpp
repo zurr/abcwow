@@ -2967,9 +2967,11 @@ uint8 Spell::CanCast(bool tolerate)
 		// check for duel areas
 		if(p_caster && GetProto()->Id == 7266)
 		{
+			/*
 			AreaTable* at = dbcArea.LookupEntry( p_caster->GetAreaID() );
 			if(at->AreaFlags & AREA_CITY_AREA)
 				return SPELL_FAILED_NO_DUELING;
+				*/
 			// instance & stealth checks
 			if ( p_caster->GetMapMgr() && p_caster->GetMapMgr()->GetMapInfo() && p_caster->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL )
 					return SPELL_FAILED_NO_DUELING;
