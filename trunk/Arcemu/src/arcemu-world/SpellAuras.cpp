@@ -448,6 +448,7 @@ char* SpellAuraNames[TOTAL_SPELL_AURAS] = {
     "DETECT_AMORE",										// 170 Detect Amore
 	"",													// 171
     "INCREASE_MOVEMENT_AND_MOUNTED_SPEED",				// 172 Increase Movement and Mounted Speed (Non-Stacking)
+	"",													// 173
     "INCREASE_SPELL_DAMAGE_PCT",						// 174 Increase Spell Damage by % status
     "INCREASE_SPELL_HEALING_PCT",						// 175 Increase Spell Healing by % status
     "SPIRIT_OF_REDEMPTION",								// 176 Spirit of Redemption Auras
@@ -3202,7 +3203,9 @@ void Aura::SpellAuraModStealth(bool apply)
 	if(apply)
 	{
 		SetPositive();
-		m_target->SetStealth(GetSpellId());
+		if( m_spellProto->NameHash != SPELL_HASH_VANISH)
+			m_target->SetStealth(GetSpellId());
+
 		if( m_spellProto->NameHash == SPELL_HASH_STEALTH)
 			m_target->SetFlag(UNIT_FIELD_BYTES_2,0x1E000000);//sneak anim
 
@@ -3260,7 +3263,9 @@ void Aura::SpellAuraModStealth(bool apply)
 	}
 	else
 	{
-		m_target->SetStealth(0);
+		if( m_spellProto->NameHash != SPELL_HASH_VANISH)
+			m_target->SetStealth(0);
+
 		m_target->m_stealthLevel -= mod->m_amount;
 		if( m_spellProto->NameHash == SPELL_HASH_STEALTH)
 			m_target->RemoveFlag(UNIT_FIELD_BYTES_2,0x1E000000);
@@ -5692,12 +5697,7 @@ void Aura::SpellAuraMounted(bool apply)
 
 		//desummon summons
 		if( p_target->GetSummon() != NULL )
-		{
-			if( p_target->GetSummon()->GetUInt32Value( UNIT_CREATED_BY_SPELL ) > 0 )
-				p_target->GetSummon()->Dismiss( false ); // warlock summon -> dismiss
-			else
-				p_target->GetSummon()->Remove( false, true, false ); // hunter pet -> just remove for later re-call
-		}
+			p_target->GetSummon()->Remove( false, true, false ); // just remove for later re-call
 	}
 	else
 	{
@@ -5847,6 +5847,8 @@ void Aura::SpellAuraSplitDamage(bool apply)
 		return;
 
 	caster = static_cast< Unit* >( GetCaster() );
+	if(!caster)
+		return;
 
 	if(caster->m_damageSplitTarget)
 	{
@@ -6038,7 +6040,7 @@ void Aura::SpellAuraChannelDeathItem(bool apply)
 					if(!pCaster->GetItemInterface()->AddItemToFreeSlot(item))
 					{
 						pCaster->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_INVENTORY_FULL);
-						ItemPool.PooledDelete( item );
+						item->DeleteMe();
 						return;
 					}
 					/*WorldPacket data(45);
@@ -7646,8 +7648,6 @@ void Aura::SpellAuraIncreaseSpellDamageByAttribute(bool apply)
 				}
 				else
 					m_target->ModUnsigned32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, -mod->realamount );
-
-				static_cast< Player* >( m_target )->SpellDmgDoneByAttribute[stat][x] += ((float)(val))/100;
 			}
 		}
 		if(m_target->IsPlayer())

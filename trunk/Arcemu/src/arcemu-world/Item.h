@@ -138,6 +138,7 @@ public:
 	void SaveToDB( int8 containerslot, int8 slot, bool firstsave, QueryBuffer* buf );
 	bool LoadAuctionItemFromDB( uint64 guid );
 	void DeleteFromDB();
+	void DeleteMe();
 	
 	ARCEMU_INLINE void SoulBind()
 	{
@@ -190,6 +191,9 @@ public:
 
 	//! Check if we have an enchantment of this id?
 	int32 HasEnchantment( uint32 Id );
+
+	//! Check if we have an enchantment on that slot
+	bool HasEnchantmentOnSlot( uint32 slot );
 
 	//! Modify the time of an existing enchantment.
 	void ModifyEnchantmentTime( uint32 Slot, uint32 Duration );

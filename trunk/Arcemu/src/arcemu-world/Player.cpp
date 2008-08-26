@@ -237,7 +237,6 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	for(uint32 a = 0; a < 6; a++)
 		for(uint32 x = 0; x < 7; x++)
 		{	
-			SpellDmgDoneByAttribute[a][x] = 0;
 			SpellHealDoneByAttribute[a][x] = 0;
 		}
 
@@ -755,12 +754,12 @@ bool Player::Create(WorldPacket& data )
 				if((*is).slot<INVENTORY_SLOT_BAG_END)
 				{
 					if( !GetItemInterface()->SafeAddItem(item, INVENTORY_SLOT_NOT_SET, (*is).slot) )
-						ItemPool.PooledDelete( item );
+						item->DeleteMe();
 				}
 				else
 				{
 					if( !GetItemInterface()->AddItemToFreeSlot(item) )
-						ItemPool.PooledDelete( item );
+						item->DeleteMe();
 				}
 			}
 		}
@@ -1331,6 +1330,8 @@ void Player::_EventExploration()
 		SetUInt32Value(offset, (uint32)(currFields | val));
 
 		uint32 explore_xp = at->level * 10;
+		explore_xp *= float2int32(sWorld.getRate(RATE_EXPLOREXP));
+
 		WorldPacket data(SMSG_EXPLORATION_EXPERIENCE, 8);
 		data << at->AreaId << explore_xp;
 		m_session->SendPacket(&data);
@@ -1838,16 +1839,13 @@ void Player::SpawnActivePet()
 	if( m_Summon != NULL )
 		return;
 
-	if( getClass() == HUNTER )
-	{
-		std::map< uint32, PlayerPet* >::iterator itr = m_Pets.begin();
-		for( ; itr != m_Pets.end(); itr++ )
-			if( itr->second->stablestate == STABLE_STATE_ACTIVE && itr->second->active )
-			{
-				SpawnPet( itr->first );
-				return;
-			}
-	}
+	std::map< uint32, PlayerPet* >::iterator itr = m_Pets.begin();
+	for( ; itr != m_Pets.end(); itr++ )
+		if( itr->second->stablestate == STABLE_STATE_ACTIVE && itr->second->active )
+		{
+			SpawnPet( itr->first );
+			return;
+		}
 }
 
 void Player::_LoadPetSpells(QueryResult * result)
@@ -3226,7 +3224,10 @@ void Player::SetPersistentInstanceId(uint32 mapId, uint32 difficulty, uint32 ins
 	m_playerInfo->savedInstanceIdsLock.Acquire();
 	PlayerInstanceMap::iterator itr = m_playerInfo->savedInstanceIds[difficulty].find(mapId);
 	if(itr == m_playerInfo->savedInstanceIds[difficulty].end())
-		m_playerInfo->savedInstanceIds[difficulty].insert(PlayerInstanceMap::value_type(mapId, instanceId));
+	{
+		if(instanceId != 0)
+			m_playerInfo->savedInstanceIds[difficulty].insert(PlayerInstanceMap::value_type(mapId, instanceId));
+	}
 	else
 	{
 		if(instanceId == 0)
@@ -5844,7 +5845,7 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 
 void Player::EventRepeatSpell()
 {
-	if( !m_curSelection )
+	if( !m_curSelection || !IsInWorld() )
 		return;
 	
 	Unit* target = GetMapMgr()->GetUnit( m_curSelection );
@@ -11112,7 +11113,7 @@ void Player::VampiricSpell(uint32 dmg, Unit* pTarget)
 			{
 				for( itr = pSubGroup->GetGroupMembersBegin(); itr != pSubGroup->GetGroupMembersEnd(); ++itr )
 				{
-					if( (*itr)->m_loggedInPlayer != NULL && (*itr) != m_playerInfo )
+					if( (*itr)->m_loggedInPlayer != NULL && (*itr) != m_playerInfo && (*itr)->m_loggedInPlayer->isAlive() )
 						Heal( (*itr)->m_loggedInPlayer, 15286, bonus );
 				}
 			}
