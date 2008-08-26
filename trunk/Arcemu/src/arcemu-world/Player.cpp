@@ -406,9 +406,11 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	m_outStealthDamageBonusPct = m_outStealthDamageBonusPeriod = m_outStealthDamageBonusTimer = 0;
 	m_vampiricEmbrace = m_vampiricTouch = 0;
 	LastSeal = 0;
+/*
 #ifdef COLLISION
 	m_flyhackCheckTimer = 0;
 #endif
+*/
 }
 
 void Player::OnLogin()
@@ -922,7 +924,7 @@ void Player::Update( uint32 p_time )
 	}
 	}
 #endif
-
+/*
 #ifdef COLLISION
 	if( mstime >= m_flyhackCheckTimer )
 	{
@@ -930,6 +932,7 @@ void Player::Update( uint32 p_time )
 		m_flyhackCheckTimer = mstime + 10000; 
 	}
 #endif
+*/
 }
 
 void Player::EventDismount(uint32 money, float x, float y, float z)
@@ -10694,7 +10697,7 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 
 	} while ( result->NextRow( ) );
 }
-
+/*
 #ifdef COLLISION
 void Player::_FlyhackCheck()
 {
@@ -10732,7 +10735,7 @@ void Player::_FlyhackCheck()
 	}
 }
 #endif
-
+*/
 /************************************************************************/
 /* SOCIAL                                                               */
 /************************************************************************/
