@@ -262,8 +262,6 @@ Pet::~Pet()
 	for(std::map<uint32, AI_Spell*>::iterator itr = m_AISpellStore.begin(); itr != m_AISpellStore.end(); ++itr)
 		delete itr->second;
 
-	m_mapMgr->m_PetStorage.erase( this->GetUIdFromGUID() );
-
 	if(IsInWorld())
 		this->Remove(false, true, true);
 }
@@ -391,7 +389,7 @@ void Pet::SendCastFailed( uint32 spellid, uint8 fail )
 
 void Pet::InitializeSpells()
 {
-	for(PetSpellMap::iterator itr = mSpells.begin(); itr != mSpells.end(); ++itr)
+	for( PetSpellMap::iterator itr = mSpells.begin(); itr != mSpells.end(); ++itr )
 	{
 		SpellEntry *info = itr->first;
 
@@ -400,18 +398,18 @@ void Pet::InitializeSpells()
 		{
 			// Cast on self..
 			Spell * sp = SpellPool.PooledNew();
-			sp->Init(this, info, true, false);
-			SpellCastTargets targets(this->GetGUID());
-			sp->prepare(&targets);
+			sp->Init( this, info, true, false );
+			SpellCastTargets targets( this->GetGUID() );
+			sp->prepare( &targets );
 
 			continue;
 		}
 
-		AI_Spell * sp = CreateAISpell(info);
-		if(itr->second == AUTOCAST_SPELL_STATE)
-			SetAutoCast(sp, true);
+		AI_Spell * sp = CreateAISpell( info );
+		if( itr->second == AUTOCAST_SPELL_STATE )
+			SetAutoCast( sp, true );
 		else
-			SetAutoCast(sp,false);
+			SetAutoCast( sp, false );
 	}
 }
 
@@ -609,10 +607,10 @@ void Pet::InitializeMe(bool first)
 			do 
 			{
 				Field * f = query->Fetch();
-				SpellEntry* spell = dbcSpell.LookupEntry(f[2].GetUInt32());
+				SpellEntry* spell = dbcSpell.LookupEntry( f[2].GetUInt32() );
 				uint16 flags = f[3].GetUInt16();
-				if(mSpells.find(spell) == mSpells.end())
-					mSpells.insert ( make_pair( spell, flags ) );
+				if( spell != NULL && mSpells.find( spell ) == mSpells.end() )
+					mSpells.insert( make_pair( spell, flags ) );
 
 			} while(query->NextRow());
 		}

@@ -451,7 +451,14 @@ void Spell::SpellEffectInstantKill(uint32 i)
 
 			static_cast<Pet*>(u_caster)->Dismiss( true );
 			return;
+		}break;
+	case SPELL_HASH_DEMONIC_SACRIFICE:
+		{
+			if( !p_caster->IsPlayer() )
+				return;
 
+			static_cast<Pet*>(unitTarget)->Dismiss( true );
+			return;
 		}break;
 
 	default:
@@ -2211,7 +2218,7 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 				p_caster->SendMessageToSet(&data, true);*/
 				p_caster->GetSession()->SendItemPushResult(newItem,true,false,true,true,slotresult.ContainerSlot,slotresult.Slot,item_count);
 			} else {
-				ItemPool.PooledDelete( newItem );
+				newItem->DeleteMe();
 			}
 		} 
 		else 
@@ -2234,7 +2241,7 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 					newItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, item_count - item_count_filled);
 					if(!p_caster->GetItemInterface()->SafeAddItem(newItem,slotresult.ContainerSlot, slotresult.Slot))
 					{
-						ItemPool.PooledDelete( newItem );
+						newItem->DeleteMe();
 						item_count = item_count_filled;
 					}
 					else
@@ -6125,7 +6132,7 @@ void Spell::SpellEffectTranformItem(uint32 i)
 	if(!result2) //should never get here
 	{ 
 		owner->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,INV_ERR_BAG_FULL);
-		ItemPool.PooledDelete( it );
+		it->DeleteMe();
 	}
 }
 
@@ -6185,6 +6192,9 @@ void Spell::SpellEffectEnchantHeldItem( uint32 i )
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry( GetProto()->EffectMiscValue[i] );
 	
 	if( Enchantment == NULL )
+		return;
+
+	if (m_spellInfo->NameHash == SPELL_HASH_WINDFURY_TOTEM_EFFECT && item->HasEnchantmentOnSlot( 1 ) && item->GetEnchantment( 1 )->Enchantment != Enchantment) //dirty fix for Windfury totem not overwriting existing enchantments
 		return;
 
 	item->RemoveEnchantment( 1 );

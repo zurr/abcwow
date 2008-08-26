@@ -327,55 +327,197 @@ Unit::Unit()
 }
 
 Unit::~Unit()
-{  
+{
+	//start to remove badptrs, if you delete from the heap null the ptr's damn!
 	RemoveAllAuras();
 
-	if(SM_CriticalChance != 0) delete [] SM_CriticalChance ;
-	if(SM_FDur != 0) delete [] SM_FDur ;//flat
-	if(SM_PDur != 0) delete [] SM_PDur ;//pct
-	if(SM_FRadius != 0) delete [] SM_FRadius ;
-	if(SM_FRange != 0) delete [] SM_FRange ;
-	if(SM_PCastTime != 0) delete [] SM_PCastTime ;
-	if(SM_FCastTime != 0) delete [] SM_FCastTime ;
-	if(SM_PCriticalDamage != 0) delete [] SM_PCriticalDamage ;
-	if(SM_FDOT != 0) delete [] SM_FDOT ;
-	if(SM_PDOT != 0) delete [] SM_PDOT ;
-	if(SM_PEffectBonus != 0) delete [] SM_PEffectBonus ;
-    if(SM_FEffectBonus != 0) delete [] SM_FEffectBonus ;
-	if(SM_FDamageBonus != 0) delete [] SM_FDamageBonus ;
-	if(SM_PDamageBonus != 0) delete [] SM_PDamageBonus ;
-	if(SM_PSPELL_VALUE != 0) delete [] SM_PSPELL_VALUE ;
-	if(SM_FSPELL_VALUE != 0) delete [] SM_FSPELL_VALUE ;
-	if(SM_FHitchance != 0) delete [] SM_FHitchance ;
-	if(SM_PRange != 0) delete [] SM_PRange ;//pct
-	if(SM_PRadius != 0) delete [] SM_PRadius ;
-	if(SM_PAPBonus != 0) delete [] SM_PAPBonus ;
-	if(SM_PCost != 0) delete [] SM_PCost ;
-	if(SM_FCost != 0) delete [] SM_FCost ;
-	if(SM_FAdditionalTargets != 0) delete [] SM_FAdditionalTargets ;
-	if(SM_PJumpReduce != 0) delete [] SM_PJumpReduce ;
-	if(SM_FSpeedMod != 0) delete [] SM_FSpeedMod ;
-	if(SM_PNonInterrupt != 0) delete [] SM_PNonInterrupt ;
-	if(SM_FPenalty != 0) delete [] SM_FPenalty ;
-	if(SM_PPenalty != 0) delete [] SM_PPenalty ;
-	if(SM_FCooldownTime != 0) delete [] SM_FCooldownTime ;
-	if(SM_PCooldownTime != 0) delete [] SM_PCooldownTime ;
-	if(SM_FChanceOfSuccess != 0) delete [] SM_FChanceOfSuccess ;
-	if(SM_FRezist_dispell != 0) delete [] SM_FRezist_dispell ;
-	if(SM_PRezist_dispell != 0) delete [] SM_PRezist_dispell ;
-	if(SM_FCharges != 0) delete [] SM_FCharges ;
-	if(SM_PCharges != 0) delete [] SM_PCharges ;
+	if( SM_CriticalChance != NULL ) {
+		delete [] SM_CriticalChance;
+		SM_CriticalChance = NULL;
+	}
+
+	if( SM_FDur != NULL ) {
+		delete [] SM_FDur;
+		SM_FDur = NULL;
+	}
+	
+	if( SM_PDur != NULL ) {
+		delete [] SM_PDur;
+		SM_PDur = NULL;
+	}
+
+	if( SM_FRadius != NULL ) {
+		delete [] SM_FRadius;
+		SM_FRadius = NULL;
+	}
+
+	if( SM_FRange != NULL ) {
+		delete [] SM_FRange;
+		SM_FRange = NULL;
+	}
+
+	if( SM_PCastTime != NULL ) {
+		delete [] SM_PCastTime;
+		SM_PCastTime = NULL;
+	}
+
+	if(SM_FCastTime != NULL ) {
+		delete [] SM_FCastTime;
+		SM_FCastTime = NULL;
+	}
+
+	if(SM_PCriticalDamage != NULL ) {
+		delete [] SM_PCriticalDamage;
+		SM_PCriticalDamage = NULL;
+	}
+
+	if(SM_FDOT != NULL ) {
+		delete [] SM_FDOT;
+		SM_FDOT = NULL;
+	}
+
+	if(SM_PDOT != NULL ) {
+		delete [] SM_PDOT;
+		SM_PDOT = NULL;
+	}
+
+	if(SM_PEffectBonus != NULL ) {
+		delete [] SM_PEffectBonus;
+		SM_PEffectBonus = NULL;
+	}
+
+    if(SM_FEffectBonus != NULL ) {
+		delete [] SM_FEffectBonus;
+		SM_FEffectBonus = NULL;
+	}
+
+	if(SM_FDamageBonus != NULL ) {
+		delete [] SM_FDamageBonus;
+		SM_FDamageBonus = NULL;
+	}
+
+	if(SM_PDamageBonus != NULL ) {
+		delete [] SM_PDamageBonus;
+		SM_PDamageBonus = NULL;
+	}
+
+	if(SM_PSPELL_VALUE != NULL ) {
+		delete [] SM_PSPELL_VALUE;
+		SM_PSPELL_VALUE = NULL;
+	}
+
+	if(SM_FSPELL_VALUE != NULL ) {
+		delete [] SM_FSPELL_VALUE;
+		SM_FSPELL_VALUE = NULL;
+	}
+
+	if(SM_FHitchance != NULL ) {
+		delete [] SM_FHitchance;
+		SM_FHitchance = NULL;
+	}
+
+	if(SM_PRange != NULL ) {
+		delete [] SM_PRange;
+		SM_PRange = NULL;
+	}
+
+	if(SM_PRadius != NULL ) {
+		delete [] SM_PRadius;
+		SM_PRadius = NULL;
+	}
+
+	if(SM_PAPBonus != NULL ) {
+		delete [] SM_PAPBonus;
+		SM_PAPBonus = NULL;
+	}
+
+	if(SM_PCost != NULL ) {
+		delete [] SM_PCost;
+		SM_PCost = NULL;
+	}
+
+	if(SM_FCost != NULL ) {
+		delete [] SM_FCost;
+		SM_FCost = NULL;
+	}
+
+	if(SM_FAdditionalTargets != NULL ) {
+		delete [] SM_FAdditionalTargets;
+		SM_FAdditionalTargets = NULL;
+	}
+
+	if(SM_PJumpReduce != NULL ) {
+		delete [] SM_PJumpReduce;
+		SM_PJumpReduce = NULL;
+	}
+
+	if(SM_FSpeedMod != NULL ) {
+		delete [] SM_FSpeedMod;
+		SM_FSpeedMod = NULL;
+	}
+
+	if(SM_PNonInterrupt != NULL ) {
+		delete [] SM_PNonInterrupt;
+		SM_PNonInterrupt = NULL;
+	}
+
+	if(SM_FPenalty != NULL ) {
+		delete [] SM_FPenalty;
+		SM_FPenalty = NULL;
+	}
+
+	if(SM_PPenalty != NULL ) {
+		delete [] SM_PPenalty;
+		SM_PPenalty = NULL;
+	}
+
+	if(SM_FCooldownTime != NULL ) {
+		delete [] SM_FCooldownTime;
+		SM_FCooldownTime = NULL;
+	}
+
+	if(SM_PCooldownTime != NULL ) {
+		delete [] SM_PCooldownTime;
+		SM_PCooldownTime = NULL;
+	}
+
+	if(SM_FChanceOfSuccess != NULL ) {
+		delete [] SM_FChanceOfSuccess;
+		SM_FChanceOfSuccess = NULL;
+	}
+
+	if(SM_FRezist_dispell != NULL ) {
+		delete [] SM_FRezist_dispell;
+		SM_FRezist_dispell = NULL;
+	}
+
+	if(SM_PRezist_dispell != NULL ) {
+		delete [] SM_PRezist_dispell;
+		SM_PRezist_dispell = NULL;
+	}
+
+	if(SM_FCharges != NULL ) {
+		delete [] SM_FCharges;
+		SM_FCharges = NULL;
+	}
+
+	if(SM_PCharges != NULL ) {
+		delete [] SM_PCharges;
+		SM_PCharges = NULL;
+	}
 
 	delete m_aiInterface;
+	m_aiInterface = NULL;
 
-	/*for(int i = 0; i < 4; i++)
-		if(m_ObjectSlots[i])
-			delete m_ObjectSlots[i];*/
-
-	if(m_currentSpell)
+	if( m_currentSpell ) {
 		m_currentSpell->cancel();
+		m_currentSpell = NULL;
+	}
 
-	if (m_damageSplitTarget) delete m_damageSplitTarget;
+	if( m_damageSplitTarget ) {
+		delete m_damageSplitTarget;
+		m_damageSplitTarget = NULL;
+	}
 }
 
 void Unit::Update( uint32 p_time )
@@ -1335,6 +1477,11 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}
 						}
 					}break;
+				//mage - Winter's Chill
+				case 12579:
+					// Winter's Chill shouldn't proc on self
+					if (victim == this) continue;
+					break;
 				//priest - prayer of mending	
 				case 41637: //the heal spell
 					{
@@ -3402,8 +3549,12 @@ else
 //--------------------------dirty fixes-----------------------------------------------------
 	//vstate=1-wound,2-dodge,3-parry,4-interrupt,5-block,6-evade,7-immune,8-deflect	
 	// the above code was remade it for reasons : damage shield needs moslty same flags as handleproc + dual wield should proc too ?
+	if (ability && ability->noproc)
+	{
+		disable_proc = true;
+	}
 	if( !disable_proc && weapon_damage_type != OFFHAND )
-    {
+	{
 		//damage shield must come before handleproc to not loose 1 charge : speel gets removed before last charge
 		if( realdamage > 0 || vproc & PROC_ON_BLOCK_VICTIM )
 		{
@@ -3784,41 +3935,41 @@ void Unit::smsg_AttackStop(uint64 victimGuid)
 
 void Unit::smsg_AttackStart(Unit* pVictim)
 {
-	if(GetTypeId() != TYPEID_PLAYER) 
-		return;
+    // Prevent user from ignoring attack speed and stopping and start combat really really fast
+    /*if(!isAttackReady())
+        setAttackTimer(uint32(0));
+    else if(!canReachWithAttack(pVictim))
+    {
+        setAttackTimer(uint32(500));
+        //pThis->GetSession()->OutPacket(SMSG_ATTACKSWING_NOTINRANGE);
+    }
+    else if(!isInFront(pVictim))
+    {
+        setAttackTimer(uint32(500));
+        //pThis->GetSession()->OutPacket(SMSG_ATTACKSWING_NOTINRANGE);
+    }*/
 
-	Player* pThis = static_cast< Player* >( this );
+    // Send out ATTACKSTART
+    WorldPacket data(SMSG_ATTACKSTART, 16);
+    data << GetGUID();
+    data << pVictim->GetGUID();
+//    SendMessageToSet(&data, true);
+    SendMessageToSet(&data, false);
+    sLog.outDebug( "WORLD: Sent SMSG_ATTACKSTART" );
 
-	// Prevent user from ignoring attack speed and stopping and start combat really really fast
-	/*if(!isAttackReady())
-		setAttackTimer(uint32(0));
-	else if(!canReachWithAttack(pVictim))
-	{
-		setAttackTimer(uint32(500));
-		//pThis->GetSession()->OutPacket(SMSG_ATTACKSWING_NOTINRANGE);
-	}
-	else if(!isInFront(pVictim))
-	{
-		setAttackTimer(uint32(500));
-		//pThis->GetSession()->OutPacket(SMSG_ATTACKSWING_NOTINRANGE);
-	}*/
-
-	// Send out ATTACKSTART
-	WorldPacket data(SMSG_ATTACKSTART, 16);
-	data << GetGUID();
-	data << pVictim->GetGUID();
-	SendMessageToSet(&data, true);
-	sLog.outDebug( "WORLD: Sent SMSG_ATTACKSTART" );
-
-	// FLAGS changed so other players see attack animation
-	//	addUnitFlag(UNIT_FLAG_COMBAT);
-	//	setUpdateMaskBit(UNIT_FIELD_FLAGS );
-	if(pThis->cannibalize)
-	{
-		sEventMgr.RemoveEvents(pThis, EVENT_CANNIBALIZE);
-		pThis->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-		pThis->cannibalize = false;
-	}
+    // FLAGS changed so other players see attack animation
+    //    addUnitFlag(UNIT_FLAG_COMBAT);
+    //    setUpdateMaskBit(UNIT_FIELD_FLAGS );
+    if(GetTypeId() != TYPEID_PLAYER)
+    {
+        Player* pThis = static_cast< Player* >( this );
+        if( pThis->cannibalize)
+        {
+            sEventMgr.RemoveEvents(pThis, EVENT_CANNIBALIZE);
+            pThis->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+            pThis->cannibalize = false;
+        }
+    }
 }
 
 void Unit::AddAura(Aura *aur)
@@ -4487,11 +4638,6 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	if( spellInfo->c_is_flags & SPELL_FLAG_IS_NOT_USING_DMG_BONUS )
 		return 0;
 
-	if( caster->IsPlayer() )
-	{
-		for(uint32 a = 0; a < 6; a++)
-			plus_damage += float2int32(static_cast< Player* >(caster)->SpellDmgDoneByAttribute[a][school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT0 + a)));
-	}
 //------------------------------by school---------------------------------------------------
 	plus_damage += caster->GetDamageDoneMod(school);
 	plus_damage += pVictim->DamageTakenMod[school];

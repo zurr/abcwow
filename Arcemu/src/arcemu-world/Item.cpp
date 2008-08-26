@@ -428,6 +428,16 @@ void Item::DeleteFromDB()
 	CharacterDatabase.Execute( "DELETE FROM playeritems WHERE guid = %u", m_uint32Values[OBJECT_FIELD_GUID] );
 }
 
+void Item::DeleteMe()
+{
+	//Don't inline me!
+	if( IsContainer() ) {
+		delete static_cast<Container*>(this);
+	} else {
+		ItemPool.PooledDelete( this );
+	}
+}
+
 uint32 GetSkillByProto( uint32 Class, uint32 SubClass )
 {
 	if( Class == 4 && SubClass < 7 )
@@ -972,6 +982,15 @@ int32 Item::HasEnchantment( uint32 Id )
 	}
 
 	return -1;
+}
+
+bool Item::HasEnchantmentOnSlot( uint32 slot )
+{
+	EnchantmentMap::iterator itr = Enchantments.find( slot );
+	if( itr == Enchantments.end() )
+		return false;
+
+	return true;
 }
 
 void Item::ModifyEnchantmentTime( uint32 Slot, uint32 Duration )
