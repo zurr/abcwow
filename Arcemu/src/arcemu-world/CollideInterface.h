@@ -82,17 +82,6 @@ public:
 	void ActivateTile(uint32 mapId, uint32 tileX, uint32 tileY);
 	void DeactivateTile(uint32 mapId, uint32 tileX, uint32 tileY);
 
-	inline bool isCollitionMap( uint32 mapId )
-	{
-		static uint32 maps[11] = { 572, 566, 562, 559, 529, 489, 37, 30, 999 };
-		for(uint32 i = 0; maps[i] != 999; i++ )
-		{
-			if ( mapId == maps[i] ) 
-				return true;
-		}
-		return false;
-	}
-
 #ifdef COLLISION_DEBUG
 
 	bool CheckLOS(uint32 mapId, float x1, float y1, float z1, float x2, float y2, float z2);
