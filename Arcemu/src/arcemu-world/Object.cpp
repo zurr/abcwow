@@ -2165,19 +2165,11 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		pVictim->SetUInt32Value(UNIT_FIELD_HEALTH, 0);
 		if(pVictim->IsPlayer())
 		{
-<<<<<<< .mine
-			uint32 self_res_spell = 0;
-			if ( GetMapMgr()->GetMapId() != 572 && GetMapMgr()->GetMapId() != 562 && GetMapMgr()->GetMapId() != 559)
-			{
-				self_res_spell = static_cast< Player* >( pVictim )->SoulStone;
-				static_cast< Player* >( pVictim )->SoulStone = static_cast< Player* >( pVictim )->SoulStoneReceiver = 0;
-=======
 			uint32 self_res_spell = 0;
 			if (static_cast< Player* >( pVictim )->m_bg == NULL || (static_cast< Player* >( pVictim )->m_bg != NULL && static_cast< Player* >( pVictim )->m_bg->GetType() != BATTLEGROUND_ARENA_5V5 && static_cast< Player* >( pVictim )->m_bg->GetType() != BATTLEGROUND_ARENA_3V3 && static_cast< Player* >( pVictim )->m_bg->GetType() != BATTLEGROUND_ARENA_2V2))
 			{
 				self_res_spell = static_cast< Player* >( pVictim )->SoulStone;
 				static_cast< Player* >( pVictim )->SoulStone = static_cast< Player* >( pVictim )->SoulStoneReceiver = 0;
->>>>>>> .theirs
 
 				if( !self_res_spell && static_cast< Player* >( pVictim )->bReincarnation )
 				{
@@ -2190,7 +2182,6 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 					}
 				}
 			}
-
 			pVictim->SetUInt32Value( PLAYER_SELF_RES_SPELL, self_res_spell );
 			pVictim->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0 );
 			//pVictim->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
