@@ -905,8 +905,6 @@ void Player::Update( uint32 p_time )
 	}
 
 #ifdef COLLISION
-	if (CollideInterface.isCollitionMap(m_mapId))
-	{
 	if(m_MountSpellId != 0)
 	{
 		if( mstime >= m_mountCheckTimer )
@@ -921,7 +919,6 @@ void Player::Update( uint32 p_time )
 				m_mountCheckTimer = mstime + COLLISION_MOUNT_CHECK_INTERVAL;
 			}
 		}
-	}
 	}
 #endif
 /*
@@ -1312,16 +1309,9 @@ void Player::_EventExploration()
 		if(m_isResting)
 		{
 #ifdef COLLISION
-			if (CollideInterface.isCollitionMap(GetMapId()))
-			{
-				const LocationVector & loc = GetPosition();
-				if(!CollideInterface.IsIndoor(GetMapId(), loc.x, loc.y, loc.z + 2.0f))
-					ApplyPlayerRestState(false);
-			}
-			else
-			{
+			const LocationVector & loc = GetPosition();
+			if(!CollideInterface.IsIndoor(GetMapId(), loc.x, loc.y, loc.z + 2.0f))
 				ApplyPlayerRestState(false);
-			}
 #else
 			ApplyPlayerRestState(false);
 #endif
@@ -5759,9 +5749,8 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 
 	// Check if in line of sight (need collision detection).
 #ifdef COLLISION
-	if (CollideInterface.isCollitionMap(GetMapId()))
-		if (GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(GetMapId(),GetPositionNC(),target->GetPositionNC()))
-			return SPELL_FAILED_LINE_OF_SIGHT;
+	if (GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(GetMapId(),GetPositionNC(),target->GetPositionNC()))
+		return SPELL_FAILED_LINE_OF_SIGHT;
 #endif
 
 	// Check if we aren't casting another spell allready
@@ -10701,8 +10690,7 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 #ifdef COLLISION
 void Player::_FlyhackCheck()
 {
-	if(!sWorld.antihack_flight || m_TransporterGUID != 0 || GetTaxiState() || (sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions())
-		|| !CollideInterface.isCollitionMap(GetMapId()))
+	if(!sWorld.antihack_flight || m_TransporterGUID != 0 || GetTaxiState() || (sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions()))
 		return;
 
 	MovementInfo * mi = GetSession()->GetMovementInfo();
