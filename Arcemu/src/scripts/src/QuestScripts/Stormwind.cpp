@@ -35,14 +35,6 @@ public:
 
 	void OnDamageTaken(Unit* mAttacker, float fAmount)
 	{
-		uint32 chance = RandomUInt(100);
-		if(chance < 15)
-		{
-			string say = "Now you're gonna get it good, ";
-			say+=((Player*)mAttacker)->GetName();
-			say+="!";
-			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, say.c_str());
-		}
 		if(_unit->GetUInt32Value(UNIT_FIELD_HEALTH)- fAmount<=_unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*0.2)
 		{
 			if(mAttacker->GetTypeId() == TYPEID_PLAYER)
@@ -88,10 +80,21 @@ public:
 
 		if(Dashel == NULL)
 			return;
-
+		
 		Dashel->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 72);
 		Dashel->GetAIInterface()->disable_melee = false;
 		Dashel->GetAIInterface()->SetAllowedToEnterCombat(true);
+
+		uint32 chance = RandomUInt(100);
+		if(chance < 15)
+		{
+			string say = "Now you're gonna get it good, ";
+			say+=((Player*)mTarget)->GetName();
+			say+="!";
+			Dashel->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, say.c_str());
+		}
+		Creature *Thug1 = sEAS.SpawnCreature(mTarget, 4969, -8686.803711, 445.267792, 99.789223, 5.461184, 300000);
+		Creature *Thug2 = sEAS.SpawnCreature(mTarget, 4969, -8675.571289, 444.162262, 99.644737, 3.834103, 300000);
 	}
 };
 
