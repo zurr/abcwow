@@ -4963,7 +4963,7 @@ public:
 	SP_AI_Spell spells[2];
 	bool m_spellcheck[2];
 
-	COILFANGFATHOMWITCHNAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	COILFANGFATHOMWITCHAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
 		m_shadownova = 8 + RandomUInt(4);
 		nrspells = 2;
@@ -4989,7 +4989,7 @@ public:
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		m_shadownova = 8 + RandomUInt(4);
+		m_shadownova = 12 + RandomUInt(4);
 		RegisterAIUpdateEvent(1000);
 	}
 
@@ -5013,7 +5013,7 @@ public:
 		if (!m_shadownova)
 		{
 			_unit->CastSpell(_unit, SHADOWNOVA, false);
-			m_shadownova = 8 + RandomUInt(4);
+			m_shadownova = 12 + RandomUInt(4);
 		}
 		else
 		{
@@ -5104,7 +5104,8 @@ public:
 	}
 
 protected:
-	m_shadownova;
+	int nrspells
+	uint32 m_shadownova;
 };
 
 void SetupSerpentshrineCavern(ScriptMgr * mgr)
