@@ -4949,6 +4949,164 @@ public:
 protected:
 };
 
+//Coilfang Fathom-Witch
+
+#define CN_COILFANGFATHOMWITCH 21299
+#define DOMINATION 38626
+#define SHADOWBOLT 38628
+#define SHADOWNOVA 38627
+
+class COILFANGFATHOMWITCHAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(COILFANGFATHOMWITCHAI);
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
+
+	COILFANGFATHOMWITCHNAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+		m_shadownova = 8 + RandomUInt(4);
+		nrspells = 2;
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+		}
+
+		spells[0].info = dbcSpell.LookupEntry(DOMINATION);
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
+		spells[0].instant = false;
+		spells[1].cooldown = 15;
+		spells[0].perctrigger = 10.0f;
+		spells[0].attackstoptimer = 1000;
+
+		spells[1].info = dbcSpell.LookupEntry(SHADOWBOLT);
+		spells[1].targettype = TARGET_RANDOM_SINGLE;
+		spells[1].cooldown = 10;
+		spells[1].instant = false;
+		spells[1].perctrigger = 15.0f;
+		spells[1].attackstoptimer = 1000
+	}
+
+	void OnCombatStart(Unit* mTarget)
+	{
+		m_shadownova = 8 + RandomUInt(4);
+		RegisterAIUpdateEvent(1000);
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void OnTargetDied(Unit* mTarget)
+	{ 
+	}
+	void AIUpdate()
+	{
+		if (!m_shadownova)
+		{
+			_unit->CastSpell(_unit, SHADOWNOVA, false);
+			m_shadownova = 8 + RandomUInt(4);
+		}
+		else
+		{
+			m_shadownova--;
+			float val = (float)RandomFloat(100.0f);
+			SpellCast(val);
+		}
+	}
+
+	void CastTime()
+	{
+		for(int i=0;i<nrspells;i++)
+			spells[i].casttime = spells[i].cooldown;
+	}
+
+	void SpellCast(float val)
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
+			float comulativeperc = 0;
+			Unit *target = NULL;
+			for(int i=0;i<nrspells;i++)
+			{
+				if(!spells[i].perctrigger) continue;
+
+				if(m_spellcheck[i])
+				{
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+					case TARGET_SELF:
+					case TARGET_VARIOUS:
+						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+					case TARGET_ATTACKING:
+						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+					case TARGET_DESTINATION:
+						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					case TARGET_RANDOM_SINGLE:
+						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
+						if (target)
+							_unit->CastSpell(target, spells[i].info, spells[i].instant);
+					case TARGET_RANDOM_DESTINATION:
+						target = RandomTarget(false, true, 10000);
+						if (target != NULL)
+							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					}
+
+					m_spellcheck[i] = false;
+					return;
+				}
+
+					uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+		}
+	}
+
+	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return NULL;
+
+		std::vector<Unit*> targetTable;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			Unit *temp = itr->first;
+			if (_unit->GetDistance2dSq(temp) <= dist)
+			{
+				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (targetTable.empty())
+			return NULL;
+
+		uint32 randt = RandomUInt(100)%targetTable.size();
+		Unit * randomtarget = targetTable[randt];
+		return randomtarget;
+	}
+
+protected:
+	m_shadownova;
+};
+
 void SetupSerpentshrineCavern(ScriptMgr * mgr)
 {
 	//Hydross the Unstable
@@ -4994,4 +5152,5 @@ void SetupSerpentshrineCavern(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_UNDERBOGCOLOSSUS, &UNDERBOGCOLOSSUSAI::Create);
 	mgr->register_creature_script(CN_GREYHEARTNETHERMAGE, &GREYHEARTNETHERMAGEAI::Create);
 	mgr->register_creature_script(CN_GREYHEARTTECHNICAN, &GREYHEARTTECHNICANAI::Create);
+	mgr->register_creature_script(CN_COILFANGFATHOMWITCH, &COILFANGFATHOMWITCHAI::Create);
 }
