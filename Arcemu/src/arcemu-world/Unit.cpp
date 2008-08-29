@@ -109,9 +109,10 @@ static float AttackToRageConversionTable[PLAYER_LEVEL_CAP + 1]=
 
 Unit::Unit()
 {
+	m_chain = NULL;
 	m_attackTimer = 0;
 	m_attackTimer_1 = 0;
-	m_duelWield = false;
+	m_dualWield = false;
 
 	m_fearmodifiers = 0;
 	m_state = 0;
@@ -330,6 +331,9 @@ Unit::~Unit()
 {
 	//start to remove badptrs, if you delete from the heap null the ptr's damn!
 	RemoveAllAuras();
+
+	if (m_chain)
+		m_chain->RemoveUnit(this);
 
 	if( SM_CriticalChance != NULL ) {
 		delete [] SM_CriticalChance;
@@ -6231,6 +6235,9 @@ void CombatStatusHandler::UpdateFlag()
 
 bool CombatStatusHandler::InternalIsInCombat()
 {
+	if(m_Unit->IsPlayer() && m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->IsCombatInProgress())
+		return true;
+
 	if(m_healed.size() > 0)
 		return true;
 
@@ -6969,3 +6976,17 @@ void Unit::RemoveFieldSummon()
 	}
 }
 
+void UnitChain::AddUnit(Unit* u)
+{
+	m_units.insert(u);
+	u->m_chain = this;
+}
+ 
+void UnitChain::RemoveUnit(Unit* u)
+{
+	m_units.erase(u);
+	u->m_chain = NULL;
+ 
+	if (m_units.size() == 0 && !m_persist)
+		delete this;
+}
