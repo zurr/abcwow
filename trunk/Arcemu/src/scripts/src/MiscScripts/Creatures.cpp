@@ -256,6 +256,135 @@ public:
 	}
 };
 
+// ------------
+
+class BUILDERCREWAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(BUILDERCREWAI);
+
+	BUILDERCREWAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+		if (_unit->IsPet())
+		{
+			m_pet = static_cast<Pet*>(_unit);
+			if (m_pet->m_Owner)
+				m_owner = m_pet->m_Owner;
+			flameCd = 30;
+			RegisterAIUpdateEvent(1000);
+		}
+	}
+
+	void OnCombatStart(Unit* mTarget)
+	{
+		if (mTarget->IsPlayer())
+		{
+			char msg[256];
+			snprintf((char*)msg, 256, "Tits or GTFO %s", static_cast<Player*>(mTarget)->GetName());
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);
+		}
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		//_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		//_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void OnTargetDied(Unit* mTarget)
+	{
+		if (mTarget->IsPlayer())
+		{
+			char msg[256];
+			snprintf((char*)msg, 256, "%s that nap died again...", static_cast<Player*>(mTarget)->GetName());
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);
+		}
+	}
+
+	void AIUpdate()
+	{
+		if (m_owner != NULL)
+		{
+			if (!_unit->GetCurrentSpell())
+			{
+				if (m_owner->GetHealthPct() < 100)
+				{
+					_unit->CastSpell(m_owner, 43575, false);
+				}
+				else if (!m_owner->HasAura(33147) && m_owner->CombatStatus.IsInCombat)
+				{
+					_unit->CastSpell(m_owner, 33147, false);
+				}
+			}
+			if (!flameCd)
+			{
+				if (Rand(20) == 1)
+				{
+					Player *flamed = RandomPlayer();
+					if (flamed != NULL)
+					{
+						char msg[256];
+						switch (Rand(2))
+						{
+						case 0:
+							snprintf((char*)msg, 256, "Haha did you seen %s?", flamed->GetName());
+							break;
+						case 1:
+							snprintf((char*)msg, 256, "Looks like we have a noob called %s around...", flamed->GetName());
+							break;
+						case 2:
+							snprintf((char*)msg, 256, "Im sure %s will even loose a duel vs a lvl 1 rat!", flamed->GetName());
+							break;
+						}
+						_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);
+						flameCd = 300;
+					}
+				}
+			}
+			else
+			{
+				flameCd--;
+			}
+		}
+	}
+
+	Player *RandomPlayer()
+	{
+		if (m_owner == NULL)
+			return NULL;
+
+		Player *tmpPlr;
+		std::vector<Player*> playerTable;
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			tmpPlr = (*itrPlr);
+
+			if (_unit->GetDistance2dSq(tmpPlr) > 900.0f)
+				continue;
+
+			if (m_owner != tmpPlr)
+				playerTable.push_back(tmpPlr);
+		}
+		if (playerTable.empty)
+			return NULL;
+
+		uint32 randt = RandomUInt(100)%playerTable.size();
+		return playerTable[randt];
+	}
+
+protected:
+	Player *m_owner;
+	Pet *m_pet;
+	uint32 flameCd;
+};
+
+// ------------
+
 void SetupMiscCreatures(ScriptMgr *mgr)
 {
 	mgr->register_creature_script(11120, &CrimsonHammersmith::Create);
@@ -364,4 +493,6 @@ void SetupMiscCreatures(ScriptMgr *mgr)
 	mgr->register_creature_script(4949, &Thrall::Create);
 	mgr->register_creature_script(3057, &CairneBloodhoof::Create);
 	mgr->register_creature_script(10181, &LadySylvanasWindrunner::Create);
+
+	mgr->register_creature_script(128, &BUILDERCREWAI::Create);
 }
