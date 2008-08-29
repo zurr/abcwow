@@ -265,6 +265,10 @@ public:
 
 	BUILDERCREWAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
+		m_owner = NULL;
+		m_flameCd = 30;
+		m_shieldCd = 10;
+
 		Player *tmpPlr;
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
@@ -275,14 +279,20 @@ public:
 				break;
 			}
 		}
-		flameCd = 30;
+
 		if (m_owner != NULL)
+		{
+			_unit->GetAIInterface()->SetUnitToFollow(m_owner);
+			_unit->GetAIInterface()->SetFollowDistance(3.0f);
 			RegisterAIUpdateEvent(1000);
+		}
+		else
+			_unit->Despawn(100, 0);
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		if (mTarget->IsPlayer())
+		if (mTarget != NULL && mTarget->IsPlayer())
 		{
 			char msg[256];
 			snprintf((char*)msg, 256, "Tits or GTFO %s", static_cast<Player*>(mTarget)->GetName());
@@ -292,8 +302,8 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
-		//_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-		//_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 	}
 
 	void OnDied(Unit * mKiller)
@@ -303,7 +313,7 @@ public:
 
 	void OnTargetDied(Unit* mTarget)
 	{
-		if (mTarget->IsPlayer())
+		if (mTarget != NULL && mTarget->IsPlayer())
 		{
 			char msg[256];
 			snprintf((char*)msg, 256, "%s that nap died again...", static_cast<Player*>(mTarget)->GetName());
@@ -313,20 +323,25 @@ public:
 
 	void AIUpdate()
 	{
-		if (m_owner != NULL)
+		if (m_owner != NULL && m_owner->isAlive())
 		{
+			if (m_shieldCd > 0)
+				m_shieldCd--;
+
 			if (!_unit->GetCurrentSpell())
 			{
 				if (m_owner->GetHealthPct() < 100)
 				{
 					_unit->CastSpell(m_owner, 43575, false);
 				}
-				else if (!m_owner->HasAura(33147) && m_owner->CombatStatus.IsInCombat)
+				else if (!m_shieldCd && !m_owner->HasAura(33147) && m_owner->CombatStatus.IsInCombat())
 				{
 					_unit->CastSpell(m_owner, 33147, false);
+					m_shieldCd = 60;
 				}
 			}
-			if (!flameCd)
+
+			if (!m_flameCd)
 			{
 				if (Rand(20) == 1)
 				{
@@ -334,7 +349,7 @@ public:
 					if (flamed != NULL)
 					{
 						char msg[256];
-						switch (Rand(1)
+						switch (RandomUInt(2))
 						{
 						case 0:
 							snprintf((char*)msg, 256, "Haha did you seen %s?", flamed->GetName());
@@ -342,11 +357,9 @@ public:
 						case 1:
 							snprintf((char*)msg, 256, "Looks like we have a noob called %s around...", flamed->GetName());
 							break;
-							/*
 						case 2:
 							snprintf((char*)msg, 256, "Im sure %s will even loose a duel vs a lvl 1 rat!", flamed->GetName());
 							break;
-							*/
 						}
 						_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);
 						flameCd = 300;
@@ -354,10 +367,10 @@ public:
 				}
 			}
 			else
-			{
-				flameCd--;
-			}
+				m_flameCd--;
 		}
+		else
+			_unit->Despawn(100, 0);
 	}
 
 	Player *RandomPlayer()
@@ -386,7 +399,8 @@ public:
 
 protected:
 	Player *m_owner;
-	uint32 flameCd;
+	uint32 m_flameCd;
+	uint32 m_shieldCd;
 };
 
 // ------------
