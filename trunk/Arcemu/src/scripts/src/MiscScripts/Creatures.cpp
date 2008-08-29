@@ -266,14 +266,16 @@ public:
 	BUILDERCREWAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
 		m_owner = NULL;
-		m_flameCd = 30;
-		m_shieldCd = 10;
+		m_flameCd = 30 + RandomUInt(30);
+		m_shieldCd = 10 + RandomUInt(20);
+		m_fearCd = 1 + RandomUInt(20);
 
 		Player *tmpPlr;
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			tmpPlr = (*itrPlr);
-			if (tmpPlr->GetName() == "Dealer")
+			string name = "Dealer";
+			if (tmpPlr->GetName() == name)
 			{
 				m_owner = tmpPlr;
 				break;
@@ -292,7 +294,7 @@ public:
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		if (mTarget != NULL && mTarget->IsPlayer())
+		if (mTarget != NULL && m_owner != NULL && mTarget->IsPlayer() && mTarget != m_owner)
 		{
 			char msg[256];
 			snprintf((char*)msg, 256, "Tits or GTFO %s", static_cast<Player*>(mTarget)->GetName());
@@ -313,7 +315,7 @@ public:
 
 	void OnTargetDied(Unit* mTarget)
 	{
-		if (mTarget != NULL && mTarget->IsPlayer())
+		if (mTarget != NULL && m_owner != NULL && mTarget->IsPlayer() && mTarget != m_owner)
 		{
 			char msg[256];
 			snprintf((char*)msg, 256, "%s that nap died again...", static_cast<Player*>(mTarget)->GetName());
@@ -323,33 +325,44 @@ public:
 
 	void AIUpdate()
 	{
-		if (m_owner != NULL && m_owner->isAlive())
+		if (m_owner != NULL && m_owner->isAlive() && _unit->GetMapMgr() != NULL && _unit->GetDistance2dSq(m_owner) < 10000.0f)
 		{
+			if (m_fearCd > 0)
+				m_fearCd--;
 			if (m_shieldCd > 0)
 				m_shieldCd--;
 
 			if (!_unit->GetCurrentSpell())
 			{
-				if (m_owner->GetHealthPct() < 100)
+				if (!m_shieldCd && !m_owner->HasAura(41373) && m_owner->CombatStatus.IsInCombat())
+				{
+					_unit->CastSpell(m_owner, 41373, false);
+					m_shieldCd = 20 + RandomUInt(20);
+				}
+				else if (m_owner->GetHealthPct() < 100)
 				{
 					_unit->CastSpell(m_owner, 43575, false);
 				}
-				else if (!m_shieldCd && !m_owner->HasAura(33147) && m_owner->CombatStatus.IsInCombat())
+				else if (!m_fearCd && m_owner->CombatStatus.IsInCombat() && m_owner->CombatStatus.GetPrimaryAttackTarget() != 0)
 				{
-					_unit->CastSpell(m_owner, 33147, false);
-					m_shieldCd = 60;
+					Unit *target = _unit->GetMapMgr()->GetUnit(m_owner->CombatStatus.GetPrimaryAttackTarget());
+					if (target && !target->HasAura(12096))
+					{
+						_unit->CastSpell(target, 12096, false);
+						m_fearCd = 20 + RandomUInt(20);
+					}
 				}
 			}
 
 			if (!m_flameCd)
 			{
-				if (Rand(20) == 1)
+				if (RandomUInt(20) == 1)
 				{
 					Player *flamed = RandomPlayer();
 					if (flamed != NULL)
 					{
 						char msg[256];
-						switch (RandomUInt(2))
+						switch (RandomUInt(4))
 						{
 						case 0:
 							snprintf((char*)msg, 256, "Haha did you seen %s?", flamed->GetName());
@@ -360,9 +373,12 @@ public:
 						case 2:
 							snprintf((char*)msg, 256, "Im sure %s will even loose a duel vs a lvl 1 rat!", flamed->GetName());
 							break;
+							case 3:
+							snprintf((char*)msg, 256, "Im so cool. but whats about you %s?", flamed->GetName());
+							break;
 						}
 						_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);
-						flameCd = 300;
+						m_flameCd = 300 + RandomUInt(100);
 					}
 				}
 			}
@@ -370,7 +386,12 @@ public:
 				m_flameCd--;
 		}
 		else
-			_unit->Despawn(100, 0);
+		{
+			RemoveAIUpdateEvent();
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Oh noes Dealer is gone. gonna vanish!");
+			_unit->CastSpell(_unit, 29448, false);
+			_unit->Despawn(2000, 0);
+		}
 	}
 
 	Player *RandomPlayer()
@@ -384,7 +405,7 @@ public:
 		{
 			tmpPlr = (*itrPlr);
 
-			if (_unit->GetDistance2dSq(tmpPlr) > 900.0f)
+			if (!tmpPlr->isAlive() || _unit->GetDistance2dSq(tmpPlr) > 900.0f)
 				continue;
 
 			if (m_owner != tmpPlr)
@@ -401,6 +422,7 @@ protected:
 	Player *m_owner;
 	uint32 m_flameCd;
 	uint32 m_shieldCd;
+	uint32 m_fearCd;
 };
 
 // ------------
