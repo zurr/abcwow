@@ -4984,7 +4984,7 @@ public:
 		spells[1].cooldown = 10;
 		spells[1].instant = false;
 		spells[1].perctrigger = 15.0f;
-		spells[1].attackstoptimer = 1000
+		spells[1].attackstoptimer = 1000;
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -5086,7 +5086,7 @@ public:
 		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
-			Unit *temp = itr->first;
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
 			if (_unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
@@ -5104,7 +5104,7 @@ public:
 	}
 
 protected:
-	int nrspells
+	int nrspells;
 	uint32 m_shadownova;
 };
 
