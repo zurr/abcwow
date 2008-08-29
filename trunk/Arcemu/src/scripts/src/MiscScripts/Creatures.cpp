@@ -266,7 +266,7 @@ public:
 	BUILDERCREWAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
 		Player *tmpPlr;
-		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			tmpPlr = (*itrPlr);
 			if (tmpPlr->GetName() == "Dealer")
@@ -334,7 +334,7 @@ public:
 					if (flamed != NULL)
 					{
 						char msg[256];
-						switch (Rand(2))
+						switch (Rand(1)
 						{
 						case 0:
 							snprintf((char*)msg, 256, "Haha did you seen %s?", flamed->GetName());
@@ -342,9 +342,11 @@ public:
 						case 1:
 							snprintf((char*)msg, 256, "Looks like we have a noob called %s around...", flamed->GetName());
 							break;
+							/*
 						case 2:
 							snprintf((char*)msg, 256, "Im sure %s will even loose a duel vs a lvl 1 rat!", flamed->GetName());
 							break;
+							*/
 						}
 						_unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);
 						flameCd = 300;
@@ -365,7 +367,7 @@ public:
 
 		Player *tmpPlr;
 		std::vector<Player*> playerTable;
-		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			tmpPlr = (*itrPlr);
 
@@ -375,7 +377,7 @@ public:
 			if (m_owner != tmpPlr)
 				playerTable.push_back(tmpPlr);
 		}
-		if (playerTable.empty)
+		if (playerTable.empty())
 			return NULL;
 
 		uint32 randt = RandomUInt(100)%playerTable.size();
