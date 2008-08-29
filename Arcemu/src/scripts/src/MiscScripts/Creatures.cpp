@@ -265,14 +265,19 @@ public:
 
 	BUILDERCREWAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		if (_unit->IsPet())
+		Player *tmpPlr;
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
-			m_pet = static_cast<Pet*>(_unit);
-			if (m_pet->m_Owner)
-				m_owner = m_pet->m_Owner;
-			flameCd = 30;
-			RegisterAIUpdateEvent(1000);
+			tmpPlr = (*itrPlr);
+			if (tmpPlr->GetName() == "Dealer")
+			{
+				m_owner = tmpPlr;
+				break;
+			}
 		}
+		flameCd = 30;
+		if (m_owner != NULL)
+			RegisterAIUpdateEvent(1000);
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -379,7 +384,6 @@ public:
 
 protected:
 	Player *m_owner;
-	Pet *m_pet;
 	uint32 flameCd;
 };
 
