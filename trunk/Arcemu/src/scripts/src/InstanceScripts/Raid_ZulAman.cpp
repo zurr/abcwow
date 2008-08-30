@@ -36,21 +36,21 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(BRUTAL_SWIPE); 
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = true;
-		spells[0].perctrigger = 1.0f;
+		spells[0].perctrigger = 3.0f;
 		spells[0].attackstoptimer = 1000;
 
 
 		spells[1].info = dbcSpell.LookupEntry(MANGLE); 
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
-		spells[1].perctrigger = 2.0f;
+		spells[1].perctrigger = 4.0f;
 		spells[1].attackstoptimer = 1000;
 
 
 		spells[2].info = dbcSpell.LookupEntry(SURGE); 
 		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = true;
-		spells[2].perctrigger = 4.0f;
+		spells[2].perctrigger = 6.0f;
 		spells[2].attackstoptimer = 1000;
 
 
@@ -63,14 +63,14 @@ public:
 		spells[4].info = dbcSpell.LookupEntry(REND_FLESH); 
 		spells[4].targettype = TARGET_ATTACKING;
 		spells[4].instant = true;
-		spells[4].perctrigger = 4.0f;
+		spells[4].perctrigger = 6.0f;
 		spells[4].attackstoptimer = 1000;
 
 
 		spells[5].info = dbcSpell.LookupEntry(DEAFENING_ROAR); 
 		spells[5].targettype = TARGET_VARIOUS;
 		spells[5].instant = true;
-		spells[5].perctrigger = 6.0f;
+		spells[5].perctrigger = 7.0f;
 		spells[5].attackstoptimer = 1000;
 
 		nrspells = 3;
@@ -98,7 +98,7 @@ public:
 	{
 		if (_unit->GetHealthPct() > 0)	
 		{
-			int RandomSpeach=RandomUInt(1000)%2;
+			uint32 RandomSpeach=RandomUInt(2);
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -303,14 +303,14 @@ public:
 		spells[2].attackstoptimer = 1000;
 
 
-		m_electicalstorm = 50 + RandomUInt(1000)%10;
+		m_electicalstorm = 50 + RandomUInt(10);
 		m_enrage = 600;
 		enraged = 0;
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		m_electicalstorm = 50 + RandomUInt(1000)%10;
+		m_electicalstorm = 50 + RandomUInt(10);
 		m_enrage = 600;
 		enraged = 0;
 		_unit->PlaySoundToSet(12013);
@@ -323,7 +323,7 @@ public:
 	{
 		if (_unit->GetHealthPct() > 0)	
 		{
-			int RandomSpeach = RandomUInt(1000)%2;
+			uint32 RandomSpeach = RandomUInt(2);
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -364,21 +364,20 @@ public:
 			_unit->DamageDoneModPCT[5] = 5;
 			enraged = 1;
 		}
-		/* Disabled fucked up :(
 		m_electicalstorm--;
 		if (!m_electicalstorm)
 		{
-		m_electicalstorm = 50 + RandomUInt(1000)%10;
-		Player *target = (Player *) RandomTarget(false, true, 10000);
-		if (target)
-		{
-		_unit->CastSpellAoF(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), dbcSpell.LookupEntry(ELECTRICAL_STORM_CLOUD), true);
-		target->_Relocate(_unit->GetMapId(), LocationVector(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 10, target->GetOrientation()), false, false, _unit->GetInstanceID());
-		_unit->CastSpell(target, ELECTRICAL_STORM, true);
-		sEventMgr.AddEvent(this, &AKILZONAI::summonEagles, EVENT_SCRIPT_UPDATE_EVENT, 10000, 1, 0);
+			m_electicalstorm = 50 + RandomUInt(10);
+			Player *target = (Player *) RandomTarget(false, true, 10000);
+			if (target)
+			{
+				_unit->CastSpellAoF(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), dbcSpell.LookupEntry(ELECTRICAL_STORM_CLOUD), true);
+				target->SafeTeleport(temp->GetMapId(), temp->GetInstanceID(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 10.0f, target->GetOrientation());
+				_unit->CastSpell(target, ELECTRICAL_STORM, true);
+				sEventMgr.AddEvent(this, &AKILZONAI::summonEagles, EVENT_SCRIPT_UPDATE_EVENT, 10000, 1, 0);
+			}
 		}
-		}
-		*/
+		
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
 	}
@@ -630,6 +629,7 @@ public:
 		m_enrage = 600;
 		m_phase =1;
 		m_phasestep = 1;
+		lynx = NULL;
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -640,6 +640,8 @@ public:
 		m_phasestep = 1;
 		enrage = false;
 		m_enrage = 600;
+		lynx = NULL;
+
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Get on your knees and bow to da fang and claw!");
 		_unit->PlaySoundToSet(12020);
 		RegisterAIUpdateEvent(1000);
@@ -650,9 +652,7 @@ public:
 	{
 		if (_unit->GetHealthPct() > 0)	
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
+			uint32 RandomSpeach=RandomUInt(2);
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -795,9 +795,10 @@ public:
 				spmin = 1;
 				nrspells = 2;
 				m_phase = 2;
-				m_totemcd = 50 + RandomUInt(1000)%15;
+				m_totemcd = 50 + RandomUInt(10);
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-				lynx = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZILYNX, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0, true, false, 0, 0);
+				if (_unit->GetMapMgr() != NULL)
+					lynx = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZILYNX, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.0f, true, false, 0, 0);
 			}
 			break;
 		case 2:
@@ -807,7 +808,8 @@ public:
 				nrspells = 2;
 				m_phase = 2;
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-				lynx = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZILYNX, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0, true, false, 0, 0);
+				if (_unit->GetMapMgr() != NULL)
+					lynx = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZILYNX, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.0f, true, false, 0, 0);
 			}
 			break;
 		case 3:
@@ -817,7 +819,8 @@ public:
 				nrspells = 2;
 				m_phase = 2;
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-				lynx = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZILYNX, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0, true, false, 0, 0);
+				if (_unit->GetMapMgr() != NULL)
+					lynx = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZILYNX, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.0f, true, false, 0, 0);
 			}
 			break;
 		}
@@ -825,7 +828,7 @@ public:
 	void PhaseTwo()
 	{
 		m_totemcd--;
-		if (_unit->GetHealthPct() <= 10 || lynx->GetHealthPct() <= 10) 
+		if (_unit->GetHealthPct() <= 20 || (lynx != NULL && lynx->GetHealthPct() <= 20))
 		{
 			switch (m_phasestep)
 			{
@@ -834,7 +837,8 @@ public:
 				spmin = 0;
 				m_phase =1;
 				m_phasestep = 2;
-				lynx->Despawn(100, 0);
+				if (lynx != NULL)
+					lynx->Despawn(100, 0);
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, (uint32)(_unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*0.75));
 				break;
 			case 2:
@@ -842,11 +846,13 @@ public:
 				spmin = 0;
 				m_phase =1;
 				m_phasestep = 3;
-				lynx->Despawn(100, 0);
+				if (lynx != NULL)
+					lynx->Despawn(100, 0);
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, (uint32)(_unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*0.50));
 				break;
 			case 3:
-				lynx->Despawn(100, 0);
+				if (lynx != NULL)
+					lynx->Despawn(100, 0);
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, (uint32)(_unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*0.25));
 				m_phase = 3;
 				spmin = 0;
@@ -856,16 +862,18 @@ public:
 		}
 		if (!m_totemcd)
 		{
-			Creature *cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CORRUPTED_LIGHTING_TOTEM, _unit->GetPositionX()+2, _unit->GetPositionY()+2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
-			m_totemcd = 30 + RandomUInt(1000)%15;
+			if (_unit->GetMapMgr() != NULL)
+				Creature *cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CORRUPTED_LIGHTING_TOTEM, _unit->GetPositionX()+2, _unit->GetPositionY()+2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
+			m_totemcd = 30 + RandomUInt(10);
 		}
 	}
 	void PhaseThree()
 	{
 		if (!m_totemcd)
 		{
-			Creature *cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CORRUPTED_LIGHTING_TOTEM, _unit->GetPositionX()+2, _unit->GetPositionY()+2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
-			m_totemcd = 20 + RandomUInt(1000)%15;
+			if (_unit->GetMapMgr() != NULL)
+				Creature *cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CORRUPTED_LIGHTING_TOTEM, _unit->GetPositionX()+2, _unit->GetPositionY()+2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
+			m_totemcd = 20 + RandomUInt(10);
 		}
 	}
 protected:
@@ -891,11 +899,11 @@ public:
 
 	CLTOTEMAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
+		_unit->GetAIInterface()->m_canMove = false;
 	}
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		_unit->GetAIInterface()->m_canMove = false;
 		RegisterAIUpdateEvent(1000);
 	}
 
@@ -970,7 +978,7 @@ public:
 		enraged = false;
 		m_enrage = 600;
 		m_softenrage = 300;
-		m_firebombs = 35 + RandomUInt(100)%25;
+		m_firebombs = 35 + RandomUInt(25);
 		m_adds = 14;
 
 		for(int i=0;i<nrspells;i++)
@@ -983,7 +991,7 @@ public:
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		m_firebombs = 35 + RandomUInt(100)%25;
+		m_firebombs = 35 + RandomUInt(25);
 		m_softenrage = 300;
 		m_adds = 14;
 		softenrage = false;
@@ -998,9 +1006,7 @@ public:
 	{
 		if (_unit->GetHealthPct() > 0)	
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
+			uint32 RandomSpeach=RandomUInt(2);
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -1038,12 +1044,12 @@ public:
 		if (!m_enrage && !enraged)
 		{
 			enraged = true;
-			_unit->DamageDoneModPCT[0] = 1;
-			_unit->DamageDoneModPCT[1] = 1;
-			_unit->DamageDoneModPCT[2] = 1;
-			_unit->DamageDoneModPCT[3] = 1;
-			_unit->DamageDoneModPCT[4] = 1;
-			_unit->DamageDoneModPCT[5] = 1;
+			_unit->DamageDoneModPCT[0] = 3;
+			_unit->DamageDoneModPCT[1] = 3;
+			_unit->DamageDoneModPCT[2] = 3;
+			_unit->DamageDoneModPCT[3] = 3;
+			_unit->DamageDoneModPCT[4] = 3;
+			_unit->DamageDoneModPCT[5] = 3;
 		}
 		if (!softenrage && (_unit->GetHealthPct() <= 25 || !m_softenrage)) 
 		{
@@ -1059,11 +1065,11 @@ public:
 
 			for (int z = 0; z < 16;z++)
 			{
-				x = -51.0f + RandomUInt(100)%39;
-				y = 1132.0f + RandomUInt(100)%35;
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(FIREBOMBTARGET, x, y, _unit->GetPositionZ(), 0, true, false, 0, 0);
+				x = -51.0f + RandomUInt(39);
+				y = 1132.0f + RandomUInt(35);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(FIREBOMBTARGET, x, y, _unit->GetPositionZ(), 0.0f, true, false, 0, 0);
 			}
-			m_firebombs = 35 + RandomUInt(100)%25;
+			m_firebombs = 35 + RandomUInt(25);
 		}
 		if (!m_adds)
 		{
@@ -1076,7 +1082,7 @@ public:
 			summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 			summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(AMANIDRAGONHAWKHATCHLING, -33.18f, 1201.79f, 18.71f, 0, true, false, 0, 0);
 			summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
-			m_adds = 80 + RandomUInt(100)%25;
+			m_adds = 80 + RandomUInt(25);
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
@@ -1227,9 +1233,7 @@ public:
     {
 				if (_unit->GetHealthPct() > 0)	
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
+			uint32 RandomSpeach = RandomUInt(2);
 			switch (RandomSpeach)
 			{
 			case 0:
@@ -1273,9 +1277,7 @@ public:
 		{
 			for(int j=0;j<4;j++)
 			{
-				int RandomSpeach;
-				RandomUInt(1000);
-				RandomSpeach=rand()%8;
+				uint32 RandomSpeach=RandomUInt(8);
 				switch (RandomSpeach)
 				{
 					case 0:
@@ -1487,9 +1489,7 @@ public:
     {
 					if (_unit->GetHealthPct() > 0)	
 		{
-			int RandomSpeach;
-			RandomUInt(1000);
-			RandomSpeach=rand()%3;
+			uint32 RandomSpeach=RandomUInt(2);
 			switch (RandomSpeach)
 			{
 			case 0:

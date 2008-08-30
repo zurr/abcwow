@@ -269,6 +269,7 @@ public:
 		m_flameCd = 30 + RandomUInt(30);
 		m_shieldCd = 10 + RandomUInt(20);
 		m_fearCd = 1 + RandomUInt(20);
+		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 
 		Player *tmpPlr;
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
