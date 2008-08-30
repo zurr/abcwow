@@ -28,10 +28,6 @@ public:
 
 	NALORAKKAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		for(int i=spmin;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-		}
 
 		spells[0].info = dbcSpell.LookupEntry(BRUTAL_SWIPE); 
 		spells[0].targettype = TARGET_ATTACKING;
@@ -79,6 +75,11 @@ public:
 		m_phasechange = 45;
 		m_enrage = 600;
 		enraged = 0;
+
+		for(int i=spmin;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+		}
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -602,10 +603,6 @@ public:
 
 	HALAZZIAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		for(int i=0;i<nrspells;i++)
-		{
-			m_spellcheck[i] = false;
-		}
 
 		spells[0].info = dbcSpell.LookupEntry(SABER_LASH);
 		spells[0].targettype = TARGET_DESTINATION;
@@ -630,6 +627,11 @@ public:
 		m_phase =1;
 		m_phasestep = 1;
 		lynx = NULL;
+
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+		}
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -1407,10 +1409,6 @@ public:
 
     ZULJINAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-			for(int i=0;i<nrspells;i++)
-			{
-				m_spellcheck[i] = false;
-			}
 		
         spells[0].info = dbcSpell.LookupEntry(ZULJIN_GRIEVOUS_THROW);
 		spells[0].targettype = TARGET_ATTACKING;
@@ -1471,6 +1469,13 @@ public:
 		spells[9].instant = true;
 		spells[9].perctrigger = 5.0f;
 		spells[9].attackstoptimer = 1000;			
+
+		nrspells = 2;
+		spmin = 0;
+		for(int i=0;i<nrspells;i++)
+			{
+				m_spellcheck[i] = false;
+			}
 
     }
     
