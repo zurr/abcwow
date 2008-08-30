@@ -372,7 +372,7 @@ public:
 			if (target)
 			{
 				_unit->CastSpellAoF(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), dbcSpell.LookupEntry(ELECTRICAL_STORM_CLOUD), true);
-				target->SafeTeleport(temp->GetMapId(), temp->GetInstanceID(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 10.0f, target->GetOrientation());
+				target->SafeTeleport(target->GetMapId(), target->GetInstanceID(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 10.0f, target->GetOrientation());
 				_unit->CastSpell(target, ELECTRICAL_STORM, true);
 				sEventMgr.AddEvent(this, &AKILZONAI::summonEagles, EVENT_SCRIPT_UPDATE_EVENT, 10000, 1, 0);
 			}
