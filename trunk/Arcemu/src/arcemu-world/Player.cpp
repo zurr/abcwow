@@ -2683,8 +2683,8 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 
 	// set the rest of the stuff
 	m_uint32Values[ PLAYER_FIELD_WATCHED_FACTION_INDEX ]	= get_next_field.GetUInt32();
-	SetUInt64Value( PLAYER_FIELD_KNOWN_TITLES, get_next_field.GetUInt64() );
 	m_uint32Values[ PLAYER_CHOSEN_TITLE ]					= get_next_field.GetUInt32();
+	SetUInt64Value( PLAYER_FIELD_KNOWN_TITLES, get_next_field.GetUInt64() );
 	m_uint32Values[ PLAYER_FIELD_COINAGE ]					= get_next_field.GetUInt32();
 	m_uint32Values[ PLAYER_AMMO_ID ]						= get_next_field.GetUInt32();
 	m_uint32Values[ PLAYER_CHARACTER_POINTS2 ]				= get_next_field.GetUInt32();
@@ -11175,4 +11175,23 @@ uint32 Player::GetMaxPersonalRating()
 	}
 
 	return maxrating;
+}
+
+void Player::SetKnownTitle( RankTitles title, bool set )
+{	
+	if( !( HasKnownTitle( title ) ^ set ) )
+		return;
+
+	uint64 current = GetUInt64Value( PLAYER_FIELD_KNOWN_TITLES );
+	if( set )
+		SetUInt64Value( PLAYER_FIELD_KNOWN_TITLES, current | uint64(1) << uint8( title ) );
+	else
+		SetUInt64Value( PLAYER_FIELD_KNOWN_TITLES, current & ~uint64(1) << uint8( title ) );
+	
+	if( title >= PVPTITLE_INVISIBLE_NAME ) // to avoid client crash
+		return;
+	
+	WorldPacket *data = new WorldPacket( SMSG_TITLE_EARNED, 8 );
+	*data << uint32( title ) << uint32( set ? 1 : 0 );
+	m_session->SendPacket( data );		
 }
