@@ -326,7 +326,7 @@ public:
 
 	void AIUpdate()
 	{
-		if (m_owner != NULL && m_owner->isAlive() && _unit->GetMapMgr() != NULL && _unit->GetDistance2dSq(m_owner) < 10000.0f)
+		if (m_owner != NULL && m_owner->isAlive() && _unit->GetMapId() != m_owner->GetMapId() && _unit->GetMapMgr() != NULL && _unit->GetDistance2dSq(m_owner) < 10000.0f)
 		{
 			if (m_fearCd > 0)
 				m_fearCd--;
