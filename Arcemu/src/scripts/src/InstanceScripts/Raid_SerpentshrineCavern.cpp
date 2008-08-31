@@ -757,6 +757,13 @@ public:
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
+
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			Player *tmpPlr = (*itrPlr);
+			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+				return;
+		}
 		_unit->Despawn(100, 0);
 	}
 
@@ -903,6 +910,13 @@ public:
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
+
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			Player *tmpPlr = (*itrPlr);
+			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+				return;
+		}
 		_unit->Despawn(100, 0);
 	}
 
@@ -2126,6 +2140,13 @@ public:
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
+
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			Player *tmpPlr = (*itrPlr);
+			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+				return;
+		}
 		_unit->Despawn(100, 0);
 	}
 
@@ -3251,6 +3272,7 @@ public:
 		if (_unit->GetHealthPct() <= 70 && m_phase == 1)
 		{
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_SPELL);
+			_unit->GetAIInterface()->disable_targeting = true;
 			_unit->PlaySoundToSet(11539);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "The time is now! Leave none standing!");
 			_unit->AddAuraVisual(VASHJ_SHIELD, 1, true);
@@ -3270,6 +3292,7 @@ public:
 		else if (_unit->GetHealthPct() <= 50 && m_phase == 2)
 		{
 			_unit->GetAIInterface()->setCurrentAgent(AGENT_MELEE);
+			_unit->GetAIInterface()->disable_targeting = false;
 			_unit->PlaySoundToSet(11540);
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You may want to take cover.");
 			_unit->RemoveAuraVisual(VASHJ_SHIELD, 1);
@@ -3414,7 +3437,7 @@ public:
 				}
 				_unit->CastSpell(_unit, VASHJ_ENTANGLE, true);
 				_unit->GetAIInterface()->_CalcDestinationAndMove(_unit->GetAIInterface()->GetNextTarget(), 20);
-				entanglecd = 30 + RandomUInt(100)%15;
+				entanglecd = 30 + RandomUInt(15);
 			}
 			else
 			{
@@ -3430,7 +3453,7 @@ public:
 		_unit->GetAIInterface()->AttackReaction(_unit->GetAIInterface()->GetMostHated(), 1, 0);
 		if (!forgedlightningcd)
 		{
-			int spelldest = RandomUInt(100)%4;
+			int spelldest = RandomUInt(4);
 			switch (spelldest)
 			{
 			case 0:
@@ -3526,8 +3549,7 @@ public:
 				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 118.946030f, -948.197021f, 20.749378f, 2.861951f, true, false, 0, 0);
 				break;
 			}
-			taintedelemtalcd = 53;
-			enchantedelemtalcd = 4;
+			taintedelemtalcd = 55;
 		}
 		if (!coilfangelitecd)
 		{
@@ -3578,7 +3600,7 @@ public:
 				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.688040f, -827.500061f, 20.697882f, 4.703711f, true, false, 0, 0);
 				break;
 			}
-			coilfangstridercd = 62;
+			coilfangstridercd = 60;
 		}
 		else
 		{
@@ -3740,6 +3762,13 @@ public:
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
+
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			Player *tmpPlr = (*itrPlr);
+			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+				return;
+		}
 		_unit->Despawn(100, 0);
 	}
 
@@ -3956,6 +3985,13 @@ public:
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
+
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			Player *tmpPlr = (*itrPlr);
+			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+				return;
+		}
 		_unit->Despawn(100, 0);
 	}
 
@@ -4306,6 +4342,13 @@ public:
 	void OnCombatStop(Unit *mTarget)
 	{
 		RemoveAIUpdateEvent();
+
+		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		{
+			Player *tmpPlr = (*itrPlr);
+			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+				return;
+		}
 		_unit->Despawn(100,0);
 	}
 
