@@ -758,7 +758,7 @@ public:
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
 
-		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
 			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
@@ -911,7 +911,7 @@ public:
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
 
-		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
 			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
@@ -2141,7 +2141,7 @@ public:
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
 
-		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
 			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
@@ -3763,7 +3763,7 @@ public:
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
 
-		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
 			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
@@ -3986,7 +3986,7 @@ public:
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
 
-		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
 			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
@@ -4343,7 +4343,7 @@ public:
 	{
 		RemoveAIUpdateEvent();
 
-		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
+		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
 			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
@@ -4782,7 +4782,7 @@ public:
 			spells[0].targettype = TARGET_ATTACKING;
 			spells[0].instant = false;
 			spells[0].cooldown = 10;
-			spells[0].perctrigger = 3f;
+			spells[0].perctrigger = 3.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FROSTBOLTVOLLEY);
@@ -4800,7 +4800,7 @@ public:
 			spells[0].targettype = TARGET_RANDOM_DESTINATION;
 			spells[0].instant = false;
 			spells[0].cooldown = 10;
-			spells[0].perctrigger = 3f;
+			spells[0].perctrigger = 3.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FIREBALLVOLLEY);
@@ -4817,7 +4817,7 @@ public:
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = true;
 			spells[0].cooldown = 10;
-			spells[0].perctrigger =3f;
+			spells[0].perctrigger =3.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(ARCANEVOLLEY);
