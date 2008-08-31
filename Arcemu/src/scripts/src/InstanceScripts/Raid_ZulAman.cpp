@@ -31,41 +31,41 @@ public:
 
 		spells[0].info = dbcSpell.LookupEntry(BRUTAL_SWIPE); 
 		spells[0].targettype = TARGET_ATTACKING;
-		spells[0].instant = true;
+		spells[0].instant = false;
 		spells[0].perctrigger = 3.0f;
 		spells[0].attackstoptimer = 1000;
 
 
 		spells[1].info = dbcSpell.LookupEntry(MANGLE); 
 		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = true;
+		spells[1].instant = false;
 		spells[1].perctrigger = 6.0f;
 		spells[1].attackstoptimer = 1000;
 
 
 		spells[2].info = dbcSpell.LookupEntry(SURGE); 
 		spells[2].targettype = TARGET_RANDOM_SINGLE;
-		spells[2].instant = true;
-		spells[2].perctrigger = 8.0f;
+		spells[2].instant = false;
+		spells[2].perctrigger = 10.0f;
 		spells[2].attackstoptimer = 1000;
 
 
 		spells[3].info = dbcSpell.LookupEntry(LACERATING_SLASH);
 		spells[3].targettype = TARGET_ATTACKING;
-		spells[3].instant = true;
+		spells[3].instant = false;
 		spells[3].perctrigger = 7.0f;
 		spells[3].attackstoptimer = 1000;
 
 		spells[4].info = dbcSpell.LookupEntry(REND_FLESH); 
 		spells[4].targettype = TARGET_ATTACKING;
-		spells[4].instant = true;
+		spells[4].instant = false;
 		spells[4].perctrigger = 6.0f;
 		spells[4].attackstoptimer = 1000;
 
 
 		spells[5].info = dbcSpell.LookupEntry(DEAFENING_ROAR); 
 		spells[5].targettype = TARGET_VARIOUS;
-		spells[5].instant = true;
+		spells[5].instant = false;
 		spells[5].perctrigger = 8.0f;
 		spells[5].attackstoptimer = 1000;
 
@@ -286,21 +286,21 @@ public:
 
 		spells[0].info = dbcSpell.LookupEntry(STATIC_DISRUPTION);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
-		spells[0].instant = true;
+		spells[0].instant = false;
 		spells[0].perctrigger = 4.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(CALL_LIGHTING);
 		spells[1].targettype = TARGET_RANDOM_SINGLE;
-		spells[1].instant = true;
-		spells[1].perctrigger = 4.0f;
+		spells[1].instant = false;
+		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
 
 
 		spells[2].info = dbcSpell.LookupEntry(GUST_OF_WIND);
 		spells[2].targettype = TARGET_RANDOM_SINGLE;
-		spells[2].instant = true;
-		spells[2].perctrigger = 3.0f;
+		spells[2].instant = false;
+		spells[2].perctrigger = 9.0f;
 		spells[2].attackstoptimer = 1000;
 
 
@@ -375,7 +375,7 @@ public:
 			{
 				_unit->CastSpellAoF(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), dbcSpell.LookupEntry(ELECTRICAL_STORM_CLOUD), true);
 				target->SafeTeleport(target->GetMapId(), target->GetInstanceID(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 10.0f, target->GetOrientation());
-				_unit->CastSpell(target, ELECTRICAL_STORM, true);
+				_unit->CastSpell(target, ELECTRICAL_STORM, false);
 				sEventMgr.AddEvent(this, &AKILZONAI::summonEagles, EVENT_SCRIPT_UPDATE_EVENT, 10000, 1, 0);
 			}
 		}
@@ -885,7 +885,7 @@ public:
 		{
 			if (_unit->GetMapMgr() != NULL)
 				Creature *cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CORRUPTED_LIGHTING_TOTEM, _unit->GetPositionX()+2, _unit->GetPositionY()+2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
-			m_totemcd = 30 + RandomUInt(10);
+			m_totemcd = 35 + RandomUInt(10);
 		}
 	}
 	void PhaseThree()
@@ -895,7 +895,7 @@ public:
 		{
 			if (_unit->GetMapMgr() != NULL)
 				Creature *cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CORRUPTED_LIGHTING_TOTEM, _unit->GetPositionX()+2, _unit->GetPositionY()+2, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
-			m_totemcd = 20 + RandomUInt(10);
+			m_totemcd = 15 + RandomUInt(10);
 		}
 	}
 protected:
@@ -1133,8 +1133,8 @@ public:
 
 		spells[0].info = dbcSpell.LookupEntry(FLAME_BREATH);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
-		spells[0].instant = true;
-		spells[0].perctrigger = 5.0f;
+		spells[0].instant = false;
+		spells[0].perctrigger = 9.0f;
 		spells[0].attackstoptimer = 1000;
 
 		nrspells = 1;
