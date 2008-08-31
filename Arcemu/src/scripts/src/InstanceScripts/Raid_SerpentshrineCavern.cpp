@@ -2452,9 +2452,9 @@ public:
 		_unit->GetAIInterface()->SetAllowedToEnterCombat(false);
 		_unit->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-		channeler1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPELLBINDER, 378.073700f, -444.240204f, 29.524496f, 5.570440f, true, false, 0, 0);
-		channeler2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPELLBINDER, 382.517914f, -448.232117f, 29.527136f, 2.161806f, true, false, 0, 0);
-		channeler3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPELLBINDER, 383.528076f, -443.769165f, 29.527136f, 3.827633f, true, false, 0, 0);
+		channeler1 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPELLBINDER, 369.234f, -446.473f, 29.702f, 0.820574f, true, false, 0, 0);
+		channeler2 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPELLBINDER, 373.219f, -429.148f, 29.7064f, 5.04949f, true, false, 0, 0);
+		channeler3 = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_SPELLBINDER, 385.158f, -441.597f, 29.7121f, 2.81006f, true, false, 0, 0);
 
 		RegisterAIUpdateEvent(1000);
 	}
@@ -4781,15 +4781,15 @@ public:
 			spells[0].info = dbcSpell.LookupEntry(CONEOFCOLD);
 			spells[0].targettype = TARGET_ATTACKING;
 			spells[0].instant = false;
-			spells[0].cooldown = 18;
-			spells[0].perctrigger = 1.5f;
+			spells[0].cooldown = 10;
+			spells[0].perctrigger = 3f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FROSTBOLTVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = false;
-			spells[1].cooldown = 12;
-			spells[1].perctrigger = 2.0f;
+			spells[1].cooldown = 5;
+			spells[1].perctrigger = 6.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		case 1:
@@ -4799,15 +4799,15 @@ public:
 			spells[0].info = dbcSpell.LookupEntry(RAINOFFIRE);
 			spells[0].targettype = TARGET_RANDOM_DESTINATION;
 			spells[0].instant = false;
-			spells[0].cooldown = 18;
-			spells[0].perctrigger = 1.5f;
+			spells[0].cooldown = 10;
+			spells[0].perctrigger = 3f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(FIREBALLVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = false;
-			spells[1].cooldown = 12;
-			spells[1].perctrigger = 2.0f;
+			spells[1].cooldown = 5;
+			spells[1].perctrigger = 6.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		case 2:
@@ -4816,15 +4816,15 @@ public:
 			spells[0].info = dbcSpell.LookupEntry(ARCANELIGHTNING);
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = true;
-			spells[0].cooldown = 18;
-			spells[0].perctrigger = 1.5f;
+			spells[0].cooldown = 10;
+			spells[0].perctrigger =3f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(ARCANEVOLLEY);
 			spells[1].targettype = TARGET_VARIOUS;
 			spells[1].instant = false;
-			spells[1].cooldown = 12;
-			spells[1].perctrigger = 2.0f;
+			spells[1].cooldown = 5;
+			spells[1].perctrigger = 6.0f;
 			spells[1].attackstoptimer = 1000;
 			break;
 		}
