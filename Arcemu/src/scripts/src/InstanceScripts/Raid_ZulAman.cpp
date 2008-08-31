@@ -354,6 +354,7 @@ public:
 
 	void AIUpdate()
 	{
+		m_enrage--;
 		if (!m_enrage && !enraged)
 		{
 			_unit->DamageDoneModPCT[0] = 5;
@@ -427,7 +428,6 @@ public:
 				comulativeperc += spells[i].perctrigger;
 			}
 		}
-		m_enrage--;
 	}
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
 	{
@@ -775,7 +775,6 @@ public:
 				comulativeperc += spells[i].perctrigger;
 			}
 		}
-		m_enrage--;
 	}
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
 	{
@@ -1064,7 +1063,6 @@ public:
 				comulativeperc += spells[i].perctrigger;
 			}
 		}
-		m_enrage--;
 	}
 	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
 	{
