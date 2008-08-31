@@ -682,6 +682,10 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Chaga... choka'jinn.");
 		_unit->PlaySoundToSet(12028);
 		RemoveAIUpdateEvent();
+
+		GameObject *door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(305.53f, 1117.75f, 10.19f, 186303);
+		if (door != NULL)
+			door->SetUInt32Value(GAMEOBJECT_STATE, 0)
 	}
 
 	void AIUpdate()
