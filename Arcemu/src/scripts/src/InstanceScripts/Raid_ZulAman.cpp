@@ -646,6 +646,11 @@ public:
 
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Get on your knees and bow to da fang and claw!");
 		_unit->PlaySoundToSet(12020);
+
+		GameObject *door2 = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(369.33f, 1057.30f, 10.06f, 186304);
+		if (door2 != NULL)
+			door2->SetUInt32Value(GAMEOBJECT_STATE, 1);
+
 		RegisterAIUpdateEvent(1000);
 	}
 
@@ -675,6 +680,10 @@ public:
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
+
+		GameObject *door2 = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(369.33f, 1057.30f, 10.06f, 186304);
+		if (door2 != NULL)
+			door2->SetUInt32Value(GAMEOBJECT_STATE, 0);
 	}
 
 	void OnDied(Unit * mKiller)
@@ -685,7 +694,11 @@ public:
 
 		GameObject *door = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(305.53f, 1117.75f, 10.19f, 186303);
 		if (door != NULL)
-			door->SetUInt32Value(GAMEOBJECT_STATE, 0)
+			door->SetUInt32Value(GAMEOBJECT_STATE, 0);
+
+		GameObject *door2 = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(369.33f, 1057.30f, 10.06f, 186304);
+		if (door2 != NULL)
+			door2->SetUInt32Value(GAMEOBJECT_STATE, 0);
 	}
 
 	void AIUpdate()
