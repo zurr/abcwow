@@ -198,7 +198,6 @@ public:
 						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
 						if (target)
 						{
-							_unit->GetAIInterface()->SetNextTarget(target);
 							_unit->CastSpell(target, spells[i].info, spells[i].instant);
 						}
 						break;
@@ -287,20 +286,20 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(STATIC_DISRUPTION);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
-		spells[0].perctrigger = 3.0f;
+		spells[0].perctrigger = 4.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(CALL_LIGHTING);
 		spells[1].targettype = TARGET_RANDOM_SINGLE;
 		spells[1].instant = true;
-		spells[1].perctrigger = 3.5f;
+		spells[1].perctrigger = 4.0f;
 		spells[1].attackstoptimer = 1000;
 
 
 		spells[2].info = dbcSpell.LookupEntry(GUST_OF_WIND);
 		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = true;
-		spells[2].perctrigger = 2.0f;
+		spells[2].perctrigger = 3.0f;
 		spells[2].attackstoptimer = 1000;
 
 
@@ -408,7 +407,6 @@ public:
 						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
 						if (target)
 						{
-							_unit->GetAIInterface()->SetNextTarget(target);
 							_unit->CastSpell(target, spells[i].info, spells[i].instant);
 						}
 						break;
@@ -585,7 +583,7 @@ protected:
 //Halazzi <Lynx Avatar>
 
 #define HALAZZI 23577
-#define HALAZZILYNX 23812
+#define HALAZZILYNX 24143
 #define CORRUPTED_LIGHTING_TOTEM 24224 
 
 //Phase 1
@@ -605,21 +603,21 @@ public:
 	{
 
 		spells[0].info = dbcSpell.LookupEntry(SABER_LASH);
-		spells[0].targettype = TARGET_DESTINATION;
+		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 1.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(FLAME_SHOCK);
 		spells[1].targettype = TARGET_RANDOM_SINGLE; 
-		spells[1].instant = true;
-		spells[1].perctrigger = 2.0f;
+		spells[1].instant = false;
+		spells[1].perctrigger = 3.0f;
 		spells[1].attackstoptimer = 1000;
 
 		spells[2].info = dbcSpell.LookupEntry(EARTH_SHOCK);
 		spells[2].targettype = TARGET_RANDOM_SINGLE; 
-		spells[2].instant = true;
-		spells[2].perctrigger = 2.0f;
+		spells[2].instant = false;
+		spells[2].perctrigger = 3.0f;
 		spells[2].attackstoptimer = 1000;
 
 		enrage = false;
@@ -627,6 +625,8 @@ public:
 		m_phase =1;
 		m_phasestep = 1;
 		lynx = NULL;
+		nrspells = 1;
+		spmin = 0;
 
 		for(int i=0;i<nrspells;i++)
 		{
@@ -697,7 +697,7 @@ public:
 			_unit->DamageDoneModPCT[5] = 2;
 			enrage = true;
 		}
-		float val = (float)RandomFloat(100.0f);
+		float val = RandomFloat(100.0f);
 		SpellCast(val);
 		switch (m_phase)
 		{
@@ -738,7 +738,6 @@ public:
 						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
 						if (target)
 						{
-							_unit->GetAIInterface()->SetNextTarget(target);
 							_unit->CastSpell(target, spells[i].info, spells[i].instant);
 						}
 						break;
@@ -787,6 +786,7 @@ public:
 		Unit * randomtarget = targetTable[randt];
 		return randomtarget;
 	}
+
 	void PhaseOne()
 	{
 		switch (m_phasestep)
@@ -795,7 +795,7 @@ public:
 			if (_unit->GetHealthPct() <= 75)
 			{
 				spmin = 1;
-				nrspells = 2;
+				nrspells = 3;
 				m_phase = 2;
 				m_totemcd = 50 + RandomUInt(10);
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
@@ -807,7 +807,7 @@ public:
 			if (_unit->GetHealthPct() <= 50)
 			{
 				spmin = 1;
-				nrspells = 2;
+				nrspells = 3;
 				m_phase = 2;
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 				if (_unit->GetMapMgr() != NULL)
@@ -818,7 +818,7 @@ public:
 			if (_unit->GetHealthPct() <= 25)
 			{
 				spmin = 1;
-				nrspells = 2;
+				nrspells = 3;
 				m_phase = 2;
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 				if (_unit->GetMapMgr() != NULL)
@@ -906,7 +906,7 @@ public:
 
 	void OnCombatStart(Unit* mTarget)
 	{
-		RegisterAIUpdateEvent(1000);
+		RegisterAIUpdateEvent(2000);
 	}
 
 
@@ -925,8 +925,8 @@ public:
 
 	void OnDied(Unit * mKiller)
 	{
-		_unit->Despawn(100,0);
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void AIUpdate()
@@ -935,6 +935,150 @@ public:
 			_unit->CastSpell(_unit->GetAIInterface()->GetNextTarget(), CLT_LIGHTING, false);
 	}
 protected:
+};
+
+//Lynx Spirit
+#define LYNXFLURRY 43290
+#define LYNXSHREDARMOR 43243
+
+
+class LYNXSPIRITAI : public CreatureAIScript
+{
+public:
+	ADD_CREATURE_FACTORY_FUNCTION(LYNXSPIRITAI);
+	SP_AI_Spell spells[2];
+	bool m_spellcheck[2];
+
+	LYNXSPIRITAI(Creature* pCreature) : CreatureAIScript(pCreature)
+	{
+		spells[0].info = dbcSpell.LookupEntry(LYNXFLURRY);
+		spells[0].targettype = TARGET_SELF;
+		spells[0].instant = false;
+		spells[0].perctrigger = 8.0f;
+		spells[0].attackstoptimer = 1000;
+
+		spells[1].info = dbcSpell.LookupEntry(LYNXSHREDARMOR);
+		spells[1].targettype = TARGET_ATTACKING; 
+		spells[1].instant = false;
+		spells[1].perctrigger = 6.0f;
+		spells[1].attackstoptimer = 1000;
+
+		nrspells = 2;
+		spmin = 0;
+
+		for(int i=0;i<nrspells;i++)
+		{
+			m_spellcheck[i] = false;
+		}
+	}
+
+	void OnCombatStart(Unit* mTarget)
+	{
+		RegisterAIUpdateEvent(2000);
+	}
+
+
+	void OnTargetDied(Unit* mTarget)
+	{
+
+	}
+
+	void OnCombatStop(Unit *mTarget)
+	{
+		_unit->Despawn(100,0);
+		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+		RemoveAIUpdateEvent();
+	}
+
+	void OnDied(Unit * mKiller)
+	{
+		RemoveAIUpdateEvent();
+	}
+
+	void AIUpdate()
+	{
+		float val = RandomFloat(100.0f);
+		SpellCast(val);
+	}
+
+	void SpellCast(float val)
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
+			float comulativeperc = 0;
+			Unit *target = NULL;
+			for(int i=spmin;i<nrspells;i++)
+			{
+				if(!spells[i].perctrigger) continue;
+				if(m_spellcheck[i])
+				{
+					target = _unit->GetAIInterface()->GetNextTarget();
+					switch(spells[i].targettype)
+					{
+					case TARGET_SELF:
+					case TARGET_VARIOUS:
+						_unit->CastSpell(_unit, spells[i].info, spells[i].instant); break;
+					case TARGET_ATTACKING:
+						_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
+					case TARGET_DESTINATION:
+						_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+					case TARGET_RANDOM_SINGLE:
+						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
+						if (target)
+						{
+							_unit->CastSpell(target, spells[i].info, spells[i].instant);
+						}
+						break;
+					}	
+					if (spells[i].speech != "")
+					{
+						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
+						_unit->PlaySoundToSet(spells[i].soundid); 
+					}
+					m_spellcheck[i] = false;
+					return;
+				}
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				{
+					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					m_spellcheck[i] = true;
+				}
+				comulativeperc += spells[i].perctrigger;
+			}
+		}
+		m_enrage--;
+	}
+	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return NULL;
+
+		std::vector<Unit*> targetTable;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		TargetMap::iterator itr;
+		for (itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
+			if (_unit->GetDistance2dSq(temp) <= dist)
+			{
+				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (!targetTable.size())
+			return NULL;
+
+		uint32 randt = RandomUInt(100)%targetTable.size();
+		Unit * randomtarget = targetTable[randt];
+		return randomtarget;
+	}
+
+protected:
+	int nrspells;
+	int spmin;
 };
 
 
@@ -971,7 +1115,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(FLAME_BREATH);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = true;
-		spells[0].perctrigger = 2.0f;
+		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
 
 		nrspells = 1;
@@ -1115,7 +1259,6 @@ public:
 						target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
 						if (target)
 						{
-							_unit->GetAIInterface()->SetNextTarget(target);
 							_unit->CastSpell(target, spells[i].info, spells[i].instant);
 						}
 						break;
@@ -2573,6 +2716,7 @@ void SetupZulAman(ScriptMgr * mgr)
 	//Halazzi
 	mgr->register_creature_script(HALAZZI, &HALAZZIAI::Create);
 	mgr->register_creature_script(CORRUPTED_LIGHTING_TOTEM, &CLTOTEMAI::Create);
+	mgr->register_creature_script(HALAZZILYNX, &LYNXSPIRITAI::Create);
 
 	//Jan'alai
 	mgr->register_creature_script(JANALAI, &JANALAIAI::Create);

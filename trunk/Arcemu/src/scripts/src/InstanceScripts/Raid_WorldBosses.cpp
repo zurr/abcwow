@@ -2000,7 +2000,7 @@ public:
 		for(set<Player*>::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 		{
 			Player *currentTarget = (*itr);
-			if (currentTarget && currentTarget->isAlive() && _unit->GetDistance2dSq(currentTarget) <= 1600)
+			if (currentTarget && currentTarget->isAlive() && _unit->GetDistance2dSq(currentTarget) <= 1600.0f)
 			{
 				if (currentTarget->HasAura(MARK_OF_DEATH))
 					currentTarget->CastSpell(currentTarget, AURA_OF_DEATH, true);

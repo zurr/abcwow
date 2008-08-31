@@ -763,6 +763,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void AIUpdate()
@@ -908,6 +909,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void AIUpdate()
@@ -1456,6 +1458,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -2129,6 +2132,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -2326,6 +2330,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -2374,6 +2379,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -2961,6 +2967,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -3739,6 +3746,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -3954,6 +3962,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -4141,7 +4150,7 @@ public:
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
-		_unit->Despawn(5000, 0);
+		_unit->Despawn(1000,0);
 	}
 
 	void OnTargetDied(Unit* mTarget)
@@ -4296,11 +4305,14 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		RemoveAIUpdateEvent();
+		_unit->Despawn(100,0);
 	}
 
 	void OnDied(Unit * mKiller)
 	{
 		RemoveAIUpdateEvent();
+		_unit->Despawn(1000,0);
 	}
 
 	void AIUpdate()
