@@ -39,14 +39,14 @@ public:
 		spells[1].info = dbcSpell.LookupEntry(MANGLE); 
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = true;
-		spells[1].perctrigger = 4.0f;
+		spells[1].perctrigger = 6.0f;
 		spells[1].attackstoptimer = 1000;
 
 
 		spells[2].info = dbcSpell.LookupEntry(SURGE); 
 		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = true;
-		spells[2].perctrigger = 6.0f;
+		spells[2].perctrigger = 8.0f;
 		spells[2].attackstoptimer = 1000;
 
 
@@ -66,7 +66,7 @@ public:
 		spells[5].info = dbcSpell.LookupEntry(DEAFENING_ROAR); 
 		spells[5].targettype = TARGET_VARIOUS;
 		spells[5].instant = true;
-		spells[5].perctrigger = 7.0f;
+		spells[5].perctrigger = 8.0f;
 		spells[5].attackstoptimer = 1000;
 
 		nrspells = 3;
@@ -89,6 +89,7 @@ public:
 		m_phase = 0;
 		m_enrage = 600;
 		enraged = 0;
+		m_phasechange = 45;
 		_unit->PlaySoundToSet(12070);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "You be dead soon enough!");
 		RegisterAIUpdateEvent(1000);
@@ -131,14 +132,16 @@ public:
 
 	void AIUpdate()
 	{
+		m_enrage--;
+		m_phasechange--;
 		if (!m_enrage && !enraged)
 		{
-			_unit->DamageDoneModPCT[0] = 2;
-			_unit->DamageDoneModPCT[1] = 2;
-			_unit->DamageDoneModPCT[2] = 2;
-			_unit->DamageDoneModPCT[3] = 2;
-			_unit->DamageDoneModPCT[4] = 2;
-			_unit->DamageDoneModPCT[5] = 2;
+			_unit->DamageDoneModPCT[0] = 3;
+			_unit->DamageDoneModPCT[1] = 3;
+			_unit->DamageDoneModPCT[2] = 3;
+			_unit->DamageDoneModPCT[3] = 3;
+			_unit->DamageDoneModPCT[4] = 3;
+			_unit->DamageDoneModPCT[5] = 3;
 			enraged = 1;
 		}
 		if (!m_phasechange)
@@ -147,7 +150,7 @@ public:
 			{
 			case 0:
 				//bear
-				nrspells = 7;
+				nrspells = 6;
 				spmin = 3;
 				m_phase = 1;
 				m_phasechange = 30;
@@ -158,7 +161,7 @@ public:
 			case 1:
 				//human
 				nrspells = 3;
-				spmin = 3;
+				spmin = 0;
 				m_phase = 0;
 				m_phasechange = 45;
 				//_unit->PlaySoundToSet(11313);
@@ -169,8 +172,6 @@ public:
 		}
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
-		m_enrage--;
-		m_phasechange--;
 	}
 
 	void SpellCast(float val)
@@ -706,16 +707,18 @@ public:
 		m_enrage--;
 		if (!enrage && !m_enrage)
 		{
-			_unit->DamageDoneModPCT[0] = 2;
-			_unit->DamageDoneModPCT[1] = 2;
-			_unit->DamageDoneModPCT[2] = 2;
-			_unit->DamageDoneModPCT[3] = 2;
-			_unit->DamageDoneModPCT[4] = 2;
-			_unit->DamageDoneModPCT[5] = 2;
+			_unit->DamageDoneModPCT[0] = 3;
+			_unit->DamageDoneModPCT[1] = 3;
+			_unit->DamageDoneModPCT[2] = 3;
+			_unit->DamageDoneModPCT[3] = 3;
+			_unit->DamageDoneModPCT[4] = 3;
+			_unit->DamageDoneModPCT[5] = 3;
 			enrage = true;
 		}
+
 		float val = RandomFloat(100.0f);
 		SpellCast(val);
+
 		switch (m_phase)
 		{
 		case 1:
@@ -887,6 +890,7 @@ public:
 	}
 	void PhaseThree()
 	{
+		m_totemcd--;
 		if (!m_totemcd)
 		{
 			if (_unit->GetMapMgr() != NULL)
@@ -976,7 +980,7 @@ public:
 		spells[1].info = dbcSpell.LookupEntry(LYNXSHREDARMOR);
 		spells[1].targettype = TARGET_ATTACKING; 
 		spells[1].instant = false;
-		spells[1].perctrigger = 6.0f;
+		spells[1].perctrigger = 14.0f;
 		spells[1].attackstoptimer = 1000;
 
 		nrspells = 2;
