@@ -1793,7 +1793,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 							break;
 						}
 					}
-					else
+					if (!immune)
 					{
 						// Spells wich do more than just one thing (damage and the effect) dont have a mechanic and we should only cancel the aura to be placed
 						switch (m_spellInfo->EffectApplyAuraName[i])
