@@ -3859,7 +3859,7 @@ else
 		m_extraAttackCounter = false;
 	}
 
-	if(m_extrastriketargets)
+	if(m_extrastriketargets > 0)
 	{
 		int32 m_extra = m_extrastriketargets;
 		int32 m_temp = m_extrastriketargets;
@@ -3867,7 +3867,7 @@ else
 
 		for(set<Object*>::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end() && m_extra; ++itr)
 		{
-			if(m_extra == 0)
+			if(m_extra <= 0)
 				break;
 			if (!(*itr) || (*itr) == pVictim || !(*itr)->IsUnit())
 				continue;
@@ -3879,7 +3879,7 @@ else
 				--m_extra;
 			}
 		}
-		m_extrastriketargets = m_temp;
+		m_extrastriketargets += m_temp;
 	}
 }	
 
