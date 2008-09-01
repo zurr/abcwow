@@ -1640,6 +1640,11 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
+	//improved sprint effect
+	case 30918:
+	{
+		m_target->RemoveAllMovementImpairing();
+	}break;
 	//Requires No Ammo
 	case 46699:
 		{

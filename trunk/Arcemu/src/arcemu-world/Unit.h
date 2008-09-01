@@ -835,7 +835,8 @@ public:
 	uint32 RemoveAllPosAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	uint32 RemoveAllNegAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAllAurasByMechanic( uint32 MechanicType , uint32 MaxDispel , bool HostileOnly ); // Removes all (de)buffs on unit of a specific mechanic type.
-	
+	void RemoveAllMovementImpairing();
+
 	void RemoveNegativeAuras();
 	void RemoveAllAreaAuras();
 	// Temporary remove all auras
