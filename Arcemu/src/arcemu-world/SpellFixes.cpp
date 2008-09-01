@@ -866,7 +866,7 @@ void ApplyExtraDataFixes()
 	sp = dbcSpell.LookupEntryForced(5676);
 	if( sp != NULL )
 		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
-
+/*
 	// Spell 5938 (Shiv Rank 1) is infront from spell extra.
 	sp = dbcSpell.LookupEntryForced(5938);
 	if( sp != NULL )
@@ -876,7 +876,7 @@ void ApplyExtraDataFixes()
 	sp = dbcSpell.LookupEntryForced(5940);
 	if( sp != NULL )
 		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
-
+*/
 	// Spell 6041 (Lightning Bolt Rank 6) is infront from spell extra.
 	sp = dbcSpell.LookupEntryForced(6041);
 	if( sp != NULL )
@@ -12704,10 +12704,12 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->EffectSpellGroupRelation[0]=64;
 	#endif
+		/*
 		//rogue-shiv -> add 1 combo point
 		sp = dbcSpell.LookupEntryForced( 5938 );
 		if( sp != NULL )
 			sp->Effect[1]=80;
+			*/
 		//garrot
 		sp = dbcSpell.LookupEntryForced( 703 );
 		if( sp != NULL )

@@ -750,6 +750,59 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	 *  --------------------------------------------
 	 *************************/
 
+	case 5938: //shiv
+	{
+		if( p_caster == NULL || unitTarget == NULL )
+			return;
+
+		/*
+		p_caster->Strike( unitTarget, OFFHAND, m_spellInfo, 0, 0, 0, false, true );
+		p_caster->AddComboPoints( unitTarget->GetGUID(), 1 );
+*/
+/*
+		SpellEntry *spPrc = dbcSpell.LookupEntry( 5940 );
+		if( spPrc == NULL )
+			return;
+
+		SpellCastTargets targets( unitTarget->GetGUID() );
+		Spell *spell = new Spell( p_caster, spPrc, true, 0 );
+		spell->prepare( &targets );
+*/
+		p_caster->CastSpell(unitTarget->GetGUID(),5940,true);
+
+		if( p_caster->GetItemInterface() )
+		{
+			Item *it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+			if( it == NULL )
+				return;
+		
+			EnchantmentInstance * ench = it->GetEnchantment( 1 ); // temp enchantment slot
+			if(ench)
+			{
+				EnchantEntry* Entry = ench->Enchantment;
+				for( uint32 c = 0; c < 3; c++ )
+				{
+					if( Entry->type[c] && Entry->spell[c] )
+					{
+						SpellEntry *sp = dbcSpell.LookupEntry( Entry->spell[c] );
+						if( sp == NULL )
+							return;
+					
+						if( sp->c_is_flags & SPELL_FLAG_IS_POISON )
+						{
+							p_caster->CastSpell(unitTarget->GetGUID(),Entry->spell[c], true);
+							/*
+							SpellCastTargets targets( unitTarget->GetGUID() );
+							Spell *spell = new Spell( p_caster, sp, true, 0 );
+							spell->prepare( &targets );
+							*/
+						}
+					}
+				}
+			}
+		}
+
+	} break;
 	/*
 		Preparation
 		When activated, this ability immediately finishes the cooldown on your Evasion, Sprint, Vanish, Cold Blood, Shadowstep and Premeditation abilities.		
