@@ -1773,7 +1773,7 @@ void Aura::SpellAuraDummy(bool apply)
 		{
 	      if(apply)
 			 m_target->m_extrastriketargets++;
-		  else
+		  else if( m_target->m_extrastriketargets > 0 )
 			  m_target->m_extrastriketargets--;
 
 		}break;
@@ -2786,7 +2786,6 @@ void Aura::EventPeriodicHeal( uint32 amount )
 		bonus += penalty_flt;
 		*/
 		SM_PIValue( c->SM_PPenalty, &bonus, m_spellProto->SpellGroupType );
-
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		int spell_flat_modifers=0;
 		int spell_pct_modifers=0;
@@ -7125,7 +7124,7 @@ void Aura::SpellAuraModHaste( bool apply )
 	{
 		if( apply )
 			m_target->m_extrastriketargets++;
-		else
+		else if( m_target->m_extrastriketargets > 0 )
 			m_target->m_extrastriketargets--;
 	}
 
