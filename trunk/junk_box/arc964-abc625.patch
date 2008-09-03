@@ -1,0 +1,121 @@
+Index: CharacterHandler.cpp
+===================================================================
+--- CharacterHandler.cpp	(revision 963)
++++ CharacterHandler.cpp	(working copy)
+@@ -844,10 +844,10 @@
+ 
+ 	// Send revision (if enabled)
+ #ifdef WIN32
+-	_player->BroadcastMessage("Powered by: %sArcEmu %s r%u/%s-Win-%s %s(Please report ALL bugs to www.ArcEmu.org/forums/)", MSG_COLOR_WHITE, BUILD_TAG,
++	_player->BroadcastMessage("%sArcEmu/ABCWoW %s r%u/%s-Win-%s %s(www.ArcEmu.org)", MSG_COLOR_WHITE, BUILD_TAG,
+ 		BUILD_REVISION, CONFIG, ARCH, MSG_COLOR_LIGHTBLUE);		
+ #else
+-	_player->BroadcastMessage("Powered by: %sArcEmu %s r%u/%s-%s %s(Please report ALL bugs to www.ArcEmu.org/forums/)", MSG_COLOR_WHITE, BUILD_TAG,
++	_player->BroadcastMessage("%sArcEmu/ABCWoW %s r%u/%s-%s %s(www.ArcEmu.org)", MSG_COLOR_WHITE, BUILD_TAG,
+ 		BUILD_REVISION, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
+ #endif
+ 
+Index: Player.cpp
+===================================================================
+--- Player.cpp	(revision 963)
++++ Player.cpp	(working copy)
+@@ -407,9 +407,11 @@
+ 	m_outStealthDamageBonusPct = m_outStealthDamageBonusPeriod = m_outStealthDamageBonusTimer = 0;
+ 	m_vampiricEmbrace = m_vampiricTouch = 0;
+ 	LastSeal = 0;
++/*
+ #ifdef COLLISION
+ 	m_flyhackCheckTimer = 0;
+ #endif
++*/
+ }
+ 
+ void Player::OnLogin()
+@@ -682,7 +684,7 @@
+ 	SetUInt32Value(UNIT_FIELD_STAT3, info->intellect );
+ 	SetUInt32Value(UNIT_FIELD_STAT4, info->spirit );
+ 	SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 0.388999998569489f );
+-	SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f   );
++	SetFloatValue(UNIT_FIELD_COMBATREACH, 3.0f   );
+ 	if(race != 10)
+ 	{
+ 		SetUInt32Value(UNIT_FIELD_DISPLAYID, info->displayId + gender );
+@@ -920,7 +922,7 @@
+ 		}
+ 	}
+ #endif
+-
++/*
+ #ifdef COLLISION
+ 	if( mstime >= m_flyhackCheckTimer )
+ 	{
+@@ -928,6 +930,7 @@
+ 		m_flyhackCheckTimer = mstime + 10000; 
+ 	}
+ #endif
++*/
+ }
+ 
+ void Player::EventDismount(uint32 money, float x, float y, float z)
+@@ -2758,7 +2761,7 @@
+ 	SetUInt32Value(UNIT_FIELD_BYTES_2, (0x28 << 8) );
+ 	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+ 	SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 0.388999998569489f );
+-	SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f   );
++	SetFloatValue(UNIT_FIELD_COMBATREACH, 3.0f   );
+ 
+ 	if(getRace() != 10)
+ 	{
+@@ -10706,7 +10709,7 @@
+ 
+ 	} while ( result->NextRow( ) );
+ }
+-
++/*
+ #ifdef COLLISION
+ void Player::_FlyhackCheck()
+ {
+@@ -10743,7 +10746,7 @@
+ 	}
+ }
+ #endif
+-
++*/
+ /************************************************************************/
+ /* SOCIAL                                                               */
+ /************************************************************************/
+Index: Player.h
+===================================================================
+--- Player.h	(revision 963)
++++ Player.h	(working copy)
+@@ -2015,12 +2015,12 @@
+ 	void addDeletedSpell(uint32 id) { mDeletedSpells.insert( id ); }
+ 
+ 	map<uint32, uint32> m_forcedReactions;
+-
++/*
+ #ifdef COLLISION
+ 	uint32 m_flyhackCheckTimer;
+ 	void _FlyhackCheck();
+ #endif
+-
++*/
+ 	bool m_passOnLoot;
+ 	uint32 m_tradeSequence;
+ 	bool m_changingMaps;
+Index: Spell.cpp
+===================================================================
+--- Spell.cpp	(revision 963)
++++ Spell.cpp	(working copy)
+@@ -2981,9 +2981,11 @@
+ 		// check for duel areas
+ 		if(p_caster && GetProto()->Id == 7266)
+ 		{
++			/*
+ 			AreaTable* at = dbcArea.LookupEntry( p_caster->GetAreaID() );
+ 			if(at->AreaFlags & AREA_CITY_AREA)
+ 				return SPELL_FAILED_NO_DUELING;
++				*/
+ 			// instance & stealth checks
+ 			if ( p_caster->GetMapMgr() && p_caster->GetMapMgr()->GetMapInfo() && p_caster->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL )
+ 					return SPELL_FAILED_NO_DUELING;
