@@ -2716,7 +2716,7 @@ void Aura::SpellAuraPeriodicHeal( bool apply )
 	if( apply )
 	{
 		SetPositive();
-		sEventMgr.AddEvent( this, &Aura::EventPeriodicHeal,(uint32)mod->m_amount, EVENT_AURA_PERIODIC_HEAL, GetDuration(), 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+		sEventMgr.AddEvent( this, &Aura::EventPeriodicHeal,(uint32)mod->m_amount, EVENT_AURA_PERIODIC_HEAL, GetSpellProto()->EffectAmplitude[mod->i], 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 
 		if( GetSpellProto()->NameHash == SPELL_HASH_REJUVENATION || GetSpellProto()->NameHash == SPELL_HASH_REGROWTH )
 		{
@@ -2777,12 +2777,16 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 	if( c != NULL && m_spellProto->SpellGroupType )
 	{
+		/*
 		int penalty_pct = 0;
 		int penalty_flt = 0;
 		SM_FIValue( c->SM_PPenalty, &penalty_pct, GetSpellProto()->SpellGroupType );
 		bonus += bonus * ( penalty_pct / 100 );
 		SM_FIValue( c->SM_FPenalty, &penalty_flt, GetSpellProto()->SpellGroupType );
 		bonus += penalty_flt;
+		*/
+		SM_PIValue( c->SM_PPenalty, &bonus, m_spellProto->SpellGroupType );
+
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		int spell_flat_modifers=0;
 		int spell_pct_modifers=0;
