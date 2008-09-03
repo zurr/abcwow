@@ -866,17 +866,7 @@ void ApplyExtraDataFixes()
 	sp = dbcSpell.LookupEntryForced(5676);
 	if( sp != NULL )
 		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
-/*
-	// Spell 5938 (Shiv Rank 1) is infront from spell extra.
-	sp = dbcSpell.LookupEntryForced(5938);
-	if( sp != NULL )
-		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
 
-	// Spell 5940 (Shiv Rank 1) is infront from spell extra.
-	sp = dbcSpell.LookupEntryForced(5940);
-	if( sp != NULL )
-		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
-*/
 	// Spell 6041 (Lightning Bolt Rank 6) is infront from spell extra.
 	sp = dbcSpell.LookupEntryForced(6041);
 	if( sp != NULL )
@@ -12704,12 +12694,6 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->EffectSpellGroupRelation[0]=64;
 	#endif
-		/*
-		//rogue-shiv -> add 1 combo point
-		sp = dbcSpell.LookupEntryForced( 5938 );
-		if( sp != NULL )
-			sp->Effect[1]=80;
-			*/
 		//garrot
 		sp = dbcSpell.LookupEntryForced( 703 );
 		if( sp != NULL )
@@ -13462,21 +13446,33 @@ void ApplyNormalFixes()
 		/**********************************************************
 		 *	Healing Way
 		 **********************************************************/
+		/*
+		Zack : disabled this to not create confusion that it is working. Burlex deleted code so it needs to be reverted in order to work
 		sp = dbcSpell.LookupEntryForced( 29202 ); 
 		if( sp != NULL )
 		{
 			sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
+			sp->procChance = sp->EffectBasePoints[0] + 1;
 		}
 		sp = dbcSpell.LookupEntryForced( 29205 ); 
 		if( sp != NULL )
 		{
 			sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
+			sp->procChance = sp->EffectBasePoints[0] + 1;
 		}
 		sp = dbcSpell.LookupEntryForced( 29206 ); 
 		if( sp != NULL )
 		{
 			sp->procFlags = PROC_ON_CAST_SPELL;
+            sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            sp->EffectImplicitTargetA[0] = EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET;
+			sp->procChance = sp->EffectBasePoints[0] + 1;
 		}
+		*/
 
 		/**********************************************************
 		 *	Elemental Devastation
@@ -13548,6 +13544,22 @@ void ApplyNormalFixes()
 
 	// Insert mage spell fixes here
 
+		/**********************************************************
+		*    Improved Blink by Alice
+		**********************************************************/
+	    
+		//Improved Blink - *Rank 1*
+		sp = dbcSpell.LookupEntryForced( 31569 );
+		if( sp != NULL )
+		{        
+			sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
+		}
+			//Improved Blink - *Rank 2*
+		sp = dbcSpell.LookupEntryForced( 31570 );
+		if( sp != NULL )
+		{
+			sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
+		}
 		/**********************************************************
 		 *	Arcane Concentration
 		 **********************************************************/
@@ -15591,12 +15603,7 @@ void ApplyNormalFixes()
 			sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_ON_CAST_SPELL;
 		}
 
-		//Weakened Soul Reduction ( arena set bonus )
-		sp = dbcSpell.LookupEntry( 33333 ); 
-		if( sp != NULL )
-		{
-			sp->EffectSpellGroupRelation[0] = 0x20000000;
-		}
+
 
 		//////////////////////////////////////////
 		// BOSSES								//

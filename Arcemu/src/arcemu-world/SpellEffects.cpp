@@ -755,19 +755,6 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		if( p_caster == NULL || unitTarget == NULL )
 			return;
 
-		/*
-		p_caster->Strike( unitTarget, OFFHAND, m_spellInfo, 0, 0, 0, false, true );
-		p_caster->AddComboPoints( unitTarget->GetGUID(), 1 );
-*/
-/*
-		SpellEntry *spPrc = dbcSpell.LookupEntry( 5940 );
-		if( spPrc == NULL )
-			return;
-
-		SpellCastTargets targets( unitTarget->GetGUID() );
-		Spell *spell = new Spell( p_caster, spPrc, true, 0 );
-		spell->prepare( &targets );
-*/
 		p_caster->CastSpell(unitTarget->GetGUID(),5940,true);
 
 		if( p_caster->GetItemInterface() )
@@ -791,11 +778,6 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 						if( sp->c_is_flags & SPELL_FLAG_IS_POISON )
 						{
 							p_caster->CastSpell(unitTarget->GetGUID(),Entry->spell[c], true);
-							/*
-							SpellCastTargets targets( unitTarget->GetGUID() );
-							Spell *spell = new Spell( p_caster, sp, true, 0 );
-							spell->prepare( &targets );
-							*/
 						}
 					}
 				}
@@ -1785,7 +1767,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 				Spell Haste (Curse of Tongues) (aura): 16384
 				Interrupt Cast: 32768
 				Mod Healing % (Mortal Strike) (aura): 65536
-				Total Stats % (Vindication) (aura): 65536
+				Total Stats % (Vindication) (aura): 131072
 				*/
 
 				//Spells with Mechanic also add other ugly auras, but if the main aura is the effect --> immune to whole spell
@@ -1884,7 +1866,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 								immune = true;
 							break;
 						case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
-							if (c->GetProto()->modImmunities & 32768)
+							if (c->GetProto()->modImmunities & 65536)
 								immune = true;
 							break;
 						case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
@@ -2148,10 +2130,6 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 						spell->SetUnitTarget( unitTarget );
 						spell->Heal( (int32)new_dmg );
 					}
-					/*
-					if( new_dmg > 0 )
-						Heal( (int32)new_dmg );
-					*/
 				}
 			}break;
 		default:
@@ -4028,6 +4006,7 @@ void Spell::SpellEffectPowerBurn(uint32 i) // power burn
 		Player* mPlayer = static_cast< Player* >( unitTarget );
 		if( mPlayer->IsInFeralForm() )
 			return;
+
 		// Resilience - reduces the effect of mana drains by (CalcRating*2)%.
 		damage *= float2int32( 1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) );
 	}
