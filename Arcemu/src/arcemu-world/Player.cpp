@@ -1345,6 +1345,8 @@ void Player::EventDeath()
 
 	if(!IS_INSTANCE(GetMapId()) && !sEventMgr.HasEvent(this,EVENT_PLAYER_FORECED_RESURECT)) //Should never be true 
 		sEventMgr.AddEvent(this,&Player::RepopRequestedPlayer,EVENT_PLAYER_FORECED_RESURECT,PLAYER_FORCED_RESURECT_INTERVAL,1,0); //in case he forgets to release spirit (afk or something)
+
+	RemoveNegativeAuras();
 }
 
 void Player::BuildEnumData( WorldPacket * p_data )
@@ -8841,7 +8843,7 @@ void Player::SetShapeShift(uint8 ss)
 		if( m_auras[x] != NULL )
 		{
 			uint32 reqss = m_auras[x]->GetSpellProto()->RequiredShapeShift;
-			if( reqss != 0 && m_auras[x]->IsPositive() )
+			if( reqss != 0 && m_auras[x]->IsPositive() && this->getClass() != PRIEST )
 			{
 				if( old_ss > 0 )
 				{

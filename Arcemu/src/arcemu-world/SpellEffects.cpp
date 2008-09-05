@@ -970,24 +970,36 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	*/
 	case 18350:
 		{
-			if(!p_caster) return;
-			SpellEntry * sp = p_caster->last_heal_spell ? p_caster->last_heal_spell : GetProto();
-			uint32 cost = float2int32( float( float(sp->manaCost) * 0.6f ) );
-			uint32 basecost = cost;
-			SendHealManaSpellOnPlayer(p_caster, p_caster, cost, 0);
-			cost+=p_caster->GetUInt32Value(UNIT_FIELD_POWER1);
-			if(cost>p_caster->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
-				p_caster->SetUInt32Value(UNIT_FIELD_POWER1,p_caster->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
-			else
-				p_caster->SetUInt32Value(UNIT_FIELD_POWER1,cost);
-
-			WorldPacket datamr(SMSG_HEALMANASPELL_ON_PLAYER, 30);
-			datamr << unitTarget->GetNewGUID();
-			datamr << u_caster->GetNewGUID();
-			datamr << uint32(20272);
-			datamr << uint32(0);
-			datamr << uint32( basecost );
-			u_caster->SendMessageToSet(&datamr,true);
+			switch( m_triggeredByAura==NULL ? pSpellId : m_triggeredByAura->GetSpellId() )
+			{
+			case 20210:
+			case 20212:
+			case 20213:
+			case 20214:
+			case 20215:
+				{
+					if(!p_caster) return;
+					SpellEntry * sp = p_caster->last_heal_spell ? p_caster->last_heal_spell : GetProto();
+					uint32 cost = float2int32( float( float(sp->manaCost) * 0.6f ) );
+					p_caster->Energize(p_caster, 20272, cost, POWER_TYPE_MANA );
+				}break;
+			case 38443:
+				{
+					// Shaman - Skyshatter Regalia - Two Piece Bonus
+					// it checks for earth, air, water, fire totems and triggers Totemic Mastery spell 38437.
+					if(!p_caster) return;
+					if(p_caster->m_TotemSlots[0] && p_caster->m_TotemSlots[1] && p_caster->m_TotemSlots[2] && p_caster->m_TotemSlots[3])
+					{
+						Aura *aur = AuraPool.PooledNew();
+						aur->Init(dbcSpell.LookupEntry(38437), 5000, p_caster, p_caster);
+						for( uint32 i=0; i<3; i++ ) 
+							aur->AddMod( aur->GetSpellProto()->EffectApplyAuraName[i], aur->GetSpellProto()->EffectBasePoints[i]+1, aur->GetSpellProto()->EffectMiscValue[i], i );
+						p_caster->AddAura(aur);
+					}
+				}break;
+			default:
+				return;
+			}
 		}break;
 	/*************************
 	 * PRIEST SPELLS
@@ -1159,15 +1171,11 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		if(!p_caster || !playerTarget)
 			return;
 
-		uint32 damage = (((GetProto()->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(GetProto()->School)*80)/100);
-		if (damage >= playerTarget->GetUInt32Value(UNIT_FIELD_HEALTH))
+		uint32 damage = ( ( ( GetProto()->EffectBasePoints[i] + 1 ) * ( 100 + playerTarget->m_lifetapbonus ) ) / 100 ) + ( ( playerTarget->GetDamageDoneMod( GetProto()->School ) * 80 ) / 100 );
+		if( damage >= playerTarget->GetUInt32Value( UNIT_FIELD_HEALTH ) )
 			return;
-		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
-		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
-			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
-		else
-			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage);
-			SendHealManaSpellOnPlayer(p_caster, playerTarget, damage, 0);
+		p_caster->DealDamage( playerTarget, damage, 0, 0, spellId );
+		p_caster->Energize( playerTarget, spellId, damage, POWER_TYPE_MANA );
 		}break;
 	case 974:
 	case 32593:
@@ -1201,14 +1209,14 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			}
 
 			uint32 gain = (uint32)(count * (2.17*p_caster->getLevel()+9.136));
-			p_caster->Energize(unitTarget,28730,gain,POWER_TYPE_MANA);
+			p_caster->Energize( unitTarget, 28730, gain, POWER_TYPE_MANA );
 		}break;
 	case 39610://Mana Tide
 		{
 			if(unitTarget == NULL || unitTarget->isDead() || unitTarget->getClass() == WARRIOR || unitTarget->getClass() == ROGUE)
  				return;
  			uint32 gain = (uint32) (unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)*0.06);
-			unitTarget->Energize(unitTarget,16191,gain,POWER_TYPE_MANA);
+			unitTarget->Energize( unitTarget, 16191, gain, POWER_TYPE_MANA );
 		}break;
 	case 20425: //Judgement of Command
 	case 20961: //Judgement of Command
@@ -1885,6 +1893,8 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	// avoid map corruption.
 	if(unitTarget->GetInstanceID()!=m_caster->GetInstanceID())
 		return;
+	if (!unitTarget->isAlive())
+		return;
 
 	//check if we already have stronger aura
 	Aura *pAura;
@@ -1950,18 +1960,8 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 		// Resilience - reduces the effect of mana drains by (CalcRating*2)%.
 		damage *= float2int32( 1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) );
 	}
-	uint32 amt=damage+((u_caster->GetDamageDoneMod(GetProto()->School)*80)/100);
-	if(amt>curPower)
-	{
-		amt=curPower;
-	}
-	unitTarget->SetUInt32Value(powerField,curPower-amt);
-	uint32 m=u_caster->GetUInt32Value(UNIT_FIELD_MAXPOWER1+GetProto()->EffectMiscValue[i]);
-	if(u_caster->GetUInt32Value(powerField)+amt>m)
-		u_caster->SetUInt32Value(powerField,m);
-	else
-		u_caster->SetUInt32Value(powerField,u_caster->GetUInt32Value(powerField)+amt);	
-	SendHealManaSpellOnPlayer(u_caster, u_caster, amt, GetProto()->EffectMiscValue[i]);
+	uint32 amt = damage + ( ( u_caster->GetDamageDoneMod( GetProto()->School ) * 80 ) / 100 );
+	u_caster->Energize( u_caster, amt, GetProto()->Id, GetProto()->EffectMiscValue[i] );
 }
 
 void Spell::SpellEffectHealthLeech(uint32 i) // Health Leech
@@ -2756,16 +2756,12 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 	else  
         modEnergy = damage;
 
-	if(unitTarget->HasAura(17619)) 
+	if( unitTarget->HasAura( 17619 ) ) 
 	{ 
-		modEnergy = uint32(modEnergy*1.4f);      
+		modEnergy = uint32( modEnergy * 1.4f );      
 	} 
-	SendHealManaSpellOnPlayer(u_caster, unitTarget, modEnergy, GetProto()->EffectMiscValue[i]);
 
-	if(modEnergy + curEnergy > maxEnergy)
-		unitTarget->SetUInt32Value(POWER_TYPE,maxEnergy);
-	else
-		unitTarget->SetUInt32Value(POWER_TYPE,modEnergy + curEnergy);
+	u_caster->Energize( unitTarget, GetProto()->Id, modEnergy, GetProto()->EffectMiscValue[i] );
 }
 
 void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage
@@ -3391,6 +3387,8 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 	{
 		start=0;
 		end=MAX_POSITIVE_AURAS;
+		if (unitTarget->SchoolImmunityList[GetProto()->School])
+			return;
 	}
 	else
 	{
@@ -5470,7 +5468,7 @@ void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 	SpellEntry *spellInfo = dbcSpell.LookupEntry(GetProto()->EffectTriggerSpell[i]);
 	Spell *sp= SpellPool.PooledNew();
 	sp->Init((Object *)p_caster,spellInfo,true,NULL);
-	sp->forced_basepoints[0] = damage - 1;
+	sp->forced_basepoints[0] = damage;
 	SpellCastTargets tgt;
 	tgt.m_unitTarget=pPet->GetGUID();
 	sp->prepare(&tgt);
@@ -5647,13 +5645,7 @@ void Spell::SpellEffectDestroyAllTotems(uint32 i)
 		}
 	}
 
-	// get the current mana, get the max mana. Calc if we overflow
-	SendHealManaSpellOnPlayer(m_caster, m_caster, (uint32)RetreivedMana, 0);
-	RetreivedMana += float(m_caster->GetUInt32Value(UNIT_FIELD_POWER1));
-	uint32 max = m_caster->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-	if((uint32)RetreivedMana > max)
-		RetreivedMana = (float)max;
-	m_caster->SetUInt32Value(UNIT_FIELD_POWER1, (uint32)RetreivedMana);
+	p_caster->Energize( p_caster, GetProto()->Id, uint32( RetreivedMana ), POWER_TYPE_MANA );
 }
 
 void Spell::SpellEffectSummonDemon(uint32 i)
@@ -5964,9 +5956,12 @@ void Spell::SpellEffectFilming( uint32 i )
 
 	TaxiPath* taxipath = sTaxiMgr.GetTaxiPath(GetProto()->EffectMiscValue[0]);
 
+	if( !taxipath )
+		return;
+
 	TaxiNode* taxinode = sTaxiMgr.GetTaxiNode( taxipath->GetSourceNode() );
 
-	if( !taxinode || !taxipath )
+	if( !taxinode )
 		return;
 
 	uint32 modelid =0;

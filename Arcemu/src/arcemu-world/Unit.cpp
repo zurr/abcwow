@@ -592,7 +592,12 @@ bool Unit::canReachWithAttack(Unit *pVictim)
 		return false;
 
 //	float targetreach = pVictim->GetFloatValue(UNIT_FIELD_COMBATREACH);
-	float selfreach = m_floatValues[UNIT_FIELD_COMBATREACH];
+	float selfreach;
+	if( IsPlayer() )
+		selfreach = 5.0f; // minimum melee range, UNIT_FIELD_COMBATREACH is too small and used eg. in melee spells
+	else
+		selfreach = m_floatValues[UNIT_FIELD_COMBATREACH];
+
 	float targetradius;
 //	targetradius = pVictim->m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; //this is plain wrong. Represents i have no idea what :)
 	targetradius = pVictim->GetModelHalfSize();
@@ -2125,12 +2130,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						if( CastingSpell == NULL )
 							continue;
 					}break;
-				//http://www.wowhead.com/?item=33509  Idol of Terror
-				case 43738: //Your Mangle ability has a chance to grant 65 agility for 10 sec.
-					{
-						if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_MANGLE__BEAR_ || CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_)
-							continue;
-					}break;
 				//http://www.wowhead.com/?item=32488 Ashtongue Talisman of Insight
 				case 40483:
 					{
@@ -3041,13 +3040,13 @@ else
 	crit += pVictim->IsPlayer() ? vsk * 0.04f : min( vsk * 0.2f, 0.0f ); 
 
 	if(vsk>0)
-			hitchance = std::max(hitchance,95.0f+vsk*0.02f+hitmodifier);
+			hitchance = 95.0f+vsk*0.02f;
 	else
 	{
 		if(pVictim->IsPlayer())
-			hitchance = std::max(hitchance,95.0f+vsk*0.04f+hitmodifier);
+			hitchance = 95.0f+vsk*0.04f;
 		else
-			hitchance = std::max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
+			hitchance = 100.0f+vsk*0.6f; //not wowwiki but more balanced
 	}
 
 	if(ability && ability->SpellGroupType)
@@ -3082,6 +3081,7 @@ else
 		glanc=0.0f;
 	}
 	else
+	{
 		if(this->IsPlayer())
 		{
 			it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
@@ -3094,6 +3094,9 @@ else
 					hitmodifier -= 4.0f;
 			}
 		}
+	}
+
+	hitchance+= hitmodifier;
 
 	//Hackfix for Surprise Attacks
 	if(  this->IsPlayer() && ability && static_cast< Player* >( this )->m_finishingmovesdodge && ability->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE)
@@ -3908,17 +3911,17 @@ void Unit::smsg_AttackStop(Unit* pVictim)
 	}
 	else
 	{
-		if(!IsPlayer() || getClass() == ROGUE)
+		if( !IsPlayer() || getClass() == ROGUE )
 		{
 			m_cTimer = getMSTime() + 5000;
-			sEventMgr.RemoveEvents(this, EVENT_COMBAT_TIMER); 
-			sEventMgr.AddEvent(this, &Unit::EventUpdateFlag, EVENT_COMBAT_TIMER, 5000, 1, 0);
-			sEventMgr.AddEvent(pVictim, &Unit::EventUpdateFlag, EVENT_COMBAT_TIMER, 5000, 1, 0);
-		}
+			sEventMgr.RemoveEvents( this, EVENT_COMBAT_TIMER ); 
+			sEventMgr.AddEvent( this, &Unit::EventUpdateFlag, EVENT_COMBAT_TIMER, 5000, 1, 0 );
+			if( pVictim->IsUnit() ) // there could be damage coming from objects/enviromental
+				sEventMgr.AddEvent( pVictim, &Unit::EventUpdateFlag, EVENT_COMBAT_TIMER, 5000, 1, 0 );		}
 		else
 		{
-			pVictim->CombatStatus.RemoveAttacker(this, GetGUID());
-			CombatStatus.RemoveAttackTarget(pVictim);
+			pVictim->CombatStatus.RemoveAttacker( this, GetGUID() );
+			CombatStatus.RemoveAttackTarget( pVictim );
 		}
 	}
 }
@@ -6533,31 +6536,29 @@ void Unit::Heal(Unit *target, uint32 SpellId, uint32 amount)
 		target->RemoveAurasByHeal();
 	}
 }
-void Unit::Energize(Unit* target,uint32 SpellId, uint32 amount,uint32 type)
-{//Static energize
-	if(!target || !SpellId || !amount)
+void Unit::Energize( Unit* target, uint32 SpellId, uint32 amount, uint32 type )
+{	//Static energize
+	if( !target || !SpellId || !amount )
 		return;
-	uint32 cm=target->GetUInt32Value(UNIT_FIELD_POWER1+type);
-	uint32 mm=target->GetUInt32Value(UNIT_FIELD_MAXPOWER1+type);
-	if(mm!=cm)
-	{
-		cm += amount;
-		if(cm > mm)
-		{
-			target->SetUInt32Value(UNIT_FIELD_POWER1+type, mm);
-			amount += mm-cm;
-		}
-		else 
-			target->SetUInt32Value(UNIT_FIELD_POWER1+type, cm);
+	
+	uint32 cur = target->GetUInt32Value( UNIT_FIELD_POWER1 + type );
+	uint32 max = target->GetUInt32Value( UNIT_FIELD_MAXPOWER1 + type );
+	
+	/*if( max == cur ) // can we show null power gains in client? eg. zero happiness gain should be show...
+		return;*/
 
-		WorldPacket datamr(SMSG_HEALMANASPELL_ON_PLAYER, 30);
-		datamr << target->GetNewGUID();
-		datamr << this->GetNewGUID();
-		datamr << uint32(SpellId);
-		datamr << uint32(0);
-		datamr << uint32(amount);
-		this->SendMessageToSet(&datamr,true);
-	}
+	if( cur + amount > max )
+		amount = max - cur;
+
+	target->SetUInt32Value( UNIT_FIELD_POWER1 + type, cur + amount );
+
+	WorldPacket datamr( SMSG_SPELLENERGIZELOG, 30 );
+	datamr << target->GetNewGUID();
+	datamr << this->GetNewGUID();
+	datamr << SpellId;
+	datamr << type;
+	datamr << amount;
+	this->SendMessageToSet( &datamr, true );
 }
 
 void Unit::InheritSMMods(Unit *inherit_from)
@@ -6954,7 +6955,7 @@ void Unit::ReplaceAIInterface(AIInterface *new_interface)
 
 void Unit::EventUpdateFlag()  
 {  
-static_cast< Player * >( this )->CombatStatus.UpdateFlag(); 
+	CombatStatus.UpdateFlag(); 
 }
 
 bool Unit::HasAurasOfNameHashWithCaster(uint32 namehash, Unit * caster)
