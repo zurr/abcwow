@@ -189,7 +189,11 @@ void Token_Vendor::TradePoints(Object * pObject, Player* Plr, uint32 Index, uint
 		if( Plr->GetItemInterface()->AddItemToFreeSlot(item) )
 		{
 			Plr->ModUnsigned32Value(Index, -int32(count));
-			Plr->m_honorPoints -=int32(count);
+			if ( Index == PLAYER_FIELD_HONOR_CURRENCY )
+				Plr->m_honorPoints -=int32(count);
+			if ( Index == PLAYER_FIELD_ARENA_CURRENCY )
+				Plr->m_arenaPoints -=int32(count);
+			Plr->SaveToDB();
 
 			SlotResult *lr = Plr->GetItemInterface()->LastSearchResult();
 			Plr->GetSession()->SendItemPushResult(item, false, true, false, true, lr->ContainerSlot, lr->Slot, dItemCount);
