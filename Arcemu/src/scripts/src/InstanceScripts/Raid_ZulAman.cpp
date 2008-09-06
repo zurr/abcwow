@@ -2740,7 +2740,6 @@ void SetupZulAman(ScriptMgr * mgr)
 	//Jan'alai
 	mgr->register_creature_script(JANALAI, &JANALAIAI::Create);
 
-	/*
 	mgr->register_creature_script(HEX_LORD_MALACRASS, &HEXLORDMALACRASSAI::Create);
 	mgr->register_creature_script(ZULJIN, &ZULJINAI::Create);
 	//MOBS
@@ -2752,5 +2751,5 @@ void SetupZulAman(ScriptMgr * mgr)
 	mgr->register_creature_script(FENSTALKER, &FENSTALKERAI::Create);
 	mgr->register_creature_script(ALYSON_ANTILLE, &ALYSONANTILLEAI::Create);
 	mgr->register_creature_script(KORAGG, &KORAGGAI::Create);
-	mgr->register_creature_script(FEATHER_VORTEX, &FEATHERVORTEXAI::Create);*/
+	mgr->register_creature_script(FEATHER_VORTEX, &FEATHERVORTEXAI::Create);
 }

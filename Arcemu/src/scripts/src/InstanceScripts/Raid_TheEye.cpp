@@ -3721,9 +3721,9 @@ void SetupTheEye(ScriptMgr * mgr)
 	mgr->register_dummy_spell(SOLARIAN_WRATH_OF_THE_ASTROMANCER, &Dummy_Solarian_WrathOfTheAstromancer);
 
 	//Al'ar event
-	/*mgr->register_creature_script(CN_ALAR, &AlarAI::Create);
+	mgr->register_creature_script(CN_ALAR, &AlarAI::Create);
 	mgr->register_creature_script(CN_EMBEROFALAR, &EmberAlarAI::Create);
-	mgr->register_creature_script(CN_PATCHALAR, &PatchAlarAI::Create);*/
+	mgr->register_creature_script(CN_PATCHALAR, &PatchAlarAI::Create);
 
 	//Kael'Thas Encounter
 	mgr->register_creature_script(CN_PHOENIX, &PhoenixAI::Create);
