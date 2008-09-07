@@ -1961,7 +1961,7 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 		damage *= float2int32( 1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) );
 	}
 	uint32 amt = damage + ( ( u_caster->GetDamageDoneMod( GetProto()->School ) * 80 ) / 100 );
-	u_caster->Energize( u_caster, amt, GetProto()->Id, GetProto()->EffectMiscValue[i] );
+	u_caster->Energize( u_caster, GetProto()->Id, amt, GetProto()->EffectMiscValue[i] );
 }
 
 void Spell::SpellEffectHealthLeech(uint32 i) // Health Leech
@@ -5400,30 +5400,22 @@ void Spell::SpellEffectDisenchant( uint32 i )
 		it->loot = new Loot;
 		lootmgr.FillDisenchantingLoot( it->loot, it->GetEntry() );
 	}
-	if ( it->loot->items.size() > 0 )
+
+	Log.Debug( "SpellEffect", "Succesfully disenchanted item %d", uint32( itemTarget->GetEntry() ) );
+	p_caster->SendLoot( itemTarget->GetGUID(), LOOT_DISENCHANTING );
+
+	//We can increase Enchanting skill up to 60 
+	uint32 skill = p_caster->_GetSkillLineCurrent( SKILL_ENCHANTING );
+	if( skill && skill < 60 )
 	{
-		Log.Debug( "SpellEffect", "Succesfully disenchanted item %d", uint32( itemTarget->GetEntry() ) );
-		p_caster->SendLoot( itemTarget->GetGUID(), LOOT_DISENCHANTING );
-		
-		//We can increase Enchanting skill up to 60 
-		uint32 skill = p_caster->_GetSkillLineCurrent( SKILL_ENCHANTING );
-		if( skill && skill < 60 )
+		if( Rand( 100.0f - float( skill ) * 0.75f ) )
 		{
-			if( Rand( 100.0f - float( skill ) * 0.75f ) )
-			{
-				uint32 SkillUp = float2int32( 1.0f * sWorld.getRate( RATE_SKILLRATE ) );
-				if( skill + SkillUp > 60 )
-					SkillUp = 60 - skill;
+			uint32 SkillUp = float2int32( 1.0f * sWorld.getRate( RATE_SKILLRATE ) );
+			if( skill + SkillUp > 60 )
+				SkillUp = 60 - skill;
 
-				p_caster->_AdvanceSkillLine( SKILL_ENCHANTING, SkillUp );
-			}
-	}
-
-	} 
-	else
-	{
-		Log.Debug("SpellEffect","Disenchanting failed, item %d has no loot", uint32( itemTarget->GetEntry() ) );
-		SendCastResult( SPELL_FAILED_CANT_BE_DISENCHANTED );
+			p_caster->_AdvanceSkillLine( SKILL_ENCHANTING, SkillUp );
+		}
 	}
 	if( it == i_caster )
 		i_caster = NULL;
