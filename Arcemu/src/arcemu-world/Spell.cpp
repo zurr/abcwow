@@ -3077,14 +3077,6 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 
 		// check if spell is allowed while we have a battleground flag
-		/*Shady: 
-		1. We have 3 AuraInterruptFlags for Warsong Flags (AURA_INTERRUPT_ON_INVINCIBLE,AURA_INTERRUPT_ON_LEAVE_AREA,AURA_INTERRUPT_ON_MOUNTAURA_INTERRUPT_ON_MOUNT)
-		So we should implement all this 3 interruptions, instead of hackfixes.
-		2. As we can see AURA_INTERRUPT_ON_STEALTH doesn't included in DBC so if it blizzlike (flag drops if we r trying to stealth)
-		just add AURA_INTERRUPT_ON_STEALTH flag to WSG\EotS flag auras and check its implementation.
-		3. DropFlag() already called in RemoveAura()
-		4. DUDES, Think about how it should works, before commiting anything!
-		Result: commented.
 		if(p_caster->m_bgHasFlag)
 		{
 			switch(GetProto()->Id)
@@ -3119,7 +3111,6 @@ uint8 Spell::CanCast(bool tolerate)
 				}
 			}
 		}
-		*/
 
 		// Arathi's Flags take by stealthed --> Remove stealth
 		//Shady: we have ATTRIBUTESEX_NOT_BREAK_STEALTH for this purposes. All spells without this flag break stealth.
