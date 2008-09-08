@@ -1339,7 +1339,7 @@ protected:
 
 //HEX_LORD_MALACRASS
 
-#define CN_HEX_LORD_MALACRASS 24239
+#define HEX_LORD_MALACRASS 24239
 //summons
 #define GAZAKROTH 24244
 #define THURG 24241 
@@ -1535,7 +1535,7 @@ protected:
 
 //ZUL’JIN
 
-#define CN_ZULJIN 23863
+#define ZULJIN 23863
 
 //Phase 1 troll
 #define ZULJIN_GRIEVOUS_THROW 43093 
@@ -2622,7 +2622,8 @@ protected:
 };
 
 //FEATHER_VORTEX
-#define CYCLONE_STRIKE 42495 
+#define CYCLONE_STRIKE 42495
+#define FEATHER_VORTEX 24136
 
 class FEATHERVORTEXAI : public CreatureAIScript
 {

@@ -4817,7 +4817,7 @@ public:
 			spells[0].targettype = TARGET_RANDOM_SINGLE;
 			spells[0].instant = true;
 			spells[0].cooldown = 10;
-			spells[0].perctrigger =3.0f;
+			spells[0].perctrigger = 3.0f;
 			spells[0].attackstoptimer = 1000;
 
 			spells[1].info = dbcSpell.LookupEntry(ARCANEVOLLEY);

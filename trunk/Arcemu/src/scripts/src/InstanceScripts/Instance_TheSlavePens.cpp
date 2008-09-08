@@ -1423,7 +1423,7 @@ public:
         spells[0].info = dbcSpell.LookupEntry(ACID_GEYSER);
 		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = false;
-		spells[0].cooldown = 20;
+		spells[0].cooldown = 40;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000;
 		spells[0].mindist2cast = 0.0f;
@@ -1432,7 +1432,7 @@ public:
         spells[1].info = dbcSpell.LookupEntry(POISON_BOLT_VOLLEY);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
-		spells[1].cooldown = 10;
+		spells[1].cooldown = 20;
 		spells[1].perctrigger = 15.0f;
 		spells[1].attackstoptimer = 2000;
 
