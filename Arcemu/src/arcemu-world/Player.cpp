@@ -9693,7 +9693,7 @@ void Player::_ModifySkillBonusByType(uint32 SkillType, int32 Delta)
 float PlayerSkill::GetSkillUpChance()
 {
 	float diff = float(MaximumValue - CurrentValue);
-	return (diff * 100.0f / float(MaximumValue)) / 3.0f;
+	return (diff * 100.0f / float(MaximumValue));
 }
 
 void Player::_RemoveLanguages()
