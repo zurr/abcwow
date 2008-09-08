@@ -3105,6 +3105,22 @@ void Spell::SpellEffectSendEvent(uint32 i) //Send Event
 	switch(spellId)
 	{
 
+	// WSG Flags
+	case 8505:
+	case 8504:
+		{
+			/* set the flag holder */
+			m_flagHolders[p_caster->GetTeam()] = p_caster->GetLowGUID();
+			if(m_homeFlags[p_caster->GetTeam()]->IsInWorld())
+				m_homeFlags[p_caster->GetTeam()]->RemoveFromWorld(false);
+
+			p_caster->m_bgHasFlag = true;
+
+			if( p_caster->GetTeam() == 1 )
+				SendChatMessage( CHAT_MSG_BG_EVENT_HORDE, p_caster->GetGUID(), "The Alliance flag was picked up by %s!", p_caster->GetName() );
+			else
+				SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, p_caster->GetGUID(), "The Horde flag was picked up by %s!", p_caster->GetName() );
+		}break;
 	// Place Loot
 	case 25720: // Places the Bag of Gold at the designated Drop-Off Point.
 		{
