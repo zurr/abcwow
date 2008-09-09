@@ -1351,8 +1351,8 @@ protected:
 #define KORAGG 24247 
 
 //spells
-#define HEX_LORD_MALACRASS_SOUL_DRAIN 41303
-#define HEX_LORD_MALACRASS_SPIRIT_BOLTS 43382 //43383 
+#define HEX_LORD_MALACRASS_POWER_DRAIN 44131
+#define HEX_LORD_MALACRASS_SPIRIT_BOLTS 43382 //43383 // change this after doubledmg from aoes is fixed
 
 class HEXLORDMALACRASSAI : public CreatureAIScript
 {
@@ -1369,16 +1369,18 @@ public:
 				m_spellcheck[i] = false;
 			}
 		
-        spells[0].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_SOUL_DRAIN);
-		spells[0].targettype = TARGET_VARIOUS;
-		spells[0].instant = false;
-		spells[0].perctrigger = 1.0f;
+		spells[0].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_POWER_DRAIN);
+		spells[0].targettype = TARGET_SELF;
+		spells[1].cooldown = 60;
+		spells[0].instant = true;
+		spells[0].perctrigger = 50.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_SPIRIT_BOLTS);
-		spells[1].targettype = TARGET_DESTINATION; 
+		spells[1].targettype = TARGET_VARIOUS; 
 		spells[1].instant = true;
-		spells[1].perctrigger = 3.0f;
+		spells[1].cooldown = 4; // change this after doubledmg from aoes is fixed
+		spells[1].perctrigger = 50.0f;
 		spells[1].attackstoptimer = 1000;
 
     }
@@ -1393,7 +1395,7 @@ public:
     }
 
 
-	void OnTargetDied(Unit* mTarget)
+    void OnTargetDied(Unit* mTarget)
     {
 				if (_unit->GetHealthPct() > 0)	
 		{
@@ -1426,19 +1428,22 @@ public:
     {
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Dis not da end for me..");
 		_unit->PlaySoundToSet(12051);
-       RemoveAIUpdateEvent();
+		RemoveAIUpdateEvent();
 
-	   GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(123.256f, 914.422f, 34.1441f, 186306);
-        if(pDoor == 0)
-            return;
+		GameObject * pDoor = _unit->GetMapMgr()->GetInterface()->GetGameObjectNearestCoords(123.256f, 914.422f, 34.1441f, 186306);
+		if(pDoor == 0)
+			return;
 
-       pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0); // Open the door
+		pDoor->SetUInt32Value(GAMEOBJECT_STATE, 0); // Open the door
     }
 
     void AIUpdate()
 	{
 		if (!timer && !mobs)
 		{
+			uint32 summons[8] = { GAZAKROTH, DARKHEART, FENSTALKER, SLITHER, ALYSON_ANTILLE, THURG, KORAGG, LORD_RAADAN };
+			// TODO: pick or drop 4 of those ... the code below allows to spawn 2 same mobs
+
 			for(int j=0;j<4;j++)
 			{
 				uint32 RandomSpeach=RandomUInt(8);
@@ -1472,7 +1477,7 @@ public:
 				Creature *cre = NULL;
 				cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(summon, 
 				(_unit->GetPositionX() + RandomFloat(10)-10), (_unit->GetPositionY() + RandomFloat(10)-10),
-				_unit->GetPositionZ(), _unit->GetOrientation(),
+				_unit->GetPositionZ() + 2.0f, _unit->GetOrientation(),
 				true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
 				cre->GetAIInterface()->setOutOfCombatRange(50000);
 			}
@@ -1508,17 +1513,14 @@ public:
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-                  	m_spellcheck[i] = false;
+					m_spellcheck[i] = false;
 					return;
 				}
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
@@ -1548,7 +1550,8 @@ protected:
 //phase3  eagle
 #define ZULJIN_ENERGY_STORM 43983 //not Work
 #define ZULJIN_MODEL_EAGLE 22257
-#define ZULJIN_FEATHER_VORTEX 24136 //summons npc 4 begin phase
+#define ZULJIN_FEATHER_VORTEX 43112
+#define ZULJIN_FEATHER_VORTEX_NPC 24136 //summons npc 4 begin phase
 //phase4  lynx
 #define ZULJIN_CLAW_RAGE  43150 
 #define ZULJIN_LYNX_RUSH 43153
@@ -1556,7 +1559,7 @@ protected:
 //phase5  dragonhawk
 #define ZULJIN_FLAME_WHIRL 43213 //43208, 43213
 #define ZULJIN_FLAME_BREATH 43215 
-#define ZULJIN_FLAME_SHOCK 43303
+#define ZULJIN_PILLAR_OF_FIRE 43206
 #define ZULJIN_MODEL_DRAGONHAWK 21901
 
 
@@ -1572,7 +1575,7 @@ public:
     ZULJINAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
 		
-        spells[0].info = dbcSpell.LookupEntry(ZULJIN_GRIEVOUS_THROW);
+		spells[0].info = dbcSpell.LookupEntry(ZULJIN_GRIEVOUS_THROW);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 5.0f;
@@ -1584,20 +1587,20 @@ public:
 		spells[1].perctrigger = 25.0f;
 		spells[1].attackstoptimer = 1000;
 		
-        spells[2].info = dbcSpell.LookupEntry(ZULJIN_CREEPING_PARALYSIS); 
+		spells[2].info = dbcSpell.LookupEntry(ZULJIN_CREEPING_PARALYSIS); 
 		spells[2].targettype = TARGET_VARIOUS;
 		spells[2].instant = true;
 		spells[2].perctrigger = 5.0f;
 		spells[2].attackstoptimer = 1000;
 		
-        spells[3].info = dbcSpell.LookupEntry(ZULJIN_OVERPOWER);
+		spells[3].info = dbcSpell.LookupEntry(ZULJIN_OVERPOWER);
 		spells[3].targettype = TARGET_VARIOUS; 
 		spells[3].instant = true;
 		spells[3].perctrigger = 10.0f;
 		spells[3].attackstoptimer = 1000;
 
 		spells[4].info = dbcSpell.LookupEntry(ZULJIN_ENERGY_STORM); 
-		spells[4].targettype = TARGET_VARIOUS;  
+		spells[4].targettype = TARGET_RANDOM_DESTINATION;  
 		spells[4].instant = true;
 		spells[4].perctrigger = 10.0f;
 		spells[4].attackstoptimer = 1000;
@@ -1614,9 +1617,10 @@ public:
 		spells[6].perctrigger = 10.0f;
 		spells[6].attackstoptimer = 1000;
 		
-        spells[7].info = dbcSpell.LookupEntry(ZULJIN_FLAME_WHIRL); 
+		spells[7].info = dbcSpell.LookupEntry(ZULJIN_FLAME_WHIRL); 
 		spells[7].targettype = TARGET_VARIOUS;
 		spells[7].instant = true;
+		spells[7].cooldown = 12;
 		spells[7].perctrigger = 3.0f;
 		spells[7].attackstoptimer = 1000;
 
@@ -1626,8 +1630,8 @@ public:
 		spells[8].perctrigger = 5.0f;
 		spells[8].attackstoptimer = 1000;
 
-		spells[9].info = dbcSpell.LookupEntry(ZULJIN_FLAME_SHOCK);
-		spells[9].targettype = TARGET_ATTACKING; 
+		spells[9].info = dbcSpell.LookupEntry(ZULJIN_PILLAR_OF_FIRE);
+		spells[9].targettype = TARGET_RANDOM_DESTINATION; 
 		spells[9].instant = true;
 		spells[9].perctrigger = 5.0f;
 		spells[9].attackstoptimer = 1000;			
@@ -1750,7 +1754,7 @@ public:
         if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
         {
 			float comulativeperc = 0;
-		    Unit *target = NULL;
+			Unit *target = NULL;
 			for(int i=spmin;i<nrspells;i++)
 			{
 				if(!spells[i].perctrigger) continue;
@@ -1766,18 +1770,19 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_DESTINATION:
+							target = RandomTarget(false, true, 10000);
+							if (target != NULL)
+								_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
-					if (spells[i].speech != "")
-					{
-						_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, spells[i].speech.c_str());
-						_unit->PlaySoundToSet(spells[i].soundid); 
-					}
-                  	m_spellcheck[i] = false;
+					m_spellcheck[i] = false;
 					return;
 				}
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
