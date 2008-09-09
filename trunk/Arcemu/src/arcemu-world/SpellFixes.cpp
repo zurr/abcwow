@@ -12864,6 +12864,7 @@ void ApplyNormalFixes()
 		}
 
 		//shadowfiend
+		/*
 		sp = dbcSpell.LookupEntryForced( 41913 );
 		if( sp != NULL )
 			sp->procFlags = PROC_ON_MELEE_ATTACK;
@@ -12876,6 +12877,7 @@ void ApplyNormalFixes()
 			sp->EffectBasePoints[0] = 100; // represent pct value to convert dmg to mana
 			sp->Effect[1] = sp->Effect[2] = 0; //disable these
 		}
+		*/
 		/**********************************************************
 		 *	Holy Nova
 		 **********************************************************/
