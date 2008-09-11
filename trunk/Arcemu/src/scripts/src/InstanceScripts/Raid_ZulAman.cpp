@@ -1789,6 +1789,31 @@ public:
 			}
         }
     }
+	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return NULL;
+
+		std::vector<Unit*> targetTable;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
+			if (_unit->GetDistance2dSq(temp) <= dist)
+			{
+				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (targetTable.empty())
+			return NULL;
+
+		uint32 randt = RandomUInt(100)%targetTable.size();
+		Unit * randomtarget = targetTable[randt];
+		return randomtarget;
+	}
 protected:
 
 	int nrspells;
