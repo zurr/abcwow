@@ -2715,12 +2715,13 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 		Creature * pCreature = u_caster->GetMapMgr()->CreateCreature(cp->Id);
 		ASSERT(pCreature != NULL);
 
+
 		pCreature->Load(cp, u_caster->GetPositionX(), u_caster->GetPositionY(), u_caster->GetPositionZ());
 		pCreature->_setFaction();
 		pCreature->GetAIInterface()->Init(pCreature,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
 		pCreature->GetAIInterface()->SetUnitToFollow(u_caster);
 		pCreature->GetAIInterface()->SetUnitToFollowAngle(float(-(M_PI/2)));
-		pCreature->GetAIInterface()->SetFollowDistance(3.0f);
+		pCreature->GetAIInterface()->SetFollowDistance(GetRadius(GetProto()->EffectRadiusIndex[i]));
 		pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, u_caster->getLevel());
 		pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, u_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 		pCreature->_setFaction();
@@ -3605,8 +3606,8 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 	for(int i=0;i<damage;i++)
 	{
 		float m_fallowAngle=-(float(M_PI)/2*i);
-		float x = u_caster->GetPositionX()+(3*(cosf(m_fallowAngle+u_caster->GetOrientation())));
-		float y = u_caster->GetPositionY()+(3*(sinf(m_fallowAngle+u_caster->GetOrientation())));
+		float x = u_caster->GetPositionX()+(GetRadius(GetProto()->EffectRadiusIndex[i])*(cosf(m_fallowAngle+u_caster->GetOrientation())));
+		float y = u_caster->GetPositionY()+(GetRadius(GetProto()->EffectRadiusIndex[i])*(sinf(m_fallowAngle+u_caster->GetOrientation())));
 		float z = u_caster->GetPositionZ();
 		Creature * p = u_caster->GetMapMgr()->CreateCreature(cr_entry);
 		//ASSERT(p);
@@ -5452,7 +5453,7 @@ void Spell::SpellEffectSummonCritter(uint32 i)
 	pCreature->GetAIInterface()->Init(pCreature,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
 	pCreature->GetAIInterface()->SetUnitToFollow(u_caster);
 	pCreature->GetAIInterface()->SetUnitToFollowAngle(float(-(M_PI/2)));
-	pCreature->GetAIInterface()->SetFollowDistance(3.0f);
+	pCreature->GetAIInterface()->SetFollowDistance(GetRadius(GetProto()->EffectRadiusIndex[i]));
 	pCreature->GetAIInterface()->disable_melee = true;
 	pCreature->bInvincible = true;
 	pCreature->PushToWorld(u_caster->GetMapMgr());
