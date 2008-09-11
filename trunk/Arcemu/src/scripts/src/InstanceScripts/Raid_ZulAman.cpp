@@ -1351,37 +1351,225 @@ protected:
 #define KORAGG 24247 
 
 //spells
-#define HEX_LORD_MALACRASS_POWER_DRAIN 44131
-#define HEX_LORD_MALACRASS_SPIRIT_BOLTS 43382 //43383 // change this after doubledmg from aoes is fixed
+#define HEX_LORD_MALACRASS_DRAIN_POWER 44131
+#define HEX_LORD_MALACRASS_SPIRIT_BOLTS 43383
+#define HEX_LORD_MALACRASS_SIPHON_SOUL 43501
+
+/////////class spells
+//Druid
+#define HEX_LORD_MALACRASS_LIFEBLOOM 43421
+#define HEX_LORD_MALACRASS_THORNS 43420
+#define HEX_LORD_MALACRASS_MOONFIRE 43545
+//Hunter
+#define HEX_LORD_MALACRASS_EXPLOSIVE_TRAP 43444
+#define HEX_LORD_MALACRASS_FREEZING_TRAP 43447
+#define HEX_LORD_MALACRASS_SNAKE_TRAP 43449
+//Mage
+#define HEX_LORD_MALACRASS_FROSTBOLT 43428
+#define HEX_LORD_MALACRASS_FROST_NOVA 43426
+#define HEX_LORD_MALACRASS_ICE_LANCE 43427
+//Paladin
+#define HEX_LORD_MALACRASS_CONSECRATION 43429
+#define HEX_LORD_MALACRASS_HOLY_LIGHT 43451
+#define HEX_LORD_MALACRASS_AVENGING_WRATH 43430
+//Priest
+#define HEX_LORD_MALACRASS_MIND_CONTROL 43550
+#define HEX_LORD_MALACRASS_PSYCHIC_SCREAM 43432
+#define HEX_LORD_MALACRASS_FLASH_HEAL 43431
+//Rogue
+#define HEX_LORD_MALACRASS_BLIND 43433
+#define HEX_LORD_MALACRASS_SLICE_AND_DICE 43547
+#define HEX_LORD_MALACRASS_WOUND_POISON 39665
+//Shaman
+#define HEX_LORD_MALACRASS_FIRE_NOVA_TOTEM 43436
+#define HEX_LORD_MALACRASS_HEALING_WAVE 43547
+#define HEX_LORD_MALACRASS_CHAIN_LIGHTNING 43435
+//Warlock
+#define HEX_LORD_MALACRASS_CURSE_OF_DOOM 43439
+#define HEX_LORD_MALACRASS_RAIN_OF_FIRE 43440
+#define HEX_LORD_MALACRASS_UNSTABLE_AFFILICTION 43522 //35183 ??
+//Warrior
+#define HEX_LORD_MALACRASS_SPELL_REFLECTION 43443
+#define HEX_LORD_MALACRASS_WHIRLWIND 43442
+#define HEX_LORD_MALACRASS_MORTAL_STRIKE 43441
 
 class HEXLORDMALACRASSAI : public CreatureAIScript
 {
 public:
     ADD_CREATURE_FACTORY_FUNCTION(HEXLORDMALACRASSAI);
-	SP_AI_Spell spells[2];
-	bool m_spellcheck[2];
+	SP_AI_Spell spells[27];
+	bool m_spellcheck[27];
 
     HEXLORDMALACRASSAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-			nrspells = 2;
+			nrspells = 27;
 			for(int i=0;i<nrspells;i++)
 			{
 				m_spellcheck[i] = false;
 			}
 		
-		spells[0].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_POWER_DRAIN);
+		spells[0].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_LIFEBLOOM);
 		spells[0].targettype = TARGET_SELF;
-		spells[1].cooldown = 60;
 		spells[0].instant = true;
-		spells[0].perctrigger = 50.0f;
+		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
 
-		spells[1].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_SPIRIT_BOLTS);
-		spells[1].targettype = TARGET_VARIOUS; 
+		spells[1].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_THORNS);
+		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
-		spells[1].cooldown = 4; // change this after doubledmg from aoes is fixed
-		spells[1].perctrigger = 50.0f;
+		spells[1].perctrigger = 5.0f;
 		spells[1].attackstoptimer = 1000;
+
+		spells[2].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_MOONFIRE);
+		spells[2].targettype = TARGET_RANDOM_SINGLE;
+		spells[2].instant = true;
+		spells[2].perctrigger = 5.0f;
+		spells[2].attackstoptimer = 1000;
+
+		spells[3].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_EXPLOSIVE_TRAP);
+		spells[3].targettype = TARGET_RANDOM_DESTINATION;
+		spells[3].instant = true;
+		spells[3].perctrigger = 5.0f;
+		spells[3].attackstoptimer = 1000;
+
+		spells[4].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_FREEZING_TRAP);
+		spells[4].targettype = TARGET_RANDOM_DESTINATION;
+		spells[4].instant = true;
+		spells[4].perctrigger = 5.0f;
+		spells[4].attackstoptimer = 1000;
+
+		spells[5].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_SNAKE_TRAP);
+		spells[5].targettype = TARGET_RANDOM_DESTINATION;
+		spells[5].instant = true;
+		spells[5].perctrigger = 5.0f;
+		spells[5].attackstoptimer = 1000;
+
+		spells[6].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_FROSTBOLT);
+		spells[6].targettype = TARGET_RANDOM_SINGLE;
+		spells[6].instant = false;
+		spells[6].perctrigger = 5.0f;
+		spells[6].attackstoptimer = 1000;
+
+		spells[7].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_FROST_NOVA);
+		spells[7].targettype = TARGET_VARIOUS;
+		spells[7].instant = true;
+		spells[7].perctrigger = 5.0f;
+		spells[7].attackstoptimer = 1000;
+
+		spells[8].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_ICE_LANCE);
+		spells[8].targettype = TARGET_RANDOM_SINGLE;
+		spells[8].instant = true;
+		spells[8].perctrigger = 5.0f;
+		spells[8].attackstoptimer = 1000;
+
+		spells[9].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_CONSECRATION);
+		spells[9].targettype = TARGET_VARIOUS;
+		spells[9].instant = true;
+		spells[9].perctrigger = 5.0f;
+		spells[9].attackstoptimer = 1000;
+
+		spells[10].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_HOLY_LIGHT);
+		spells[10].targettype = TARGET_SELF;
+		spells[10].instant = false;
+		spells[10].perctrigger = 5.0f;
+		spells[10].attackstoptimer = 1000;
+
+		spells[11].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_AVENGING_WRATH);
+		spells[11].targettype = TARGET_SELF;
+		spells[11].instant = true;
+		spells[11].perctrigger = 5.0f;
+		spells[11].attackstoptimer = 1000;
+
+		spells[12].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_MIND_CONTROL);
+		spells[12].targettype = TARGET_RANDOM_SINGLE;
+		spells[12].instant = false;
+		spells[12].perctrigger = 5.0f;
+		spells[12].attackstoptimer = 1000;
+
+		spells[13].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_PSYCHIC_SCREAM);
+		spells[13].targettype = TARGET_VARIOUS;
+		spells[13].instant = true;
+		spells[13].perctrigger = 5.0f;
+		spells[13].attackstoptimer = 1000;
+
+		spells[14].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_FLASH_HEAL);
+		spells[14].targettype = TARGET_SELF;
+		spells[14].instant = false;
+		spells[14].perctrigger = 5.0f;
+		spells[14].attackstoptimer = 1000;
+
+		spells[15].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_BLIND);
+		spells[15].targettype = TARGET_RANDOM_SINGLE;
+		spells[15].instant = true;
+		spells[15].perctrigger = 5.0f;
+		spells[15].attackstoptimer = 1000;
+
+		spells[16].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_SLICE_AND_DICE);
+		spells[16].targettype = TARGET_SELF;
+		spells[16].instant = true;
+		spells[16].perctrigger = 5.0f;
+		spells[16].attackstoptimer = 1000;
+
+		spells[17].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_WOUND_POISON);
+		spells[17].targettype = TARGET_ATTACKING;
+		spells[17].instant = true;
+		spells[17].perctrigger = 5.0f;
+		spells[17].attackstoptimer = 1000;
+
+		spells[18].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_FIRE_NOVA_TOTEM);
+		spells[18].targettype = TARGET_SELF;
+		spells[18].instant = true;
+		spells[18].perctrigger = 5.0f;
+		spells[18].attackstoptimer = 1000;
+
+		spells[19].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_HEALING_WAVE);
+		spells[19].targettype = TARGET_SELF;
+		spells[19].instant = false;
+		spells[19].perctrigger = 5.0f;
+		spells[19].attackstoptimer = 1000;
+
+		spells[20].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_CHAIN_LIGHTNING);
+		spells[20].targettype = TARGET_RANDOM_SINGLE;
+		spells[20].instant = false;
+		spells[20].perctrigger = 5.0f;
+		spells[20].attackstoptimer = 1000;
+
+		spells[21].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_CURSE_OF_DOOM);
+		spells[21].targettype = TARGET_RANDOM_SINGLE;
+		spells[21].instant = true;
+		spells[21].perctrigger = 5.0f;
+		spells[21].attackstoptimer = 1000;
+
+		spells[22].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_RAIN_OF_FIRE);
+		spells[22].targettype = TARGET_RANDOM_DESTINATION;
+		spells[22].instant = false;
+		spells[22].perctrigger = 5.0f;
+		spells[22].attackstoptimer = 1000;
+
+		spells[23].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_UNSTABLE_AFFILICTION);
+		spells[23].targettype = TARGET_RANDOM_SINGLE;
+		spells[23].instant = true;
+		spells[23].perctrigger = 5.0f;
+		spells[23].attackstoptimer = 1000;
+
+		spells[24].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_SPELL_REFLECTION);
+		spells[24].targettype = TARGET_SELF;
+		spells[24].instant = true;
+		spells[24].perctrigger = 5.0f;
+		spells[24].attackstoptimer = 1000;
+
+		spells[25].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_WHIRLWIND);
+		spells[25].targettype = TARGET_VARIOUS;
+		spells[25].instant = true;
+		spells[25].perctrigger = 5.0f;
+		spells[25].attackstoptimer = 1000;
+
+		spells[26].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_MORTAL_STRIKE);
+		spells[26].targettype = TARGET_ATTACKING;
+		spells[26].instant = true;
+		spells[26].perctrigger = 5.0f;
+		spells[26].attackstoptimer = 1000;
+ 
 
     }
     
@@ -1390,6 +1578,7 @@ public:
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Da shadow gonna fall on you...");
 		_unit->PlaySoundToSet(12041);
 		timer = 5;
+		seconds = 0;
 		mobs = 0;
 		RegisterAIUpdateEvent(1000);
     }
@@ -1417,11 +1606,14 @@ public:
 
     void OnCombatStop(Unit *mTarget)
     {
-		nrspells = 2;
-		timer = 0;
-        _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
-        _unit->GetAIInterface()->SetAIState(STATE_IDLE);
-        RemoveAIUpdateEvent();
+	spmin = 0;
+	nrspells = 1;
+	seconds = 0;
+	timer = 0;
+	
+	_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
+	_unit->GetAIInterface()->SetAIState(STATE_IDLE);
+	RemoveAIUpdateEvent();
     }
 
     void OnDied(Unit * mKiller)
@@ -1483,21 +1675,89 @@ public:
 			}
 			mobs = 1;
 		}
+
+		// Soul Siphon
+		if(seconds % 40 == 0) {
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your will belong ta me now!");
+//TODO			_unit->PlaySoundToSet(?????);
+			Unit *siphon_player = RandomTarget(true, true, 10000);
+			_unit->CastSpell(siphon_player, HEX_LORD_MALACRASS_SIPHON_SOUL, true);
+
+			switch (siphon_player->getClass())
+			{
+				case DRUID:
+					nrspells = 3;
+					spmin = 0;
+					break;
+				case HUNTER:
+					nrspells = 3;
+					spmin = 3;
+					break;
+				case MAGE:
+					nrspells = 3;
+					spmin = 6;
+					break;
+				case PALADIN:
+					nrspells = 3;
+					spmin = 9;
+					break;
+				case PRIEST:
+					nrspells = 3;
+					spmin = 12;
+					break;
+				case ROGUE:
+					nrspells = 3;
+					spmin = 15;
+					break;
+				case SHAMAN:
+					nrspells = 3;
+					spmin = 18;
+					break;
+				case WARLOCK:
+					nrspells = 3;
+					spmin = 21;
+					break;
+				case WARRIOR:
+					nrspells = 3;
+					spmin = 24;
+					break;
+				default:
+					nrspells = 1;
+					spmin = 0;
+			}
+		}
+
+		// Spirit bolts
+		if(seconds % 40 == 30) {
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your soul gonna bleed!");
+//TODO			_unit->PlaySoundToSet(?????);
+			_unit->CastSpell(_unit, HEX_LORD_MALACRASS_SPIRIT_BOLTS, false);
+		}
+
+		// Drain Power TODO: trigger a spell 44132 from each affected (and alive) player back to malacrass (spelleffect #140)
+		if(seconds > 0 && seconds % 60 == 0) {
+			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Darkness comin' for you...");
+//TODO			_unit->PlaySoundToSet(?????);
+			_unit->CastSpell(_unit, HEX_LORD_MALACRASS_DRAIN_POWER, true);
+		}
+
+
 		if (timer)
 		{
 			timer--;
 		}
+		seconds++;
 		float val = (float)RandomFloat(100.0f);
 		SpellCast(val);
 	}
 
-    void SpellCast(float val)
-    {
-        if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
-        {
+	void SpellCast(float val)
+	{
+		if(_unit->GetCurrentSpell() == NULL && _unit->GetAIInterface()->GetNextTarget())
+		{
 			float comulativeperc = 0;
-		    Unit *target = NULL;
-			for(int i=0;i<nrspells;i++)
+			Unit *target = NULL;
+			for(int i=spmin;i<nrspells;i++)
 			{
 				if(!spells[i].perctrigger) continue;
 				if(m_spellcheck[i])
@@ -1512,6 +1772,16 @@ public:
 							_unit->CastSpell(target, spells[i].info, spells[i].instant); break;
 						case TARGET_DESTINATION:
 							_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
+						case TARGET_RANDOM_SINGLE:
+							target = RandomTarget(false, true, spells[i].info->base_range_or_radius_sqr);
+							if (target)
+							{
+								_unit->CastSpell(target, spells[i].info, spells[i].instant);
+							} break;
+						case TARGET_RANDOM_DESTINATION:
+							target = RandomTarget(false, true, 10000);
+							if (target != NULL)
+								_unit->CastSpellAoF(target->GetPositionX(),target->GetPositionY(),target->GetPositionZ(), spells[i].info, spells[i].instant); break;
 					}
 					m_spellcheck[i] = false;
 					return;
@@ -1525,12 +1795,40 @@ public:
 				}
 				comulativeperc += spells[i].perctrigger;
 			}
-        }
-    }
+		}
+
+	}
+	Unit *RandomTarget(bool tank,bool onlyplayer, float dist)
+	{
+		if (_unit->GetAIInterface()->getAITargetsCount() == 0)
+			return NULL;
+
+		std::vector<Unit*> targetTable;
+		TargetMap *targets = _unit->GetAIInterface()->GetAITargets();
+		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
+		{
+			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
+			if (_unit->GetDistance2dSq(temp) <= dist)
+			{
+				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
+				{
+					targetTable.push_back(temp);
+				}
+			}
+		}
+		if (targetTable.empty())
+			return NULL;
+
+		uint32 randt = RandomUInt(100)%targetTable.size();
+		Unit * randomtarget = targetTable[randt];
+		return randomtarget;
+	}
 protected:
 
 	int nrspells;
+	int spmin;
 	int timer;
+	int seconds;
 	uint32 summon;
 	bool mobs;
 };

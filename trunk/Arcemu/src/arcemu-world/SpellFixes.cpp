@@ -15637,4 +15637,10 @@ void ApplyNormalFixes()
 			sp = dbcSpell.LookupEntryForced( 26029 );
 			if( sp != NULL )
 				sp->cone_width = 15.0f; // 15 degree cone
+
+			// Spirit Bolts // delete when doubledmg from aoes gets fixed
+			sp = dbcSpell.LookupEntryForced( 43382 );
+			if( sp != NULL )
+				sp->EffectBasePoints[0] = 224; // halved dmg
+
 }
