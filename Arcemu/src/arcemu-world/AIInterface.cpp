@@ -1496,7 +1496,7 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 			if ( target_land_z == NO_WMO_HEIGHT )
 				target_land_z = m_Unit->GetMapMgr()->GetLandHeight(pUnit->GetPositionX(), pUnit->GetPositionY());
 
-			if (fabs(pUnit->GetPositionZ() - target_land_z) > _CalcAggroRange(pUnit, false) )
+			if (fabs(pUnit->GetPositionZ() - target_land_z) > _CalcAggroRange(pUnit) )
 			{
 				if ( pUnit->GetTypeId()!=TYPEID_PLAYER && target_land_z > m_Unit->GetMapMgr()->GetWaterHeight(pUnit->GetPositionX(), pUnit->GetPositionY()) )
 					return;
