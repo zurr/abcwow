@@ -32,6 +32,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(BRUTAL_SWIPE); 
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
+		spells[0].cooldown = 10;
 		spells[0].perctrigger = 3.0f;
 		spells[0].attackstoptimer = 1000;
 
@@ -211,9 +212,11 @@ public:
 					m_spellcheck[i] = false;
 					return;
 				}
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
 				{
 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
@@ -606,6 +609,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(SABER_LASH);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
+		spells[0].cooldown = 10;
 		spells[0].perctrigger = 1.0f;
 		spells[0].attackstoptimer = 1000;
 
@@ -770,9 +774,11 @@ public:
 					m_spellcheck[i] = false;
 					return;
 				}
-				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger))
-				{
-					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+				uint32 t = (uint32)time(NULL);
+				if(val > comulativeperc && val <= (comulativeperc + spells[i].perctrigger) && t > spells[i].casttime)
+ 				{
+ 					_unit->setAttackTimer(spells[i].attackstoptimer, false);
+					spells[i].casttime = t + spells[i].cooldown;
 					m_spellcheck[i] = true;
 				}
 				comulativeperc += spells[i].perctrigger;
