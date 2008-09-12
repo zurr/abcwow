@@ -49,7 +49,7 @@ public:
 
 			case 1:
 			{
-				if (!plr->_HasSkillLine(164) || plr->_GetSkillLineCurrent(164, false) < 300)
+				if (!plr->_HasSkillLine(164) || plr->_GetSkillLineCurrent(164, false) < 250)
 				{
 				    //pCreature->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Only skilled blacksmiths can obtain this knowledge." );
 					SendQuickMenu(20001);
@@ -157,7 +157,7 @@ public:
 
 			case 1:
 			{
-				if (!plr->_HasSkillLine(164) || plr->_GetSkillLineCurrent(164, false) < 300)
+				if (!plr->_HasSkillLine(164) || plr->_GetSkillLineCurrent(164, false) < 250)
 				{
 				    //pCreature->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Only skilled blacksmiths can obtain this knowledge." );
 					SendQuickMenu(20001);
@@ -265,7 +265,7 @@ public:
 
 			case 1:
 			{
-				if (!plr->_HasSkillLine(164) || plr->_GetSkillLineCurrent(164, false) < 300)
+				if (!plr->_HasSkillLine(164) || plr->_GetSkillLineCurrent(164, false) < 250)
 				{
 				    //pCreature->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, "Only skilled blacksmiths can obtain this knowledge." );
 					SendQuickMenu(20001);
