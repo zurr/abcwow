@@ -15638,9 +15638,11 @@ void ApplyNormalFixes()
 			if( sp != NULL )
 				sp->cone_width = 15.0f; // 15 degree cone
 
-			// Spirit Bolts // delete when doubledmg from aoes gets fixed
-			sp = dbcSpell.LookupEntryForced( 43382 );
+			// Drain Power (Malacrass)
+			sp = dbcSpell.LookupEntryForced( 44131 );
 			if( sp != NULL )
-				sp->EffectBasePoints[0] = 224; // halved dmg
-
+				sp->DurationIndex = 21;
+			sp = dbcSpell.LookupEntryForced( 44132 );
+			if( sp != NULL )
+				sp->DurationIndex = 21;
 }

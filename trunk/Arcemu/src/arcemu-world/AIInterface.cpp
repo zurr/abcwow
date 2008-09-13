@@ -1029,7 +1029,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 			if ( target_land_z == NO_WMO_HEIGHT )
 				target_land_z = m_Unit->GetMapMgr()->GetLandHeight(GetNextTarget()->GetPositionX(), GetNextTarget()->GetPositionY());
 
-			if (fabs(GetNextTarget()->GetPositionZ() - target_land_z) > _CalcCombatRange(GetNextTarget(), false))
+			if (fabs(GetNextTarget()->GetPositionZ() - target_land_z) > _CalcAggroRange(GetNextTarget()))
 			{
 				if ( GetNextTarget()->GetTypeId() != TYPEID_PLAYER )
 				{
@@ -1627,7 +1627,7 @@ bool AIInterface::UnsafeCanOwnerAttackUnit(Unit *pUnit)
 			return false;
 
 	//make sure we do not agro flying stuff
-	if( abs( pUnit->GetPositionZ() - m_Unit->GetPositionZ() ) > _CalcCombatRange( pUnit, false ) )
+	if( abs( pUnit->GetPositionZ() - m_Unit->GetPositionZ() ) > _CalcAggroRange( pUnit ) )
 		return false; //blizz has this set to 250 but uses pathfinding
 
 	return true;

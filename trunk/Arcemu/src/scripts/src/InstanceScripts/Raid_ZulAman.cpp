@@ -23,8 +23,8 @@ class NALORAKKAI : public CreatureAIScript
 {
 public:
 	ADD_CREATURE_FACTORY_FUNCTION(NALORAKKAI);
-	SP_AI_Spell spells[7];
-	bool m_spellcheck[7];
+	SP_AI_Spell spells[6];
+	bool m_spellcheck[6];
 
 	NALORAKKAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
@@ -39,7 +39,7 @@ public:
 
 		spells[1].info = dbcSpell.LookupEntry(MANGLE); 
 		spells[1].targettype = TARGET_ATTACKING;
-		spells[1].instant = false;
+		spells[1].instant = true;
 		spells[1].perctrigger = 6.0f;
 		spells[1].attackstoptimer = 1000;
 
@@ -47,7 +47,8 @@ public:
 		spells[2].info = dbcSpell.LookupEntry(SURGE); 
 		spells[2].targettype = TARGET_RANDOM_SINGLE;
 		spells[2].instant = false;
-		spells[2].perctrigger = 10.0f;
+		spells[2].cooldown = 3;
+		spells[2].perctrigger = 6.0f;
 		spells[2].attackstoptimer = 1000;
 
 
@@ -1417,7 +1418,7 @@ public:
 		spells[0].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_LIFEBLOOM);
 		spells[0].targettype = TARGET_SELF;
 		spells[0].instant = true;
-		spells[0].perctrigger = 5.0f;
+		spells[0].perctrigger = 6.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_THORNS);
@@ -1453,7 +1454,7 @@ public:
 		spells[6].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_FROSTBOLT);
 		spells[6].targettype = TARGET_RANDOM_SINGLE;
 		spells[6].instant = false;
-		spells[6].perctrigger = 5.0f;
+		spells[6].perctrigger = 8.0f;
 		spells[6].attackstoptimer = 1000;
 
 		spells[7].info = dbcSpell.LookupEntry(HEX_LORD_MALACRASS_FROST_NOVA);
@@ -1617,6 +1618,12 @@ public:
 	seconds = 0;
 	timer = 0;
 	
+	for( set<Player*>::iterator PlayerIter = _unit->GetInRangePlayerSetBegin(); PlayerIter != _unit->GetInRangePlayerSetEnd(); ++PlayerIter ) 
+	{
+		(*PlayerIter)->RemoveAllAuras(HEX_LORD_MALACRASS_DRAIN_POWER,0);
+	}	
+
+	_unit->RemoveAllAuras(HEX_LORD_MALACRASS_DRAIN_POWER+1,0);
 	_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 	_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 	RemoveAIUpdateEvent();
@@ -1624,6 +1631,12 @@ public:
 
     void OnDied(Unit * mKiller)
     {
+		for( set<Player*>::iterator PlayerIter = _unit->GetInRangePlayerSetBegin(); PlayerIter != _unit->GetInRangePlayerSetEnd(); ++PlayerIter ) 
+		{
+			(*PlayerIter)->RemoveAllAuras(HEX_LORD_MALACRASS_DRAIN_POWER,0);
+		}	
+
+		_unit->RemoveAllAuras(HEX_LORD_MALACRASS_DRAIN_POWER+1,0);
 		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Dis not da end for me..");
 		_unit->PlaySoundToSet(12051);
 		RemoveAIUpdateEvent();
@@ -1685,7 +1698,7 @@ public:
 		// Soul Siphon
 		if(seconds % 40 == 0) {
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your will belong ta me now!");
-//TODO			_unit->PlaySoundToSet(?????);
+			_unit->PlaySoundToSet(12045);
 			Unit *siphon_player = RandomTarget(true, true, 10000);
 			_unit->CastSpell(siphon_player, HEX_LORD_MALACRASS_SIPHON_SOUL, true);
 
@@ -1696,35 +1709,35 @@ public:
 					spmin = 0;
 					break;
 				case HUNTER:
-					nrspells = 3;
+					nrspells = 6;
 					spmin = 3;
 					break;
 				case MAGE:
-					nrspells = 3;
+					nrspells = 9;
 					spmin = 6;
 					break;
 				case PALADIN:
-					nrspells = 3;
+					nrspells = 12;
 					spmin = 9;
 					break;
 				case PRIEST:
-					nrspells = 3;
+					nrspells = 15;
 					spmin = 12;
 					break;
 				case ROGUE:
-					nrspells = 3;
+					nrspells = 18;
 					spmin = 15;
 					break;
 				case SHAMAN:
-					nrspells = 3;
+					nrspells = 21;
 					spmin = 18;
 					break;
 				case WARLOCK:
-					nrspells = 3;
+					nrspells = 24;
 					spmin = 21;
 					break;
 				case WARRIOR:
-					nrspells = 3;
+					nrspells = 27;
 					spmin = 24;
 					break;
 				default:
@@ -1736,14 +1749,14 @@ public:
 		// Spirit bolts
 		if(seconds % 40 == 30) {
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Your soul gonna bleed!");
-//TODO			_unit->PlaySoundToSet(?????);
+			_unit->PlaySoundToSet(12047);
 			_unit->CastSpell(_unit, HEX_LORD_MALACRASS_SPIRIT_BOLTS, false);
 		}
 
 		// Drain Power TODO: trigger a spell 44132 from each affected (and alive) player back to malacrass (spelleffect #140)
 		if(seconds > 0 && seconds % 60 == 0) {
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Darkness comin' for you...");
-//TODO			_unit->PlaySoundToSet(?????);
+			_unit->PlaySoundToSet(12046);
 			_unit->CastSpell(_unit, HEX_LORD_MALACRASS_DRAIN_POWER, true);
 		}
 
@@ -2003,6 +2016,7 @@ public:
 			spmin = 2;
 			nrspells = 4;
 			phase = 2;
+			_unit->ClearHateList();
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_BEAR);  //change to Bear
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Got me some new tricks...like me bruddah bear!");
 			_unit->PlaySoundToSet(12092);
@@ -2021,6 +2035,7 @@ public:
 				true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
 				cre->GetAIInterface()->setOutOfCombatRange(50000);
 			}
+			_unit->ClearHateList();
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_EAGLE);  //change to Eagle
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Dere be no hidin' from da eagle!");
 			_unit->PlaySoundToSet(12093);
@@ -2030,6 +2045,7 @@ public:
 			spmin = 5;
 			nrspells = 7;
 			phase = 4;
+			_unit->ClearHateList();
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_LYNX);  //change to Lynx
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Let me introduce to you my new bruddahs: fang and claw!");
 			_unit->PlaySoundToSet(12094);
@@ -2039,6 +2055,7 @@ public:
 			spmin = 7;
 			nrspells = 10;
 			phase = 5;
+			_unit->ClearHateList();
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_DRAGONHAWK);  //change to Dragonhawk
 			_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "Ya don' have to look to da sky to see da dragonhawk!");
 			_unit->PlaySoundToSet(12095);
