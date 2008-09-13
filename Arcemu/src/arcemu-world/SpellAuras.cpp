@@ -3875,10 +3875,41 @@ void Aura::SpellAuraModSkill(bool apply)
 void Aura::SpellAuraModIncreaseSpeed(bool apply)
 {
 	if(apply)
+	{
+		m_target->speedAdditionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
+	}
+	else
+	{
+		map< uint32, int32 >::iterator itr = m_target->speedAdditionMap.find(m_spellProto->Id);
+		if(itr != m_target->speedAdditionMap.end())
+			m_target->speedAdditionMap.erase(itr);
+	}
+
+	int32 maxInc = 0;
+	uint32 spId = 0;
+	map< uint32, int32 >::iterator itr = m_target->speedAdditionMap.begin();
+	for(; itr != m_target->speedAdditionMap.end(); ++itr)
+	{
+		if ( maxInc < itr->second )
+		{
+			maxInc = itr->second;
+			spId = itr->first;
+		}
+	}
+
+	itr = m_target->speedAdditionMap.find(m_target->m_ActiveSpeedSpell);
+	if(itr != m_target->speedAdditionMap.end())
+		m_target->m_speedModifier -= itr->second;
+
+	m_target->m_ActiveSpeedSpell = spId;
+	m_target->m_speedModifier += maxInc;
+
+/*
+	if(apply)
 		m_target->m_speedModifier += mod->m_amount;
 	else
 		m_target->m_speedModifier -= mod->m_amount;
-
+*/
 	m_target->UpdateSpeed();
 }
 

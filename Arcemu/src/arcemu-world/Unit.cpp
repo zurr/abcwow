@@ -142,6 +142,7 @@ Unit::Unit()
 	}
 	m_speedModifier = 0;
 	m_slowdown = 0;
+	m_ActiveSpeedSpell = 0;
 	m_mountedspeedModifier=0;
 	m_maxSpeed = 0;
 	for(uint32 x=0;x<31;x++)
