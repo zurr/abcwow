@@ -71,6 +71,9 @@ public:
 		spells[5].perctrigger = 8.0f;
 		spells[5].attackstoptimer = 1000;
 
+		for(uint32 x = 0; x < 6; x++)
+			_unit->DamageDoneModPCT[x] = 0;
+
 		nrspells = 3;
 		spmin = 0;
 		m_phase = 0;
@@ -119,6 +122,9 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		if (_unit->isAlive())
+			_unit->Despawn(100, 2500);
+
 		_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , 21631);  //change to Troll
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
@@ -138,12 +144,9 @@ public:
 		m_phasechange--;
 		if (!m_enrage && !enraged)
 		{
-			_unit->DamageDoneModPCT[0] = 3;
-			_unit->DamageDoneModPCT[1] = 3;
-			_unit->DamageDoneModPCT[2] = 3;
-			_unit->DamageDoneModPCT[3] = 3;
-			_unit->DamageDoneModPCT[4] = 3;
-			_unit->DamageDoneModPCT[5] = 3;
+			for(uint32 x = 0; x < 6; x++)
+				_unit->DamageDoneModPCT[x] = 3;
+
 			enraged = 1;
 		}
 		if (!m_phasechange)
@@ -307,6 +310,8 @@ public:
 		spells[2].perctrigger = 9.0f;
 		spells[2].attackstoptimer = 1000;
 
+		for(uint32 x = 0; x < 6; x++)
+			_unit->DamageDoneModPCT[x] = 0;
 
 		m_electicalstorm = 50 + RandomUInt(10);
 		m_enrage = 600;
@@ -345,6 +350,9 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		if (_unit->isAlive())
+			_unit->Despawn(100, 2500);
+
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -362,12 +370,8 @@ public:
 		m_enrage--;
 		if (!m_enrage && !enraged)
 		{
-			_unit->DamageDoneModPCT[0] = 5;
-			_unit->DamageDoneModPCT[1] = 5;
-			_unit->DamageDoneModPCT[2] = 5;
-			_unit->DamageDoneModPCT[3] = 5;
-			_unit->DamageDoneModPCT[4] = 5;
-			_unit->DamageDoneModPCT[5] = 5;
+			for(uint32 x = 0; x < 6; x++)
+				_unit->DamageDoneModPCT[x] = 5;
 			enraged = 1;
 		}
 		m_electicalstorm--;
@@ -634,6 +638,9 @@ public:
 		nrspells = 1;
 		spmin = 0;
 
+		for(uint32 x = 0; x < 6; x++)
+			_unit->DamageDoneModPCT[x] = 0;
+
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -683,6 +690,9 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		if (_unit->isAlive())
+			_unit->Despawn(100, 2500);
+
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -712,12 +722,9 @@ public:
 		m_enrage--;
 		if (!enrage && !m_enrage)
 		{
-			_unit->DamageDoneModPCT[0] = 3;
-			_unit->DamageDoneModPCT[1] = 3;
-			_unit->DamageDoneModPCT[2] = 3;
-			_unit->DamageDoneModPCT[3] = 3;
-			_unit->DamageDoneModPCT[4] = 3;
-			_unit->DamageDoneModPCT[5] = 3;
+			for(uint32 x = 0; x < 6; x++)
+				_unit->DamageDoneModPCT[x] = 5;
+
 			enrage = true;
 		}
 
@@ -1153,12 +1160,13 @@ public:
 		m_firebombs = 35 + RandomUInt(25);
 		m_adds = 14;
 
+		for(uint32 x = 0; x < 6; x++)
+			_unit->DamageDoneModPCT[x] = 0;
+
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
 		}
-
-
 	}
 
 	void OnCombatStart(Unit* mTarget)
@@ -1195,6 +1203,9 @@ public:
 
 	void OnCombatStop(Unit *mTarget)
 	{
+		if (_unit->isAlive())
+			_unit->Despawn(100, 2500);
+
 		_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 		_unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		RemoveAIUpdateEvent();
@@ -1216,12 +1227,9 @@ public:
 		if (!m_enrage && !enraged)
 		{
 			enraged = true;
-			_unit->DamageDoneModPCT[0] = 3;
-			_unit->DamageDoneModPCT[1] = 3;
-			_unit->DamageDoneModPCT[2] = 3;
-			_unit->DamageDoneModPCT[3] = 3;
-			_unit->DamageDoneModPCT[4] = 3;
-			_unit->DamageDoneModPCT[5] = 3;
+
+			for(uint32 x = 0; x < 6; x++)
+				_unit->DamageDoneModPCT[x] = 3;
 		}
 		if (!softenrage && (_unit->GetHealthPct() <= 25 || !m_softenrage)) 
 		{
@@ -1623,6 +1631,9 @@ public:
 		(*PlayerIter)->RemoveAllAuras(HEX_LORD_MALACRASS_DRAIN_POWER,0);
 	}	
 
+	if (_unit->isAlive())
+		_unit->Despawn(100, 2500);
+
 	_unit->RemoveAllAuras(HEX_LORD_MALACRASS_DRAIN_POWER+1,0);
 	_unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
 	_unit->GetAIInterface()->SetAIState(STATE_IDLE);
@@ -1997,6 +2008,10 @@ public:
 		nrspells = 2;
 		spmin = 0;
 		phase =1;
+
+		if (_unit->isAlive())
+			_unit->Despawn(100, 2500);
+
         _unit->GetAIInterface()->setCurrentAgent(AGENT_NULL);
         _unit->GetAIInterface()->SetAIState(STATE_IDLE);
 		_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_TROLL);  //change to Troll
