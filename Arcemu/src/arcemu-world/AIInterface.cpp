@@ -1020,7 +1020,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 
 #ifdef COLLISION
 	float target_land_z=0.0f;
-	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL )
+	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL && !IS_INSTANCE(m_Unit->GetMapId()))
 	{
 
 		if (!m_moveFly)
@@ -1029,7 +1029,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 			if ( target_land_z == NO_WMO_HEIGHT )
 				target_land_z = m_Unit->GetMapMgr()->GetLandHeight(GetNextTarget()->GetPositionX(), GetNextTarget()->GetPositionY());
 
-			if (fabs(GetNextTarget()->GetPositionZ() - target_land_z) > _CalcAggroRange(GetNextTarget()))
+			if (fabs(GetNextTarget()->GetPositionZ() - target_land_z) > _CalcCombatRange(GetNextTarget(), false))
 			{
 				if ( GetNextTarget()->GetTypeId() != TYPEID_PLAYER )
 				{
@@ -1484,7 +1484,7 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 
 	
 #ifdef COLLISION
-	if( pUnit->IsPlayer() )
+	if( pUnit->IsPlayer() && !IS_INSTANCE(pUnit->GetMapId()))
 	{
 	float target_land_z=0.0f;
 	if ( m_Unit->GetMapMgr() != NULL )
@@ -1496,7 +1496,7 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 			if ( target_land_z == NO_WMO_HEIGHT )
 				target_land_z = m_Unit->GetMapMgr()->GetLandHeight(pUnit->GetPositionX(), pUnit->GetPositionY());
 
-			if (fabs(pUnit->GetPositionZ() - target_land_z) > _CalcAggroRange(pUnit) )
+			if (fabs(pUnit->GetPositionZ() - target_land_z) > _CalcCombatRange(pUnit, false) )
 			{
 				if ( pUnit->GetTypeId()!=TYPEID_PLAYER && target_land_z > m_Unit->GetMapMgr()->GetWaterHeight(pUnit->GetPositionX(), pUnit->GetPositionY()) )
 					return;
