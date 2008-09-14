@@ -3874,20 +3874,32 @@ void Aura::SpellAuraModSkill(bool apply)
 
 void Aura::SpellAuraModIncreaseSpeed(bool apply)
 {
+	int32 initSpeedMod = m_target->m_speedModifier;
+	map< uint32, int32 >::iterator itr;
+
 	if(apply)
 	{
-		m_target->speedAdditionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
+		itr = m_target->speedAdditionMap.find(m_spellProto->Id);
+		if(itr == m_target->speedAdditionMap.end())
+			m_target->speedAdditionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
 	}
 	else
 	{
-		map< uint32, int32 >::iterator itr = m_target->speedAdditionMap.find(m_spellProto->Id);
+		itr = m_target->speedAdditionMap.find(m_spellProto->Id);
 		if(itr != m_target->speedAdditionMap.end())
+		{
 			m_target->speedAdditionMap.erase(itr);
+			m_target->m_speedModifier -= itr->second;
+		}
 	}
+
+	itr = m_target->speedAdditionMap.find(m_target->m_ActiveSpeedSpell);
+	if(itr != m_target->speedAdditionMap.end())
+		m_target->m_speedModifier -= itr->second;
 
 	int32 maxInc = 0;
 	uint32 spId = 0;
-	map< uint32, int32 >::iterator itr = m_target->speedAdditionMap.begin();
+	itr = m_target->speedAdditionMap.begin();
 	for(; itr != m_target->speedAdditionMap.end(); ++itr)
 	{
 		if ( maxInc < itr->second )
@@ -3896,10 +3908,6 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 			spId = itr->first;
 		}
 	}
-
-	itr = m_target->speedAdditionMap.find(m_target->m_ActiveSpeedSpell);
-	if(itr != m_target->speedAdditionMap.end())
-		m_target->m_speedModifier -= itr->second;
 
 	m_target->m_ActiveSpeedSpell = spId;
 	m_target->m_speedModifier += maxInc;
@@ -3910,7 +3918,8 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 	else
 		m_target->m_speedModifier -= mod->m_amount;
 */
-	m_target->UpdateSpeed();
+	if ( initSpeedMod != m_target->m_speedModifier )
+		m_target->UpdateSpeed();
 }
 
 void Aura::SpellAuraModIncreaseMountedSpeed(bool apply)
