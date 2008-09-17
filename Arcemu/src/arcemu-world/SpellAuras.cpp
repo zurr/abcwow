@@ -1643,16 +1643,25 @@ void Aura::SpellAuraDummy(bool apply)
 	// Deadly Throw Interrupt
 	case 32748:
 	{
-		if ( m_target == NULL )
+		printf("Deadly Throw Interrupt\n");
+
+		Player* plr = static_cast< Player* >( GetUnitCaster() );
+		if ( plr == NULL )
 			return;
 
+		Unit *unitTarget = plr->GetMapMgr()->GetUnit(plr->GetSelection());
+
+		if ( unitTarget == NULL )
+			return;
+
+		printf("Deadly Throw Interrupt -1\n");
 		uint32 school = 0;
-		if(m_target->GetCurrentSpell())
+		if(unitTarget->GetCurrentSpell())
 		{
-			school = m_target->GetCurrentSpell()->GetProto()->School;
+			school = unitTarget->GetCurrentSpell()->GetProto()->School;
 		}
-		m_target->InterruptSpell();
-		m_target->SchoolCastPrevent[school]=3000+getMSTime();
+		unitTarget->InterruptSpell();
+		unitTarget->SchoolCastPrevent[school] = 3000 + getMSTime();
 	}break;
 	//improved sprint effect
 	case 30918:
@@ -3874,6 +3883,7 @@ void Aura::SpellAuraModSkill(bool apply)
 
 void Aura::SpellAuraModIncreaseSpeed(bool apply)
 {
+	/*
 	int32 initSpeedMod = m_target->m_speedModifier;
 	map< uint32, int32 >::iterator itr;
 
@@ -3911,14 +3921,14 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 
 	m_target->m_ActiveSpeedSpell = spId;
 	m_target->m_speedModifier += maxInc;
+*/
 
-/*
 	if(apply)
 		m_target->m_speedModifier += mod->m_amount;
 	else
 		m_target->m_speedModifier -= mod->m_amount;
-*/
-	if ( initSpeedMod != m_target->m_speedModifier )
+
+	//if ( initSpeedMod != m_target->m_speedModifier )
 		m_target->UpdateSpeed();
 }
 
