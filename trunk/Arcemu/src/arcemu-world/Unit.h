@@ -1068,10 +1068,10 @@ public:
 	// Affect Speed
 	int32 m_speedModifier;
 	int32 m_slowdown;
-	int32 m_ActiveSpeedSpell;
+	//int32 m_ActiveSpeedSpell;
 	float m_maxSpeed;
 	map< uint32, int32 > speedReductionMap;
-	map< uint32, int32 > speedAdditionMap;
+	//map< uint32, int32 > speedAdditionMap;
 	bool GetSpeedDecrease();
 	int32 m_mountedspeedModifier;
 	int32 m_flyspeedModifier;

@@ -142,7 +142,7 @@ Unit::Unit()
 	}
 	m_speedModifier = 0;
 	m_slowdown = 0;
-	m_ActiveSpeedSpell = 0;
+	//m_ActiveSpeedSpell = 0;
 	m_mountedspeedModifier=0;
 	m_maxSpeed = 0;
 	for(uint32 x=0;x<31;x++)
@@ -3083,7 +3083,17 @@ else
 		parry=0.0f;
 		glanc=0.0f;
 	}
+	else if ( weapon_damage_type == OFFHAND && !ability )
+	{
+		if( this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()) )
+			hitmodifier -= 19.0f;
+	}
 	else
+	{
+		if( this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()) )
+			hitmodifier -= 4.0f;
+	}
+	/*
 	{
 		if(this->IsPlayer())
 		{
@@ -3098,7 +3108,7 @@ else
 			}
 		}
 	}
-
+	*/
 	hitchance+= hitmodifier;
 
 	//Hackfix for Surprise Attacks
