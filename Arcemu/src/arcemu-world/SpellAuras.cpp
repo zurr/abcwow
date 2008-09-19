@@ -1643,7 +1643,7 @@ void Aura::SpellAuraDummy(bool apply)
 	// Deadly Throw Interrupt
 	case 32748:
 	{
-		printf("Deadly Throw Interrupt\n");
+		//printf("Deadly Throw Interrupt\n");
 
 		Player* plr = static_cast< Player* >( GetUnitCaster() );
 		if ( plr == NULL )
@@ -1654,7 +1654,7 @@ void Aura::SpellAuraDummy(bool apply)
 		if ( unitTarget == NULL )
 			return;
 
-		printf("Deadly Throw Interrupt -1\n");
+		//printf("Deadly Throw Interrupt -1\n");
 		uint32 school = 0;
 		if(unitTarget->GetCurrentSpell())
 		{
