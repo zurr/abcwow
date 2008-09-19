@@ -3074,10 +3074,10 @@ else
 	}
 	else
 	{
-		if(this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()))
+		if(this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()) && !ability)
 		{
 			it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
-			if( it != NULL && it->GetProto()->InventoryType == INVTYPE_WEAPON && !ability )//dualwield to-hit penalty
+			if( it != NULL && it->GetProto()->InventoryType == INVTYPE_WEAPON )//dualwield to-hit penalty
 				hitmodifier -= 19.0f;
 			else
 			{
@@ -3087,7 +3087,6 @@ else
 			}
 		}
 	}
-
 	hitchance+= hitmodifier;
 
 	//Hackfix for Surprise Attacks
