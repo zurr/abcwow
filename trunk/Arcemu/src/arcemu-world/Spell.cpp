@@ -4267,7 +4267,6 @@ exit:
 				value += (uint32) ceilf( ( ap * 0.18f ) / 6 );
 			}
 		}
-
 	}
 	else if( GetProto()->NameHash == SPELL_HASH_RUPTURE )
 	{
@@ -4281,15 +4280,20 @@ exit:
 		if( u_caster->IsPlayer() )
 		{
 			float ap = (float)u_caster->GetAP();
-			float cp = (float)static_cast< Player* >(u_caster)->m_comboPoints;
+			int8 cp = static_cast< Player* >(u_caster)->m_comboPoints;
+			value += (uint32)GetProto()->EffectPointsPerComboPoint[0]*cp;
 			value += (uint32) ceilf( ( ap * ( 0.04f * cp ) ) / ( ( 6 + ( cp * 2 ) ) / 2 ) );
 		}
 	}
 	else if( GetProto()->NameHash == SPELL_HASH_RIP ) //rip
 	{
 		if( u_caster != NULL )
-			value+=(uint32)(u_caster->GetAP()*0.04f);
-
+		{
+			float ap = (float)u_caster->GetAP();
+			int8 cp = static_cast< Player* >(u_caster)->m_comboPoints;
+			value += (uint32)GetProto()->EffectPointsPerComboPoint[0]*cp;
+			value += (uint32)ceilf(ap*0.22f);
+		}
 	}
 	else if( GetProto()->NameHash == SPELL_HASH_MONGOOSE_BITE ) //Mongoose Bite
 	{
