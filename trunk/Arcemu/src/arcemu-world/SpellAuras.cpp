@@ -868,7 +868,6 @@ void Aura::AddMod( uint32 t, int32 a, uint32 miscValue, uint32 i )
 
 void Aura::ApplyModifiers( bool apply )
 {
-
 	for( uint32 x = 0; x < m_modcount; x++ )
 	{
 		mod = &m_modList[x];
@@ -878,6 +877,27 @@ void Aura::ApplyModifiers( bool apply )
 			sLog.outDebug( "WORLD: target = %u , Spell Aura id = %u (%s), SpellId  = %u, i = %u, apply = %s, duration = %u, damage = %d",
 				m_target->GetLowGUID(),mod->m_type, SpellAuraNames[mod->m_type], m_spellProto->Id, mod->i, apply ? "true" : "false",GetDuration(),mod->m_amount);
 			(*this.*SpellAuraHandler[mod->m_type])(apply);
+		}
+		else
+			sLog.outError("Unknown Aura id %d", (uint32)mod->m_type);
+	}
+}
+
+void Aura::UpdateModifiers( )
+{
+	for( uint32 x = 0; x < m_modcount; x++ )
+	{
+		mod = &m_modList[x];
+
+		if(mod->m_type<TOTAL_SPELL_AURAS)
+		{
+			sLog.outDebug( "WORLD: target = %u , Spell Aura id = %u (%s), SpellId  = %u, i = %u, duration = %u, damage = %d",
+				m_target->GetLowGUID(),mod->m_type, SpellAuraNames[mod->m_type], m_spellProto->Id, mod->i, GetDuration(),mod->m_amount);
+			switch (mod->m_type)
+			{
+				case 33: UpdateAuraModDecreaseSpeed(); break;
+
+			}
 		}
 		else
 			sLog.outError("Unknown Aura id %d", (uint32)mod->m_type);
@@ -1643,25 +1663,16 @@ void Aura::SpellAuraDummy(bool apply)
 	// Deadly Throw Interrupt
 	case 32748:
 	{
-		//printf("Deadly Throw Interrupt\n");
-
-		Player* plr = static_cast< Player* >( GetUnitCaster() );
-		if ( plr == NULL )
+		if ( m_target == NULL )
 			return;
 
-		Unit *unitTarget = plr->GetMapMgr()->GetUnit(plr->GetSelection());
-
-		if ( unitTarget == NULL )
-			return;
-
-		//printf("Deadly Throw Interrupt -1\n");
 		uint32 school = 0;
-		if(unitTarget->GetCurrentSpell())
+		if(m_target->GetCurrentSpell())
 		{
-			school = unitTarget->GetCurrentSpell()->GetProto()->School;
+			school = m_target->GetCurrentSpell()->GetProto()->School;
 		}
-		unitTarget->InterruptSpell();
-		unitTarget->SchoolCastPrevent[school] = 3000 + getMSTime();
+		m_target->InterruptSpell();
+		m_target->SchoolCastPrevent[school]=3000+getMSTime();
 	}break;
 	//improved sprint effect
 	case 30918:
@@ -1780,11 +1791,10 @@ void Aura::SpellAuraDummy(bool apply)
 	//warrior - sweeping strikes
 	case 12328:
 		{
-	      if(apply)
-			 m_target->m_extrastriketargets++;
-		  else if( m_target->m_extrastriketargets > 0 )
-			  m_target->m_extrastriketargets--;
-
+			if(apply)
+				m_target->AddExtraStrikeTarget(GetSpellProto(), 10);
+			else
+				m_target->RemoveExtraStrikeTarget(GetSpellProto());
 		}break;
 	//taming rod spells
 	case 19548:	{                 //invoke damage to trigger attack
@@ -3026,10 +3036,10 @@ void Aura::SpellAuraModStun(bool apply)
 
 		//warrior talent - second wind triggers on stun and immobilize. This is not used as proc to be triggered always !
 		Unit *caster = GetUnitCaster();
-		if( caster && caster->IsPlayer() && m_target )
-			static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
-		if( m_target && m_target->IsPlayer() && caster )
-			static_cast<Player*>(m_target)->EventStunOrImmobilize( caster, true );
+		if( caster && m_target )
+			static_cast<Unit*>(caster)->EventStunOrImmobilize( m_target );
+		if( m_target && caster )
+			static_cast<Unit*>(m_target)->EventStunOrImmobilize( caster, true );
 		if (m_target->isCasting())
 			m_target->CancelSpell(NULL); //cancel spells.
 	}
@@ -3244,7 +3254,7 @@ void Aura::SpellAuraModStealth(bool apply)
 		if( m_target->IsPlayer() )
 			m_target->SetFlag(PLAYER_FIELD_BYTES2, 0x2000);
 
-		m_target->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_STEALTH);
+		m_target->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_STEALTH | AURA_INTERRUPT_ON_INVINCIBLE);
 		m_target->m_stealthLevel += mod->m_amount;
 
 		// hack fix for vanish stuff
@@ -3341,12 +3351,15 @@ void Aura::SpellAuraModInvisibility(bool apply)
 
 	if(apply)
 	{
+		m_target->SetInvisibility(GetSpellId());
 		m_target->m_invisFlag = mod->m_miscValue;
 		if( m_target->GetTypeId() == TYPEID_PLAYER )
 		{
 			if( GetSpellId() == 32612 ) 
 				static_cast<Player*>(m_target)->SetFlag( PLAYER_FIELD_BYTES2, 0x4000 ); //Mage Invis self visual
 		}
+
+		m_target->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_INVINCIBLE);
 	}
 	else
 	{
@@ -3766,6 +3779,9 @@ void Aura::SpellAuraReflectSpells(bool apply)
 {
 	if(apply)
 	{
+		SpellEntry *sp = dbcSpell.LookupEntry(GetSpellId());
+		if (sp == NULL) return;
+
 		for(std::list<struct ReflectSpellSchool*>::iterator i = m_target->m_reflectSpellSchool.begin();i != m_target->m_reflectSpellSchool.end();)
 		{
 			if(GetSpellId() == (*i)->spellId)
@@ -3781,6 +3797,7 @@ void Aura::SpellAuraReflectSpells(bool apply)
 		rss->spellId = GetSpellId();
 		rss->school = -1;
 		rss->require_aura_hash = 0;
+		rss->charges = sp->procCharges;
 		m_target->m_reflectSpellSchool.push_back(rss);
 	}
 	else
@@ -3883,53 +3900,12 @@ void Aura::SpellAuraModSkill(bool apply)
 
 void Aura::SpellAuraModIncreaseSpeed(bool apply)
 {
-	/*
-	int32 initSpeedMod = m_target->m_speedModifier;
-	map< uint32, int32 >::iterator itr;
-
-	if(apply)
-	{
-		itr = m_target->speedAdditionMap.find(m_spellProto->Id);
-		if(itr == m_target->speedAdditionMap.end())
-			m_target->speedAdditionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
-	}
-	else
-	{
-		itr = m_target->speedAdditionMap.find(m_spellProto->Id);
-		if(itr != m_target->speedAdditionMap.end())
-		{
-			m_target->speedAdditionMap.erase(itr);
-			m_target->m_speedModifier -= itr->second;
-		}
-	}
-
-	itr = m_target->speedAdditionMap.find(m_target->m_ActiveSpeedSpell);
-	if(itr != m_target->speedAdditionMap.end())
-		m_target->m_speedModifier -= itr->second;
-
-	int32 maxInc = 0;
-	uint32 spId = 0;
-	itr = m_target->speedAdditionMap.begin();
-	for(; itr != m_target->speedAdditionMap.end(); ++itr)
-	{
-		if ( maxInc < itr->second )
-		{
-			maxInc = itr->second;
-			spId = itr->first;
-		}
-	}
-
-	m_target->m_ActiveSpeedSpell = spId;
-	m_target->m_speedModifier += maxInc;
-*/
-
 	if(apply)
 		m_target->m_speedModifier += mod->m_amount;
 	else
 		m_target->m_speedModifier -= mod->m_amount;
 
-	//if ( initSpeedMod != m_target->m_speedModifier )
-		m_target->UpdateSpeed();
+	m_target->UpdateSpeed();
 }
 
 void Aura::SpellAuraModIncreaseMountedSpeed(bool apply)
@@ -4006,9 +3982,9 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 			//yes we are freezing the bastard, so can we proc anything on this ?
 			Unit *caster = GetUnitCaster();
 			if( caster && caster->IsPlayer() && m_target )
-				static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
+				static_cast<Unit*>(caster)->EventStunOrImmobilize( m_target );
 			if( m_target && m_target->IsPlayer() && caster )
-				static_cast<Player*>(m_target)->EventStunOrImmobilize( caster, true );
+				static_cast<Unit*>(m_target)->EventStunOrImmobilize( caster, true );
 		}
 		m_target->speedReductionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
 		//m_target->m_slowdown=this;
@@ -4024,7 +4000,29 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 	}
 	if(m_target->GetSpeedDecrease())
 		m_target->UpdateSpeed();
+}
 
+void Aura::UpdateAuraModDecreaseSpeed()
+{
+	if( m_target )
+	{
+		if( m_target->MechanicsDispels[MECHANIC_ENSNARED] )
+		{
+			m_flags |= 1 << mod->i;
+			return;
+		}
+	}
+
+	//let's check Mage talents if we proc anythig
+	if(m_spellProto->School==SCHOOL_FROST)
+	{
+		//yes we are freezing the bastard, so can we proc anything on this ?
+		Unit *caster = GetUnitCaster();
+		if( caster && caster->IsPlayer() && m_target )
+			static_cast<Unit*>(caster)->EventStunOrImmobilize( m_target );
+		if( m_target && m_target->IsPlayer() && caster )
+			static_cast<Unit*>(m_target)->EventStunOrImmobilize( caster, true );
+	}
 }
 
 void Aura::SpellAuraModIncreaseHealth(bool apply)
@@ -4461,6 +4459,11 @@ void Aura::SpellAuraModSchoolImmunity(bool apply)
 				pAura->Remove();
 			}
 		}
+	}
+
+	if( apply && ( m_spellProto->NameHash == SPELL_HASH_DIVINE_SHIELD || m_spellProto->NameHash == SPELL_HASH_BLESSING_OF_PROTECTION || m_spellProto->NameHash == SPELL_HASH_ICE_BLOCK) )
+	{
+		m_target->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_INVINCIBLE);
 	}
 
 	if(apply)
@@ -7135,9 +7138,9 @@ void Aura::SpellAuraModHaste( bool apply )
 	if( m_spellProto->NameHash == SPELL_HASH_BLADE_FLURRY )
 	{
 		if( apply )
-			m_target->m_extrastriketargets++;
-		else if( m_target->m_extrastriketargets > 0 )
-			m_target->m_extrastriketargets--;
+			m_target->AddExtraStrikeTarget(GetSpellProto(), 0);
+		else
+			m_target->RemoveExtraStrikeTarget(GetSpellProto());
 	}
 
 	if( mod->m_amount < 0 )

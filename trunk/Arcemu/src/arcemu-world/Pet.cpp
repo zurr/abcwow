@@ -22,6 +22,12 @@
 #define GROWL_RANK_1 2649
 #define GROWL_RANK_2 14916
 #define WATER_ELEMENTAL 510
+#define PET_IMP 416
+#define PET_VOIDWALKER 1860
+#define PET_SUCCUBUS 1863
+#define PET_FELHUNTER 417
+#define PET_FELGUARD 17252
+
 
 uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 {
@@ -105,7 +111,7 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 	return AUTOCAST_EVENT_NONE;
 }
 
-void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_creature, Player* owner, SpellEntry* created_by_spell, uint32 type, uint32 expiretime)
+void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_creature, Player* owner, SpellEntry* created_by_spell, uint32 type, uint32 expiretime, LocationVector* Vec)
 {
 	SetIsPet(true);
 
@@ -124,8 +130,21 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	else
 		m_name.assign( myFamily->name );
 
+	float x, y, z;
+	if( Vec )
+	{
+		x = Vec->x;
+		y = Vec->y;
+		z = Vec->z;
+	}
+	else
+	{
+		x = owner->GetPositionX();
+		y = owner->GetPositionY();
+		z = owner->GetPositionZ();
+	}
 	// Create ourself	
-	Create(m_name.c_str(), owner->GetMapId(), owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
+	Create(m_name.c_str(), owner->GetMapId(), x, y, z, owner->GetOrientation());
 	SetUInt32Value(OBJECT_FIELD_ENTRY, entry);
 	SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);	// better set this one
 
@@ -160,6 +179,23 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 			m_name = "Water Elemental";
 		else if(entry == 19668)
 			m_name = "Shadowfiend";
+		else if((entry==PET_IMP) || (entry==PET_VOIDWALKER) || (entry==PET_SUCCUBUS) ||
+			(entry==PET_FELHUNTER) || (entry==PET_FELGUARD)) // check if it has a name
+		{
+			QueryResult* result = CharacterDatabase.Query("SELECT `name` FROM `playersummons` WHERE `ownerguid`=%u AND `entry`=%d",
+				owner->GetLowGUID(), entry);
+			if(result)
+			{
+				m_name = result->Fetch()->GetString();
+				delete result;
+			}
+			else // no name found, generate one and save it
+			{
+				m_name = sWorld.GenerateName();
+				CharacterDatabase.Execute("INSERT INTO playersummons VALUES(%u, %u, '%s')",
+					owner->GetLowGUID(), entry, m_name.data());
+			}
+		}
 		else
 			m_name = sWorld.GenerateName();
 
@@ -1073,6 +1109,12 @@ void Pet::Rename(string NewName)
 
 	// update timestamp to force a re-query
 	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, (uint32)UNIXTIME);
+
+	// save new summoned name to db (.pet renamepet)
+	if(m_Owner->getClass() == WARLOCK) {
+		CharacterDatabase.Execute("UPDATE `playersummons` SET `name`='%s' WHERE `ownerguid`=%u AND `entry`=%u",
+			m_name.data(), m_Owner->GetLowGUID(), GetEntry());
+	}
 }
 
 void Pet::ApplySummonLevelAbilities()
@@ -1339,9 +1381,10 @@ void Pet::ApplySummonLevelAbilities()
 	static double R_mod_spr[6] = {3.47826087, 1.775, 1.775, 1.775, 1.775, 3.5};
 	static double R_base_pwr[6] = {7.202898551, -101, -101, -101, -101, -101};
 	static double R_mod_pwr[6] = {2.797101449, 6.5, 6.5, 6.5, 6.5, 6.5};
-	static double R_base_armor[6] = {-11.69565217, -702, -929.4, -1841.25, -1157.55, -1000};
-	static double R_mod_armor[6] = {31.69565217, 139.6, 74.62, 89.175, 101.1316667, 100};
-	static double R_pet_sta_to_hp[6] = {4.5, 15.0, 7.5, 10.0, 10.6, 10.0};
+	static double R_base_armor[6] = {-11.69565217, -702, -929.4, -1841.25, -1157.55, 0};
+	static double R_mod_armor[6] = {31.69565217, 139.6, 74.62, 89.175, 101.1316667, 20};
+	static double R_pet_sta_to_hp[6] = {4.5, 15.0, 7.5, 10.0, 10.6, 7.5};
+	static double R_pet_int_to_mana[6] = {15.0, 15.0, 15.0, 15.0, 15.0, 5.0};
 	static double R_base_min_dmg[6] = {0.550724638, 4.566666667, 26.82, 29.15, 20.17888889, 20};
 	static double R_mod_min_dmg[6] = {1.449275362, 1.433333333, 2.18, 1.85, 1.821111111, 1};
 	static double R_base_max_dmg[6] = {1.028985507, 7.133333333, 36.16, 39.6, 27.63111111, 20};
@@ -1366,6 +1409,7 @@ void Pet::ApplySummonLevelAbilities()
 	double base_max_dmg = R_base_max_dmg[stat_index];
 	double mod_max_dmg = R_mod_max_dmg[stat_index];
 	double pet_sta_to_hp = R_pet_sta_to_hp[stat_index];
+	double pet_int_to_mana = R_pet_int_to_mana[stat_index];
 
 	// Calculate bonuses
 	
@@ -1392,19 +1436,12 @@ void Pet::ApplySummonLevelAbilities()
 	// Apply attack power.
 	SetUInt32Value(UNIT_FIELD_ATTACK_POWER, FL2UINT(pet_pwr));
 		
-	// Priest's Shadowfiend
-	/*
-	if (m_uint32Values[OBJECT_FIELD_ENTRY]==19668) {
-	    SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 1500);
-	    SetUInt32Value(UNIT_FIELD_ATTACK_POWER,((uint32)(350+0.57*m_Owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS_05)))/2);
-	}
-	*/
 	BaseResistance[0] = FL2UINT(pet_arm);
 	CalcResistance(0);
 
 	// Calculate health / mana
 	double health = pet_sta * pet_sta_to_hp;
-	double mana = has_mana ? (pet_int * 15) : 0.0;
+	double mana = has_mana ? (pet_int * pet_int_to_mana) : 0.0;
 	if( health == 0 )
 	{
 		sLog.outError("Pet with entry %u has 0 health !! \n",m_uint32Values[OBJECT_FIELD_ENTRY]);

@@ -160,7 +160,7 @@ pSpellEffect SpellEffectsHandler[TOTAL_SPELL_EFFECTS]={
 		&Spell::SpellEffectNULL,					// unknown - 137 // http://www.thottbot.com/s41542
 		&Spell::SpellEffectNULL,					// unknown - 138 // related to superjump or even "*jump" spells http://www.thottbot.com/?e=Unknown%20138
 		&Spell::SpellEffectNULL,					// unknown - 139 // no spells
-		&Spell::SpellEffectTriggerSpell,			//SPELL_EFFECT_TELEPORT_UNITS - 140 IronForge teleport / portal only it seems
+		&Spell::SpellEffectTeleportUnits,			//SPELL_EFFECT_TELEPORT_UNITS - 140 IronForge teleport / portal only it seems
 		&Spell::SpellEffectNULL,					// unknown - 141 // triggers spell, magic one,  (Mother spell) http://www.thottbot.com/s41065
 		&Spell::SpellEffectTriggerSpellWithValue,	//SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE - 142 // triggers some kind of "Put spell on target" thing... (dono for sure) http://www.thottbot.com/s40872 and http://www.thottbot.com/s33076
 		&Spell::SpellEffectNULL,					// unknown - 143 // Master -> deamon effecting spell, http://www.thottbot.com/s25228 and http://www.thottbot.com/s35696
@@ -1959,6 +1959,9 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 		damage *= float2int32( 1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) );
 	}
 	uint32 amt = damage + ( ( u_caster->GetDamageDoneMod( GetProto()->School ) * 80 ) / 100 );
+	if(amt>curPower)
+		amt=curPower;
+	unitTarget->SetUInt32Value(powerField,curPower-amt);
 	u_caster->Energize( u_caster, GetProto()->Id, amt, GetProto()->EffectMiscValue[i] );
 }
 
@@ -2715,7 +2718,6 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 		Creature * pCreature = u_caster->GetMapMgr()->CreateCreature(cp->Id);
 		ASSERT(pCreature != NULL);
 
-
 		pCreature->Load(cp, u_caster->GetPositionX(), u_caster->GetPositionY(), u_caster->GetPositionZ());
 		pCreature->_setFaction();
 		pCreature->GetAIInterface()->Init(pCreature,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
@@ -2728,7 +2730,7 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 
 		pCreature->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, p_caster->GetGUID());
 		pCreature->SetUInt64Value(UNIT_FIELD_CREATEDBY, p_caster->GetGUID());
-		u_caster->SetUInt64Value(UNIT_FIELD_SUMMON, pCreature->GetGUID());
+ 		u_caster->SetUInt64Value(UNIT_FIELD_SUMMON, pCreature->GetGUID());
 
 		if ( m_spellInfo->EffectMiscValue[i] == 19668 ) //shadowfiend
 		{
@@ -2806,10 +2808,6 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 	if(!unitTarget || !unitTarget->isAlive())
 		return;
 
-	uint32 POWER_TYPE=UNIT_FIELD_POWER1+GetProto()->EffectMiscValue[i];
-
-	uint32 curEnergy = (uint32)unitTarget->GetUInt32Value(POWER_TYPE);
-	uint32 maxEnergy = (uint32)unitTarget->GetUInt32Value(POWER_TYPE+6);
 	uint32 modEnergy = 0;
 	//yess there is always someone special : shamanistic rage - talent
 	if(GetProto()->Id==30824)
@@ -3221,6 +3219,7 @@ void Spell::SpellEffectSendEvent(uint32 i) //Send Event
 			else
 				p_caster->m_bg->SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, p_caster->GetGUID(), "The Horde flag was picked up by %s!", p_caster->GetName() );
 		}break;
+
 	// Place Loot
 	case 25720: // Places the Bag of Gold at the designated Drop-Off Point.
 		{
@@ -3603,12 +3602,24 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 		sLog.outDetail("Warning : Missing summon creature template %u used by spell %u!",cr_entry,GetProto()->Id);
 		return;
 	}
+	float x, y, z;
+	if( m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION && m_targets.m_destX && m_targets.m_destY && m_targets.m_destZ )
+	{
+		x = m_targets.m_destX;
+		y = m_targets.m_destY;
+		z = m_targets.m_destZ;
+	}
+	else
+	{
+		x = u_caster->GetPositionX();
+		y = u_caster->GetPositionY();
+		z = u_caster->GetPositionZ();
+	}
 	for(int i=0;i<damage;i++)
 	{
 		float m_fallowAngle=-(float(M_PI)/2*i);
-		float x = u_caster->GetPositionX()+(GetRadius(GetProto()->EffectRadiusIndex[i])*(cosf(m_fallowAngle+u_caster->GetOrientation())));
-		float y = u_caster->GetPositionY()+(GetRadius(GetProto()->EffectRadiusIndex[i])*(sinf(m_fallowAngle+u_caster->GetOrientation())));
-		float z = u_caster->GetPositionZ();
+		x += (GetRadius(GetProto()->EffectRadiusIndex[i])*(cosf(m_fallowAngle+u_caster->GetOrientation())));
+		y += (GetRadius(GetProto()->EffectRadiusIndex[i])*(sinf(m_fallowAngle+u_caster->GetOrientation())));
 		Creature * p = u_caster->GetMapMgr()->CreateCreature(cr_entry);
 		//ASSERT(p);
 		p->Load(proto, x, y, z);
@@ -3637,6 +3648,7 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 {
 	GameObject * obj = NULL; //Snake trap part 1
+	LocationVector * vec = NULL;
 	
 	if ( g_caster ) 
 	{
@@ -3667,13 +3679,18 @@ void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 			}
 		}
 	}*/
+	if( m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION && m_targets.m_destX && m_targets.m_destY && m_targets.m_destZ )
+	{
+		vec = new LocationVector(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ);
+	}
 
 	float angle_for_each_spawn = -float(M_PI) * 2 / damage;
 	for( int i = 0; i < damage; i++ )
 	{
 		float m_fallowAngle = angle_for_each_spawn * i;
-		u_caster->create_guardian(cr_entry,GetDuration(),m_fallowAngle,level,obj);
+		u_caster->create_guardian(cr_entry,GetDuration(),m_fallowAngle,level,obj,vec );
 	}
+	if (vec) delete vec;
 }
 
 void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
@@ -3899,6 +3916,12 @@ void Spell::SpellEffectSummonObject(uint32 i)
 				sChatHandler.BlueSystemMessage(p_caster->GetSession(), "non-existant gameobject %u tried to be created by SpellEffectSummonObject. Report to devs!", entry);
 			}
 			return;
+		}
+		if( m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION && m_targets.m_destX && m_targets.m_destY && m_targets.m_destZ )
+		{
+			posx = m_targets.m_destX;
+			posy = m_targets.m_destY;
+			pz = m_targets.m_destZ;
 		}
 		GameObject *go=m_caster->GetMapMgr()->CreateGameObject(entry);
 		
@@ -4612,13 +4635,11 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 				//for self
 				Spell *sp = SpellPool.PooledNew();
 				sp->Init( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt( p_caster->GetGUID() );
 				sp->prepare( &tgt );
 				//for pet
 				sp = SpellPool.PooledNew();
 				sp->Init( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt1( unitTarget->GetGUID() );
 				sp->prepare( &tgt1 );
 			}
@@ -4666,13 +4687,11 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 				//for self
 				Spell *sp = SpellPool.PooledNew();
 				sp->Init( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt( p_caster->GetGUID() );
 				sp->prepare( &tgt );
 				//for pet
 				sp = SpellPool.PooledNew();
 				sp->Init( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt1( unitTarget->GetGUID() );
 				sp->prepare( &tgt1 );
 			}
@@ -4720,13 +4739,11 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 				//for self
 				Spell *sp = SpellPool.PooledNew();
 				sp->Init( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt( p_caster->GetGUID() );
 				sp->prepare( &tgt );
 				//for pet
 				sp = SpellPool.PooledNew();
 				sp->Init( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt1( unitTarget->GetGUID() );
 				sp->prepare( &tgt1 );
 			}
@@ -4774,13 +4791,11 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 				//for self
 				Spell *sp = SpellPool.PooledNew();
 				sp->Init( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt( p_caster->GetGUID() );
 				sp->prepare( &tgt );
 				//for pet
 				sp = SpellPool.PooledNew();
 				sp->Init( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt1( unitTarget->GetGUID() );
 				sp->prepare( &tgt1 );
 			}
@@ -4849,13 +4864,11 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 				//for self
 				Spell *sp = SpellPool.PooledNew();
 				sp->Init( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt( p_caster->GetGUID() );
 				sp->prepare( &tgt );
 				//for pet
 				sp = SpellPool.PooledNew();
 				sp->Init( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
-				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
 				SpellCastTargets tgt1( unitTarget->GetGUID() );
 				sp->prepare( &tgt1 );
 			}
@@ -5764,10 +5777,15 @@ void Spell::SpellEffectSummonDemon(uint32 i)
 	CreatureInfo *ci = CreatureNameStorage.LookupEntry(GetProto()->EffectMiscValue[i]);
 	if(ci)
 	{
-
+		LocationVector *vec = NULL;
+		if( m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION && m_targets.m_destX && m_targets.m_destY && m_targets.m_destZ )
+		{
+			vec = new LocationVector(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ);
+		}
 		pPet = objmgr.CreatePet();
 		pPet->SetInstanceID(p_caster->GetInstanceID());
-		pPet->CreateAsSummon(GetProto()->EffectMiscValue[i], ci, NULL, p_caster, GetProto(), 1, 300000);
+		pPet->CreateAsSummon(GetProto()->EffectMiscValue[i], ci, NULL, p_caster, GetProto(), 1, 300000, vec);
+		if (vec) delete vec;
 	}
 	//Create Enslave Aura if its inferno spell
 	if(GetProto()->Id == 1122)

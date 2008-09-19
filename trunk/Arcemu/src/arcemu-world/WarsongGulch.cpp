@@ -338,8 +338,6 @@ void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
 	if(m_homeFlags[plr->GetTeam()]->IsInWorld())
 		m_homeFlags[plr->GetTeam()]->RemoveFromWorld(false);
 
-	plr->m_bgHasFlag = true;
-
 	PlaySoundToAll(plr->GetTeam() ? SOUND_HORDE_CAPTURE : SOUND_ALLIANCE_CAPTURE);
 	SetWorldState(plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 2);
 }

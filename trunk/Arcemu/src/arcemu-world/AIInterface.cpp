@@ -1020,7 +1020,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 
 #ifdef COLLISION
 	float target_land_z=0.0f;
-	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL && !IS_INSTANCE(m_Unit->GetMapId()))
+	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL )
 	{
 
 		if (!m_moveFly)
@@ -1484,7 +1484,7 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 
 	
 #ifdef COLLISION
-	if( pUnit->IsPlayer() && !IS_INSTANCE(pUnit->GetMapId()))
+	if( pUnit->IsPlayer() )
 	{
 	float target_land_z=0.0f;
 	if ( m_Unit->GetMapMgr() != NULL )
@@ -1627,7 +1627,7 @@ bool AIInterface::UnsafeCanOwnerAttackUnit(Unit *pUnit)
 			return false;
 
 	//make sure we do not agro flying stuff
-	if( abs( pUnit->GetPositionZ() - m_Unit->GetPositionZ() ) > _CalcAggroRange( pUnit ) )
+	if( abs( pUnit->GetPositionZ() - m_Unit->GetPositionZ() ) > _CalcCombatRange( pUnit, false ) )
 		return false; //blizz has this set to 250 but uses pathfinding
 
 	return true;
@@ -1691,7 +1691,7 @@ Unit* AIInterface::FindTarget()
 				continue;
 			if (tmpPlr->m_invisible)
 				continue;
-			if (tmpPlr->CombatStatus.GetPrimaryAttackTarget() == NULL)
+			if (tmpPlr->CombatStatus.GetPrimaryAttackTarget() == 0)
 				continue;
 			else
 			{

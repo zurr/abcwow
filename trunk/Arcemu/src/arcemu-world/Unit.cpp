@@ -142,7 +142,6 @@ Unit::Unit()
 	}
 	m_speedModifier = 0;
 	m_slowdown = 0;
-	//m_ActiveSpeedSpell = 0;
 	m_mountedspeedModifier=0;
 	m_maxSpeed = 0;
 	for(uint32 x=0;x<31;x++)
@@ -224,6 +223,7 @@ Unit::Unit()
 	CreatureAttackPowerMod[11] = 0;
 	CreatureRangedAttackPowerMod[11] = 0;
 
+	m_invisibility = 0;
 	m_invisible = false;
 	m_invisFlag = INVIS_FLAG_NORMAL;
 
@@ -312,7 +312,6 @@ Unit::Unit()
 	polySpell = 0;
 	RangedDamageTaken = 0;
 	m_procCounter = 0;
-	m_extrastriketargets = 0;
 	m_damgeShieldsInUse = false;
 //	fearSpell = 0;
 	m_extraAttackCounter = false;
@@ -324,6 +323,8 @@ Unit::Unit()
 	m_hasVampiricEmbrace = m_hasVampiricTouch = 0;
 	m_hitfrommeleespell	 = 0;
 	m_damageSplitTarget = NULL;
+	m_extrastriketarget = 0;
+	m_extrastriketargetc = 0;
 	ModelHalfSize = 1.0f; //worst case unit size. (Should be overwritten)
 }
 
@@ -2237,18 +2238,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						CastingSpell->Id == 16959 )
 						continue;
 				}break;
-				//priest - shadowfiend - proc
-				/*
-                case 41914:
-                    {
-						//sadly shadowfriend is a summon and will have this field empty
-//								if( !GetUInt64Value( UNIT_FIELD_CREATEDBY ) )
-//									continue; //we have no target to energize ?
-						dmg_overwrite = (spe->EffectBasePoints[0]*dmg) / 100;
-						if( dmg_overwrite == 0 )
-							continue;
-                    }break;
-					*/
 			}
 		}
 
@@ -2745,7 +2734,7 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 		dodge=0.0f;
 		parry=0.0f;
 	}
-	else if(this->IsPlayer())
+	else if(this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()))
 	{
 		it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
 		if( it != NULL && it->GetProto()->InventoryType == INVTYPE_WEAPON && !ability )//dualwield to-hit penalty
@@ -3083,19 +3072,9 @@ else
 		parry=0.0f;
 		glanc=0.0f;
 	}
-	else if ( weapon_damage_type == OFFHAND && !ability )
-	{
-		if( this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()) )
-			hitmodifier -= 19.0f;
-	}
 	else
 	{
-		if( this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()) )
-			hitmodifier -= 4.0f;
-	}
-	/*
-	{
-		if(this->IsPlayer())
+		if(this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()))
 		{
 			it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
 			if( it != NULL && it->GetProto()->InventoryType == INVTYPE_WEAPON && !ability )//dualwield to-hit penalty
@@ -3108,7 +3087,7 @@ else
 			}
 		}
 	}
-	*/
+
 	hitchance+= hitmodifier;
 
 	//Hackfix for Surprise Attacks
@@ -3430,7 +3409,8 @@ else
 						//sLog.outString( "DEBUG: After Resilience check: %u" , dmg.full_damage );
 					}
 					
-					pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
+					if (pVictim->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(pVictim)->GetCreatureInfo() && static_cast<Creature*>(pVictim)->GetCreatureInfo()->Rank != ELITE_WORLDBOSS)
+						pVictim->Emote( EMOTE_ONESHOT_WOUNDCRITICAL );
 					vproc |= PROC_ON_CRIT_HIT_VICTIM;
 					aproc |= PROC_ON_CRIT_ATTACK;
 					if( weapon_damage_type == RANGED )
@@ -3878,27 +3858,45 @@ else
 		m_extraAttackCounter = false;
 	}
 
-	if(m_extrastriketargets > 0)
+	if(m_extrastriketargetc > 0 && m_extrastriketarget == 0)
 	{
-		int32 m_extra = m_extrastriketargets;
-		int32 m_temp = m_extrastriketargets;
-		m_extrastriketargets = 0;
+		m_extrastriketarget = 1;
 
-		for(set<Object*>::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end() && m_extra; ++itr)
+		for(std::list<ExtraStrike*>::iterator itx = m_extraStrikeTargets.begin();itx != m_extraStrikeTargets.end(); itx++)
 		{
-			if(m_extra <= 0)
-				break;
-			if (!(*itr) || (*itr) == pVictim || !(*itr)->IsUnit())
-				continue;
+			ExtraStrike *ex = *itx;
 
+			if (ex->deleted) continue;
 
-			if(CalcDistance(*itr) < 10.0f && isAttackable(this, (*itr)) && (*itr)->isInFront(this) && !((Unit*)(*itr))->IsPacified())
+			for(set<Object*>::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr)
 			{
-				Strike( static_cast< Unit* >( *itr ), weapon_damage_type, ability, add_damage, pct_dmg_mod, exclusive_damage, false ,false );
-				--m_extra;
+				if (!(*itr) || (*itr) == pVictim || !(*itr)->IsUnit())
+					continue;
+
+				if(CalcDistance(*itr) < 5.0f && isAttackable(this, (*itr)) && (*itr)->isInFront(this) && !((Unit*)(*itr))->IsPacified())
+				{
+					// Sweeping Strikes hits cannot be dodged, missed or parried (from wowhead)
+					bool skip_hit_check = ex->spell_info->Id == 12328 ? true : false;
+					//zack : should we use the spell id the registered this extra strike when striking ? It would solve a few proc on proc problems if so ;)
+//					Strike( static_cast< Unit* >( *itr ), weapon_damage_type, ability, add_damage, pct_dmg_mod, exclusive_damage, false, skip_hit_check );
+					Strike( static_cast< Unit* >( *itr ), weapon_damage_type, ex->spell_info, add_damage, pct_dmg_mod, exclusive_damage, false, skip_hit_check );
+					break;
+				}
+			}
+
+			// Sweeping Strikes charges are used up regardless whether there is a secondary target in range or not. (from wowhead)
+			if (ex->charges > 0)
+			{
+				ex->charges--;
+				if (ex->charges <= 0)
+				{
+					ex->deleted = true;
+					m_extrastriketargetc--;
+				}
 			}
 		}
-		m_extrastriketargets += m_temp;
+
+		m_extrastriketarget = 0;
 	}
 }	
 
@@ -4108,6 +4106,10 @@ void Unit::AddAura(Aura *aur)
 						}
 						if(maxStack <= f)
 						{
+							if (f == 1)
+							{
+								m_auras[x]->UpdateModifiers();
+							}
 							deleteAur = true;
 							break;
 						}
@@ -4139,7 +4141,7 @@ void Unit::AddAura(Aura *aur)
 
 	if( aur->m_auraSlot != 0xffff )
 		m_auras[ aur->m_auraSlot ] = NULL;
-	
+
 	aur->m_auraSlot = 0xffff;
 	aur->ApplyModifiers(true);
 	//Zack : if all mods were resisted it means we did not apply anything and we do not need to delete this spell eighter
@@ -4237,6 +4239,19 @@ void Unit::AddAura(Aura *aur)
 
 			GetAIInterface()->AttackReaction(pCaster, 1, aur->GetSpellId());
 		}*/
+	}
+
+	if (aur->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_INVINCIBLE)
+	{
+		Unit * pCaster = aur->GetUnitCaster();
+		if(pCaster)
+		{
+			pCaster->RemoveStealth();
+			pCaster->RemoveInvisibility();
+			pCaster->RemoveAllAuraByNameHash(SPELL_HASH_ICE_BLOCK);
+			pCaster->RemoveAllAuraByNameHash(SPELL_HASH_DIVINE_SHIELD);
+			pCaster->RemoveAllAuraByNameHash(SPELL_HASH_BLESSING_OF_PROTECTION);
+		}
 	}
 }
 
@@ -5353,10 +5368,10 @@ void Unit::EventSummonPetExpire()
 	sEventMgr.RemoveEvents(this, EVENT_SUMMON_PET_EXPIRE);
 }
 
-void Unit::CastSpell(Unit* Target, SpellEntry* Sp, bool triggered)
+uint8 Unit::CastSpell(Unit* Target, SpellEntry* Sp, bool triggered)
 {
 	if( Sp == NULL )
-		return;
+		return SPELL_FAILED_UNKNOWN;
 
 	Spell *newSpell = SpellPool.PooledNew();
 	newSpell->Init(this, Sp, triggered, 0);
@@ -5370,34 +5385,34 @@ void Unit::CastSpell(Unit* Target, SpellEntry* Sp, bool triggered)
 	{
 		newSpell->GenerateTargets(&targets);
 	}
-	newSpell->prepare(&targets);
+	return newSpell->prepare(&targets);
 }
 
-void Unit::CastSpell(Unit* Target, uint32 SpellID, bool triggered)
+uint8 Unit::CastSpell(Unit* Target, uint32 SpellID, bool triggered)
 {
 	SpellEntry * ent = dbcSpell.LookupEntry(SpellID);
-	if(ent == 0) return;
+	if(ent == 0) return SPELL_FAILED_UNKNOWN;
 
-	CastSpell(Target, ent, triggered);
+	return CastSpell(Target, ent, triggered);
 }
 
-void Unit::CastSpell(uint64 targetGuid, SpellEntry* Sp, bool triggered)
+uint8 Unit::CastSpell(uint64 targetGuid, SpellEntry* Sp, bool triggered)
 {
 	if( Sp == NULL )
-		return;
+		return SPELL_FAILED_UNKNOWN;
 
 	SpellCastTargets targets(targetGuid);
 	Spell *newSpell = SpellPool.PooledNew();
 	newSpell->Init(this, Sp, triggered, 0);
-	newSpell->prepare(&targets);
+	return newSpell->prepare(&targets);
 }
 
-void Unit::CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered)
+uint8 Unit::CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered)
 {
 	SpellEntry * ent = dbcSpell.LookupEntry(SpellID);
-	if(ent == 0) return;
+	if(ent == 0) return SPELL_FAILED_UNKNOWN;
 
-	CastSpell(targetGuid, ent, triggered);
+	return CastSpell(targetGuid, ent, triggered);
 }
 void Unit::CastSpellAoF(float x,float y,float z,SpellEntry* Sp, bool triggered)
 {
@@ -6107,7 +6122,7 @@ void Unit::SetFacing(float newo)
 }
 
 //guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
-Unit* Unit::create_guardian(uint32 guardian_entry,uint32 duration,float angle, uint32 lvl, GameObject * obj )
+Unit* Unit::create_guardian(uint32 guardian_entry,uint32 duration,float angle, uint32 lvl, GameObject * obj, LocationVector * Vec)
 {
 	CreatureProto * proto = CreatureProtoStorage.LookupEntry(guardian_entry);
 	CreatureInfo * info = CreatureNameStorage.LookupEntry(guardian_entry);
@@ -6125,8 +6140,15 @@ Unit* Unit::create_guardian(uint32 guardian_entry,uint32 duration,float angle, u
 	Creature* p = GetMapMgr()->CreateCreature(guardian_entry);
 	p->SetInstanceID(GetMapMgr()->GetInstanceID());
 	
+	if( Vec )
+	{
+		x += Vec->x;
+		y += Vec->y;
+		z += Vec->z;
+		p->Load(proto, x, y, z);	
+	}
 	//Summoned by a GameObject?
-	if ( !obj ) 
+	else if ( !obj ) 
 	{
 		x += GetPositionX();
 		y += GetPositionY();
@@ -6376,7 +6398,8 @@ void CombatStatusHandler::OnDamageDealt(Unit * pTarget)
 	if(pTarget == m_Unit)
 		return;
 
-	if(!pTarget->isAlive())
+	//no need to be in combat if dead
+	if( !pTarget->isAlive() || !m_Unit->isAlive() )
 		return;
 
 	AttackerMap::iterator itr = m_attackTargets.find(pTarget->GetGUID());
@@ -7022,3 +7045,82 @@ void Unit::RemoveFieldSummon()
 	}
 }
 
+//what is an Immobilize spell ? Have to add it later to spell effect handler
+void Unit::EventStunOrImmobilize(Unit *proc_target, bool is_victim)
+{
+	if ( this == proc_target )
+		return; //how and why would we stun ourselfs
+
+	int32 t_trigger_on_stun,t_trigger_on_stun_chance;
+	if( is_victim == false )
+	{
+		t_trigger_on_stun = trigger_on_stun;
+		t_trigger_on_stun_chance = trigger_on_stun_chance;
+	}
+	else
+	{
+		t_trigger_on_stun = trigger_on_stun_victim;
+		t_trigger_on_stun_chance = trigger_on_stun_chance_victim;
+	}
+
+	if( t_trigger_on_stun )
+	{
+		if( t_trigger_on_stun_chance < 100 && !Rand( t_trigger_on_stun_chance ) )
+			return;
+
+		SpellEntry *spellInfo = dbcSpell.LookupEntry(t_trigger_on_stun);
+
+		if(!spellInfo)
+			return;
+
+		Spell *spell = SpellPool.PooledNew();
+		spell->Init(this, spellInfo ,true, NULL);
+		SpellCastTargets targets;
+
+		if ( spellInfo->procFlags & PROC_TARGET_SELF )
+			targets.m_unitTarget = GetGUID();
+		else if ( proc_target ) 
+			targets.m_unitTarget = proc_target->GetGUID();
+		else 
+			targets.m_unitTarget = GetGUID();
+		spell->prepare(&targets);
+	}
+}
+
+void Unit::RemoveExtraStrikeTarget(SpellEntry *spell_info)
+{
+	for(std::list<ExtraStrike*>::iterator i = m_extraStrikeTargets.begin();i != m_extraStrikeTargets.end();i++)
+	{
+		if((*i)->deleted == false && spell_info == (*i)->spell_info)
+		{
+			m_extrastriketargetc--;
+			(*i)->deleted = true;
+		}
+	}
+}
+
+void Unit::AddExtraStrikeTarget(SpellEntry *spell_info, uint32 charges)
+{
+	for(std::list<ExtraStrike*>::iterator i = m_extraStrikeTargets.begin();i != m_extraStrikeTargets.end();i++)
+	{
+		//a pointer check or id check ...should be the same
+		if(spell_info == (*i)->spell_info)
+		{
+			if ((*i)->deleted == true)
+			{
+				(*i)->deleted = false;
+				m_extrastriketargetc++;
+			}
+			(*i)->charges = charges;
+			return;
+		}
+	}
+
+	ExtraStrike *es = new ExtraStrike;
+
+	es->spell_info = spell_info;
+	es->charges = charges;
+	es->deleted = false;
+	m_extraStrikeTargets.push_back(es);
+	m_extrastriketargetc++;
+}
