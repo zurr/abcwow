@@ -44,6 +44,16 @@ void CreateDummySpell(uint32 id)
 void ApplyExtraDataFixes()
 {
 	SpellEntry * sp;
+	// Spell 30455 (Ice Lance) 
+	sp = dbcSpell.LookupEntryForced(30455);
+	if( sp != NULL )
+		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
+
+	// Spell 17364 (Stormstrike) 
+	sp = dbcSpell.LookupEntryForced(17364);
+	if( sp != NULL )
+		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
+
 	// Spell 53 (Backstab Rank 1) is in behind from spell extra.
 	sp = dbcSpell.LookupEntryForced(53);
 	if( sp != NULL )
@@ -1809,6 +1819,16 @@ void ApplyExtraDataFixes()
 
 	// Spell 9912 (Wrath Rank 8) is infront from spell extra.
 	sp = dbcSpell.LookupEntryForced(9912);
+	if( sp != NULL )
+		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
+
+	// Spell 26984 (Wrath Rank 9) 
+	sp = dbcSpell.LookupEntryForced(26984);
+	if( sp != NULL )
+		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
+
+	// Spell 26985 (Wrath Rank 10) 
+	sp = dbcSpell.LookupEntryForced(26985);
 	if( sp != NULL )
 		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
 
@@ -6982,6 +7002,16 @@ void ApplyExtraDataFixes()
 	if( sp != NULL )
 		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
 
+	// Spell 27078 (Fire blast Rank 8) is infront from spell extra.
+	sp = dbcSpell.LookupEntryForced(27078);
+	if( sp != NULL )
+		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
+
+	// Spell 27079 (Fire blast Rank 9) is infront from spell extra.
+	sp = dbcSpell.LookupEntryForced(27079);
+	if( sp != NULL )
+		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
+
 	// Spell 27138 (Exorcism Rank 7) is infront from spell extra.
 	sp = dbcSpell.LookupEntryForced(27138);
 	if( sp != NULL )
@@ -7699,11 +7729,6 @@ void ApplyExtraDataFixes()
 
 	// Spell 30478 (Hemorrhage ) is infront from spell extra.
 	sp = dbcSpell.LookupEntryForced(30478);
-	if( sp != NULL )
-		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
-
-	// Spell 30482 (Molten Armor Rank 1) is infront from spell extra.
-	sp = dbcSpell.LookupEntryForced(30482);
 	if( sp != NULL )
 		sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT;
 
@@ -11096,6 +11121,9 @@ void ApplyNormalFixes()
 		//////////////////////////////////////////
 
 		// Insert priest spell fixes here
+			// Mind Flay,reduces target's movement speed by 50%
+			if ( sp->NameHash == SPELL_HASH_MIND_FLAY )
+				sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DECREASE_SPEED;
 
 		//////////////////////////////////////////
 		// SHAMAN								//
@@ -12863,21 +12891,6 @@ void ApplyNormalFixes()
 			sp->procFlags = PROC_ON_GAIN_EXPIERIENCE;
 		}
 
-		//shadowfiend
-		/*
-		sp = dbcSpell.LookupEntryForced( 41913 );
-		if( sp != NULL )
-			sp->procFlags = PROC_ON_MELEE_ATTACK;
-		//shadowfiend proc -> kinda rewriting this
-		sp = dbcSpell.LookupEntryForced( 41914 );
-		if( sp != NULL )
-		{
-			sp->Effect[0] = SPELL_EFFECT_ENERGIZE;
-			sp->EffectImplicitTargetA[0] = EFF_TARGET_PET_MASTER;
-			sp->EffectBasePoints[0] = 100; // represent pct value to convert dmg to mana
-			sp->Effect[1] = sp->Effect[2] = 0; //disable these
-		}
-		*/
 		/**********************************************************
 		 *	Holy Nova
 		 **********************************************************/
@@ -14561,13 +14574,13 @@ void ApplyNormalFixes()
 		if ( sp != NULL )
 		{
 			sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-			sp->EffectTriggerSpell[1] = 24864;
+			sp->EffectTriggerSpell[1] = 24867;
 		}
 		sp = dbcSpell.LookupEntryForced( 24866 );
 		if ( sp != NULL )
 		{
 			sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-			sp->EffectTriggerSpell[1] = 24867;
+			sp->EffectTriggerSpell[1] = 24864;
 		}
 
 		//Druid: Natural Perfection
@@ -15637,12 +15650,4 @@ void ApplyNormalFixes()
 			sp = dbcSpell.LookupEntryForced( 26029 );
 			if( sp != NULL )
 				sp->cone_width = 15.0f; // 15 degree cone
-
-			// Drain Power (Malacrass)
-			sp = dbcSpell.LookupEntryForced( 44131 );
-			if( sp != NULL )
-				sp->DurationIndex = 21;
-			sp = dbcSpell.LookupEntryForced( 44132 );
-			if( sp != NULL )
-				sp->DurationIndex = 21;
 }

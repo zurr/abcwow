@@ -502,7 +502,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 										pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
 										return;
 									}
-										pGO->Despawn(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 180000 + ( RandomUInt( 180000 ) ) : (IS_INSTANCE(pGO->GetMapId()) ? 0 : 900000 + ( RandomUInt( 600000 ) ) ) );
+									pGO->Despawn(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 180000 + ( RandomUInt( 180000 ) ) : (IS_INSTANCE(pGO->GetMapId()) ? 0 : 900000 + ( RandomUInt( 600000 ) ) ) );
 									return;
 								}
 							}
@@ -682,7 +682,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 			}
 		}
 
-		if(!((class_mask << 1) & plr->getClassMask()) || !((race_mask << 1) & plr->getRaceMask()))
+		if(!((class_mask >> 1) & plr->getClassMask()) || !((race_mask >> 1) & plr->getRaceMask()))
 			add = false;
 
 		// skip players that fail zone check
@@ -746,21 +746,37 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
 	if(pPlayer)
 	{
 		sHookInterface.OnLogoutRequest(pPlayer);
-		if(pPlayer->m_isResting ||	  // We are resting so log out instantly
-			pPlayer->GetTaxiState() ||  // or we are on a taxi
-			HasGMPermissions())		   // or we are a gm
+
+		if(HasGMPermissions())
 		{
 			//Logout on NEXT sessionupdate to preserve processing of dead packets (all pending ones should be processed)
 			SetLogoutTimer(1);
 			return;
 		}
 
-		if(pPlayer->DuelingWith != NULL || pPlayer->CombatStatus.IsInCombat())
+		if(pPlayer->CombatStatus.IsInCombat())
+		{
+			//can't quit still in combat
+			data << uint32(0x1); //Filler
+			data << uint8(0); //Logout accepted
+			SendPacket( &data );
+			return;
+		}
+
+		if(pPlayer->DuelingWith != NULL)
 		{
 			//can't quit still dueling or attacking
 			data << uint32(0x1); //Filler
 			data << uint8(0); //Logout accepted
 			SendPacket( &data );
+			return;
+		}
+
+		if(pPlayer->m_isResting ||	  // We are resting so log out instantly
+			pPlayer->GetTaxiState())  // or we are on a taxi
+		{
+			//Logout on NEXT sessionupdate to preserve processing of dead packets (all pending ones should be processed)
+			SetLogoutTimer(1);
 			return;
 		}
 

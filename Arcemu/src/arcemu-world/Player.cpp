@@ -922,6 +922,7 @@ void Player::Update( uint32 p_time )
 		}
 	}
 #endif
+
 /*
 #ifdef COLLISION
 	if( mstime >= m_flyhackCheckTimer )
@@ -969,6 +970,8 @@ void Player::_EventAttack( bool offhand )
 {
 	if (m_currentSpell)
 	{
+        if(m_currentSpell->GetProto()->ChannelInterruptFlags != 0) // this is a channeled spell - ignore the attack event
+            return;
 		m_currentSpell->cancel();
 		setAttackTimer(500, offhand);
 		return;
@@ -1548,6 +1551,14 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 		//set full hp and mana
 		SetUInt32Value(UNIT_FIELD_HEALTH,GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 		SetUInt32Value(UNIT_FIELD_POWER1,GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+
+		// if warlock has summonned pet, increase its level too
+		if(info->class_ == WARLOCK) {
+			if((m_Summon != NULL) && (m_Summon->IsInWorld()) && (m_Summon->isAlive())) {
+				m_Summon->ModUnsigned32Value(UNIT_FIELD_LEVEL, 1);
+				m_Summon->ApplyStatsForLevel();
+			}
+		}
 	}
 
 	// Set the update bit
@@ -1685,7 +1696,7 @@ void Player::_SavePet(QueryBuffer * buf)
 	for(std::map<uint32, PlayerPet*>::iterator itr = m_Pets.begin(); itr != m_Pets.end(); itr++)
 	{
 		ss.rdbuf()->str("");
-		ss << "INSERT INTO playerpets VALUES('"
+		ss << "REPLACE INTO playerpets VALUES('"
 			<< GetLowGUID() << "','"
 			<< itr->second->number << "','"
 			<< CharacterDatabase.EscapeString(itr->second->name) << "','"
@@ -4854,11 +4865,14 @@ void Player::UpdateStats()
 	case DRUID:
 		AP = str * 2 - 20;
 
-		if( GetShapeShift() == FORM_CAT )
+		// lev * 2 and lev * 3 bonus to attack power is already added elsewhere (in Cat Form and Bear From aura i think)
+		/* if( GetShapeShift() == FORM_CAT )
 			AP += agi + lev * 2;
 
 		if( GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR )
-			AP += lev * 3;
+			AP += lev * 3; */
+		if (GetShapeShift() == FORM_CAT)
+			AP += agi; 
 
 		break;
 
@@ -5197,7 +5211,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 						return bGMTagOn; // GM can see stealthed players
 				}
 
-				return true;
+				return !pObj->m_isGmInvisible;
 			}
 		//------------------------------------------------------------------
 
@@ -5812,6 +5826,20 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 	// see extra/supalosa_range_research.txt for more info
 	//bonusRange = 2.52f;
 	//sLog.outString( "Bonus range = %f" , bonusRange );
+
+	// check if facing target
+	if(!isInFront(target))
+	{
+		fail = SPELL_FAILED_UNIT_NOT_INFRONT;
+	}
+ 
+	// Check ammo count
+	if( iprot && itm->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_WAND )
+	{
+		uint32 ammocount = GetItemInterface()->GetItemCount(iprot->ItemId);
+		if(ammocount == 0)
+			fail = SPELL_FAILED_NO_AMMO;
+	}
 
 	// Check for too close
 	if( spellid != SPELL_RANGED_WAND )//no min limit for wands
@@ -8843,9 +8871,10 @@ void Player::SetShapeShift(uint8 ss)
 		if( m_auras[x] != NULL )
 		{
 			uint32 reqss = m_auras[x]->GetSpellProto()->RequiredShapeShift;
-			if( reqss != 0 && m_auras[x]->IsPositive() && this->getClass() != PRIEST )
+			if( reqss != 0 && m_auras[x]->IsPositive() )
 			{
-				if( old_ss > 0 )
+				if( old_ss > 0 && old_ss != 28 )	// 28 = FORM_SHADOW - Didn't find any aura that required this form
+													// not sure why all priest spell proto's RequiredShapeShift are set [to 134217728]
 				{
 					if(  ( ((uint32)1 << (old_ss-1)) & reqss ) &&		// we were in the form that required it
 						!( ((uint32)1 << (ss-1) & reqss) ) )			// new form doesnt have the right form
@@ -8925,28 +8954,61 @@ void Player::CalcDamage()
 
 		if(IsInFeralForm())
 		{
+			float tmp = 1; // multiplicative damage modifier
+			for (map<uint32, WeaponModifier>::iterator i = damagedone.begin(); i!=damagedone.end();i++)
+			{
+				if (i->second.wclass == (uint32) - 1) // applying only "any weapon" modifiers
+					tmp += i->second.value;
+			}
 			uint32 lev = getLevel();
-			/*if(ss==FORM_CAT)
-				r = delta + ap_bonus * 1000.0;
-			else
-				r = delta + ap_bonus * 2500.0;*/
+			float feral_damage; // average base damage before bonuses and modifiers
+			uint32 x; // itemlevel of the two hand weapon with dps equal to cat or bear dps
 
-			if(ss == FORM_CAT)
-				r = lev + delta + ap_bonus * 1000.0f;
-			else
-				r = lev + delta + ap_bonus * 2500.0f;
-			
-			//SetFloatValue(UNIT_FIELD_MINDAMAGE,r);
-			//SetFloatValue(UNIT_FIELD_MAXDAMAGE,r);
+			if (ss == FORM_CAT)
+			{
+				if (lev < 42) x = lev - 1;
+				else if (lev < 46) x = lev;
+				else if (lev < 49) x = 2 * lev - 45;
+				else if (lev < 60) x = lev + 4;
+				else x = 64; 
 
-			r *= 0.9f;
-			SetFloatValue(UNIT_FIELD_MINDAMAGE,r>0?r:0);
+				// 3rd grade polinom for calculating blue two-handed weapon dps based on itemlevel (from Hyzenthlei)
+				if (x <= 28) feral_damage = 1.563e-03f * x*x*x - 1.219e-01f * x*x + 3.802e+00f * x - 2.227e+01f;
+				else if (x <= 41) feral_damage = -3.817e-03f * x*x*x + 4.015e-01f * x*x - 1.289e+01f * x + 1.530e+02f;
+				else feral_damage = 1.829e-04f * x*x*x - 2.692e-02f * x*x + 2.086e+00f * x - 1.645e+01f;
 
-			r *= 1.2222f;
-			SetFloatValue(UNIT_FIELD_MAXDAMAGE,r>0?r:0);
+				r = feral_damage * 0.79f + delta + ap_bonus * 1000.0f;
+				r *= tmp;
+				SetFloatValue(UNIT_FIELD_MINDAMAGE,r>0?r:0);
+
+				r = feral_damage * 1.21f + delta + ap_bonus * 1000.0f;
+				r *= tmp;
+				SetFloatValue(UNIT_FIELD_MAXDAMAGE,r>0?r:0);
+			}
+			else // Bear or Dire Bear Form
+			{
+				if (ss == FORM_BEAR) x = lev;
+				else x = lev + 5; // DIRE_BEAR dps is slightly better than bear dps
+				if (x > 70) x = 70;
+
+				// 3rd grade polinom for calculating green two-handed weapon dps based on itemlevel (from Hyzenthlei)
+				if (x <= 30) feral_damage = 7.638e-05f * x*x*x + 1.874e-03f * x*x + 4.967e-01f * x + 1.906e+00f;
+				else if (x <= 44) feral_damage = -1.412e-03f * x*x*x + 1.870e-01f * x*x - 7.046e+00f * x + 1.018e+02f;
+				else feral_damage = 2.268e-04f * x*x*x - 3.704e-02f * x*x + 2.784e+00f * x - 3.616e+01f;
+				feral_damage *= 2.5f; // Bear Form attack speed
+
+				r = feral_damage * 0.79f + delta + ap_bonus * 2500.0f;
+				r *= tmp;
+				SetFloatValue(UNIT_FIELD_MINDAMAGE,r>0?r:0);
+
+				r = feral_damage * 1.21f + delta + ap_bonus * 2500.0f;
+				r *= tmp;
+				SetFloatValue(UNIT_FIELD_MAXDAMAGE,r>0?r:0);
+			}
 
 			return;
 		}
+
 //////no druid ss	
 		uint32 speed=2000;
 		Item *it = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
@@ -9382,55 +9444,6 @@ void Player::UnPossess()
 		data.Initialize( SMSG_PET_SPELLS );
 		data << uint64( 0 );
 		m_session->SendPacket( &data );
-	}
-}
-
-//what is an Immobilize spell ? Have to add it later to spell effect handler
-void Player::EventStunOrImmobilize(Unit *proc_target, bool is_victim)
-{
-	if ( this == proc_target )
-		return; //how and why would we stun ourselfs
-	int32 t_trigger_on_stun,t_trigger_on_stun_chance;
-	if( is_victim == false )
-	{
-		t_trigger_on_stun = trigger_on_stun;
-		t_trigger_on_stun_chance = trigger_on_stun_chance;
-	}
-	else
-	{
-		t_trigger_on_stun = trigger_on_stun_victim;
-		t_trigger_on_stun_chance = trigger_on_stun_chance_victim;
-	}
-
-	if( t_trigger_on_stun )
-	{
-		if( t_trigger_on_stun_chance < 100 && !Rand( t_trigger_on_stun_chance ) )
-			return;
-
-		SpellEntry *spellInfo = dbcSpell.LookupEntry(t_trigger_on_stun);
-
-		if(!spellInfo)
-			return;
-
-		SM_FIValue(SM_FChanceOfSuccess,&t_trigger_on_stun_chance,spellInfo->SpellGroupType);
-
-		if(t_trigger_on_stun_chance<100 && !Rand(t_trigger_on_stun_chance))
-			return;
-
-		Spell *spell = SpellPool.PooledNew();
-		spell->Init(this, spellInfo ,true, NULL);
-		SpellCastTargets targets;
-
-		if ( spellInfo->procFlags & PROC_TARGET_SELF )
-			targets.m_unitTarget = GetGUID() ;
-		else if ( proc_target ) 
-			targets.m_unitTarget = proc_target->GetGUID() ;
-		else 
-			targets.m_unitTarget = 0 ;
-/*		if(proc_target)
-			targets.m_unitTarget = proc_target->GetGUID();
-		else targets.m_unitTarget = GetGUID();*/
-		spell->prepare(&targets);
 	}
 }
 
@@ -10711,6 +10724,7 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 
 	} while ( result->NextRow( ) );
 }
+
 /*
 #ifdef COLLISION
 void Player::_FlyhackCheck()
@@ -10749,6 +10763,7 @@ void Player::_FlyhackCheck()
 }
 #endif
 */
+
 /************************************************************************/
 /* SOCIAL                                                               */
 /************************************************************************/

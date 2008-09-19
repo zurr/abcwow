@@ -49,6 +49,7 @@ struct FactionDBC;
 struct ReflectSpellSchool
 {
 	uint32 spellId;
+	uint32 charges;
 	int32 school;
 	int32 chance;
 	int32 require_aura_hash;
@@ -75,6 +76,12 @@ struct AreaAura
 	uint32 auraid;
 	Unit* caster;
 };
+
+typedef struct {
+	SpellEntry *spell_info;
+	uint32 charges;
+	bool deleted;
+} ExtraStrike;
 
 enum DeathState
 {
@@ -739,13 +746,16 @@ public:
 	void HandleProcDmgShield(uint32 flag, Unit* attacker);//almost the same as handleproc :P
 //	void HandleProcSpellOnSpell(Unit* Victim,uint32 damage,bool critical);//nasty, some spells proc other spells
 
+	void RemoveExtraStrikeTarget(SpellEntry *spell_info);
+	void AddExtraStrikeTarget(SpellEntry *spell_info, uint32 charges);
+
 	int32 GetAP();
 	int32 GetRAP();
 
-	void CastSpell(Unit* Target, uint32 SpellID, bool triggered);
-	void CastSpell(Unit* Target, SpellEntry* Sp, bool triggered);
-	void CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered);
-	void CastSpell(uint64 targetGuid, SpellEntry* Sp, bool triggered);
+	uint8 CastSpell(Unit* Target, uint32 SpellID, bool triggered);
+	uint8 CastSpell(Unit* Target, SpellEntry* Sp, bool triggered);
+	uint8 CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered);
+	uint8 CastSpell(uint64 targetGuid, SpellEntry* Sp, bool triggered);
 	void CastSpellAoF(float x,float y,float z,SpellEntry* Sp, bool triggered);
 	void EventCastSpell(Unit * Target, SpellEntry * Sp);
 
@@ -775,6 +785,9 @@ public:
 	float detectRange;
 
 	// Invisibility
+	ARCEMU_INLINE void SetInvisibility(uint32 id) { m_invisibility = id; }
+	ARCEMU_INLINE bool IsInvisible() { return (m_invisible!=0 ? true : false); }
+	uint32 m_invisibility;
 	bool m_invisible;
 	uint8 m_invisFlag;
 	int32 m_invisDetect[INVIS_FLAG_TOTAL];
@@ -840,7 +853,7 @@ public:
 	//caller is the caster
 	int32 GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg, bool isdot);
    
-	Unit* create_guardian(uint32 guardian_entry,uint32 duration,float angle, uint32 lvl = 0, GameObject * obj = NULL);//guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
+	Unit* create_guardian(uint32 guardian_entry,uint32 duration,float angle, uint32 lvl = 0, GameObject * obj = NULL, LocationVector * Vec = NULL);//guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
 
 	uint32 m_addDmgOnce;
 	Creature *m_TotemSlots[4];
@@ -975,6 +988,29 @@ public:
 	void EventAurastateExpire(uint32 aurastateflag){RemoveFlag(UNIT_FIELD_AURASTATE,aurastateflag);} //hmm this looks like so not necesary :S
 	void EventHealthChangeSinceLastUpdate();
 
+    /************************************************************************/
+    /* Stun Immobilize                                                      */
+    /************************************************************************/
+	uint32	    trigger_on_stun;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
+	uint32	    trigger_on_stun_chance; //also using this for mage "Frostbite" talent
+	uint32	    trigger_on_stun_victim;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
+	uint32	    trigger_on_stun_chance_victim; //also using this for mage "Frostbite" talent
+
+	void SetTriggerStunOrImmobilize(uint32 newtrigger,uint32 new_chance,bool is_victim=false)
+    {
+		if( is_victim == false )
+		{
+			trigger_on_stun = newtrigger;
+			trigger_on_stun_chance = new_chance;
+		}
+		else
+		{
+			trigger_on_stun_victim = newtrigger;
+			trigger_on_stun_chance_victim = new_chance;
+		}
+    }
+    void EventStunOrImmobilize(Unit *proc_target,bool is_victim=false);
+
 	void SetStandState (uint8 standstate);
 
 	ARCEMU_INLINE StandState GetStandState()
@@ -1055,7 +1091,9 @@ public:
 	int32 m_powerRegenPCT;
 	int32 m_stunned;
 	int32 m_extraattacks;   
-	int32 m_extrastriketargets;
+	int32 m_extrastriketarget;
+	int32 m_extrastriketargetc;
+	std::list<ExtraStrike*> m_extraStrikeTargets;
 	int32 m_fearmodifiers;
 	int64 m_magnetcaster; // Unit who acts as a magnet for this unit
 	//std::set<SpellEntry*> m_onStrikeSpells;
@@ -1068,10 +1106,8 @@ public:
 	// Affect Speed
 	int32 m_speedModifier;
 	int32 m_slowdown;
-	//int32 m_ActiveSpeedSpell;
 	float m_maxSpeed;
 	map< uint32, int32 > speedReductionMap;
-	//map< uint32, int32 > speedAdditionMap;
 	bool GetSpeedDecrease();
 	int32 m_mountedspeedModifier;
 	int32 m_flyspeedModifier;
@@ -1104,6 +1140,15 @@ public:
 		{
 			RemoveAura( m_stealth );
 			m_stealth = 0;
+		}
+	}
+
+	void RemoveInvisibility()
+	{
+		if( m_invisibility != 0 )
+		{
+			RemoveAura( m_invisibility );
+			m_invisibility = 0;
 		}
 	}
 

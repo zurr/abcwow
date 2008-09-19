@@ -96,8 +96,8 @@ if test -z "$SVN"; then AC_MSG_ERROR(Subversion not found); fi
 # Checks for libraries.
 
 # Reset 
-CFLAGS="$INCLUDES -Wall"
-CXXFLAGS="$INCLUDES -Wall"
+CFLAGS="$INCLUDES -Wall -fno-strict-aliasing"
+CXXFLAGS="$INCLUDES -Wall -fno-strict-aliasing"
 
 # Check for pthread
 ACX_PTHREAD( [
@@ -160,17 +160,8 @@ fi
 AC_ARG_ENABLE(optimize,
      AC_HELP_STRING([--enable-optimize],[enable code optimization]),
      [ if test "x$enable_optimize" = "xyes" ; then
-           CFLAGS="$CFLAGS -O2"
-           CXXFLAGS="$CXXFLAGS -O2"
-       fi
-     ],
-)
-
-AC_ARG_ENABLE(warnings,
-     AC_HELP_STRING([--enable-warnings],[enable Wall compiling]),
-     [ if test "x$enable_warnings" = "xyes" ; then
-           CFLAGS="$CFLAGS -Wall"
-	   CXXFLAGS="$CXXFLAGS -Wall"
+           CFLAGS="$CFLAGS -O2 -fomit-frame-pointer -pipe"
+           CXXFLAGS="$CXXFLAGS -O2 -fomit-frame-pointer -pipe"
        fi
      ],
 )

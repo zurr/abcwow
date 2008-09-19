@@ -1,0 +1,182 @@
+Index: CharacterHandler.cpp
+===================================================================
+--- CharacterHandler.cpp	(revision 1054)
++++ CharacterHandler.cpp	(working copy)
+@@ -844,10 +844,10 @@
+ 
+ 	// Send revision (if enabled)
+ #ifdef WIN32
+-	_player->BroadcastMessage("Powered by: %sArcEmu %s r%u/%s-Win-%s %s(Please report ALL bugs to www.ArcEmu.org/forums/)", MSG_COLOR_WHITE, BUILD_TAG,
++	_player->BroadcastMessage("%sArcEmu/ABCWoW %s r%u/%s-Win-%s %s(www.ArcEmu.org)", MSG_COLOR_WHITE, BUILD_TAG,
+ 		BUILD_REVISION, CONFIG, ARCH, MSG_COLOR_LIGHTBLUE);		
+ #else
+-	_player->BroadcastMessage("Powered by: %sArcEmu %s r%u/%s-%s %s(Please report ALL bugs to www.ArcEmu.org/forums/)", MSG_COLOR_WHITE, BUILD_TAG,
++	_player->BroadcastMessage("%sArcEmu/ABCWoW %s r%u/%s-%s %s(www.ArcEmu.org)", MSG_COLOR_WHITE, BUILD_TAG,
+ 		BUILD_REVISION, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
+ #endif
+ 
+Index: Player.cpp
+===================================================================
+--- Player.cpp	(revision 1054)
++++ Player.cpp	(working copy)
+@@ -407,9 +407,11 @@
+ 	m_outStealthDamageBonusPct = m_outStealthDamageBonusPeriod = m_outStealthDamageBonusTimer = 0;
+ 	m_vampiricEmbrace = m_vampiricTouch = 0;
+ 	LastSeal = 0;
++/*
+ #ifdef COLLISION
+ 	m_flyhackCheckTimer = 0;
+ #endif
++*/
+ }
+ 
+ void Player::OnLogin()
+@@ -921,6 +923,7 @@
+ 	}
+ #endif
+ 
++/*
+ #ifdef COLLISION
+ 	if( mstime >= m_flyhackCheckTimer )
+ 	{
+@@ -928,6 +931,7 @@
+ 		m_flyhackCheckTimer = mstime + 10000; 
+ 	}
+ #endif
++*/
+ }
+ 
+ void Player::EventDismount(uint32 money, float x, float y, float z)
+@@ -10721,6 +10725,7 @@
+ 	} while ( result->NextRow( ) );
+ }
+ 
++/*
+ #ifdef COLLISION
+ void Player::_FlyhackCheck()
+ {
+@@ -10757,6 +10762,7 @@
+ 	}
+ }
+ #endif
++*/
+ 
+ /************************************************************************/
+ /* SOCIAL                                                               */
+Index: Spell.cpp
+===================================================================
+--- Spell.cpp	(revision 1059)
++++ Spell.cpp	(working copy)
+@@ -2981,9 +2981,11 @@
+ 		// check for duel areas
+ 		if(p_caster && GetProto()->Id == 7266)
+ 		{
++			/*
+ 			AreaTable* at = dbcArea.LookupEntry( p_caster->GetAreaID() );
+ 			if(at->AreaFlags & AREA_CITY_AREA)
+ 				return SPELL_FAILED_NO_DUELING;
++			*/
+ 			// instance & stealth checks
+ 			if ( p_caster->GetMapMgr() && p_caster->GetMapMgr()->GetMapInfo() && p_caster->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL )
+ 					return SPELL_FAILED_NO_DUELING;
+Index: SpellEffects.cpp
+===================================================================
+--- SpellEffects.cpp	(revision 1054)
++++ SpellEffects.cpp	(working copy)
+@@ -2235,6 +2235,96 @@
+ 			break;
+ 		}
+ 
++		// potions learned by discovery variables
++		uint32 cast_chance = 5;
++		uint32 learn_spell = 0;
++
++		if (skill && skill->skilline == SKILL_ALCHEMY)
++		{
++			//Potion Master
++			if (strstr(m_itemProto->Name1, "Potion"))
++			{
++				if(p_caster->HasSpell(28675)) 
++					while (Rand(20) && item_count<5) item_count++;
++
++				// Super Rejuvenation Potion
++				cast_chance = 2;
++				learn_spell = 28586;
++			}
++			//Elixir Master
++			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
++			{
++				if(p_caster->HasSpell(28677)) 
++					while (Rand(20) && item_count<5) item_count++;
++
++				uint32 spList[] = {28590,28587,28588,28591,28589};
++				cast_chance = 2;
++				learn_spell = spList[RandomUInt(4)];
++			}
++			//Transmutation Master
++			if (m_spellInfo->Category == 310)
++			{
++				if (m_spellInfo->Id == 29688) //rate for primal might is lower than for anything else
++				{
++					if(p_caster->HasSpell(28672))
++						while (Rand(40) && item_count<5) item_count++;
++				}
++				else
++				{
++					if(p_caster->HasSpell(28672))
++						while (Rand(20) && item_count<5) item_count++;
++				}
++
++				uint32 spList[] = {28581,28585,28585,28584,28582,28580};
++				cast_chance = 5;
++				learn_spell = spList[RandomUInt(5)];
++			}
++		}
++
++		//random discovery by crafter item id
++			switch ( m_itemProto->ItemId )
++			{
++			case 22845: //Major Arcane Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41458;
++				}break;
++			case 22841: //Major Fire Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41500;
++				}break;
++			case 22842: //Major Frost Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41501;
++				}break;
++			case 22847: //Major Holy Protection Potion
++				{
++					// there is none
++				}break;
++			case 22844: //Major Nature Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41502;
++				}break;
++			case 22846: //Major Shadow Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41503;
++				}break;
++			}
++
++			if ( learn_spell && p_caster->getLevel() > 60 && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
++			{
++				SpellEntry* _spellproto = dbcSpell.LookupEntry( learn_spell );
++				if( _spellproto != NULL )
++				{
++					p_caster->BroadcastMessage( "%sDISCOVERY! You discovered the %s !|r", MSG_COLOR_YELLOW, _spellproto->Name );
++					p_caster->addSpell( learn_spell );
++				}
++			}
++
+ 		// item count cannot be more than allowed in a single stack
+ 		if (item_count > m_itemProto->MaxCount)
+ 			item_count = m_itemProto->MaxCount;

@@ -2198,7 +2198,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				static_cast< Player* >( this )->GetGroup()->SendPartyKillLog( this, pVictim );*/
 
 		/* Stop Unit from attacking */
-		if( this->IsPlayer() )
+		if( this->IsPlayer() && (((Player*)this)->GetSelection() == pVictim->GetGUID()) )
 			static_cast< Player* >( this )->EventAttackStop();
 	   
 		if( this->IsUnit() )
@@ -2673,7 +2673,8 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 					res = res - res * dmg_reduction_pct;
 				}
 
-				pVictim->Emote( EMOTE_ONESHOT_WOUNDCRITICAL );
+				if (pVictim->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(pVictim)->GetCreatureInfo() && static_cast<Creature*>(pVictim)->GetCreatureInfo()->Rank != ELITE_WORLDBOSS)
+					pVictim->Emote( EMOTE_ONESHOT_WOUNDCRITICAL );
 				/*aproc |= PROC_ON_SPELL_CRIT_HIT;
 				vproc |= PROC_ON_SPELL_CRIT_HIT_VICTIM;*/
 
