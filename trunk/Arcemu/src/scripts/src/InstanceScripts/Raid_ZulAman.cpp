@@ -1701,7 +1701,8 @@ public:
 				(_unit->GetPositionX() + RandomFloat(10)-10), (_unit->GetPositionY() + RandomFloat(10)-10),
 				_unit->GetPositionZ() + 2.0f, _unit->GetOrientation(),
 				true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
-				cre->GetAIInterface()->setOutOfCombatRange(50000);
+				if (cre != NULL)
+					cre->GetAIInterface()->setOutOfCombatRange(50000);
 			}
 			mobs = 1;
 		}
@@ -1904,13 +1905,13 @@ public:
     {
 		
 		spells[0].info = dbcSpell.LookupEntry(ZULJIN_GRIEVOUS_THROW);
-		spells[0].targettype = TARGET_ATTACKING;
+		spells[0].targettype = TARGET_RANDOM_SINGLE;
 		spells[0].instant = false;
 		spells[0].perctrigger = 5.0f;
 		spells[0].attackstoptimer = 1000;
 
 		spells[1].info = dbcSpell.LookupEntry(ZULJIN_WHIRLWIND); 
-		spells[1].targettype = TARGET_ATTACKING; 
+		spells[1].targettype = TARGET_SELF; 
 		spells[1].instant = false;
 		spells[1].perctrigger = 25.0f;
 		spells[1].attackstoptimer = 1000;
@@ -1922,7 +1923,7 @@ public:
 		spells[2].attackstoptimer = 1000;
 		
 		spells[3].info = dbcSpell.LookupEntry(ZULJIN_OVERPOWER);
-		spells[3].targettype = TARGET_VARIOUS; 
+		spells[3].targettype = TARGET_ATTACKING; 
 		spells[3].instant = true;
 		spells[3].perctrigger = 10.0f;
 		spells[3].attackstoptimer = 1000;
@@ -1934,34 +1935,34 @@ public:
 		spells[4].attackstoptimer = 1000;
 		
 		spells[5].info = dbcSpell.LookupEntry(ZULJIN_CLAW_RAGE);
-		spells[5].targettype = TARGET_ATTACKING; 
+		spells[5].targettype = TARGET_RANDOM_SINGLE; 
 		spells[5].instant = true;
 		spells[5].perctrigger = 10.0f;
 		spells[5].attackstoptimer = 1000;
 		
 		spells[6].info = dbcSpell.LookupEntry(ZULJIN_LYNX_RUSH);
-		spells[6].targettype = TARGET_ATTACKING; 
+		spells[6].targettype = TARGET_RANDOM_SINGLE; 
 		spells[6].instant = true;
 		spells[6].perctrigger = 10.0f;
 		spells[6].attackstoptimer = 1000;
 		
 		spells[7].info = dbcSpell.LookupEntry(ZULJIN_FLAME_WHIRL); 
 		spells[7].targettype = TARGET_VARIOUS;
-		spells[7].instant = true;
+		spells[7].instant = false;
 		spells[7].cooldown = 12;
-		spells[7].perctrigger = 3.0f;
+		spells[7].perctrigger = 10.0f;
 		spells[7].attackstoptimer = 1000;
 
 		spells[8].info = dbcSpell.LookupEntry(ZULJIN_FLAME_BREATH); 
 		spells[8].targettype = TARGET_ATTACKING; 
 		spells[8].instant = true;
-		spells[8].perctrigger = 5.0f;
+		spells[8].perctrigger = 10.0f;
 		spells[8].attackstoptimer = 1000;
 
 		spells[9].info = dbcSpell.LookupEntry(ZULJIN_PILLAR_OF_FIRE);
 		spells[9].targettype = TARGET_RANDOM_DESTINATION; 
 		spells[9].instant = true;
-		spells[9].perctrigger = 5.0f;
+		spells[9].perctrigger = 10.0f;
 		spells[9].attackstoptimer = 1000;			
 
 		nrspells = 2;
@@ -2045,10 +2046,13 @@ public:
 			{
 				Creature *cre = NULL;
 				cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(ZULJIN_FEATHER_VORTEX, 
-				(_unit->GetPositionX() + RandomFloat(10)-10), (_unit->GetPositionY() + RandomFloat(10)-10),
-				_unit->GetPositionZ(), _unit->GetOrientation(),
-				true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
-				cre->GetAIInterface()->setOutOfCombatRange(50000);
+				      (_unit->GetPositionX() + RandomFloat(10)-10), (_unit->GetPositionY() + RandomFloat(10)-10),
+				      _unit->GetPositionZ(), _unit->GetOrientation(),
+				      true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
+
+				if (cre != NULL) {
+					cre->GetAIInterface()->setOutOfCombatRange(50000);
+				}
 			}
 			_unit->ClearHateList();
 			_unit->SetUInt32Value(UNIT_FIELD_DISPLAYID , ZULJIN_MODEL_EAGLE);  //change to Eagle
