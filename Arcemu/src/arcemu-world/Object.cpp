@@ -2042,21 +2042,28 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			if( pVictim->IsPlayer() )
 			{
 				sHookInterface.OnKillPlayer( plr, static_cast< Player* >( pVictim ) );
+				bool setAurastateFlag = false;
 				if(plr->getLevel() > pVictim->getLevel())
 				{
 					unsigned int diff = plr->getLevel() - pVictim->getLevel();
 					if( diff <= 8 )
 					{
 						HonorHandler::OnPlayerKilledUnit(plr, pVictim);
-						SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+						setAurastateFlag = true;
 					}
-					else
-						RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 				}
 				else
 				{
 					HonorHandler::OnPlayerKilledUnit( plr, pVictim );
-					SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+					setAurastateFlag = true;
+				}
+
+				if (setAurastateFlag)
+				{
+					this->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+					if(!sEventMgr.HasEvent(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+						sEventMgr.AddEvent((Unit*)this,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+					else sEventMgr.ModifyEventTimeLeft(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
 				}
 			}
 			else
@@ -2064,7 +2071,6 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				if (!isCritter) // REPUTATION
 				{
 					plr->Reputation_OnKilledUnit( pVictim, false );
-					RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 				}
 			}
 		}
@@ -2378,11 +2384,24 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 								if( xp > 0 )
 								{
 									pTagger->GiveXP( xp, victimGuid, true );
+
+									this->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+									if(!sEventMgr.HasEvent(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+									{
+										sEventMgr.AddEvent((Unit*)this,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+									}
+									else
+									{
+										sEventMgr.ModifyEventTimeLeft(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
+									}
+
 									if( pTagger->GetSummon() && !pTagger->GetSummon()->IsSummon() )
 									{
 										xp = CalculateXpToGive( pVictim, pTagger->GetSummon() );
 										if( xp > 0 )
+										{
 											pTagger->GetSummon()->GiveXP( xp );
+										}
 									}
 								}
 							}
@@ -2409,6 +2428,17 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 									if( xp > 0 )
 									{
 										petOwner->GiveXP( xp, victimGuid, true );
+
+										this->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+										if(!sEventMgr.HasEvent(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE))
+										{
+											sEventMgr.AddEvent((Unit*)this,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_LASTKILLWITHHONOR,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000,1,0);
+										}
+										else
+										{
+											sEventMgr.ModifyEventTimeLeft(this,EVENT_LASTKILLWITHHONOR_FLAG_EXPIRE,20000);
+										}
+
 										if( !petTagger->IsSummon() )
 										{
 											xp = CalculateXpToGive( pVictim, petTagger );
