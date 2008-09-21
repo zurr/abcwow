@@ -2438,7 +2438,7 @@ public:
 			_unit->GetAIInterface()->SetAIState(STATE_SCRIPTMOVE);
 			_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
 			_unit->GetAIInterface()->setWaypointToMove(NextWP);
-			_unit->GetAIInterface()->SetNextTarget(NULL);
+			_unit->GetAIInterface()->SetNextTarget((Unit*)NULL);
 			Flying=true;
 		}
     }
@@ -4300,7 +4300,7 @@ public:
 					_unit->GetAIInterface()->setMoveType(MOVEMENTTYPE_WANTEDWP);
 					_unit->GetAIInterface()->setWaypointToMove(1);
 
-					_unit->GetAIInterface()->SetNextTarget(NULL);
+					_unit->GetAIInterface()->SetNextTarget((Unit*)NULL);
 				}
 
 				if (_unit->GetAIInterface()->getMoveType() == MOVEMENTTYPE_WANTEDWP)
@@ -4367,7 +4367,7 @@ public:
 					switch(Scene)
 					{
 					case 2:
-						_unit->GetAIInterface()->SetNextTarget(NULL);
+						_unit->GetAIInterface()->SetNextTarget((Unit*)NULL);
 						break;
 					case 4:
 						_unit->CastSpell(_unit, 36520, true);	// probably it's wrong spell too
