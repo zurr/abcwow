@@ -347,10 +347,6 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 		m_attack_speed[x]	= 1.0f;
 	}
 	ok_to_remove = false;
-	trigger_on_stun = 0;
-	trigger_on_stun_chance = 100;
-	trigger_on_stun_victim = 0;
-	trigger_on_stun_chance_victim = 100;
 	m_modphyscritdmgPCT = 0;
 	m_RootedCritChanceBonus = 0;
 
@@ -6344,6 +6340,7 @@ void Player::CalcResistance(uint32 type)
 
 void Player::UpdateNearbyGameObjects()
 {
+	this->AquireInrangeLock(); //make sure to release lock before exit function !
 	for (Object::InRangeSet::iterator itr = GetInRangeSetBegin(); itr != GetInRangeSetEnd(); ++itr)
 	{
 		if((*itr)->GetTypeId() == TYPEID_GAMEOBJECT)
@@ -6430,6 +6427,7 @@ void Player::UpdateNearbyGameObjects()
 				EventDeActivateGameObject((GameObject*)(*itr));
 		}
 	}
+	this->ReleaseInrangeLock();
 }
 
 
@@ -8231,7 +8229,8 @@ void Player::UpdatePvPArea()
 void Player::BuildFlagUpdateForNonGroupSet(uint32 index, uint32 flag)
 {
     Object *curObj;
-    for (Object::InRangeSet::iterator iter = GetInRangeSetBegin(); iter != GetInRangeSetEnd();)
+	this->AquireInrangeLock(); //make sure to release lock before exit function !
+	for (Object::InRangeSet::iterator iter = GetInRangeSetBegin(); iter != GetInRangeSetEnd();)
 	{
 		curObj = *iter;
 		iter++;
@@ -8248,6 +8247,7 @@ void Player::BuildFlagUpdateForNonGroupSet(uint32 index, uint32 flag)
             }
         }
     }
+	this->ReleaseInrangeLock();
 }
 
 void Player::LoginPvPSetup()
@@ -10763,7 +10763,6 @@ void Player::_FlyhackCheck()
 }
 #endif
 */
-
 /************************************************************************/
 /* SOCIAL                                                               */
 /************************************************************************/
@@ -11166,7 +11165,7 @@ void Player::VampiricSpell(uint32 dmg, Unit* pTarget)
 			{
 				for( itr = pSubGroup->GetGroupMembersBegin(); itr != pSubGroup->GetGroupMembersEnd(); ++itr )
 				{
-					if( (*itr)->m_loggedInPlayer != NULL && (*itr) != m_playerInfo && (*itr)->m_loggedInPlayer->GetPowerType() == POWER_TYPE_MANA )
+					if( (*itr)->m_loggedInPlayer != NULL && (*itr) != m_playerInfo && (*itr)->m_loggedInPlayer->isAlive() && (*itr)->m_loggedInPlayer->GetPowerType() == POWER_TYPE_MANA )
 						Energize((*itr)->m_loggedInPlayer, 34919, bonus, POWER_TYPE_MANA);
 				}
 			}

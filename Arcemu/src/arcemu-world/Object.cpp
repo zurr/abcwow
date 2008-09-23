@@ -1709,6 +1709,7 @@ void Object::_setFaction()
 void Object::UpdateOppFactionSet()
 {
 	m_oppFactsInRange.clear();
+	this->AquireInrangeLock(); //make sure to release lock before exit function !
 	for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); ++i)
 	{
 		if (((*i)->GetTypeId() == TYPEID_UNIT) || ((*i)->GetTypeId() == TYPEID_PLAYER) || ((*i)->GetTypeId() == TYPEID_GAMEOBJECT))
@@ -1730,11 +1731,13 @@ void Object::UpdateOppFactionSet()
 			}
 		}
 	}
+	this->ReleaseInrangeLock();
 }
 
 void Object::UpdateSameFactionSet()
 {
 	m_sameFactsInRange.clear();
+	this->AquireInrangeLock(); //make sure to release lock before exit function !
 	for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); ++i)
 	{
 		if (((*i)->GetTypeId() == TYPEID_UNIT) || ((*i)->GetTypeId() == TYPEID_PLAYER) || ((*i)->GetTypeId() == TYPEID_GAMEOBJECT))
@@ -1756,6 +1759,7 @@ void Object::UpdateSameFactionSet()
 			}
 		}
 	}
+	this->ReleaseInrangeLock();
 }
 
 void Object::EventSetUInt32Value(uint32 index, uint32 value)
@@ -2399,9 +2403,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 									{
 										xp = CalculateXpToGive( pVictim, pTagger->GetSummon() );
 										if( xp > 0 )
-										{
 											pTagger->GetSummon()->GiveXP( xp );
-										}
 									}
 								}
 							}
@@ -3106,4 +3108,5 @@ uint32 Object::GetTeam()
 
 	return static_cast<uint32>(-1);
 }
+
 
