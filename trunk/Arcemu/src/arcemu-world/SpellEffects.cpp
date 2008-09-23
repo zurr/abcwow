@@ -576,7 +576,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 	if (GetProto()->NameHash == SPELL_HASH_JUDGEMENT_OF_COMMAND && !unitTarget->IsStunned())
 			dmg = dmg >> 1;
 
-	if(GetProto()->speed > 0)
+	if(GetProto()->speed > 0 && m_triggeredSpell == false )
 	{
 		//FIXME:Use this one and check player movement and update distance
 		//It now only checks the first distance and hits the player after time expires.
@@ -1005,9 +1005,19 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	 * PRIEST SPELLS
 	 *************************
 	 * IDs:
-	 * NO SPELLS
+	 * 34433 Shadowfiend	STATUS: ToDo
 	 *  --------------------------------------------
 	 *************************/
+	/*
+		Creates a shadowy fiend to attack the target.  Caster receives mana when the Shadowfiend deals damage.  Lasts 15 sec.
+		Effect #1	Summon (19668)
+		Effect #2	Trigger Spell
+					Spell #41967 <--- THIS SPELL
+	*/
+	/*case 41967:
+		{
+		}break;
+	*/
 
 	/*************************
 	 * SHAMAN SPELLS

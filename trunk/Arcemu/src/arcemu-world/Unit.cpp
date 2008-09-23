@@ -325,6 +325,10 @@ Unit::Unit()
 	m_damageSplitTarget = NULL;
 	m_extrastriketarget = 0;
 	m_extrastriketargetc = 0;
+	trigger_on_stun = 0;
+	trigger_on_stun_chance = 100;
+	trigger_on_stun_victim = 0;
+	trigger_on_stun_chance_victim = 100;
 	ModelHalfSize = 1.0f; //worst case unit size. (Should be overwritten)
 }
 
@@ -2039,9 +2043,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						//trigger on lightning and chain lightning. Spell should be identical , well maybe next time :P
 						if(	CastingSpell->NameHash == SPELL_HASH_LIGHTNING_BOLT || CastingSpell->NameHash == SPELL_HASH_CHAIN_LIGHTNING )
 						{
+							CastSpell(this, 39805, true);
 							spellId = CastingSpell->Id;
 							origId = 39805;
-							dmg_overwrite = (CastingSpell->EffectBasePoints[0] + 1) / 2; //only half dmg
 						}
 						else continue;
 					}break;
@@ -2276,6 +2280,12 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 		}
 		spell->pSpellId=origId;
 		spell->prepare(&targets);
+
+		if (origId == 39805)
+		{
+			// Remove lightning overload aura after procing
+			RemoveAura(39805);
+		}
 	}
 
 	m_chargeSpellsInUse=true;
@@ -3071,13 +3081,14 @@ else
 	}
 	else
 	{
-		if(this->IsPlayer() && !(static_cast< Player* >( this )->IsInFeralForm()) && !ability)
+		if(this->IsPlayer())
 		{
 			it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
-			if( it != NULL && it->GetProto()->InventoryType == INVTYPE_WEAPON )//dualwield to-hit penalty
+			if( it != NULL && it->GetProto()->InventoryType == INVTYPE_WEAPON && !ability )//dualwield to-hit penalty
 				hitmodifier -= 19.0f;
 		}
 	}
+
 	hitchance+= hitmodifier;
 
 	//Hackfix for Surprise Attacks

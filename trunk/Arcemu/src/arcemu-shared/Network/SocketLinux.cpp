@@ -23,7 +23,7 @@ void Socket::PostEvent(uint32 events)
 		Log.Warning("epoll", "Could not post event on fd %u", m_fd);
 }
 
-int Socket::ReadCallback(uint32 len)
+void Socket::ReadCallback(uint32 len)
 {
     // We have to lock here.
     m_readMutex.Acquire();
@@ -34,7 +34,7 @@ int Socket::ReadCallback(uint32 len)
     {
         m_readMutex.Release();
         Disconnect();
-        return -1;
+        return;
     }    
     else if(bytes > 0)
     {
@@ -45,8 +45,6 @@ int Socket::ReadCallback(uint32 len)
     }
 
     m_readMutex.Release();
-
-	return 0;
 }
 
 void Socket::WriteCallback()
