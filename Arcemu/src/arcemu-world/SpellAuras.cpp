@@ -3557,7 +3557,7 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 		if(m_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT))
 		{
 			sEventMgr.AddEvent(this, &Aura::EventPeriodicTriggerSpell, spe,
-			EVENT_AURA_PERIODIC_TRIGGERSPELL,GetSpellProto()->EffectAmplitude[mod->i], 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+				EVENT_AURA_PERIODIC_TRIGGERSPELL,GetSpellProto()->EffectAmplitude[mod->i], 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
             periodic_target = m_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT);
 		}
@@ -3574,7 +3574,6 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 {
 	// Trigger Spell
 	// check for spell id
-
 	Unit *m_caster=GetUnitCaster();
 	if(!m_caster || !m_caster->IsInWorld())
 		return;
@@ -3610,21 +3609,12 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 	}
 
 	Unit *pTarget = ((Unit*)oTarget);
-
 	if(!oTarget->IsUnit())
 		return;
 
 	if(!pTarget || pTarget->isDead())
 	{
 		SendInterrupted(SPELL_FAILED_TARGETS_DEAD, m_caster);
-		SendChannelUpdate(0, m_caster);
-		this->Remove();
-		return;
-	}
-
-	if(pTarget != m_caster && !isAttackable(m_caster, pTarget))
-	{
-		SendInterrupted(SPELL_FAILED_BAD_TARGETS, m_caster);
 		SendChannelUpdate(0, m_caster);
 		this->Remove();
 		return;
@@ -3643,7 +3633,7 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 		SM_PFValue( m_caster->SM_PRange, &maxRange, spellInfo->SpellGroupType );
 	}
 
-	if( m_caster->IsStunned() || m_caster->IsFeared() || m_caster->GetDistance2dSq( pTarget ) > ( maxRange*maxRange ) )
+	if( m_caster->IsStunned() || m_caster->IsFeared() || ( maxRange != 0 && m_caster->GetDistance2dSq( pTarget ) > ( maxRange*maxRange )) )
 	{
 		// no longer valid
 		SendInterrupted(SPELL_FAILED_INTERRUPTED, m_caster);
