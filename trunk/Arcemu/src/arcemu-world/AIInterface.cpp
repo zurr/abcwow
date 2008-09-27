@@ -1020,9 +1020,8 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 
 #ifdef COLLISION
 	float target_land_z=0.0f;
-	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL )
+	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL && !m_is_in_instance )
 	{
-
 		if (!m_moveFly)
 		{
 			target_land_z = CollideInterface.GetHeight(m_Unit->GetMapId(), GetNextTarget()->GetPositionX(), GetNextTarget()->GetPositionY(), GetNextTarget()->GetPositionZ() + 2.0f);
