@@ -3170,6 +3170,19 @@ protected:
 #define VASHJ_STATICCHARGE 38280
 #define VASHJ_SHIELD 38112
 
+struct Coords vashjAddsSpawns[]=
+{
+	{ 95.416428f, -858.470093f, 20.874939f, 3.928170f },
+	{ 54.330906f, -834.683411f, 21.043386f, 4.458308f },
+	{ 6.822807f, -833.937500f, 20.874128f, 4.970778f },
+	{ -59.524456f, -898.862793f, 20.744196f, 6.009459f },
+	{ -36.159065f, -988.489197f, 20.725292f, 0.770832f },
+	{ 4.9164569f, -1012.535767f, 20.787289f, 1.322573f },
+	{ 52.985622f, -1012.738708f, 20.913624f, 1.835046f },
+	{ 96.840096f, -987.219666f, 20.758579f, 2.343590f },
+	{ 118.946030f, -948.197021f, 20.749378f, 2.861951f }
+};
+
 class VASHJAI : public CreatureAIScript
 {
 public:
@@ -3308,6 +3321,7 @@ public:
 			toxicsporebatcd = 1;
 			toxicsporebats = 20;
 			Creature *summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TOXICSPOREBAT, -59.524456f, -898.862793f, 60.000000f, 4.697067f, true, false, 0, 0);
+			if ( summon != NULL ) summon->Despawn(240000, 0);
 			m_phase = 3;
 		}
 		switch (m_phase)
@@ -3479,36 +3493,8 @@ public:
 		{
 			if (!enchantedelemtalcd)
 			{
-				switch (RandomUInt(100)%9)
-				{
-				case 0:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, 95.416428f, -858.470093f, 20.874939f, 3.928170f, true, false, 0, 0);
-					break;
-				case 1:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, 54.330906f, -834.683411f, 21.043386f, 4.458308f, true, false, 0, 0);
-					break;
-				case 2:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, 6.822807f, -833.937500f, 20.874128f, 4.970778f, true, false, 0, 0);
-					break;
-				case 3:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, -59.524456f, -898.862793f, 20.744196f, 6.009459f, true, false, 0, 0);
-					break;
-				case 4:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, -36.159065f, -988.489197f, 20.725292f, 0.770832f, true, false, 0, 0);
-					break;
-				case 5:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, 4.9164569f, -1012.535767f, 20.787289f, 1.322573f, true, false, 0, 0);
-					break;
-				case 6:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, 52.985622f, -1012.738708f, 20.913624f, 1.835046f, true, false, 0, 0);
-					break;
-				case 7:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, 96.840096f, -987.219666f, 20.758579f, 2.343590f, true, false, 0, 0);
-					break;
-				case 8:
-					_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, 118.946030f, -948.197021f, 20.749378f, 2.861951f, true, false, 0, 0);
-					break;
-				}
+				uint32 x = RandomUInt(100)%9;
+				Creature *summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_ENCHANTEDELEMTAL, vashjAddsSpawns[x].x, vashjAddsSpawns[x].y, vashjAddsSpawns[x].z,  vashjAddsSpawns[x].o, true, false, 0, 0);
 				enchantedelemtalcd = 3;
 			}
 			else
@@ -3519,70 +3505,17 @@ public:
 		}
 		else
 		{
-			switch (RandomUInt(100)%9)
-			{
-			case 0:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 95.416428f, -858.470093f, 20.874939f, 3.928170f, true, false, 0, 0);
-				break;
-			case 1:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 54.330906f, -834.683411f, 21.043386f, 4.458308f, true, false, 0, 0);
-				break;
-			case 2:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 6.822807f, -833.937500f, 20.874128f, 4.970778f, true, false, 0, 0);
-				break;
-			case 3:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, -59.524456f, -898.862793f, 20.744196f, 6.009459f, true, false, 0, 0);
-				break;
-			case 4:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, -36.159065f, -988.489197f, 20.725292f, 0.770832f, true, false, 0, 0);
-				break;
-			case 5:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 4.9164569f, -1012.535767f, 20.787289f, 1.322573f, true, false, 0, 0);
-				break;
-			case 6:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 52.985622f, -1012.738708f, 20.913624f, 1.835046f, true, false, 0, 0);
-				break;
-			case 7:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 96.840096f, -987.219666f, 20.758579f, 2.343590f, true, false, 0, 0);
-				break;
-			case 8:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, 118.946030f, -948.197021f, 20.749378f, 2.861951f, true, false, 0, 0);
-				break;
-			}
+			uint32 x = RandomUInt(100)%9;
+			Creature *summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TAINTEDELEMTAL, vashjAddsSpawns[x].x, vashjAddsSpawns[x].y, vashjAddsSpawns[x].z,  vashjAddsSpawns[x].o, true, false, 0, 0);
 			taintedelemtalcd = 55;
 		}
 		if (!coilfangelitecd)
 		{
-			switch (RandomUInt(100)%9)
-			{
-			case 0:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, 95.416428f, -858.470093f, 20.874939f, 3.928170f, true, false, 0, 0);
-				break;
-			case 1:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, 54.330906f, -834.683411f, 21.043386f, 4.458308f, true, false, 0, 0);
-				break;
-			case 2:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, 6.822807f, -833.937500f, 20.874128f, 4.970778f, true, false, 0, 0);
-				break;
-			case 3:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, -59.524456f, -898.862793f, 20.744196f, 6.009459f, true, false, 0, 0);
-				break;
-			case 4:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, -36.159065f, -988.489197f, 20.725292f, 0.770832f, true, false, 0, 0);
-				break;
-			case 5:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, 4.9164569f, -1012.535767f, 20.787289f, 1.322573f, true, false, 0, 0);
-				break;
-			case 6:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, 52.985622f, -1012.738708f, 20.913624f, 1.835046f, true, false, 0, 0);
-				break;
-			case 7:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, 96.840096f, -987.219666f, 20.758579f, 2.343590f, true, false, 0, 0);
-				break;
-			case 8:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, 118.946030f, -948.197021f, 20.749378f, 2.861951f, true, false, 0, 0);
-				break;
-			}
+			uint32 x = RandomUInt(100)%9;
+			Creature *summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, vashjAddsSpawns[x].x, vashjAddsSpawns[x].y, vashjAddsSpawns[x].z,  vashjAddsSpawns[x].o, true, false, 0, 0);
+			if ( summon != NULL )
+				summon->Despawn(240000, 0);
+	
 			coilfangelitecd = 48;
 		}
 		else
@@ -3591,13 +3524,18 @@ public:
 		}
 		if (!coilfangstridercd)
 		{
+			Creature *summon = NULL;
 			switch (RandomUInt(100)%2)
 			{
 			case 0:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.615667f, -1017.765625f, 21.570890f, 1.557591f, true, false, 0, 0);
+				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.615667f, -1017.765625f, 21.570890f, 1.557591f, true, false, 0, 0);
+				if ( summon != NULL ) 
+					summon->Despawn(240000, 0);
 				break;
 			case 1:
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.688040f, -827.500061f, 20.697882f, 4.703711f, true, false, 0, 0);
+				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.688040f, -827.500061f, 20.697882f, 4.703711f, true, false, 0, 0);
+				if ( summon != NULL ) 
+					summon->Despawn(240000, 0);
 				break;
 			}
 			coilfangstridercd = 60;
