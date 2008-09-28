@@ -885,6 +885,10 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 				if( (*itr)->m_loggedInPlayer->GetUInt32Value( UNIT_FIELD_HEALTH ) == (*itr)->m_loggedInPlayer->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) )
 					continue;
 
+#ifdef COLLISION
+				if (u_caster->GetMapId() == (*itr)->m_loggedInPlayer->GetMapId() && !CollideInterface.CheckLOS(u_caster->GetMapId(),u_caster->GetPositionNC(),(*itr)->m_loggedInPlayer->GetPositionNC()))
+					continue;
+#endif
 				if( IsInrange(u_caster,(*itr)->m_loggedInPlayer, range) )
 				{
 					SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
@@ -910,6 +914,11 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 			//we target stuff that has no full health. No idea if we must fill target list or not :(
 			if( (*itr)->GetUInt32Value( UNIT_FIELD_HEALTH ) == (*itr)->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) )
 				continue;
+
+#ifdef COLLISION
+				if (u_caster->GetMapId() == (*itr)->m_loggedInPlayer->GetMapId() && !CollideInterface.CheckLOS(u_caster->GetMapId(),u_caster->GetPositionNC(),(*itr)->m_loggedInPlayer->GetPositionNC()))
+					continue;
+#endif
 
 			if(IsInrange(firstTarget,*itr, range))
 			{
