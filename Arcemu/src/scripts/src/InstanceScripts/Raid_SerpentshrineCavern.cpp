@@ -761,7 +761,7 @@ public:
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
-			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+			if (tmpPlr->isAlive() && _unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
 				return;
 		}
 		_unit->Despawn(100, 0);
@@ -914,7 +914,7 @@ public:
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
-			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+			if (tmpPlr->isAlive() && _unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
 				return;
 		}
 		_unit->Despawn(100, 0);
@@ -2144,7 +2144,7 @@ public:
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
-			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+			if (tmpPlr->isAlive() && _unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
 				return;
 		}
 		_unit->Despawn(100, 0);
@@ -3321,7 +3321,8 @@ public:
 			toxicsporebatcd = 1;
 			toxicsporebats = 20;
 			Creature *summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_TOXICSPOREBAT, -59.524456f, -898.862793f, 60.000000f, 4.697067f, true, false, 0, 0);
-			if ( summon != NULL ) summon->Despawn(240000, 0);
+			if ( summon != NULL )
+				summon->Despawn(480000, 0);
 			m_phase = 3;
 		}
 		switch (m_phase)
@@ -3514,7 +3515,7 @@ public:
 			uint32 x = RandomUInt(100)%9;
 			Creature *summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGELITE, vashjAddsSpawns[x].x, vashjAddsSpawns[x].y, vashjAddsSpawns[x].z,  vashjAddsSpawns[x].o, true, false, 0, 0);
 			if ( summon != NULL )
-				summon->Despawn(240000, 0);
+				summon->Despawn(480000, 0);
 	
 			coilfangelitecd = 48;
 		}
@@ -3530,12 +3531,12 @@ public:
 			case 0:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.615667f, -1017.765625f, 21.570890f, 1.557591f, true, false, 0, 0);
 				if ( summon != NULL ) 
-					summon->Despawn(240000, 0);
+					summon->Despawn(480000, 0);
 				break;
 			case 1:
 				summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(CN_COILFANGSTRIDER, 29.688040f, -827.500061f, 20.697882f, 4.703711f, true, false, 0, 0);
 				if ( summon != NULL ) 
-					summon->Despawn(240000, 0);
+					summon->Despawn(480000, 0);
 				break;
 			}
 			coilfangstridercd = 60;
@@ -3704,7 +3705,7 @@ public:
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
-			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+			if (tmpPlr->isAlive() && _unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
 				return;
 		}
 		_unit->Despawn(100, 0);
@@ -3927,7 +3928,7 @@ public:
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
-			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+			if (tmpPlr->isAlive() && _unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
 				return;
 		}
 		_unit->Despawn(100, 0);
@@ -4284,7 +4285,7 @@ public:
 		for (std::set<Player*>::iterator itrPlr = _unit->GetInRangePlayerSetBegin(); itrPlr != _unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			Player *tmpPlr = (*itrPlr);
-			if (_unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
+			if (tmpPlr->isAlive() && _unit->GetDistance2dSq(tmpPlr) <= 6400.0f)
 				return;
 		}
 		_unit->Despawn(100,0);
