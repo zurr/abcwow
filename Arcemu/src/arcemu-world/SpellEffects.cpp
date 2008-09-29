@@ -3534,8 +3534,6 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 		{
 			if(GetProto()->DispelType == DISPEL_ALL)
 			{
-				unitTarget->HandleProc( PROC_ON_PRE_DISPELL_AURA_VICTIM , u_caster , GetProto(), aur->GetSpellId() );
-		
 				data.clear();
 				data << m_caster->GetNewGUID();
 				data << unitTarget->GetNewGUID();
@@ -3550,8 +3548,6 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 			}
 			else if(aur->GetSpellProto()->DispelType == GetProto()->EffectMiscValue[i])
 			{
-				unitTarget->HandleProc( PROC_ON_PRE_DISPELL_AURA_VICTIM , u_caster , GetProto(), aur->GetSpellId() );
-
 				data.clear();
 				data << m_caster->GetNewGUID();
 				data << unitTarget->GetNewGUID();
@@ -3567,6 +3563,8 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 			
 			if (auraRemoved)
 			{
+				unitTarget->HandleProc( PROC_ON_PRE_DISPELL_AURA_VICTIM , u_caster , GetProto(), aur->GetSpellId() );
+
 			if( aur->GetSpellProto()->NameHash == SPELL_HASH_UNSTABLE_AFFLICTION )
 			{
 				SpellEntry *spellInfo = dbcSpell.LookupEntry(31117);
