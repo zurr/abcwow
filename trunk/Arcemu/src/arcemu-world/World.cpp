@@ -265,7 +265,6 @@ bool BasicTaskExecutor::run()
 }
 
 void Apply112SpellFixes();
-void ApplyExtraDataFixes();
 void ApplyNormalFixes();
 
 bool World::SetInitialWorldSettings()
@@ -475,7 +474,6 @@ bool World::SetInitialWorldSettings()
 	Log.Notice("World", "GameObject size: %u bytes", sizeof(GameObject));
 
 	Apply112SpellFixes();
-	ApplyExtraDataFixes();
 	ApplyNormalFixes();
 
 // ------------------------------------------------------------------------------------------------

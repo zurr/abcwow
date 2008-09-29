@@ -3783,7 +3783,7 @@ uint8 Spell::CanCast(bool tolerate)
 				**********************************************************/
 
 				/* burlex: units are always facing the target! */
-				if(p_caster && 	GetProto()->in_front_status != SPELL_INFRONT_STATUS_REQUIRE_SKIPCHECK )
+				if(p_caster && 	GetProto()->FacingCasterFlags != SPELL_INFRONT_STATUS_REQUIRE_SKIPCHECK )
 				{
 					if( GetProto()->Spell_Dmg_Type == SPELL_DMG_TYPE_RANGED )
 					{ // our spell is a ranged spell
@@ -3792,13 +3792,13 @@ uint8 Spell::CanCast(bool tolerate)
 					}
 					else
 					{ // our spell is not a ranged spell
-						if( GetProto()->in_front_status == SPELL_INFRONT_STATUS_REQUIRE_INFRONT )
+						if( GetProto()->FacingCasterFlags == SPELL_INFRONT_STATUS_REQUIRE_INFRONT )
 						{
 							// must be in front
 							if(!u_caster->isInFront(target))
 								return SPELL_FAILED_UNIT_NOT_INFRONT;
 						}
-						else if( GetProto()->in_front_status == SPELL_INFRONT_STATUS_REQUIRE_INBACK)
+						else if( GetProto()->FacingCasterFlags == SPELL_INFRONT_STATUS_REQUIRE_INBACK)
 						{
 							// behind
 							if(target->isInFront(u_caster))
@@ -3874,17 +3874,6 @@ uint8 Spell::CanCast(bool tolerate)
 
 			if( p_caster != NULL )
 			{
-				if( GetProto()->NameHash == SPELL_HASH_GOUGE )// Gouge
-					if(!target->isInFront(p_caster))
-						return SPELL_FAILED_NOT_INFRONT;
-
-			
-				//Shady: use SpellEntry::in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT
-				/*if( GetProto()->NameHash == SPELL_HASH_MOONFIRE )// Moonfire
-					if(!p_caster->isInFront(target))
-						return SPELL_FAILED_UNIT_NOT_INFRONT;*/
-
-
 				if( GetProto()->Category==1131)//Hammer of wrath, requires target to have 20- % of hp
 				{
 					if(target->GetUInt32Value(UNIT_FIELD_HEALTH) == 0)
