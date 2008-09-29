@@ -423,6 +423,10 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 			if( !((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive() || 
 				((*itr)->IsCreature() && ((Creature*)(*itr))->IsTotem()))
 				continue;
+#ifdef COLLISION
+			if (u_caster->GetMapId() == (*itr)->GetMapId() && !CollideInterface.CheckLOS(u_caster->GetMapId(),u_caster->GetPositionNC(),(*itr)->GetPositionNC()))
+				continue;
+#endif
 
 			if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr),range))
 			{
@@ -916,7 +920,7 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 				continue;
 
 #ifdef COLLISION
-				if (u_caster->GetMapId() == (*itr)->m_loggedInPlayer->GetMapId() && !CollideInterface.CheckLOS(u_caster->GetMapId(),u_caster->GetPositionNC(),(*itr)->m_loggedInPlayer->GetPositionNC()))
+				if (u_caster->GetMapId() == (*itr)->GetMapId() && !CollideInterface.CheckLOS(u_caster->GetMapId(),u_caster->GetPositionNC(),(*itr)->GetPositionNC()))
 					continue;
 #endif
 

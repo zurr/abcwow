@@ -1400,7 +1400,7 @@ void ObjectMgr::LoadSpellFixes()
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM spellfixes");
 	if(result)
 	{
-		if( result->GetFieldCount() != 9 )
+		if( result->GetFieldCount() != 8 )
 		{
 			Log.LargeErrorMessage(LARGERRORMESSAGE_WARNING, "Incorrect column count at spellfixes, skipping, please fix it.",
 				"arcemu has skipped loading this table in order to avoid crashing.", NULL);
@@ -1418,7 +1418,6 @@ void ObjectMgr::LoadSpellFixes()
 			uint64 sf_groupRelation0 = f[5].GetUInt64();
 			uint64 sf_groupRelation1 = f[6].GetUInt64();
 			uint64 sf_groupRelation2 = f[7].GetUInt64();
-			uint32 sf_inFrontStatus = f[8].GetUInt32();
 
 			if( sf_spellId )
 			{
@@ -1452,9 +1451,6 @@ void ObjectMgr::LoadSpellFixes()
 						sp->EffectSpellGroupRelation[2] = (uint32)sf_groupRelation2;
 						sp->EffectSpellGroupRelation_high[2] = (uint32)(sf_groupRelation2>>32);
 					}
-
-					if ( sf_inFrontStatus )
-						sp->in_front_status = sf_inFrontStatus;
 				}
 			}
 		}while(result->NextRow());
