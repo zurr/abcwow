@@ -1400,7 +1400,7 @@ void ObjectMgr::LoadSpellFixes()
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM spellfixes");
 	if(result)
 	{
-		if( result->GetFieldCount() != 8 )
+		if( result->GetFieldCount() != 9 )
 		{
 			Log.LargeErrorMessage(LARGERRORMESSAGE_WARNING, "Incorrect column count at spellfixes, skipping, please fix it.",
 				"arcemu has skipped loading this table in order to avoid crashing.", NULL);
