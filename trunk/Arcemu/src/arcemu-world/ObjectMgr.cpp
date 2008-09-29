@@ -1418,6 +1418,7 @@ void ObjectMgr::LoadSpellFixes()
 			uint64 sf_groupRelation0 = f[5].GetUInt64();
 			uint64 sf_groupRelation1 = f[6].GetUInt64();
 			uint64 sf_groupRelation2 = f[7].GetUInt64();
+			uint32 sf_inFrontStatus = f[8].GetUInt32();
 
 			if( sf_spellId )
 			{
@@ -1451,6 +1452,9 @@ void ObjectMgr::LoadSpellFixes()
 						sp->EffectSpellGroupRelation[2] = (uint32)sf_groupRelation2;
 						sp->EffectSpellGroupRelation_high[2] = (uint32)(sf_groupRelation2>>32);
 					}
+
+					if ( sf_inFrontStatus )
+						sp->in_front_status = sf_inFrontStatus;
 				}
 			}
 		}while(result->NextRow());
