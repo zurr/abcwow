@@ -1579,14 +1579,12 @@ void ApplyNormalFixes()
 			sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
 		}
 
+		//TODO: add missing once here
 		if( namehash == SPELL_HASH_SHRED || namehash == SPELL_HASH_BACKSTAB || namehash == SPELL_HASH_AMBUSH )
 		{
 			// Shred, Backstab, Ambush
 			sp->FacingCasterFlags = SPELL_INFRONT_STATUS_REQUIRE_INBACK;
 		}
-
-		if( namehash == SPELL_HASH_FEAR || namehash == SPELL_HASH_POLYMORPH )
-			sp->FacingCasterFlags = SPELL_INFRONT_STATUS_REQUIRE_SKIPCHECK;
 
 //junk code to get me has :P 
 //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
