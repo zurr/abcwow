@@ -3636,6 +3636,9 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 		y = u_caster->GetPositionY();
 		z = u_caster->GetPositionZ();
 	}
+	if ( !u_caster->IsPlayer() && damage > 2 )	// temp solution, need to find out why CalculateEffect() returnes bad values here
+		damage = 2;
+
 	for(int i=0;i<damage;i++)
 	{
 		float m_fallowAngle=-(float(M_PI)/2*i);
