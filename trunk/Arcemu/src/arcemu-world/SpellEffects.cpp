@@ -3636,7 +3636,7 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 		y = u_caster->GetPositionY();
 		z = u_caster->GetPositionZ();
 	}
-	if ( !u_caster->IsPlayer() && damage > 2 )	// temp solution, need to find out why CalculateEffect() returnes bad values here
+	if ( !u_caster->IsPlayer() && (damage > 2 ||damage < 0) )	// temp solution, need to find out why CalculateEffect() returnes bad values here
 		damage = 2;
 
 	for(int i=0;i<damage;i++)
@@ -3707,6 +3707,9 @@ void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 	{
 		vec = new LocationVector(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ);
 	}
+
+	if ( !u_caster->IsPlayer() && (damage > 2 ||damage < 0) )	// temp solution, need to find out why CalculateEffect() returnes bad values here
+		damage = 2;
 
 	float angle_for_each_spawn = -float(M_PI) * 2 / damage;
 	for( int i = 0; i < damage; i++ )
