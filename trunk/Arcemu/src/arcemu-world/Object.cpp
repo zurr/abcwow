@@ -2740,7 +2740,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	}
 //------------------------------absorption--------------------------------------------------	
 	uint32 ress=(uint32)res;
-	uint32 abs_dmg = pVictim->AbsorbDamage(school, &ress);
+	uint32 abs = pVictim->AbsorbDamage(school, &ress);
 	uint32 ms_abs_dmg= pVictim->ManaShieldAbsorb(ress);
 	if (ms_abs_dmg)
 	{
@@ -2749,8 +2749,11 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		else
 			ress-=ms_abs_dmg;
 
-		abs_dmg += ms_abs_dmg;
+		abs += ms_abs_dmg;
 	}
+
+	if(abs)
+		vproc |= PROC_ON_ABSORB;
 
 	if(ress < 0) ress = 0;
 
@@ -2813,14 +2816,14 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 //==============================Data Sending ProcHandling===================================
 //==========================================================================================
-	SendSpellNonMeleeDamageLog(this, pVictim, spellID, float2int32(res), school, abs_dmg, dmg.resisted_damage, false, 0, critical, IsPlayer());
+	SendSpellNonMeleeDamageLog(this, pVictim, spellID, float2int32(res), school, abs, dmg.resisted_damage, false, 0, critical, IsPlayer());
 	DealDamage( pVictim, float2int32( res ), 2, 0, spellID );
 	
 	if( this->IsUnit() && allowProc && spellInfo->Id != 25501 && spellInfo->noproc == false)
 	{
-		pVictim->HandleProc( vproc, static_cast< Unit* >( this ), spellInfo, float2int32( res ) );
+		pVictim->HandleProc( vproc, static_cast< Unit* >( this ), spellInfo, float2int32(res), abs );
 		pVictim->m_procCounter = 0;
-		static_cast< Unit* >( this )->HandleProc( aproc, pVictim, spellInfo, float2int32( res ) );
+		static_cast< Unit* >( this )->HandleProc( aproc, pVictim, spellInfo, float2int32(res), abs );
 		static_cast< Unit* >( this )->m_procCounter = 0;
 	}
 	if( this->IsPlayer() )
@@ -2828,7 +2831,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			static_cast< Player* >( this )->m_casted_amount[school] = ( uint32 )res;
 	}
 
-	if( !(dmg.full_damage == 0 && abs_dmg) )
+	if( !(dmg.full_damage == 0 && abs) )
 	{
 		//Only pushback the victim current spell if it's not fully absorbed
 		if( pVictim->GetCurrentSpell() )
@@ -2838,7 +2841,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 //==============================Post Damage Processing======================================
 //==========================================================================================
-	if( (int32)dmg.resisted_damage == dmg.full_damage && !abs_dmg )
+	if( (int32)dmg.resisted_damage == dmg.full_damage && !abs )
 	{
 		//Magic Absorption
 		if( pVictim->IsPlayer() )
@@ -2869,7 +2872,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			//Shadow Word:Death
 			if( spellID == 32379 || spellID == 32996 ) 
 			{
-				uint32 damage = (uint32)( res + abs_dmg );
+				uint32 damage = (uint32)( res + abs );
 				uint32 absorbed = static_cast< Unit* >( this )->AbsorbDamage( school, &damage );
 				DealDamage( static_cast< Unit* >( this ), damage, 2, 0, spellID );
 				SendSpellNonMeleeDamageLog( this, this, spellID, damage, school, absorbed, 0, false, 0, false, this->IsPlayer() );
