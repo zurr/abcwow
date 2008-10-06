@@ -1886,10 +1886,13 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 				//priest - Reflective Shield 
 				case 33619:
 					{
+						if (!abs)
+							continue;
+
 						//requires Power Word: Shield active
 						int power_word_id = HasAurasWithNameHash( SPELL_HASH_POWER_WORD__SHIELD );
 						if( !power_word_id )
-							continue;//this should not ocur unless we made a fuckup somewhere
+							power_word_id = 17;
 						//make a direct strike then exit rest of handler
 						int tdmg = abs * ( ospinfo->EffectBasePoints[0] + 1 ) / 100;
 						//somehow we should make this not caused any threat (tobedone)
