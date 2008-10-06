@@ -1507,6 +1507,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 	if(m_target->SchoolImmunityList[GetSpellProto()->School])
 		return;
 	float res = float(amount);
+	uint32 abs = 0;
 	int bonus = 0;
 	uint32 school = GetSpellProto()->School;
 	Unit * c = GetUnitCaster();
@@ -1556,7 +1557,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		}
 
 		uint32 ress=(uint32)res;
-		uint32 abs_dmg = m_target->AbsorbDamage(school, &ress);
+		abs = m_target->AbsorbDamage(school, &ress);
 		uint32 ms_abs_dmg= m_target->ManaShieldAbsorb(ress);
 		if (ms_abs_dmg)
 		{
@@ -1565,7 +1566,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			else
 				ress-=ms_abs_dmg;
 
-			abs_dmg += ms_abs_dmg;
+			abs += ms_abs_dmg;
 		}
 
 
@@ -1589,7 +1590,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		}
 
 
-		SendPeriodicAuraLog(m_casterGuid, m_target, GetSpellProto()->Id, school, float2int32(res), abs_dmg, dmg.resisted_damage, FLAG_PERIODIC_DAMAGE);
+		SendPeriodicAuraLog(m_casterGuid, m_target, GetSpellProto()->Id, school, float2int32(res), abs, dmg.resisted_damage, FLAG_PERIODIC_DAMAGE);
 
 		if(school == SHADOW_DAMAGE)
 			if( c != NULL && c->isAlive() && c->IsPlayer() && c->getClass() == PRIEST )
@@ -1604,10 +1605,14 @@ void Aura::EventPeriodicDamage(uint32 amount)
 	{
 		uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION;
 		uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_VICTIM;
-		c->HandleProc(aproc, mtarget, sp, float2int32(res));
+		
+		if(abs)
+			vproc |= PROC_ON_ABSORB;
+
+		c->HandleProc(aproc, mtarget, sp, float2int32(res), abs);
 		c->m_procCounter = 0;
 
-		mtarget->HandleProc(vproc,c,sp, float2int32(res));
+		mtarget->HandleProc(vproc,c,sp, float2int32(res), abs);
 		mtarget->m_procCounter = 0;
 	}
 

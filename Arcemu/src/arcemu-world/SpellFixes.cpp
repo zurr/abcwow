@@ -3736,19 +3736,19 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 33142 );
 		if( sp != NULL )
 		{
-			sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+			sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
 			sp->procChance = 20;
 		}
 		sp = dbcSpell.LookupEntryForced( 33145 );
 		if( sp != NULL )
 		{
-			sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+			sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
 			sp->procChance = 40;
 		}
 		sp = dbcSpell.LookupEntryForced( 33146 );
 		if( sp != NULL )
 		{
-			sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+			sp->procFlags = PROC_ON_CRIT_HIT_VICTIM | PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
 			sp->procChance = 60;
 		}
 
