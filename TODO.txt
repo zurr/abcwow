@@ -1,1 +1,0 @@
--- fix talents/idols/totems/librams/equips/set bomuses and all other spells and which actually work but are missing affectedspellgroup[]
