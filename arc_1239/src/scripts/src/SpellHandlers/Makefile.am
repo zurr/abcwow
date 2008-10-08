@@ -14,4 +14,5 @@ libSpellHandlers_la_SOURCES = HunterSpells.cpp \
 	ShamanSpells.cpp \
 	WarlockSpells.cpp \
 	WarriorSpells.cpp \
-	QIspells.cpp
+	QIspells.cpp \
+	CreatureSpells.cpp
