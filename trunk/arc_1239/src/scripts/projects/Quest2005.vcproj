@@ -213,6 +213,10 @@
 				RelativePath="..\src\QuestScripts\Unsorted.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\QuestScripts\Zenn_Foulhoof.cpp"
+				>
+			</File>
 			<Filter
 				Name="Zone"
 				>
@@ -229,10 +233,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\QuestScripts\Barrens.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\QuestScripts\BladeEdge_Mountains.cpp"
 					>
 				</File>
@@ -245,6 +245,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\QuestScripts\Darkshore.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\QuestScripts\Desolace.cpp"
 					>
 				</File>
@@ -253,7 +257,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\QuestScripts\EasternPlaguelands.cpp"
+					RelativePath="..\src\QuestScripts\Eastern_Plaguelands.cpp"
 					>
 				</File>
 				<File
@@ -266,6 +270,10 @@
 				</File>
 				<File
 					RelativePath="..\src\QuestScripts\HillsbradFoothills.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\QuestScripts\Isle_of_QuelDanas.cpp"
 					>
 				</File>
 				<File
@@ -282,6 +290,10 @@
 				</File>
 				<File
 					RelativePath="..\src\QuestScripts\Netherstorm.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\QuestScripts\Old_Hillsbrad.cpp"
 					>
 				</File>
 				<File
@@ -318,6 +330,10 @@
 				</File>
 				<File
 					RelativePath="..\src\QuestScripts\ThousandNeedles.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\QuestScripts\The_Barrens.cpp"
 					>
 				</File>
 				<File

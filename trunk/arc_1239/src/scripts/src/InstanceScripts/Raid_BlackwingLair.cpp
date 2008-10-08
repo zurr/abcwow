@@ -1110,6 +1110,8 @@ public:
 
     void OnDied(Unit * mKiller)
     {
+		_unit->SendChatMessage(CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, "At last the agony ends. I have failed you my Queen... I have failed us all...");
+	//	_unit->PlaySoundToSet(); Missing SoundSet
        RemoveAIUpdateEvent();
     }
 
