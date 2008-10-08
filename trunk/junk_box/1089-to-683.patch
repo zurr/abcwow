@@ -1,0 +1,460 @@
+Index: AIInterface.cpp
+===================================================================
+--- AIInterface.cpp	(revision 1089)
++++ AIInterface.cpp	(working copy)
+@@ -1020,9 +1020,8 @@
+ 
+ #ifdef COLLISION
+ 	float target_land_z=0.0f;
+-	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL )
++	if ( m_Unit->GetMapMgr() != NULL && GetNextTarget() != NULL && !m_is_in_instance )
+ 	{
+-
+ 		if (!m_moveFly)
+ 		{
+ 			target_land_z = CollideInterface.GetHeight(m_Unit->GetMapId(), GetNextTarget()->GetPositionX(), GetNextTarget()->GetPositionY(), GetNextTarget()->GetPositionZ() + 2.0f);
+Index: CharacterHandler.cpp
+===================================================================
+--- CharacterHandler.cpp	(revision 1089)
++++ CharacterHandler.cpp	(working copy)
+@@ -844,10 +844,10 @@
+ 
+ 	// Send revision (if enabled)
+ #ifdef WIN32
+-	_player->BroadcastMessage("Powered by: %sArcEmu %s r%u/%s-Win-%s %s(Please report ALL bugs to www.ArcEmu.org/forums/)", MSG_COLOR_WHITE, BUILD_TAG,
++	_player->BroadcastMessage("%sArcEmu/ABCWoW %s r%u/%s-Win-%s %s(www.ArcEmu.org)", MSG_COLOR_WHITE, BUILD_TAG,
+ 		BUILD_REVISION, CONFIG, ARCH, MSG_COLOR_LIGHTBLUE);		
+ #else
+-	_player->BroadcastMessage("Powered by: %sArcEmu %s r%u/%s-%s %s(Please report ALL bugs to www.ArcEmu.org/forums/)", MSG_COLOR_WHITE, BUILD_TAG,
++	_player->BroadcastMessage("%sArcEmu/ABCWoW %s r%u/%s-%s %s(www.ArcEmu.org)", MSG_COLOR_WHITE, BUILD_TAG,
+ 		BUILD_REVISION, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
+ #endif
+ 
+Index: faction.cpp
+===================================================================
+--- faction.cpp	(revision 1089)
++++ faction.cpp	(working copy)
+@@ -223,7 +223,11 @@
+ 
+ 		if(objA->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP) && objB->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP))
+ 		{
+-			if( static_cast< Player* >( objA )->m_bg != NULL )
++			if(static_cast< Player* >( objA )->m_bg != NULL && static_cast< Player* >( objB )->m_bg != NULL)
++				if(static_cast< Player* >( objA )->m_bgTeam == static_cast< Player* >( objB )->m_bgTeam)
++					return false;
++
++			if(static_cast< Player* >( objA )->GetGroup() != NULL)
+ 				if( static_cast< Player* >( objA )->GetGroup() == static_cast< Player* >( objB )->GetGroup() )
+ 					return false;
+ 
+@@ -235,19 +239,35 @@
+ 	if(objA->IsPet())
+ 	{
+ 		if(objB->IsPlayer())
++		{
+ 			if(
+ 				static_cast<Pet *>(objA)->GetPetOwner() &&
+ 				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast< Player* >(objB) && 
+ 				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
+ 				)
+ 				return true;
++		if(
++				static_cast<Pet *>(objA)->GetPetOwner() &&
++				static_cast<Pet *>(objA)->GetPetOwner()->m_bg &&
++				static_cast<Pet *>(objA)->GetPetOwner()->m_bgTeam != static_cast< Player* >(objB)->m_bgTeam
++				)
++				return true;
++		}
+ 		if(objB->IsPet())
++		{
+ 			if(static_cast<Pet *>(objA)->GetPetOwner() &&
+ 				static_cast<Pet *>(objB)->GetPetOwner() &&
+ 				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast<Pet *>(objB)->GetPetOwner() && 
+ 				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
+ 				)
+ 				return true;
++			if(
++				static_cast<Pet *>(objA)->GetPetOwner() && static_cast<Pet *>(objB)->GetPetOwner() &&
++				static_cast<Pet *>(objA)->GetPetOwner()->m_bg &&
++				static_cast<Pet *>(objA)->GetPetOwner()->m_bgTeam != static_cast<Pet *>(objB)->GetPetOwner()->m_bgTeam
++				)
++				return true;
++		}
+ 	}
+ 	if(objB->IsPet())
+ 	{
+@@ -273,11 +293,19 @@
+ 		if(static_cast<Creature *>(objA)->IsTotem())
+ 		{
+ 			if(objB->IsPlayer())
++			{
+ 				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
++					static_cast<Creature *>(objA)->GetTotemOwner()->m_bg &&
++					static_cast<Creature *>(objA)->GetTotemOwner()->m_bgTeam != static_cast< Player* >(objB)->m_bgTeam
++					)
++					return true;
++
++				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
+ 					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast< Player* >(objB) && 
+ 					static_cast<Creature *>(objA)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
+ 					)
+ 					return true;
++			}
+ 			if(objB->IsPet())
+ 				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
+ 					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast<Pet *>(objB)->GetPetOwner() && 
+Index: ObjectStorage.cpp
+===================================================================
+--- ObjectStorage.cpp	(revision 1089)
++++ ObjectStorage.cpp	(working copy)
+@@ -186,12 +186,12 @@
+ 				sp->spell = spe;
+ 				sp->spellType = fields[6].GetUInt32();
+ 
+-				int32  targettype = fields[7].GetInt32();
+-				if( targettype == -1 )
++				uint32  targettype = fields[7].GetUInt32();
++				if( targettype == 0 )
+ 					sp->spelltargetType = GetAiTargetType( spe );
+ 				else sp->spelltargetType = targettype;
+ 
+-				sp->cooldown = fields[8].GetInt32();
++				sp->cooldown = fields[8].GetUInt32();
+ 				sp->floatMisc1 = fields[9].GetFloat();
+ 				sp->autocast_type=(uint32)-1;
+ 				sp->cooldowntime=getMSTime();
+@@ -218,7 +218,7 @@
+ 					sp->maxrange = GetMaxRange(dbcSpellRange.LookupEntry(sp->spell->rangeIndex));
+ 
+ 					//omg the poor darling has no clue about making ai_agents
+-					if(sp->cooldown == (uint32)-1)
++					if(sp->cooldown == 0)
+ 					{
+ 						//now this will not be exact cooldown but maybe a bigger one to not make him spam spells to often
+ 						int cooldown;
+Index: Player.cpp
+===================================================================
+--- Player.cpp	(revision 1089)
++++ Player.cpp	(working copy)
+@@ -403,9 +403,11 @@
+ 	m_outStealthDamageBonusPct = m_outStealthDamageBonusPeriod = m_outStealthDamageBonusTimer = 0;
+ 	m_vampiricEmbrace = m_vampiricTouch = 0;
+ 	LastSeal = 0;
++/*
+ #ifdef COLLISION
+ 	m_flyhackCheckTimer = 0;
+ #endif
++*/
+ }
+ 
+ void Player::OnLogin()
+@@ -917,6 +919,7 @@
+ 	}
+ #endif
+ 
++/*
+ #ifdef COLLISION
+ 	if( mstime >= m_flyhackCheckTimer )
+ 	{
+@@ -924,6 +927,7 @@
+ 		m_flyhackCheckTimer = mstime + 10000; 
+ 	}
+ #endif
++*/
+ }
+ 
+ void Player::EventDismount(uint32 money, float x, float y, float z)
+@@ -10721,6 +10725,7 @@
+ 	} while ( result->NextRow( ) );
+ }
+ 
++/*
+ #ifdef COLLISION
+ void Player::_FlyhackCheck()
+ {
+@@ -10757,7 +10762,7 @@
+ 	}
+ }
+ #endif
+-
++*/
+ /************************************************************************/
+ /* SOCIAL                                                               */
+ /************************************************************************/
+Index: Spell.cpp
+===================================================================
+--- Spell.cpp	(revision 1089)
++++ Spell.cpp	(working copy)
+@@ -3011,9 +3011,11 @@
+ 		// check for duel areas
+ 		if(p_caster && GetProto()->Id == 7266)
+ 		{
++			/*
+ 			AreaTable* at = dbcArea.LookupEntry( p_caster->GetAreaID() );
+ 			if(at->AreaFlags & AREA_CITY_AREA)
+ 				return SPELL_FAILED_NO_DUELING;
++			*/
+ 			// instance & stealth checks
+ 			if ( p_caster->GetMapMgr() && p_caster->GetMapMgr()->GetMapInfo() && p_caster->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL )
+ 					return SPELL_FAILED_NO_DUELING;
+@@ -3872,17 +3874,6 @@
+ 			if( p_caster != NULL )
+ 			{
+-				if( GetProto()->NameHash == SPELL_HASH_GOUGE )// Gouge
+-					if(!target->isInFront(p_caster))
+-						return SPELL_FAILED_NOT_INFRONT;
+-
+-			
+-				//Shady: use SpellEntry::in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INFRONT
+-				/*if( GetProto()->NameHash == SPELL_HASH_MOONFIRE )// Moonfire
+-					if(!p_caster->isInFront(target))
+-						return SPELL_FAILED_UNIT_NOT_INFRONT;*/
+-
+-
+ 				if( GetProto()->Category==1131)//Hammer of wrath, requires target to have 20- % of hp
+ 				{
+ 					if(target->GetUInt32Value(UNIT_FIELD_HEALTH) == 0)
+Index: SpellEffects.cpp
+===================================================================
+--- SpellEffects.cpp	(revision 1089)
++++ SpellEffects.cpp	(working copy)
+@@ -2245,6 +2245,96 @@
+ 			break;
+ 		}
+ 
++		// potions learned by discovery variables
++		uint32 cast_chance = 5;
++		uint32 learn_spell = 0;
++
++		if (skill && skill->skilline == SKILL_ALCHEMY)
++		{
++			//Potion Master
++			if (strstr(m_itemProto->Name1, "Potion"))
++			{
++				if(p_caster->HasSpell(28675)) 
++					while (Rand(20) && item_count<5) item_count++;
++
++				// Super Rejuvenation Potion
++				cast_chance = 2;
++				learn_spell = 28586;
++			}
++			//Elixir Master
++			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
++			{
++				if(p_caster->HasSpell(28677)) 
++					while (Rand(20) && item_count<5) item_count++;
++
++				uint32 spList[] = {28590,28587,28588,28591,28589};
++				cast_chance = 2;
++				learn_spell = spList[RandomUInt(4)];
++			}
++			//Transmutation Master
++			if (m_spellInfo->Category == 310)
++			{
++				if (m_spellInfo->Id == 29688) //rate for primal might is lower than for anything else
++				{
++					if(p_caster->HasSpell(28672))
++						while (Rand(40) && item_count<5) item_count++;
++				}
++				else
++				{
++					if(p_caster->HasSpell(28672))
++						while (Rand(20) && item_count<5) item_count++;
++				}
++
++				uint32 spList[] = {28581,28585,28585,28584,28582,28580};
++				cast_chance = 5;
++				learn_spell = spList[RandomUInt(5)];
++			}
++		}
++
++		//random discovery by crafter item id
++			switch ( m_itemProto->ItemId )
++			{
++			case 22845: //Major Arcane Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41458;
++				}break;
++			case 22841: //Major Fire Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41500;
++				}break;
++			case 22842: //Major Frost Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41501;
++				}break;
++			case 22847: //Major Holy Protection Potion
++				{
++					// there is none
++				}break;
++			case 22844: //Major Nature Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41502;
++				}break;
++			case 22846: //Major Shadow Protection Potion
++				{
++					cast_chance = 20;
++					learn_spell = 41503;
++				}break;
++			}
++
++			if ( learn_spell && p_caster->getLevel() > 60 && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
++			{
++				SpellEntry* _spellproto = dbcSpell.LookupEntry( learn_spell );
++				if( _spellproto != NULL )
++				{
++					p_caster->BroadcastMessage( "%sDISCOVERY! You discovered the %s !|r", MSG_COLOR_YELLOW, _spellproto->Name );
++					p_caster->addSpell( learn_spell );
++				}
++			}
++
+ 		// item count cannot be more than allowed in a single stack
+ 		if (item_count > m_itemProto->MaxCount)
+ 			item_count = m_itemProto->MaxCount;
+@@ -3431,21 +3521,19 @@
+ 	
+ 	WorldPacket data(SMSG_SPELLDISPELLOG, 16);
+ 
++	bool finish = false;
++
+ 	for(uint32 x=start;x<end;x++)
+ 	if(unitTarget->m_auras[x])
+ 	{
++		bool auraRemoved = false;
+ 		aur = unitTarget->m_auras[x];
++
+ 		//Nothing can dispel resurrection sickness;
+ 		if(!aur->IsPassive() && !(aur->GetSpellProto()->Attributes & ATTRIBUTES_IGNORE_INVULNERABILITY))
+ 		{
+-			uint32 UARank = 0;
+ 			if(GetProto()->DispelType == DISPEL_ALL)
+ 			{
+-				unitTarget->HandleProc( PROC_ON_PRE_DISPELL_AURA_VICTIM , u_caster , GetProto(), aur->GetSpellId() );
+-				
+-				if( aur->m_spellProto && aur->m_spellProto->NameHash == SPELL_HASH_UNSTABLE_AFFLICTION )
+-					UARank = aur->m_spellProto->RankNumber;
+-
+ 				data.clear();
+ 				data << m_caster->GetNewGUID();
+ 				data << unitTarget->GetNewGUID();
+@@ -3453,16 +3541,13 @@
+ 				data << aur->GetSpellId();
+ 				m_caster->SendMessageToSet(&data,true);
+ 				unitTarget->RemoveAura(aur);
++				auraRemoved = true;
++
+ 				if(!--damage)
+-					return;
++					finish = true;
+ 			}
+ 			else if(aur->GetSpellProto()->DispelType == GetProto()->EffectMiscValue[i])
+ 			{
+-				unitTarget->HandleProc( PROC_ON_PRE_DISPELL_AURA_VICTIM , u_caster , GetProto(), aur->GetSpellId() );
+-
+-				if( aur->m_spellProto && aur->m_spellProto->NameHash == SPELL_HASH_UNSTABLE_AFFLICTION )
+-					UARank = aur->m_spellProto->RankNumber;
+-
+ 				data.clear();
+ 				data << m_caster->GetNewGUID();
+ 				data << unitTarget->GetNewGUID();
+@@ -3470,27 +3555,43 @@
+ 				data << aur->GetSpellId();
+ 				m_caster->SendMessageToSet(&data,true);
+ 				unitTarget->RemoveAllAuras(aur->GetSpellProto()->Id,aur->GetCasterGUID());
++				auraRemoved = true;
++
+ 				if(!--damage)
+-					return;
++					finish = true;
+ 			}	
+-			if( UARank != 0 )
++			
++			if (auraRemoved)
+ 			{
+-				uint32 dmg = 0;
+-				switch ( UARank ) // BRRR, FUCKING BLIZZ
++				unitTarget->HandleProc( PROC_ON_PRE_DISPELL_AURA_VICTIM , u_caster , GetProto(), aur->GetSpellId() );
++
++			if( aur->GetSpellProto()->NameHash == SPELL_HASH_UNSTABLE_AFFLICTION )
++			{
++				SpellEntry *spellInfo = dbcSpell.LookupEntry(31117);
++				if ( spellInfo != NULL )
+ 				{
+-					case 1:
+-						dmg = 990;
+-						break;
+-					case 2:
+-						dmg = 1260;
+-						break;
+-					case 3:
+-						dmg = 1575;
+-						break;
++					Spell *spell = SpellPool.PooledNew();
++					spell->Init(u_caster, spellInfo ,true, NULL);
++					spell->forced_basepoints[0] = (aur->GetSpellProto()->EffectBasePoints[0]+1)*9; //damage effect
++					spell->ProcedOnSpell = GetProto();
++					spell->pSpellId = aur->GetSpellId();
++					SpellCastTargets targets;
++					targets.m_unitTarget = u_caster->GetGUID();
++					spell->prepare(&targets);
+ 				}
+-				u_caster->SpellNonMeleeDamageLog(u_caster,31117,dmg,true,true);
+ 			}
++			else if ( aur->GetSpellProto()->NameHash == SPELL_HASH_LIFEBLOOM )
++			{
++				Spell* spell=SpellPool.PooledNew();
++				spell->Init(aur->GetCaster(), aur->GetSpellProto(), true, NULL);
++				spell->SetUnitTarget( unitTarget );
++				spell->Heal( aur->mod->m_amount );
++			}
++			}
++
+ 		}
++		if (finish)
++			return;
+ 	}   
+ }
+ 
+@@ -3535,6 +3636,9 @@
+ 		y = u_caster->GetPositionY();
+ 		z = u_caster->GetPositionZ();
+ 	}
++	if ( !u_caster->IsPlayer() && (damage > 2 ||damage < 0) )	// temp solution, need to find out why CalculateEffect() returnes bad values here
++		damage = 2;
++
+ 	for(int i=0;i<damage;i++)
+ 	{
+ 		float m_fallowAngle=-(float(M_PI)/2*i);
+@@ -3604,6 +3708,9 @@
+ 		vec = new LocationVector(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ);
+ 	}
+ 
++	if ( !u_caster->IsPlayer() && (damage > 2 ||damage < 0) )	// temp solution, need to find out why CalculateEffect() returnes bad values here
++		damage = 2;
++
+ 	float angle_for_each_spawn = -float(M_PI) * 2 / damage;
+ 	for( int i = 0; i < damage; i++ )
+ 	{
+
+@@ -10811,15 +1579,13 @@
+ 			sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
+ 		}
+ 
++		//TODO: add missing once here
+ 		if( namehash == SPELL_HASH_SHRED || namehash == SPELL_HASH_BACKSTAB || namehash == SPELL_HASH_AMBUSH )
+ 		{
+ 			// Shred, Backstab, Ambush
+-			sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_INBACK;
++			sp->FacingCasterFlags = SPELL_INFRONT_STATUS_REQUIRE_INBACK;
+ 		}
+ 
+-		if( namehash == SPELL_HASH_FEAR || namehash == SPELL_HASH_POLYMORPH )
+-			sp->in_front_status = SPELL_INFRONT_STATUS_REQUIRE_SKIPCHECK;
+-
+ //junk code to get me has :P 
+ //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
+ //	printf("!!!!!!! name %s , id %u , hash %u \n",sp->Name,sp->Id, namehash);
