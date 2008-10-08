@@ -2247,6 +2247,96 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			break;
 		}
 
+		// potions learned by discovery variables
+		uint32 cast_chance = 5;
+		uint32 learn_spell = 0;
+
+		if (skill && skill->skilline == SKILL_ALCHEMY)
+		{
+			//Potion Master
+			if (strstr(m_itemProto->Name1, "Potion"))
+			{
+				if(p_caster->HasSpell(28675)) 
+					while (Rand(20) && item_count<5) item_count++;
+
+				// Super Rejuvenation Potion
+				cast_chance = 2;
+				learn_spell = 28586;
+			}
+			//Elixir Master
+			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
+			{
+				if(p_caster->HasSpell(28677)) 
+					while (Rand(20) && item_count<5) item_count++;
+
+				uint32 spList[] = {28590,28587,28588,28591,28589};
+				cast_chance = 2;
+				learn_spell = spList[RandomUInt(4)];
+			}
+			//Transmutation Master
+			if (m_spellInfo->Category == 310)
+			{
+				if (m_spellInfo->Id == 29688) //rate for primal might is lower than for anything else
+				{
+					if(p_caster->HasSpell(28672))
+						while (Rand(40) && item_count<5) item_count++;
+				}
+				else
+				{
+					if(p_caster->HasSpell(28672))
+						while (Rand(20) && item_count<5) item_count++;
+				}
+
+				uint32 spList[] = {28581,28585,28585,28584,28582,28580};
+				cast_chance = 5;
+				learn_spell = spList[RandomUInt(5)];
+			}
+		}
+
+		//random discovery by crafter item id
+			switch ( m_itemProto->ItemId )
+			{
+			case 22845: //Major Arcane Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41458;
+				}break;
+			case 22841: //Major Fire Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41500;
+				}break;
+			case 22842: //Major Frost Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41501;
+				}break;
+			case 22847: //Major Holy Protection Potion
+				{
+					// there is none
+				}break;
+			case 22844: //Major Nature Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41502;
+				}break;
+			case 22846: //Major Shadow Protection Potion
+				{
+					cast_chance = 20;
+					learn_spell = 41503;
+				}break;
+			}
+
+			if ( learn_spell && p_caster->getLevel() > 60 && !p_caster->HasSpell( learn_spell ) && Rand( cast_chance ) )
+			{
+				SpellEntry* _spellproto = dbcSpell.LookupEntry( learn_spell );
+				if( _spellproto != NULL )
+				{
+					p_caster->BroadcastMessage( "%sDISCOVERY! You discovered the %s !|r", MSG_COLOR_YELLOW, _spellproto->Name );
+					p_caster->addSpell( learn_spell );
+				}
+			}
+
 		// item count cannot be more than allowed in a single stack
 		if (item_count > m_itemProto->MaxCount)
 			item_count = m_itemProto->MaxCount;
@@ -3605,6 +3695,11 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 		y = u_caster->GetPositionY();
 		z = u_caster->GetPositionZ();
 	}
+
+	// temp solution, need to find out why CalculateEffect() returnes bad values here
+	if ( !u_caster->IsPlayer() && (damage > 2 ||damage < 0) )
+		damage = 2;
+
 	for(int i=0;i<damage;i++)
 	{
 		float m_fallowAngle=-(float(M_PI)/2*i);
@@ -3673,6 +3768,10 @@ void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 	{
 		vec = new LocationVector(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ);
 	}
+
+	// temp solution, need to find out why CalculateEffect() returnes bad values here
+	if ( !u_caster->IsPlayer() && (damage > 2 ||damage < 0) )
+		damage = 2;
 
 	float angle_for_each_spawn = -float(M_PI) * 2 / damage;
 	for( int i = 0; i < damage; i++ )

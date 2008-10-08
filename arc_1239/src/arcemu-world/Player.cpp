@@ -973,7 +973,6 @@ void Player::Update( uint32 p_time )
 		}
 */
 	}
-*/
 }
 
 void Player::EventDismount(uint32 money, float x, float y, float z)

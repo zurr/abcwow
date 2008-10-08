@@ -1960,7 +1960,7 @@ public:
 	map<uint32, uint32> m_forcedReactions;
 
 	uint32 m_flyhackCheckTimer;
-	void _FlyhackCheck();
+	//void _FlyhackCheck();
 
 	bool m_passOnLoot;
 	uint32 m_tradeSequence;

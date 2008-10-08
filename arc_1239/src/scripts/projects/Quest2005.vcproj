@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="QuestScripts"
 	ProjectGUID="{60406704-5136-447C-B34B-C5AD16A094FD}"
 	Keyword="Win32Proj"
@@ -122,7 +122,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\arcemu-shared;..\..\arcemu-world;..\..\..\dep\include;..\..\..\dep\src"
+				AdditionalIncludeDirectories="&quot;..\..\arcemu-shared&quot;;&quot;..\..\arcemu-world&quot;;..\..\..\dep\VC\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTLIB"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -325,11 +325,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\QuestScripts\TirisfalGlades.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\QuestScripts\ThousandNeedles.cpp"
+					RelativePath="..\src\QuestScripts\Terrokar_Forest.cpp"
 					>
 				</File>
 				<File
@@ -337,15 +333,19 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\QuestScripts\Terrokar_Forest.cpp"
+					RelativePath="..\src\QuestScripts\ThousandNeedles.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\QuestScripts\Ungoro.cpp"
+					RelativePath="..\src\QuestScripts\TirisfalGlades.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\QuestScripts\Undercity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\QuestScripts\Ungoro.cpp"
 					>
 				</File>
 				<File
