@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="MiscScripts"
 	ProjectGUID="{9F7BE2F8-C17A-4F9E-A32E-ECFF0B74566D}"
 	Keyword="Win32Proj"
@@ -122,7 +122,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\arcemu-shared;..\..\arcemu-world;..\..\..\dep\include;..\..\..\dep\src"
+				AdditionalIncludeDirectories="&quot;..\..\arcemu-shared&quot;;&quot;..\..\arcemu-world&quot;;..\..\..\dep\VC\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTLIB"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -144,7 +144,7 @@
 				AdditionalDependencies="arcemu-world.lib"
 				OutputFile="../../../bin/release/script_bin/MiscScripts.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\bin\release"
+				AdditionalLibraryDirectories="..\..\..\bin\release_x64;..\..\..\bin\release"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="../../../bin/release/script_bin/MiscScripts.pdb"
 				SubSystem="2"
@@ -206,6 +206,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\miscscripts\Custom_DJ.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\MiscScripts\DarkmoonFaireObjects.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\MiscScripts\GameObjects.cpp"
 				>
 			</File>
@@ -215,10 +223,6 @@
 			</File>
 			<File
 				RelativePath="..\src\MiscScripts\RandomScripts.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\MiscScripts\DarkmoonFaireObjects.cpp"
 				>
 			</File>
 		</Filter>

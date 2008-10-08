@@ -305,7 +305,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\arcemu-shared;..\..\arcemu-world;..\..\..\dep\include;..\..\..\dep\src"
+				AdditionalIncludeDirectories="&quot;..\..\arcemu-shared&quot;;&quot;..\..\arcemu-world&quot;;..\..\..\dep\VC\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTLIB;X64;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -405,6 +405,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\SpellHandlers\QIspells.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\SpellHandlers\RogueSpells.cpp"
 				>
 			</File>
@@ -418,10 +422,6 @@
 			</File>
 			<File
 				RelativePath="..\src\SpellHandlers\WarriorSpells.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\SpellHandlers\QIspells.cpp"
 				>
 			</File>
 		</Filter>

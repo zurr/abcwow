@@ -137,7 +137,7 @@
 				Optimization="4"
 				InlineFunctionExpansion="2"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\src\arcemu-shared"
+				AdditionalIncludeDirectories="..\..\dep\VC\include;&quot;..\..\src\arcemu-shared&quot;"
 				PreprocessorDefinitions="_HAS_ITERATOR_DEBUGGING=0;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;X64"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -171,6 +171,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(IntDir)/shared.lib"
+				AdditionalLibraryDirectories="..\..\dep\VC\lib\amd64"
 				SuppressStartupBanner="true"
 			/>
 			<Tool
@@ -505,6 +506,14 @@
 			Name="Network"
 			>
 			<File
+				RelativePath="..\..\src\arcemu-shared\Network\CircularBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\arcemu-shared\Network\CircularBuffer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\arcemu-shared\Network\ListenSocketWin32.h"
 				>
 			</File>
@@ -542,14 +551,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\arcemu-shared\Network\SocketWin32.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\arcemu-shared\Network\CircularBuffer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\arcemu-shared\Network\CircularBuffer.h"
 				>
 			</File>
 		</Filter>
