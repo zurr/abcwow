@@ -268,7 +268,7 @@ AC_CONFIG_FILES([
    src/scripts/src/SpellHandlers/Makefile
    src/scripts/src/LUAScripting/Makefile
    src/scripts/src/QuestScripts/Makefile
-#####   src/scripts/src/MiscScripts/Makefile  ######
+   src/scripts/src/MiscScripts/Makefile
    extras/Makefile
    extras/collision/Makefile
    extras/collision/collision_dll/Makefile

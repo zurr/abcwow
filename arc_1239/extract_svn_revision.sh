@@ -1,5 +1,6 @@
-revision=`svn info | grep Revision | cut -d' ' -f2`
-if [ -z $revision ];  then
+revision=$(svn info | grep Revision | cut -d' ' -f2)
+if [ -z $revision ]
+then
         revision=0
 fi
 
