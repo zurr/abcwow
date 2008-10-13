@@ -206,14 +206,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\miscscripts\Custom_DJ.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\MiscScripts\DarkmoonFaireObjects.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\MiscScripts\GameObjects.cpp"
 				>
 			</File>
