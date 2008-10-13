@@ -775,9 +775,7 @@ void Aura::Remove()
 		}
 	}
 
-	//maybe we are removing it without even assigning it. Example when we are refreshing an aura
-	if( m_auraSlot != 0xFFFF )
-		m_target->m_auras[ m_auraSlot ] = NULL;
+	m_target->m_auras[ m_auraSlot ] = NULL;
 
 	// reset diminishing return timer if needed
 	::UnapplyDiminishingReturnTimer( m_target, m_spellProto );
@@ -894,7 +892,7 @@ void Aura::UpdateModifiers( )
 
 		if(mod->m_type<TOTAL_SPELL_AURAS)
 		{
-			sLog.outDebug( "WORLD: Update Aura mods : target = %u , Spell Aura id = %u (%s), SpellId  = %u, i = %u, duration = %u, damage = %d",
+			sLog.outDebug( "WORLD: target = %u , Spell Aura id = %u (%s), SpellId  = %u, i = %u, duration = %u, damage = %d",
 				m_target->GetLowGUID(),mod->m_type, SpellAuraNames[mod->m_type], m_spellProto->Id, mod->i, GetDuration(),mod->m_amount);
 			switch (mod->m_type)
 			{
