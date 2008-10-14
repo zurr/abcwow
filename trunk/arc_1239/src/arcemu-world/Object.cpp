@@ -3002,6 +3002,9 @@ void Object::Activate(MapMgr * mgr)
 
 void Object::Deactivate(MapMgr * mgr)
 {
+	if ( mgr == NULL )
+		return;
+
 	switch(m_objectTypeId)
 	{
 	case TYPEID_UNIT:

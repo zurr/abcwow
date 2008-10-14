@@ -276,7 +276,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -620,7 +620,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -647,7 +647,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if ((temp->GetTypeId() == TYPEID_PLAYER) && (_unit->GetDistance2dSq(temp) <= 500))
+			if ((temp != NULL && temp->GetTypeId() == TYPEID_PLAYER) && (_unit->GetDistance2dSq(temp) <= 500))
 			{
 				targetTable.push_back(temp);
 			}
@@ -1240,7 +1240,7 @@ public:
 		for (TargetMap::iterator itr = _unit->GetAIInterface()->GetAITargets()->begin(); itr != _unit->GetAIInterface()->GetAITargets()->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= 10000)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= 10000)
 			{
 				if (temp != _unit->GetAIInterface()->GetNextTarget() && temp->GetTypeId() == TYPEID_PLAYER)
 				{
@@ -1284,7 +1284,7 @@ public:
 		for (TargetMap::iterator itr = _unit->GetAIInterface()->GetAITargets()->begin(); itr != _unit->GetAIInterface()->GetAITargets()->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= 10000)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= 10000)
 			{
 				if (temp != _unit->GetAIInterface()->GetNextTarget() && temp->GetTypeId() == TYPEID_PLAYER)
 				{
@@ -1338,7 +1338,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -1365,7 +1365,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (temp->GetTypeId() == TYPEID_PLAYER)
+			if (temp != NULL && temp->GetTypeId() == TYPEID_PLAYER)
 			{
 				targetTable.push_back(temp);
 			}
@@ -1663,7 +1663,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -1740,9 +1740,10 @@ public:
 			TargetMap::iterator itr;
 			for (itr = targets->begin(); itr != targets->end();itr++)
 			{
-				if (_unit->GetDistance2dSq(_unit->GetMapMgr()->GetUnit(itr->first)) <= 100)
+				Unit* target = _unit->GetMapMgr()->GetUnit(itr->first);
+				if (target != NULL && _unit->GetDistance2dSq(target) <= 100)
 				{
-					_unit->GetMapMgr()->GetUnit(itr->first)->CastSpell(_unit->GetMapMgr()->GetUnit(itr->first), KARATHRESS_TIDALSURGE, true);
+					target->CastSpell(target, KARATHRESS_TIDALSURGE, true);
 				}
 			}
 		}
@@ -1894,9 +1895,10 @@ public:
 			TargetMap::iterator itr;
 			for (itr = targets->begin(); itr != targets->end();itr++)
 			{
-				if (_unit->GetDistance2dSq(_unit->GetMapMgr()->GetUnit(itr->first)) <= 100)
+				Unit* target = _unit->GetMapMgr()->GetUnit(itr->first);
+				if (target != NULL && _unit->GetDistance2dSq(target) <= 100)
 				{
-					_unit->GetMapMgr()->GetUnit(itr->first)->CastSpell(_unit->GetMapMgr()->GetUnit(itr->first), CARIBDIS_TIDALSURGE, true);
+					target->CastSpell(target, CARIBDIS_TIDALSURGE, true);
 				}
 			}
 		}
@@ -2092,7 +2094,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -2789,7 +2791,7 @@ public:
 		for (TargetMap::iterator itr = _unit->GetAIInterface()->GetAITargets()->begin(); itr != _unit->GetAIInterface()->GetAITargets()->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= 10000)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= 10000)
 			{
 				if (temp != _unit->GetAIInterface()->GetNextTarget() && temp->GetTypeId() == TYPEID_PLAYER)
 				{
@@ -2824,7 +2826,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -2851,7 +2853,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (temp->GetTypeId() == TYPEID_PLAYER)
+			if (temp != NULL && temp->GetTypeId() == TYPEID_PLAYER)
 			{
 				targetTable.push_back(temp);
 			}
@@ -3133,7 +3135,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -3404,7 +3406,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -4642,7 +4644,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -4666,11 +4668,12 @@ public:
 			TargetMap::iterator itr;
 			for (itr = targets->begin(); itr != targets->end();itr++)
 			{
-				if (_unit->GetDistance2dSq(_unit->GetMapMgr()->GetUnit(itr->first)) <= 900)
+				Unit* target = _unit->GetMapMgr()->GetUnit(itr->first);
+				if (target != NULL &&_unit->GetDistance2dSq(target) <= 900)
 				{
 					val = RandomUInt(100)%4;
 					if (!val)
-						_unit->GetMapMgr()->GetUnit(itr->first)->CastSpell(_unit->GetMapMgr()->GetUnit(itr->first), SPOREQUAKEKNOCKDOWN, true);
+						target->CastSpell(target, SPOREQUAKEKNOCKDOWN, true);
 				}
 			}
 		}
@@ -4878,7 +4881,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -5081,7 +5084,7 @@ public:
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{

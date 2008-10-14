@@ -467,7 +467,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -689,7 +689,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -857,7 +857,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -988,7 +988,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
