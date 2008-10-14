@@ -238,7 +238,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if ( temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -449,7 +449,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if ( temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -471,8 +471,9 @@ public:
 		Creature *cre = NULL;
 		for (int x = 0; x < 6;x++)
 		{
-			cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(SOARING_EAGLE, _unit->GetPositionX() + RandomFloat(5) - 5, _unit->GetPositionY() + RandomFloat(5) - 5, _unit->GetPositionZ(), _unit->GetOrientation(), true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0); 
-			cre->GetAIInterface()->setOutOfCombatRange(5000);
+			cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(SOARING_EAGLE, _unit->GetPositionX() + RandomFloat(5) - 5, _unit->GetPositionY() + RandomFloat(5) - 5, _unit->GetPositionZ()+5, _unit->GetOrientation(), true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
+			if ( cre != NULL )
+				cre->GetAIInterface()->setOutOfCombatRange(5000);
 		}
 
 	}
@@ -804,7 +805,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if ( temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -833,7 +834,7 @@ public:
 				m_totemcd = 50 + RandomUInt(10);
 				_unit->SetUInt32Value(UNIT_FIELD_HEALTH, _unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 				if (_unit->GetMapMgr() != NULL)
-					lynx = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZILYNX, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ(), 0.0f, true, false, 0, 0);
+					lynx = _unit->GetMapMgr()->GetInterface()->SpawnCreature(HALAZZILYNX, _unit->GetPositionX(), _unit->GetPositionY(), _unit->GetPositionZ()+1, 0.0f, true, false, 0, 0);
 			}
 			break;
 		case 2:
@@ -1093,7 +1094,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -1247,7 +1248,7 @@ public:
 			{
 				x = -51.0f + RandomUInt(39);
 				y = 1132.0f + RandomUInt(35);
-				_unit->GetMapMgr()->GetInterface()->SpawnCreature(FIREBOMBTARGET, x, y, _unit->GetPositionZ(), 0.0f, true, false, 0, 0);
+				_unit->GetMapMgr()->GetInterface()->SpawnCreature(FIREBOMBTARGET, x, y, _unit->GetPositionZ()+0.5, 0.0f, true, false, 0, 0);
 			}
 			m_firebombs = 35 + RandomUInt(25);
 		}
@@ -1255,13 +1256,13 @@ public:
 		{
 			Creature *summon;
 			summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(AMANIDRAGONHAWKHATCHLING, -34.23f, 1099.19f, 18.71f, 0, true, false, 0, 0);
-			summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
+			if (summon != NULL) summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 			summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(AMANIDRAGONHAWKHATCHLING, -34.23f, 1099.19f, 18.71f, 0, true, false, 0, 0);
-			summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
+			if (summon != NULL) summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 			summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(AMANIDRAGONHAWKHATCHLING, -33.18f, 1201.79f, 18.71f, 0, true, false, 0, 0);
-			summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
+			if (summon != NULL) summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 			summon = _unit->GetMapMgr()->GetInterface()->SpawnCreature(AMANIDRAGONHAWKHATCHLING, -33.18f, 1201.79f, 18.71f, 0, true, false, 0, 0);
-			summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
+			if (summon != NULL) summon->GetAIInterface()->_CalcDestinationAndMove(_unit, 5);
 			m_adds = 80 + RandomUInt(25);
 		}
 		float val = (float)RandomFloat(100.0f);
@@ -1325,7 +1326,7 @@ public:
 		for (itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -1839,7 +1840,7 @@ public:
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{
@@ -2047,7 +2048,7 @@ public:
 				Creature *cre = NULL;
 				cre = _unit->GetMapMgr()->GetInterface()->SpawnCreature(ZULJIN_FEATHER_VORTEX, 
 				      (_unit->GetPositionX() + RandomFloat(10)-10), (_unit->GetPositionY() + RandomFloat(10)-10),
-				      _unit->GetPositionZ(), _unit->GetOrientation(),
+				      _unit->GetPositionZ()+0.5f, _unit->GetOrientation(),
 				      true, false, _unit->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE), 0);
 
 				if (cre != NULL) {
@@ -2139,7 +2140,7 @@ public:
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{

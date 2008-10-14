@@ -530,7 +530,7 @@ bool Guild::LoadFromDB(Field * f)
 	}
 
 	// load log
-	result = CharacterDatabase.Query("SELECT * FROM guild_logs WHERE guildid = %u ORDER BY timestamp ASC", m_guildId);
+	result = CharacterDatabase.Query("SELECT * FROM guild_logs WHERE guildid = %u ORDER BY timestamp DESC", m_guildId);
 	if(result)
 	{
 		do 
@@ -590,7 +590,7 @@ bool Guild::LoadFromDB(Field * f)
 				delete res2;
 			}
 
-			res2 = CharacterDatabase.Query("SELECT * FROM guild_banklogs WHERE guildid = %u AND tabid = %u ORDER BY timestamp ASC", m_guildId, result->Fetch()[1].GetUInt32());
+			res2 = CharacterDatabase.Query("SELECT * FROM guild_banklogs WHERE guildid = %u AND tabid = %u ORDER BY timestamp DESC", m_guildId, result->Fetch()[1].GetUInt32());
 			if(res2 != NULL)
 			{
 				do 
@@ -615,7 +615,7 @@ bool Guild::LoadFromDB(Field * f)
 		delete result;
 	}
 
-	result = CharacterDatabase.Query("SELECT * FROM guild_banklogs WHERE guildid = %u AND tabid = 6 ORDER BY timestamp ASC", m_guildId);
+	result = CharacterDatabase.Query("SELECT * FROM guild_banklogs WHERE guildid = %u AND tabid = 6 ORDER BY timestamp DESC", m_guildId);
 	if(result != NULL)
 	{
 		do 
@@ -1496,17 +1496,36 @@ void Guild::LogGuildBankAction(uint8 iAction, uint32 uGuid, uint32 uEntry, uint8
 
 	if(pTab->lLog.size() >= 25)
 	{
-		// pop one off the end
-		GuildBankEvent * ev2 = *(pTab->lLog.begin());
-		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE guildid = %u AND log_id = %u",
-			m_guildId, ev2->iLogId);
-
-		pTab->lLog.pop_front();
-		delete ev2;
+		uint32 min_time = 0;
+		uint32 count = 0;
+		uint32 removed = 0;
+		for(list<GuildBankEvent*>::iterator itr = pTab->lLog.begin(); itr != pTab->lLog.end(); ++itr)
+		{
+			if ((count++) < 25)
+			{
+				min_time = (*itr)->uTimeStamp;
+			}
+			else
+			{
+				removed++;
+				delete (*itr);
+			}
+		}
+		// we are inside lock - so it should be fine
+		while (removed)
+		{
+			pTab->lLog.pop_back();
+			--removed;
+		}
+			
+		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE guildid = %u AND timestamp < %u",
+									m_guildId, min_time);
 	}
 
+
+
 	ev->iLogId = GenerateGuildLogEventId();
-	pTab->lLog.push_back(ev);
+	pTab->lLog.push_front(ev);
 	m_lock.Release();
 
 	CharacterDatabase.Execute("INSERT INTO guild_banklogs VALUES(%u, %u, %u, %u, %u, %u, %u, %u)",
@@ -1527,17 +1546,34 @@ void Guild::LogGuildBankActionMoney(uint8 iAction, uint32 uGuid, uint32 uAmount)
 
 	if(m_moneyLog.size() >= 25)
 	{
-		// pop one off the end
-		GuildBankEvent * ev2 = *(m_moneyLog.begin());
-		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE guildid = %u AND log_id = %u",
-			m_guildId, ev2->iLogId);
+		uint32 min_time = 0;
+		uint32 count = 0;
+		uint32 removed = 0;
+		for(list<GuildBankEvent*>::iterator itr = m_moneyLog.begin(); itr != m_moneyLog.end(); ++itr)
+		{
+			if ((count++) < 25)
+			{
+				min_time = (*itr)->uTimeStamp;
+			}
+			else
+			{
+				removed++;
+				delete (*itr);
+			}
+		}
+		// we are inside lock - so it should be fine
+		while (removed)
+		{
+			m_moneyLog.pop_back();
+			--removed;
+		}
 
-		m_moneyLog.pop_front();
-		delete ev2;
+		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE guildid = %u AND timestamp < %u",
+									m_guildId, min_time);
 	}
 
 	ev->iLogId = GenerateGuildLogEventId();
-	m_moneyLog.push_back(ev);
+	m_moneyLog.push_front(ev);
 	m_lock.Release();
 
 	CharacterDatabase.Execute("INSERT INTO guild_banklogs VALUES(%u, %u, 6, %u, %u, %u, 0, %u)",

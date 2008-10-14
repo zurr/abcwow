@@ -711,7 +711,7 @@ public:
 
 	OlmTheSummonerAI(Creature* pCreature) : CreatureAIScript(pCreature)
 	{
-		nrspells = 4;
+		nrspells = 3;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -735,13 +735,13 @@ public:
 		spells[2].instant = true;
 		spells[2].perctrigger = 3.0f;
 		spells[2].attackstoptimer = 1000;
-
+	/*
 		spells[3].info = dbcSpell.LookupEntry(HEAL_OLM);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = false;
 		spells[3].perctrigger = 5.0f;
 		spells[3].attackstoptimer = 1000;
-
+*/
 		maulgar = _unit->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(148.645508f, 194.516510f, -10.934792f, CN_HIGH_KING_MAULAGR);
 
 	}
@@ -1166,7 +1166,7 @@ public:
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
+			if (temp != NULL && temp->GetTypeId() == TYPEID_PLAYER && temp->isAlive())
 			{
 				knockback(temp);
 				temp->CastSpell(temp, GROUND_SLAM, true);
@@ -1219,10 +1219,10 @@ public:
 
 		for ( TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++ )
 		{
-			if ( _unit->GetMapMgr()->GetUnit(itr->first) == NULL || _unit->GetMapMgr()->GetUnit(itr->first)->GetTypeId() != TYPEID_PLAYER || _unit->GetMapMgr()->GetUnit(itr->first)->isDead() )
+			Unit* trgt = _unit->GetMapMgr()->GetUnit(itr->first);
+			if ( trgt == NULL ||trgt->GetTypeId() != TYPEID_PLAYER || trgt->isDead() )
 				continue;
-
-			Player* _plr = (Player*)(_unit->GetMapMgr()->GetUnit(itr->first));
+			Player* _plr = (Player*)trgt;
 
 			for(set<Player*>::iterator itr2 = _plr->GetInRangePlayerSetBegin(); itr2 != _plr->GetInRangePlayerSetEnd(); ++itr2)
 			{
@@ -1262,13 +1262,13 @@ public:
 		{
 			itr = it2;
 			++it2;
-
-			if( _unit->GetMapMgr()->GetUnit(itr->first) == NULL || _unit->GetMapMgr()->GetUnit(itr->first)->GetTypeId() != TYPEID_PLAYER || !_unit->GetMapMgr()->GetUnit(itr->first)->isAlive() || _unit->GetDistance2dSq(_unit->GetMapMgr()->GetUnit(itr->first)) >= 100.0f )
+			Unit* targt = _unit->GetMapMgr()->GetUnit(itr->first);
+			if( targt == NULL ||targt->GetTypeId() != TYPEID_PLAYER || !targt->isAlive() || _unit->GetDistance2dSq(targt) >= 100.0f )
 				continue;
 
-			if( itr->second > currentTarget.second && _unit->GetMapMgr()->GetUnit(itr->first) != mUnit )
+			if( itr->second > currentTarget.second && targt != mUnit )
 			{
-				currentTarget.first = _unit->GetMapMgr()->GetUnit(itr->first);
+				currentTarget.first = targt;
 				currentTarget.second = itr->second;
 			}
 		}
@@ -1290,7 +1290,7 @@ public:
 		for (TargetMap::iterator itr = targets->begin(); itr != targets->end(); itr++)
 		{
 			Unit *temp = _unit->GetMapMgr()->GetUnit(itr->first);
-			if (_unit->GetDistance2dSq(temp) <= dist)
+			if (temp != NULL && _unit->GetDistance2dSq(temp) <= dist)
 			{
 				if (((!tank && temp != _unit->GetAIInterface()->GetNextTarget()) || tank) && (!onlyplayer || (onlyplayer && temp->GetTypeId() == TYPEID_PLAYER)))
 				{

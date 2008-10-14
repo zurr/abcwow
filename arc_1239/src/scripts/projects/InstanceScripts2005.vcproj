@@ -394,10 +394,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\InstanceScripts\GenericAI.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\InstanceScripts\Instance_Arcatraz.cpp"
 				>
 			</File>
