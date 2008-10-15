@@ -275,7 +275,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//251
 };
 
-char* SpellAuraNames[TOTAL_SPELL_AURAS] = {
+const char* SpellAuraNames[TOTAL_SPELL_AURAS] = {
     "NONE",												//   0 None
     "BIND_SIGHT",										//   1 Bind Sight
     "MOD_POSSESS",										//   2 Mod Possess
@@ -4900,7 +4900,7 @@ void Aura::EventPeriodicLeech(uint32 amount)
 				itx = auras.begin();
 				while (itx != auras.end()) {
 					itx2 = itx++;
-					count+= itx2->second->size();
+					count+= (int32)itx2->second->size();
 					delete itx2->second;
 				}
 			}

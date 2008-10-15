@@ -3923,6 +3923,8 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 				ts.spellId = item->GetProto()->Spells[k].Id;
 				ts.procChance = 5;
 				ts.caster = this->GetGUID();
+				ts.LastTrigger = 0;
+				ts.procCharges = 0;
 				ts.procFlags = PROC_ON_MELEE_ATTACK;
 				ts.deleted = false;
 				m_procSpells.push_front( ts );			
@@ -4284,7 +4286,7 @@ void Player::ResurrectPlayer()
 	UpdateVisibility();
 	if ( m_resurrecter && IsInWorld()
 		//don't pull players inside instances with this trick. Also fixes the part where you were able to double item bonuses
-		&& m_resurrectInstanceID == GetInstanceID() 
+		&& m_resurrectInstanceID == (uint32)GetInstanceID() 
 		)
 	{
 		SafeTeleport( m_resurrectMapId, m_resurrectInstanceID, m_resurrectPosition );
@@ -6616,7 +6618,7 @@ void Player::EventTaxiInterpolate()
 void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 {
 	int32 mapchangeid = -1;
-	float mapchangex,mapchangey,mapchangez = 0.0f;
+	float mapchangex = 0.0f, mapchangey = 0.0f, mapchangez = 0.0f;
 	uint32 cn = m_taxiMapChangeNode;
 
 	m_taxiMapChangeNode = 0;
@@ -8704,6 +8706,7 @@ void Player::CompleteLoading()
 				else
 					charge.count = sp->procCharges;
 				charge.spellId = sp->Id;
+				charge.procdiff = 0;
 				charge.ProcFlag = sp->procFlags;
 				charge.lastproc = 0;
 				m_chargeSpells.insert( make_pair( sp->Id , charge ) );

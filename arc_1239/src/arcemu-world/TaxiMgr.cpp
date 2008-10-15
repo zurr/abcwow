@@ -90,7 +90,7 @@ void TaxiPath::SetPosForTime(float &x, float &y, float &z, uint32 time, uint32 *
 	std::map<uint32, TaxiPathNode*>::iterator itr;
 	itr = m_pathNodes.begin();
 
-	float nx,ny,nz = 0.0f;
+	float nx = 0.0f,ny = 0.0f,nz = 0.0f;
 	bool set = false;
 	uint32 nodecounter = 0;
 
@@ -171,7 +171,7 @@ void TaxiPath::SendMoveForTime(Player *riding, Player *to, uint32 time)
 	std::map<uint32, TaxiPathNode*>::iterator itr;
 	itr = m_pathNodes.begin();
 
-	float nx,ny,nz = 0.0f;
+	float nx = 0.0f,ny = 0.0f,nz = 0.0f;
 	bool set = false;
 	uint32 nodecounter = 1;
 
