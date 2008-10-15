@@ -1056,14 +1056,15 @@ void WorldSession::Handle38C(WorldPacket & recv_data)
 
 const char* WorldSession::LocalizedWorldSrv(uint32 id)
 {
-	char szError[64];
+	//char szError[64];
 	WorldStringTable * wst = WorldStringTableStorage.LookupEntry(id);
+	// nothing is returned here - its address or local variable which is dead out of scope
+	// either allocate and then delete, or do nothing.
 	if(!wst){
-		memset(szError,0,64);
-		sprintf(szError,"ID:%u is a bad WorldString TEXT!",id);
-		return &szError[0];
+		//memset(szError,0,64);
+		//sprintf(szError,"ID:%u is a bad WorldString TEXT!",id);
+		return NULL;//&szError[0];
 	}
-
 	LocalizedWorldStringTable * lpi = (language>0) ? sLocalizationMgr.GetLocalizedWorldStringTable(id,language):NULL;
 	if(lpi)
 		return lpi->Text;
@@ -1073,12 +1074,12 @@ const char* WorldSession::LocalizedWorldSrv(uint32 id)
 
 const char* WorldSession::LocalizedMapName(uint32 id)
 {
-	char szError[64];
+	//char szError[64];
 	MapInfo * mi = WorldMapInfoStorage.LookupEntry(id);
 	if(!mi){
-		memset(szError,0,64);
-		sprintf(szError,"ID:%u still have no map title yet!",id);
-		return &szError[0];
+		//memset(szError,0,64);
+		//sprintf(szError,"ID:%u still have no map title yet!",id);
+		return NULL;//&szError[0];
 	}
 
 	LocalizedWorldMapInfo * lpi = (language>0) ? sLocalizationMgr.GetLocalizedWorldMapInfo(id,language):NULL;
@@ -1090,12 +1091,12 @@ const char* WorldSession::LocalizedMapName(uint32 id)
 
 const char* WorldSession::LocalizedBroadCast(uint32 id)
 {
-	char szError[64];
+	//char szError[64];
 	WorldBroadCast * wb = WorldBroadCastStorage.LookupEntry(id);
 	if(!wb){
-		memset(szError,0,64);
-		sprintf(szError,"ID:%u is a invaild WorldBroadCast message!",id);
-		return &szError[0];
+		//memset(szError,0,64);
+		//sprintf(szError,"ID:%u is a invaild WorldBroadCast message!",id);
+		return NULL;//&szError[0];
 	}
 
 	LocalizedWorldBroadCast * lpi = (language>0) ? sLocalizationMgr.GetLocalizedWorldBroadCast(id,language):NULL;

@@ -871,6 +871,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ILotP.origId = 34299;
 			ILotP.spellId = 34299;
 			ILotP.procChance = 100;
+			ILotP.procCharges = 0;
 			ILotP.procFlags = PROC_ON_CRIT_ATTACK | static_cast<uint32>(PROC_TARGET_SELF);
 			ILotP.deleted = false;
 			ILotP.caster = u_caster->GetGUID();
@@ -6299,6 +6300,7 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 					{
 						SpellCharge charge;
 						charge.count=aur_removed;
+						charge.procdiff = 0;
 						charge.spellId=aura->GetSpellId();
 						charge.ProcFlag=aura->GetSpellProto()->procFlags;
 						charge.lastproc = 0;

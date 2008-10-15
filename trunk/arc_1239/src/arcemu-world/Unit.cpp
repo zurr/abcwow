@@ -1336,7 +1336,7 @@ uint32 Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, ui
 							continue;
 						//this spell builds up in time
 						(*itr2).procCharges += dmg;
-						if( (int32)(*itr2).procCharges >= ospinfo->EffectBasePoints[ 1 ] && //if charge built up
+						if( (int32)(*itr2).procCharges >= (uint32)ospinfo->EffectBasePoints[1] && //if charge built up
 							dmg < (int32)this->GetUInt32Value( UNIT_FIELD_HEALTH ) ) //if this is not a killer blow
 							can_proc_now = true;
 					}
@@ -2948,10 +2948,6 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 		if( !backAttack )
 		{
 			// not an attack from behind so we may dodge/parry/block
-
-			uint32 pClass = plr->getClass();
-			uint32 pLevel = (getLevel() > PLAYER_LEVEL_CAP) ? PLAYER_LEVEL_CAP : getLevel();
-
 			if ( weapon_damage_type != RANGED )
 			{
 				// cannot dodge/parry ranged attacks

@@ -2853,6 +2853,7 @@ void Spell::HandleAddAura(uint64 guid)
 					charge.spellId=itr->second->GetSpellId();
 					charge.ProcFlag=itr->second->GetSpellProto()->procFlags;
 					charge.lastproc = 0;
+					charge.procdiff = 0;
 					Target->m_chargeSpells.insert(make_pair(itr->second->GetSpellId(),charge));
 				}
 			}
@@ -4582,8 +4583,6 @@ void Spell::SendHealSpellOnPlayer(Object* caster, Object* target, uint32 dmg,boo
 
 void Spell::Heal(int32 amount, bool ForceCrit)
 {
-	int32 base_amount = amount; //store base_amount for later use
-
 	if(!unitTarget || !unitTarget->isAlive())
 		return;
 
