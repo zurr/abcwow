@@ -7946,6 +7946,7 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 		break;
 
 	case SMT_CAST_TIME:
+	case SMT_CAST_TIME_FLAT:
 		SendModifierLog(&m_target->SM_FCastTime,val,AffectedGroups,mod->m_miscValue);
 		break;
 
@@ -8008,8 +8009,7 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 		SendModifierLog(&m_target->SM_FRezist_dispell, val, AffectedGroups,mod->m_miscValue);
 		break;
 	default://unknown Modifier type
-		sLog.outError(
-			"Unknown spell modifier type %u in spell %u.<<--report this line to the developer\n",
+		sLog.outError("Unknown spell modifier type %u in spell %u.<<--report this line to the developer",
 			mod->m_miscValue,GetSpellId());
 		//don't add val, though we could formaly could do,but as we don't know what it is-> no sense
 		break;

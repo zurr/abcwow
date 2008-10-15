@@ -867,7 +867,7 @@ bool Object::SetPosition(const LocationVector & v, bool allowPorting /* = false 
 	if (!allowPorting && v.z < -500)
 	{
 		m_position.z = 500;
-		sLog.outError( "setPosition: fell through map; height ported" );
+		//sLog.outError( "setPosition: fell through map; height ported" );
 
 		result = false;
 	}
