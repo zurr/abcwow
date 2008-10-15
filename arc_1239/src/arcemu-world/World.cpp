@@ -479,9 +479,6 @@ bool World::SetInitialWorldSettings()
 	Log.Notice("World", "Player size: %u bytes", sizeof(Player) + sizeof(ItemInterface) + 50000 + 30000 + 1000 + sizeof(AIInterface));
 	Log.Notice("World", "GameObject size: %u bytes", sizeof(GameObject));
 
-	Apply112SpellFixes();
-	ApplyNormalFixes();
-
 // ------------------------------------------------------------------------------------------------
 
 	Log.Notice("World","Starting Transport System...");
