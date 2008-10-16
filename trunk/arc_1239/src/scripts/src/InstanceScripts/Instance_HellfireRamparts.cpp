@@ -1661,8 +1661,8 @@ public:
 	{
 		SpellDesc *pShield = AddSpell(OMOR_THE_UNSCARRED_DEMONIC_SHIELD, Target_Self, 30, 0, 25);
 		pShield->mEnabled = false;
-		SpellDesc *pSummon = AddSpell(OMOR_THE_UNSCARRED_SUMMON_FIENDISH_HOUND, Target_Self, 8, 1, 20);
-		pSummon->AddEmote("Achor-she-ki! Feast my pet! Eat your fill!", Text_Yell, 10277);
+		//SpellDesc *pSummon = AddSpell(OMOR_THE_UNSCARRED_SUMMON_FIENDISH_HOUND, Target_Self, 8, 1, 20);
+		//pSummon->AddEmote("Achor-she-ki! Feast my pet! Eat your fill!", Text_Yell, 10277);
 		AddSpell(OMOR_THE_UNSCARRED_SHADOW_WHIP, Target_RandomPlayer, 10, 0, 30);
 		if(_unit->GetMapMgr()->iInstanceMode != MODE_HEROIC)
 		{
