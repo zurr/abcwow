@@ -221,8 +221,8 @@ void MapCell::LoadObjects(CellSpawns * sp)
 			{
 				if(!c->CanAddToWorld())
 					delete c;
-
-				c->PushToWorld(_mapmgr);
+				else
+					c->PushToWorld(_mapmgr);
 			}
 			else
 				delete c;//missing proto or smth of that kind
