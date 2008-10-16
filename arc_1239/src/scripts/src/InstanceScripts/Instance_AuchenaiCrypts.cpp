@@ -345,7 +345,7 @@ public:
 
     EXARCHMALADAARAI(Creature* pCreature) : CreatureAIScript(pCreature)
     {
-		nrspells = 3;
+		nrspells = 2;
 		for(int i=0;i<nrspells;i++)
 		{
 			m_spellcheck[i] = false;
@@ -379,20 +379,20 @@ public:
 		spells[2].cooldown = 15;
 		spells[2].mindist2cast = 0.0f;
 		spells[2].maxdist2cast = 40.0f;
-
+/*
 		spells[3].info = dbcSpell.LookupEntry(SUMMON_AVATAR);
 		spells[3].targettype = TARGET_SELF;
 		spells[3].instant = false;
 		spells[3].perctrigger = 0.0f;
 		spells[3].attackstoptimer = 1000;
 		spells[3].cooldown = -1;
-
+*/
 		Avatar = false;
 	} 
 
     void OnCombatStart(Unit* mTarget)
     {
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 3; i++)
 			spells[i].casttime = 0;
 
 		Avatar = false;
@@ -465,7 +465,7 @@ public:
 			_unit->setAttackTimer(3500, false);
 			_unit->GetAIInterface()->StopMovement(2000);
 
-			_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
+			//_unit->CastSpell(_unit, spells[3].info, spells[3].instant);
 			Avatar = true;
 		}
 

@@ -367,7 +367,7 @@ class FirelordAI : public MoonScriptCreatureAI
     MOONSCRIPT_FACTORY_FUNCTION(FirelordAI, MoonScriptCreatureAI);
     FirelordAI(Creature* pCreature) : MoonScriptCreatureAI(pCreature)
     {
-		AddSpell(FIRELORD_SUMMON_LAVA_SPAWN, Target_Self, 20, 0, 10);
+		//AddSpell(FIRELORD_SUMMON_LAVA_SPAWN, Target_Self, 20, 0, 10);
 		AddSpell(FIRELORD_SOUL_BURN, Target_RandomPlayer, 20, 0, 5);
     }
 };

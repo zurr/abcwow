@@ -1256,7 +1256,7 @@ class ShadowmoonHoundmasterAI : public MoonScriptCreatureAI
 	MOONSCRIPT_FACTORY_FUNCTION(ShadowmoonHoundmasterAI, MoonScriptCreatureAI);
 	ShadowmoonHoundmasterAI(Creature *pCreature) : MoonScriptCreatureAI(pCreature)
 	{
-		AddSpell(SHADOWMOON_HOUNDMASTER_FLARE, Target_RandomPlayerDestination, 5, 0, 30);
+		//AddSpell(SHADOWMOON_HOUNDMASTER_FLARE, Target_RandomPlayerDestination, 5, 0, 30);
 		AddSpell(SHADOWMOON_HOUNDMASTER_FREEZING_TRAP, Target_Self, 5, 0, 30);
 		AddSpell(SHADOWMOON_HOUNDMASTER_SHOOT, Target_Current, 70, 0, 1, 0, 30);
 		AddSpell(SHADOWMOON_HOUNDMASTER_SILENCING_SHOT, Target_RandomPlayer, 6, 0, 35);
@@ -6434,7 +6434,7 @@ public:
 		spells[6].perctrigger = 0.0f;
 		spells[6].attackstoptimer = 1000;
 
-        spells[7].info = dbcSpell.LookupEntry(SUMMON_DEMON);
+        spells[7].info = dbcSpell.LookupEntry(DRAW_SOUL/*SUMMON_DEMON*/);
 		spells[7].targettype = TARGET_SELF;	// ?
 		spells[7].instant = false;
 		spells[7].cooldown = 0;
