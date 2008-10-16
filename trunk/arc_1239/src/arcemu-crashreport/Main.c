@@ -59,11 +59,13 @@ void buildCrashdump(char *filename) {
 	if (ret == 0) {
 		char dstfile[1024];
 
+		/*
 		ret = sendCrashdump();
 		if (ret == 0) {
 			snprintf(dstfile, 1024, "sent.%s", filename);
 			rename(filename, dstfile);
 		}
+		*/
 	} else {
 		fprintf(stderr, "%s: '%s' returned %d\n", __FUNCTION__, cmd, ret);
 	}
