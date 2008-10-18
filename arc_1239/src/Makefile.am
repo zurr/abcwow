@@ -1,1 +1,1 @@
-SUBDIRS = arcemu-crashreport arcemu-shared arcemu-logonserver arcemu-world scripts
+SUBDIRS = arcemu-shared arcemu-logonserver arcemu-world scripts

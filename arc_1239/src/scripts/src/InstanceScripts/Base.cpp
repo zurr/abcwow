@@ -402,7 +402,7 @@ Unit* MoonScriptCreatureAI::ForceCreatureFind(uint32 pCreatureId, float pX, floa
 
 	if (pUnit == NULL)
 	{
-		for (int i = 0; i != pMapMgr->m_CreatureHighGuid; ++i)
+		for (uint32 i = 0; i != pMapMgr->m_CreatureHighGuid; ++i)
 		{
 			if (pMapMgr->m_CreatureStorage[i] != NULL)
 			{ 
