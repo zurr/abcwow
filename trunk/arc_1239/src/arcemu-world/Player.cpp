@@ -20,7 +20,7 @@
 
 #include "StdAfx.h"
 UpdateMask Player::m_visibleUpdateMask;
-#define COLLISION_MOUNT_CHECK_INTERVAL 1000
+#define COLLISION_INDOOR_CHECK_INTERVAL 1000
 
 Player::Player( uint32 guid ) : m_mailBox(guid)
 {
@@ -385,7 +385,7 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	m_fallDisabledUntil = 0;
 	m_lfgMatch = NULL;
 	m_lfgInviterGuid = 0;
-	m_mountCheckTimer = 0;
+	m_indoorCheckTimer = 0;
 	m_taxiMapChangeNode = 0;
 	this->OnLogin();
 
@@ -949,21 +949,22 @@ void Player::Update( uint32 p_time )
 			m_pvpTimer -= p_time;
 	}
 
-	if (sWorld.Collision) {
-		if(m_MountSpellId != 0)
+	if (sWorld.Collision) 
+	{
+		if( mstime >= m_indoorCheckTimer )
 		{
-			if( mstime >= m_mountCheckTimer )
+			if( CollideInterface.IsIndoor( m_mapId, m_position ) )
 			{
-				if( CollideInterface.IsIndoor( m_mapId, m_position ) )
+				for(uint32 x=0;x<MAX_POSITIVE_AURAS;x++)
 				{
-					RemoveAura( m_MountSpellId );
-					m_MountSpellId = 0;
-				}
-				else
-				{
-					m_mountCheckTimer = mstime + COLLISION_MOUNT_CHECK_INTERVAL;
+					if(m_auras[x] && m_auras[x]->GetSpellProto() && m_auras[x]->GetSpellProto()->Attributes & ATTRIBUTES_ONLY_OUTDOORS )
+						RemoveAura( m_auras[x] );
 				}
 			}
+		}
+		else
+		{
+			m_indoorCheckTimer = mstime + COLLISION_INDOOR_CHECK_INTERVAL;
 		}
 
 	/*	if( mstime >= m_flyhackCheckTimer )
@@ -971,7 +972,7 @@ void Player::Update( uint32 p_time )
 			_FlyhackCheck();
 			m_flyhackCheckTimer = mstime + 10000; 
 		}
-*/
+	*/
 	}
 }
 
