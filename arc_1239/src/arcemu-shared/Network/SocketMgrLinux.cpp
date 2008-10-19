@@ -20,7 +20,7 @@ void SocketMgr::AddSocket(Socket * s)
 
 	// Check how many connections we already have from that ip
 	saddr = s->GetRemoteAddress().s_addr;
-	for (i=0, count=0; i<max_fd; i++)
+	for (i=0, count=0; i<=max_fd; i++)
 	{
 		if (fds[i])
 		{
@@ -111,6 +111,14 @@ void SocketMgr::SpawnWorkerThreads()
 
 void SocketMgr::ShowStatus()
 {
+	int i, count;
+
+	for (i=0, count=0; i<=max_fd; i++)
+	{
+		if (fds[i]) count++;
+	}
+
+	sLog.outString("Sockets: %d", count);
 }
 
 bool SocketWorkerThread::run()
