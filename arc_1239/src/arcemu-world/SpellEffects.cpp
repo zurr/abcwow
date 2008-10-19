@@ -5311,6 +5311,12 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 				totemspelltimer = 0; //First tick done immediately
 				break;
 			}
+			case 8178: //Grounding Totem
+			case 3600: //Earthbind Totem
+			{
+				totemspelltimer = 0; //First tick done immediately
+				break;
+			}
 			case 8349: //Fire Nova Totem 1
 			case 8502: //Fire Nova Totem 2
 			case 8503: //Fire Nova Totem 3
