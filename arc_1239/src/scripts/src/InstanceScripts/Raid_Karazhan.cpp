@@ -3825,8 +3825,8 @@ public:
 		
 		for (int i = 1; i < 5; i++)
 		{
-			//_unit->GetAIInterface()->addWayPoint(CreateWaypoint(i, 0, FLY));
-			_unit->GetAIInterface()->addWayPoint(CreateWaypoint(i, 0, RUN));
+			_unit->GetAIInterface()->addWayPoint(CreateWaypoint(i, 0, FLY));
+//			_unit->GetAIInterface()->addWayPoint(CreateWaypoint(i, 0, RUN));
 		}
 	}
 
