@@ -150,7 +150,7 @@ void WorldSession::HandleReadyCheckOpcode(WorldPacket& recv_data)
 			/* send packet to group */
 			WorldPacket data(CMSG_RAID_READYCHECK, 8);
 			data << GetPlayer()->GetGUID();
-			pGroup->SendPacketToAllButOne(&data, _player);
+			pGroup->SendPacketToAll(&data, _player);
 		}
 		else
 		{
