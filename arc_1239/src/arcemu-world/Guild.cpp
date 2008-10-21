@@ -1518,8 +1518,8 @@ void Guild::LogGuildBankAction(uint8 iAction, uint32 uGuid, uint32 uEntry, uint8
 			--removed;
 		}
 			
-		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE guildid = %u AND timestamp < %u",
-									m_guildId, min_time);
+		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE tabid = %u AND guildid = %u AND timestamp < %u",
+									pTab->iTabId, m_guildId, min_time);
 	}
 
 
@@ -1568,7 +1568,7 @@ void Guild::LogGuildBankActionMoney(uint8 iAction, uint32 uGuid, uint32 uAmount)
 			--removed;
 		}
 
-		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE guildid = %u AND timestamp < %u",
+		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE tabid = 6 AND guildid = %u AND timestamp < %u",
 									m_guildId, min_time);
 	}
 
