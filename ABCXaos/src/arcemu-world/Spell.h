@@ -1515,8 +1515,9 @@ enum SpellDidHitResult
 	SPELL_DID_HIT_IMMUNE					= 7,
 };
 
+class SpellScript;
 // Spell instance
-class SERVER_DECL Spell
+class SERVER_DECL Spell : public EventableObject
 {
 public:
     friend class DummySpellHandler;
@@ -1952,6 +1953,8 @@ public:
 	Spell * m_reflectedParent;
 
 protected:
+
+    SpellScript* m_spellScript;
 
     /// Spell state's
     bool    m_usesMana;

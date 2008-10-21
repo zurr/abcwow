@@ -23,6 +23,7 @@
 
 #define SCRIPT_MODULE void*
 #define ADD_CREATURE_FACTORY_FUNCTION(cl) static CreatureAIScript * Create(Creature * c) { return new cl(c); }
+#define ADD_SPELL_FACTORY_FUNCTION(cl) static SpellScript * Create(Spell * c) { return new cl (c); }
 
 class Channel;
 class Guild;
@@ -71,6 +72,12 @@ enum ScriptTypes
 	SCRIPT_TYPE_SCRIPT_ENGINE_AS			= 0x22,
 };
 
+enum ScriptFlags
+{
+	SCRIPT_FLAG_NONE						= 0x00,
+	SSCRIPT_FLAG_COMPLETE_CHECK				= 0x01,
+};
+
 
 /* Hook typedefs */
 typedef bool(*tOnNewCharacter)(uint32 Race, uint32 Class, WorldSession * Session, const char * Name);
@@ -109,6 +116,7 @@ class Creature;
 class CreatureAIScript;
 class GossipScript;
 class GameObjectAIScript;
+class SpellScript;
 class ScriptMgr;
 struct ItemPrototype;
 class QuestLogEntry;
@@ -116,6 +124,7 @@ class QuestLogEntry;
 /* Factory Imports (from script lib) */
 typedef CreatureAIScript*(*exp_create_creature_ai)(Creature * pCreature);
 typedef GameObjectAIScript*(*exp_create_gameobject_ai)(GameObject * pGameObject);
+typedef SpellScript*(*exp_create_spell)(Spell * pSpell);
 typedef bool(*exp_handle_dummy_spell)(uint32 i, Spell * pSpell);
 typedef bool(*exp_handle_dummy_aura)(uint32 i, Aura * pAura, bool apply);
 typedef void(*exp_script_register)(ScriptMgr * mgr);
@@ -126,6 +135,7 @@ typedef uint32(*exp_get_version)();
 /* Hashmap typedefs */
 typedef HM_NAMESPACE::hash_map<uint32, exp_create_creature_ai> CreatureCreateMap;
 typedef HM_NAMESPACE::hash_map<uint32, exp_create_gameobject_ai> GameObjectCreateMap;
+typedef HM_NAMESPACE::hash_map<uint32, exp_create_spell> SpellCreateMap;
 typedef HM_NAMESPACE::hash_map<uint32, exp_handle_dummy_aura> HandleDummyAuraMap;
 typedef HM_NAMESPACE::hash_map<uint32, exp_handle_dummy_spell> HandleDummySpellMap;
 typedef set<GossipScript*> CustomGossipScripts;
@@ -151,6 +161,7 @@ public:
 
 	CreatureAIScript * CreateAIScriptClassForEntry(Creature* pCreature);
 	GameObjectAIScript * CreateAIScriptClassForGameObject(uint32 uEntryId, GameObject* pGameObject);
+	SpellScript * CreateAIScriptClassForSpell(uint32 uEntryId, Spell* pSpell);
 
 	bool CallScriptedDummySpell(uint32 uSpellId, uint32 i, Spell* pSpell);
 	bool CallScriptedDummyAura( uint32 uSpellId, uint32 i, Aura* pAura, bool apply);
@@ -158,6 +169,7 @@ public:
 
 	void register_creature_script(uint32 entry, exp_create_creature_ai callback);
 	void register_gameobject_script(uint32 entry, exp_create_gameobject_ai callback);
+	void register_spell_script(uint32 entry, exp_create_spell callback);
 	void register_gossip_script(uint32 entry, GossipScript * gs);
 	void register_go_gossip_script(uint32 entry, GossipScript * gs);
 	void register_dummy_aura(uint32 entry, exp_handle_dummy_aura callback);
@@ -172,6 +184,7 @@ protected:
 	CreatureCreateMap _creatures;
 	GameObjectCreateMap _gameobjects;
 	HandleDummyAuraMap _auras;
+	SpellCreateMap _spellscripts;
 	HandleDummySpellMap _spells;
 	LibraryHandleMap _handles;
 	ServerHookList _hooks[NUM_SERVER_HOOKS];
@@ -244,6 +257,44 @@ protected:
 
 	GameObject* _gameobject;
 };
+
+class SERVER_DECL SpellScript : public EventableObject
+{
+protected:
+	Spell* _spell;
+public:
+	SpellScript(Spell* pSpell);
+	~SpellScript();
+
+	std::set<Aura*> Auras;
+	std::set<DynamicObject*> DynamicObjects;
+	uint32 flags;
+
+	virtual SpellCastError CanCast(bool tolerate=false) { return SPELL_CANCAST_OK; }
+	virtual void OnCast() {}
+	virtual void CalculateEffect(uint32 EffectIndex, Unit* target, int32* value) {}
+	virtual void OnEffect(uint32 EffectIndex) {}
+	virtual void SpellUpdate() {}
+	virtual void OnDispel(Aura* pDispelledAura, Spell* pDispellingSpell) {}
+	virtual void OnExpire(Aura* pExpiredAura) {}
+	virtual void OnRemove(Aura* pRemovedAura) {}
+
+	void RegisterSpellUpdate(uint32 time);
+	void RemoveSpellUpdate();
+	void ModfiySpellUpdate(uint32 newtime);
+	void AddRef(Aura* obj);
+	void RemoveRef(Aura* obj);
+	void AddRef(DynamicObject* obj);
+	void RemoveRef(DynamicObject* obj);
+	void TryDelete();
+
+	//dummy/script stuff
+	virtual void DummyEffect(uint32 EffectIndex) {}
+	virtual void DummyMeleeEffect(uint32 EffectIndex) {}
+	virtual void ScriptEffect(uint32 EffectIndex) {}
+	virtual void DummyAura(bool Apply) {}
+};
+
 
 class SERVER_DECL GossipScript
 {

@@ -4099,7 +4099,7 @@ void Unit::smsg_AttackStart(Unit* pVictim)
     }
 }
 
-void Unit::AddAura(Aura *aur)
+void Unit::AddAura(Aura *aur, SpellScript* script)
 {
 	if( m_mapId != 530 )
 	{
@@ -4359,6 +4359,9 @@ void Unit::AddAura(Aura *aur)
 			pCaster->RemoveAllAuraByNameHash(SPELL_HASH_BLESSING_OF_PROTECTION);
 		}
 	}
+	//we got here, add the script reference
+	if (script != NULL)
+		script->AddRef(aur);
 }
 
 bool Unit::RemoveAura(Aura *aur)
