@@ -64,8 +64,6 @@ void Master::_OnSignal(int s)
 	case SIGABRT:
 #ifdef _WIN32
 	case SIGBREAK:
-#else
-	//case SIGSEGV:
 #endif
 		Master::m_stopEvent = true;
 		break;
@@ -760,8 +758,6 @@ void Master::_HookSignals()
 #ifdef _WIN32
 	signal( SIGBREAK, _OnSignal );
 #else
-	signal( SIGSEGV, SIG_IGN );		//lts try it
-	//signal( SIGSEGV, _OnSignal );
 	signal( SIGHUP, _OnSignal );
 	signal(SIGUSR1, _OnSignal);
 #endif
@@ -776,7 +772,6 @@ void Master::_UnhookSignals()
 	signal( SIGBREAK, 0 );
 #else
 	signal( SIGHUP, 0 );
-	signal( SIGSEGV, 0 );
 #endif
 
 }

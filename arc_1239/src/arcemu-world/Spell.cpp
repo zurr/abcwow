@@ -1381,6 +1381,9 @@ void Spell::cast(bool check)
         {
 			if( GetProto()->Effect[i] && GetProto()->Effect[i] != SPELL_EFFECT_PERSISTENT_AREA_AURA)
 				 FillTargetMap(i);
+
+				if ( i > 3 )
+					return;
         }
 
 		if(m_magnetTarget){ // Spell was redirected
@@ -1575,8 +1578,6 @@ void Spell::cast(bool check)
 				}
 			}
 
-			std::vector<uint64>::iterator i, i2;
-
 			// this is here to avoid double search in the unique list
 			//bool canreflect = false, reflected = false;
 			for(int j=0;j<3;j++)
@@ -1598,7 +1599,7 @@ void Spell::cast(bool check)
 
 			if(!IsReflected() && GetCanReflect() && m_caster->IsInWorld())
 			{
-				for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+				for(std::set<uint64>::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 				{
 					Unit *Target = m_caster->GetMapMgr()->GetUnit(*i);
 					if(Target)
@@ -1630,6 +1631,8 @@ void Spell::cast(bool check)
                     // check if we actualy have a effect
 					if( GetProto()->Effect[x])
 					{
+						sLog.outDebug( "WORLD: Spell::cast HandleEffects() (spell %d)", GetProto()->Id);
+
 						isDuelEffect = isDuelEffect ||  GetProto()->Effect[x] == SPELL_EFFECT_DUEL;
 						if( GetProto()->Effect[x] == SPELL_EFFECT_PERSISTENT_AREA_AURA)
                         {
@@ -1637,10 +1640,11 @@ void Spell::cast(bool check)
                         }
 						else if (m_targetUnits[x].size()>0)
 						{
-							for(i= m_targetUnits[x].begin();i != m_targetUnits[x].end();)
+							for(TargetsList::iterator t = m_targetUnits[x].begin(); t != m_targetUnits[x].end(); )
                             {
-								i2 = i++;
-								HandleEffects((*i2),x);
+								sLog.outDebug( "WORLD: Spell::cast HandleEffects(%d,%d) (spell %d)",*t,x, GetProto()->Id);
+								HandleEffects(*t,x);
+								++t;
                             }
 						}
 
@@ -1649,6 +1653,7 @@ void Spell::cast(bool check)
 							     GetProto()->Effect[x] == SPELL_EFFECT_SUMMON ||
 								 GetProto()->Effect[x] == SPELL_EFFECT_TRIGGER_SPELL)
                         {
+							sLog.outDebug( "WORLD: Spell::cast HandleEffects(%d,%d) SPELL_EFFECT_SUMMON (spell %d)",m_caster->GetGUID(),x, GetProto()->Id);
 							HandleEffects(m_caster->GetGUID(),x);
                         }
 					}
@@ -1660,7 +1665,7 @@ void Spell::cast(bool check)
 				{
 					hadEffect = true; // spell has had an effect (for item removal & possibly other things)
 
-					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+					for(std::set<uint64>::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 					{
 						HandleAddAura((*i));
 					}
@@ -1668,7 +1673,7 @@ void Spell::cast(bool check)
 				// spells that proc on spell cast, some talents
 				if(p_caster && p_caster->IsInWorld())
 				{
-					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+					for(std::set<uint64>::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 					{
 						Unit * Target = p_caster->GetMapMgr()->GetUnit((*i));
 
@@ -2171,7 +2176,7 @@ void Spell::SendSpellGo()
 					}
 				}
 				if( add && (*i) != 0 )
-					UniqueTargets.push_back( (*i) );
+					UniqueTargets.insert( (*i) );
 				//TargetsList::iterator itr = std::unique(m_targetUnits[x].begin(), m_targetUnits[x].end());
 				//UniqueTargets.insert(UniqueTargets.begin(),));
 				//UniqueTargets.insert(UniqueTargets.begin(), itr);
@@ -2749,7 +2754,7 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 	id = GetProto()->Effect[i];
 	if( id<TOTAL_SPELL_EFFECTS)
 	{
-		sLog.outDebug( "WORLD: Spell effect id = %u (%s), damage = %d", id, SpellEffectNames[id], damage);
+		sLog.outDebug( "WORLD: Spell effect id = %u (%s), damage = %d (spell %d)", id, SpellEffectNames[id], damage,GetProto()->Id);
 
 		/*if(unitTarget && p_caster && isAttackable(p_caster,unitTarget))
 			sEventMgr.ModifyEventTimeLeft(p_caster,EVENT_ATTACK_TIMEOUT,PLAYER_ATTACK_TIMEOUT_INTERVAL);*/
@@ -4865,16 +4870,17 @@ void Spell::SafeAddTarget(TargetsList* tgt,uint64 guid)
 {
 	if(guid == 0)
 		return;
-
+/*
 	for(TargetsList::iterator i=tgt->begin();i!=tgt->end();i++)
 		if((*i)==guid)
 			return;
-
-	tgt->push_back(guid);
+*/
+	tgt->insert(guid);
 }
 
 void Spell::SafeAddMissedTarget(uint64 guid)
 {
+
     for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
         if((*i).TargetGuid==guid)
         {
@@ -4889,6 +4895,7 @@ void Spell::SafeAddMissedTarget(uint64 guid)
 
 void Spell::SafeAddModeratedTarget(uint64 guid, uint16 type)
 {
+
 	for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
 		if((*i).TargetGuid==guid)
         {

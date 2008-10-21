@@ -1483,7 +1483,7 @@ struct SpellTargetMod
 };
 
 
-typedef std::vector<uint64> TargetsList;
+typedef std::set<uint64> TargetsList;
 typedef std::vector<SpellTargetMod> SpellTargetsList;
 
 typedef void(Spell::*pSpellEffect)(uint32 i);
@@ -1773,7 +1773,7 @@ public:
 	// It should NOT be used for weapon_damage_type which needs: 0 = MELEE, 1 = OFFHAND, 2 = RANGED
 	ARCEMU_INLINE uint32 GetType() { return ( GetProto()->Spell_Dmg_Type == SPELL_DMG_TYPE_NONE ? SPELL_DMG_TYPE_MAGIC : GetProto()->Spell_Dmg_Type ); }
 
-    std::vector<uint64> UniqueTargets;
+    std::set<uint64> UniqueTargets;
     SpellTargetsList    ModeratedTargets;
 
     ARCEMU_INLINE Item* GetItemTarget() { return itemTarget; }
@@ -1868,12 +1868,14 @@ public:
     ARCEMU_INLINE float GetRadius(uint32 i)
     {
         if(bRadSet[i])return Rad[i];
-        bRadSet[i]=true;
-        Rad[i]=::GetRadius(dbcSpellRadius.LookupEntry(GetProto()->EffectRadiusIndex[i]));
-		if(GetProto()->SpellGroupType && u_caster)
-        {
-            SM_FFValue(u_caster->SM_FRadius,&Rad[i],GetProto()->SpellGroupType);
-            SM_PFValue(u_caster->SM_PRadius,&Rad[i],GetProto()->SpellGroupType);
+		if (GetProto()->EffectRadiusIndex[i])
+		{
+			bRadSet[i]=true;
+			Rad[i]=::GetRadius(dbcSpellRadius.LookupEntry(GetProto()->EffectRadiusIndex[i]));
+			if(GetProto()->SpellGroupType && u_caster)
+			{
+				SM_FFValue(u_caster->SM_FRadius,&Rad[i],GetProto()->SpellGroupType);
+				SM_PFValue(u_caster->SM_PRadius,&Rad[i],GetProto()->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 			float spell_flat_modifers=0;
 			float spell_pct_modifers=1;
@@ -1882,9 +1884,12 @@ public:
 			if(spell_flat_modifers!=0 || spell_pct_modifers!=1)
 				printf("!!!!!spell radius mod flat %f , spell radius mod pct %f , spell radius %f, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Rad[i],GetProto()->SpellGroupType);
 #endif
-        }
+			}
 
-        return Rad[i];
+			 return Rad[i];
+		}
+		else 
+			return 0;
     }
 
     ARCEMU_INLINE static uint32 GetBaseThreat(uint32 dmg)
