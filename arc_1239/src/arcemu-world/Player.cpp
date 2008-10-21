@@ -4202,7 +4202,7 @@ void Player::RepopRequestedPlayer()
 		return;
 	}
 
-	MapInfo * pMapinfo;
+	MapInfo * pMapinfo = NULL;
 
 	sEventMgr.RemoveEvents( this, EVENT_PLAYER_FORECED_RESURECT ); //in case somebody resurrected us before this event happened
 
@@ -4257,14 +4257,16 @@ void Player::RepopRequestedPlayer()
 	if( myCorpse != NULL )
 		myCorpse->ResetDeathClock();
 	
-	switch( pMapinfo->mapid )
-	{
-		case 550: //The Eye
-		case 552: //The Arcatraz
-		case 553: //The Botanica
-		case 554: //The Mechanar
-			ResurrectPlayer();
-			break;
+	if (pMapinfo) {
+		switch( pMapinfo->mapid )
+		{
+			case 550: //The Eye
+			case 552: //The Arcatraz
+			case 553: //The Botanica
+			case 554: //The Mechanar
+				ResurrectPlayer();
+				break;
+		}
 	}
 
 }

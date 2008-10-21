@@ -2733,7 +2733,7 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 		pCreature->GetAIInterface()->Init(pCreature,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
 		pCreature->GetAIInterface()->SetUnitToFollow(u_caster);
 		pCreature->GetAIInterface()->SetUnitToFollowAngle(float(-(M_PI/2)));
-		pCreature->GetAIInterface()->SetFollowDistance(GetRadius(GetProto()->EffectRadiusIndex[i]));
+		pCreature->GetAIInterface()->SetFollowDistance(GetRadius(i));
 		pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, u_caster->getLevel());
 		pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, u_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 		pCreature->_setFaction();
@@ -5587,7 +5587,7 @@ void Spell::SpellEffectSummonCritter(uint32 i)
 	pCreature->GetAIInterface()->Init(pCreature,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
 	pCreature->GetAIInterface()->SetUnitToFollow(u_caster);
 	pCreature->GetAIInterface()->SetUnitToFollowAngle(float(-(M_PI/2)));
-	pCreature->GetAIInterface()->SetFollowDistance(GetRadius(GetProto()->EffectRadiusIndex[i]));
+	pCreature->GetAIInterface()->SetFollowDistance(GetRadius(i));
 	pCreature->GetAIInterface()->disable_melee = true;
 	pCreature->bInvincible = true;
 	pCreature->PushToWorld(u_caster->GetMapMgr());
