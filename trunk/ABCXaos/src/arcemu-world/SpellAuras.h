@@ -376,6 +376,9 @@ public:
 	void Virtual_Destructor();		//this makes sure we do not leave events on objects that are supposed to be deleted
 	int32 m_bufferPoolId;
 
+	bool m_wasremoved;
+	SpellScript* m_spellScript;
+
 	void ExpireRemove();
     void Remove();
     void Expire();

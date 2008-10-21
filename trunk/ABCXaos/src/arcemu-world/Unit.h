@@ -681,6 +681,7 @@ protected:
 //  Base object for Players and Creatures
 //====================================================================
 
+class SpellScript;
 class SERVER_DECL Unit : public Object
 {
 public:
@@ -810,7 +811,7 @@ public:
 	void OnDamageTaken();
 
 	//! Add Aura to unit
-	void AddAura(Aura *aur);
+	void AddAura(Aura *aur, SpellScript* script);
 	//! Remove aura from unit
 	bool RemoveAura(Aura *aur);
 	bool RemoveAura(uint32 spellId);

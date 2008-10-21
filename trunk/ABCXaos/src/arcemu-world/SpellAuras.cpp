@@ -608,6 +608,7 @@ Aura::Aura()
 
 void Aura::Init( SpellEntry* proto, int32 duration, Object* caster, Unit* target, Item* i_caster )
 {
+	m_wasremoved = false;
 	m_castInDuel = false;
 	m_spellProto = proto;
 	m_duration = duration;
@@ -711,7 +712,10 @@ void Aura::Virtual_Constructor()
 
 Aura::~Aura()
 {
-	sEventMgr.RemoveEvents( this );
+	if(m_spellScript != NULL)
+		m_spellScript->RemoveRef(this);
+
+	sEventMgr.RemoveEvents(this);
 }
 
 void Aura::Virtual_Destructor()
@@ -732,6 +736,14 @@ void Aura::Remove()
 	}
 
 	sEventMgr.RemoveEvents( this );
+
+	if(m_spellScript != NULL)
+	{
+		if(GetTimeLeft() == 0 && !m_ignoreunapply && !m_wasremoved)
+			m_spellScript->OnExpire(this);
+
+		m_spellScript->OnRemove(this);
+	}
 
 	if( !IsPassive() || IsPassive() && m_spellProto->AttributesEx & 1024 )
 		RemoveAuraVisual();
@@ -1084,7 +1096,7 @@ void Aura::EventUpdateAA(float r)
 			}
 			if(aura)
 			{
-				plr->AddAura(aura);
+				plr->AddAura(aura, m_spellScript);
 				NewTargets.push_back(plr->GetLowGUID());
 			}
 		}
@@ -1106,7 +1118,7 @@ void Aura::EventUpdateAA(float r)
 			aura->Init(m_spellProto, -1, u_caster, summon );
 			aura->m_areaAura = true;
 			aura->AddMod( mod->m_type, mod->m_amount, mod->m_miscValue, mod->i);
-			summon->AddAura( aura );
+			summon->AddAura( aura, m_spellScript );
 			//make sure we remove this
 //			sEventMgr.AddEvent(((Unit*)summon), &Unit::EventRemoveAura, m_spellProto->Id, EVENT_DELETE_TIMER, 10, 1,0);
 		}
@@ -1146,7 +1158,7 @@ void Aura::EventUpdateAA(float r)
 					}
 					if(aura)
 					{
-						(*itr)->m_loggedInPlayer->AddAura(aura);
+						(*itr)->m_loggedInPlayer->AddAura(aura, m_spellScript);
 						NewTargets.push_back((*itr)->m_loggedInPlayer->GetLowGUID());
 					}
 				}
@@ -1631,6 +1643,9 @@ void Aura::EventPeriodicDamage(uint32 amount)
 
 void Aura::SpellAuraDummy(bool apply)
 {
+	if(m_spellScript != NULL)
+		m_spellScript->DummyAura(apply);
+
 	// Try a dummy SpellHandler
 	if(sScriptMgr.CallScriptedDummyAura(GetSpellId(), mod->i, this, apply))
 		return;

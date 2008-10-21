@@ -340,6 +340,11 @@ void ScriptMgr::register_dummy_aura(uint32 entry, exp_handle_dummy_aura callback
 	_auras.insert( HandleDummyAuraMap::value_type( entry, callback ) );
 }
 
+void ScriptMgr::register_spell_script(uint32 entry, exp_create_spell callback)
+{
+	_spellscripts.insert( SpellCreateMap::value_type(entry, callback) );
+}
+
 void ScriptMgr::register_dummy_spell(uint32 entry, exp_handle_dummy_spell callback)
 {
 	_spells.insert( HandleDummySpellMap::value_type( entry, callback ) );
@@ -390,6 +395,16 @@ GameObjectAIScript * ScriptMgr::CreateAIScriptClassForGameObject(uint32 uEntryId
 
 	exp_create_gameobject_ai function_ptr = itr->second;
 	return (function_ptr)(pGameObject);
+}
+
+SpellScript * ScriptMgr::CreateAIScriptClassForSpell(uint32 uEntryId, Spell* pSpell)
+{
+	SpellCreateMap::iterator itr = _spellscripts.find(uEntryId);
+	if( itr == _spellscripts.end() )
+		return NULL;
+
+	exp_create_spell function_ptr = itr->second;
+	return (function_ptr)(pSpell);
 }
 
 bool ScriptMgr::CallScriptedDummySpell(uint32 uSpellId, uint32 i, Spell* pSpell)
@@ -943,4 +958,75 @@ void HookInterface::OnAdvanceSkillLine(Player * pPlayer, uint32 SkillLine, uint3
 	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_ADVANCE_SKILLLINE, tOnAdvanceSkillLine)
 		(call)(pPlayer, SkillLine, Current);
 	OUTER_LOOP_END
+}
+
+SpellScript::SpellScript(Spell *pSpell)
+{
+	_spell = pSpell;
+}
+SpellScript::~SpellScript()
+{
+	_spell = NULL;
+	sEventMgr.RemoveEvents(this);
+
+
+
+
+}
+
+void SpellScript::RegisterSpellUpdate(uint32 time)
+{
+	sEventMgr.AddEvent(this, &SpellScript::SpellUpdate, EVENT_SCRIPT_UPDATE_EVENT, time, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+}
+
+void SpellScript::RemoveSpellUpdate()
+{
+	sEventMgr.RemoveEvents(this, EVENT_SCRIPT_UPDATE_EVENT);
+}
+
+void SpellScript::ModfiySpellUpdate(uint32 newtime)
+{
+	sEventMgr.ModifyEventTimeAndTimeLeft(this, EVENT_SCRIPT_UPDATE_EVENT, newtime);
+}
+
+void SpellScript::AddRef(Aura* obj)
+{
+	Auras.insert(obj);
+	obj->m_spellScript=this;
+}
+
+void SpellScript::AddRef(DynamicObject* obj)
+{
+	DynamicObjects.insert(obj);
+	obj->m_spellScript=this;
+}
+
+void SpellScript::RemoveRef(Aura* obj)
+{
+	if (Auras.find(obj) != Auras.end())
+	{
+		obj->m_spellScript = NULL;
+		Auras.erase(obj);
+	}
+
+	//all auras removed and spell removed?
+	TryDelete();
+}
+
+void SpellScript::RemoveRef(DynamicObject* obj)
+{
+	if (DynamicObjects.find(obj) != DynamicObjects.end())
+	{
+		obj->m_spellScript = NULL;
+		DynamicObjects.erase(obj);
+	}
+
+	//all auras removed and spell removed?
+	TryDelete();
+}
+
+void SpellScript::TryDelete()
+{
+	if (Auras.size() == 0 && DynamicObjects.size() == 0 && _spell == NULL)
+		delete this;
 }

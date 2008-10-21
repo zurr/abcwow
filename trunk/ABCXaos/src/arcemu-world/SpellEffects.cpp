@@ -627,6 +627,9 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 {
 	uint32 spellId = GetProto()->Id;
 	
+	if(m_spellScript != NULL)
+		m_spellScript->DummyMeleeEffect(i);
+
 	// Try a dummy SpellHandler
 	if(sScriptMgr.CallScriptedDummySpell(spellId, i, this))
 		return;
@@ -997,7 +1000,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 						aur->Init(dbcSpell.LookupEntry(38437), 5000, p_caster, p_caster);
 						for( uint32 i=0; i<3; i++ ) 
 							aur->AddMod( aur->GetSpellProto()->EffectApplyAuraName[i], aur->GetSpellProto()->EffectBasePoints[i]+1, aur->GetSpellProto()->EffectMiscValue[i], i );
-						p_caster->AddAura(aur);
+						p_caster->AddAura(aur, m_spellScript);
 					}
 				}break;
 			default:
@@ -3622,6 +3625,9 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 			
 			if (auraRemoved)
 			{
+				if(aur->m_spellScript != NULL)
+					aur->m_spellScript->OnDispel(aur, this);
+
 				if( aur->GetSpellProto()->NameHash == SPELL_HASH_UNSTABLE_AFFLICTION )
 				{
 					SpellEntry *spellInfo = dbcSpell.LookupEntry(31117);
@@ -4526,6 +4532,9 @@ void Spell::SpellEffectSummonObjectWild(uint32 i)
 void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 {
 	uint32 spellId = GetProto()->Id;
+
+	if(m_spellScript != NULL)
+		m_spellScript->ScriptEffect(i);
 
 	// Try a dummy SpellHandler
 	if(sScriptMgr.CallScriptedDummySpell(spellId, i, this))
@@ -6089,6 +6098,10 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
+		if(m_spellScript != NULL)
+			m_spellScript->DummyMeleeEffect(i);
+
+
 	if( GetProto()->NameHash == SPELL_HASH_OVERPOWER && p_caster != NULL ) //warrior : overpower - let us clear the event and the combopoint count
 	{
 		p_caster->NullComboPoints(); //some say that we should only remove 1 point per dodge. Due to cooldown you can't cast it twice anyway..
@@ -6297,7 +6310,7 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 					{
 						aur = AuraPool.PooledNew();
 						aur->Init( aura->GetSpellProto(), aurdur, u_caster, u_caster );
-						u_caster->AddAura(aur);
+						u_caster->AddAura(aur, m_spellScript);
 						aur = NULL;
 					}
 					if(!(aura->GetSpellProto()->procFlags & PROC_REMOVEONUSE))
@@ -6311,7 +6324,7 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 						u_caster->m_chargeSpells.insert(make_pair(aura->GetSpellId(),charge));
 					}
 				}
-				u_caster->AddAura(aura);
+				u_caster->AddAura(aura, m_spellScript);
 				break;
 			}			
 		}

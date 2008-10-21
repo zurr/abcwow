@@ -1623,7 +1623,11 @@ void Spell::cast(bool check)
 			if(u_caster && !m_triggeredSpell && !m_triggeredByAura)
 				u_caster->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_CAST_SPELL, GetProto()->Id);
 
-            // if the spell is not reflected
+            // call script before doing effects/aura
+			if(m_spellScript != NULL)
+				m_spellScript->OnCast();
+
+			// if the spell is not reflected
 			if(!IsReflected())
 			{
 				for(uint32 x=0;x<3;x++)
@@ -2690,6 +2694,9 @@ bool Spell::TakePower()
 
 void Spell::HandleEffects(uint64 guid, uint32 i)
 {
+	if(m_spellScript != NULL)
+		m_spellScript->OnEffect(i);
+
 	uint32 id;
 
 	if(guid == m_caster->GetGUID() || guid == 0)
@@ -2847,8 +2854,13 @@ void Spell::HandleAddAura(uint64 guid)
 				for(int i=0;i<charges-1;i++)
 				{
 					aur = AuraPool.PooledNew();
+
+					// reference back to spellscript class
+					if(m_spellScript != NULL)
+						m_spellScript->AddRef(aur);
+
 					aur->Init(itr->second->GetSpellProto(),itr->second->GetDuration(),itr->second->GetCaster(),itr->second->GetTarget(), i_caster);
-					Target->AddAura(aur);
+					Target->AddAura(aur, m_spellScript);
 					aur=NULL;
 				}
 				if(!(itr->second->GetSpellProto()->procFlags & PROC_REMOVEONUSE))
@@ -2862,7 +2874,8 @@ void Spell::HandleAddAura(uint64 guid)
 					Target->m_chargeSpells.insert(make_pair(itr->second->GetSpellId(),charge));
 				}
 			}
-			Target->AddAura(itr->second); // the real spell is added last so the modifier is removed last
+			Target->AddAura(itr->second, m_spellScript); // the real spell is added last so the modifier is removed last
+
 			Target->tmpAura.erase(itr);
 		}
 	}
@@ -2954,6 +2967,13 @@ uint8 Spell::CanCast(bool tolerate)
 
 	if(m_caster->IsInWorld())
 	{
+		if(m_spellScript != NULL)
+		{
+			SpellCastError scriptresult = m_spellScript->CanCast(tolerate);
+			if((m_spellScript->flags & SSCRIPT_FLAG_COMPLETE_CHECK) || scriptresult != SPELL_CANCAST_OK)
+				return scriptresult;
+		}
+
 		Unit *target = m_caster->GetMapMgr()->GetUnit( m_targets.m_unitTarget );
 
 		if( target )
@@ -4405,6 +4425,9 @@ exit:
 			}
 		}
 	 }
+
+	if(m_spellScript != NULL)
+		m_spellScript->CalculateEffect(i, target, &value);
 
 	// TODO: INHERIT ITEM MODS FROM REAL ITEM OWNER - BURLEX BUT DO IT PROPERLY
 
