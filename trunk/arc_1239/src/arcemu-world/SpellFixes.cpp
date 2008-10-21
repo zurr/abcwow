@@ -658,12 +658,12 @@ void ApplyNormalFixes()
 				if(itr == sWorld.TeachingSpellMap.end())
 					sWorld.TeachingSpellMap.insert(make_pair(sp->EffectTriggerSpell[b],sp->Id));
 			}
-
+/*
 			if( sp->Attributes & ATTRIBUTES_ONLY_OUTDOORS && sp->EffectApplyAuraName[b] == SPELL_AURA_MOUNTED )
 			{
 				sp->Attributes &= ~ATTRIBUTES_ONLY_OUTDOORS;
 			}
-
+*/
 			// fill in more here
 			/*switch( sp->EffectImplicitTargetA[b] )
 			{

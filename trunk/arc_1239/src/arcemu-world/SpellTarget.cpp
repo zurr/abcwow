@@ -225,6 +225,9 @@ pSpellTarget SpellTargetHandler[EFF_TARGET_LIST_LENGTH_MARKER] =
 /// the targets are specified with numbers and handled accordingly
 void Spell::FillTargetMap(uint32 i)
 {
+	if ( i > 3 )
+		return;
+
 	uint32 cur;
 	
 	uint32 TypeA = m_spellInfo->EffectImplicitTargetA[i];
@@ -640,7 +643,7 @@ void Spell::SpellTargetTypeTAOE(uint32 i, uint32 j)
 
 	// tranquility
 	if( u_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_TRANQUILITY )
-		m_targetUnits[i].push_back( u_caster->GetGUID() );
+		m_targetUnits[i].insert( u_caster->GetGUID() );
 	else
 		FillAllTargetsInArea( (LocationVector&)Target->GetPosition(), i );
 }
@@ -666,11 +669,15 @@ void Spell::SpellTargetScriptedEffects(uint32 i, uint32 j)
 /// Spell Target Handling for type 32 / 73: related to summoned pet or creature
 void Spell::SpellTargetSummon(uint32 i, uint32 j)
 {// Minion Target
-	TargetsList *tmpMap=&m_targetUnits[i];
-	if(m_caster->GetUInt64Value(UNIT_FIELD_SUMMON) == 0)
-		SafeAddTarget(tmpMap,m_caster->GetGUID());
-	else
-		SafeAddTarget(tmpMap,m_caster->GetUInt64Value(UNIT_FIELD_SUMMON));
+
+	if ( m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_PET )
+	{
+		TargetsList *tmpMap=&m_targetUnits[i];
+		if(m_caster->GetUInt64Value(UNIT_FIELD_SUMMON) == 0)
+			SafeAddTarget(tmpMap,u_caster->GetGUID());
+		else
+			SafeAddTarget(tmpMap,m_caster->GetUInt64Value(UNIT_FIELD_SUMMON));
+	}
 }
 
 /// Spell Target Handling for type 33: Party members of totem, inside given range

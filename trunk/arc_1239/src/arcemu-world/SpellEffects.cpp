@@ -3697,15 +3697,13 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 		z = u_caster->GetPositionZ();
 	}
 
-	// temp solution, need to find out why CalculateEffect() returnes bad values here
-	if ( damage > 3 || damage < 0 )
-		damage = 3;
-
-	for(int i=0;i<damage;i++)
+	float angle_for_each_spawn = -float(M_PI) * 2 / damage;
+	for(int32 j=0;j<damage;j++)
 	{
-		float m_fallowAngle=-(float(M_PI)/2*i);
-		x += (GetRadius(GetProto()->EffectRadiusIndex[i])*(cosf(m_fallowAngle+u_caster->GetOrientation())));
-		y += (GetRadius(GetProto()->EffectRadiusIndex[i])*(sinf(m_fallowAngle+u_caster->GetOrientation())));
+		float m_fallowAngle = angle_for_each_spawn * j;
+		x += 3 * ( cosf( m_fallowAngle + u_caster->GetOrientation() ) );
+		y += 3 * ( sinf( m_fallowAngle + u_caster->GetOrientation() ) );
+
 		Creature * p = u_caster->GetMapMgr()->CreateCreature(cr_entry);
 		//ASSERT(p);
 		p->Load(proto, x, y, z);
@@ -3770,14 +3768,11 @@ void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 		vec = new LocationVector(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ);
 	}
 
-	// temp solution, need to find out why CalculateEffect() returnes bad values here
-	if ( damage > 3 || damage < 0 )
-		damage = 3;
 
 	float angle_for_each_spawn = -float(M_PI) * 2 / damage;
-	for( int i = 0; i < damage; i++ )
+	for( int32 j = 0; j < damage; j++ )
 	{
-		float m_fallowAngle = angle_for_each_spawn * i;
+		float m_fallowAngle = angle_for_each_spawn * j;
 		u_caster->create_guardian(cr_entry,GetDuration(),m_fallowAngle,level,obj,vec );
 	}
 	if (vec) delete vec;
@@ -4162,7 +4157,7 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 	//Succubus:lash of pain, soothing kiss, seduce , lesser invisibility
 	//felhunter:	 Devour Magic,Paranoia,Spell Lock,	Tainted Blood
  
-	if(!p_caster || p_caster->getClass() != WARLOCK)
+	if(!p_caster)
 		return;
 	
 	// remove old pet
@@ -4173,14 +4168,17 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 	CreatureInfo *ci = CreatureNameStorage.LookupEntry(GetProto()->EffectMiscValue[i]);
 	if(ci)
 	{
+		if(p_caster->getClass() == WARLOCK)
+		{
 		//if demonic sacrifice auras are still active, remove them
 		//uint32 spids[] = { 18789, 18790, 18791, 18792, 35701, 0 };
 		//p_caster->RemoveAuras(spids);
-		p_caster->RemoveAura(18789);
-		p_caster->RemoveAura(18790);
-		p_caster->RemoveAura(18791);
-		p_caster->RemoveAura(18792);
-		p_caster->RemoveAura(35701);
+			p_caster->RemoveAura(18789);
+			p_caster->RemoveAura(18790);
+			p_caster->RemoveAura(18791);
+			p_caster->RemoveAura(18792);
+			p_caster->RemoveAura(35701);
+		}
 
 		Pet *summon = objmgr.CreatePet();
 		summon->SetInstanceID(m_caster->GetInstanceID());
