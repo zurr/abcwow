@@ -1188,6 +1188,14 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		}
 	}
 
+	if( proto->CanRanged == 1 )
+	{
+		GetAIInterface()->m_canRangedAttack = true;
+	}
+	else
+	{
+		m_aiInterface->m_canRangedAttack = false;
+	}
 
 //SETUP NPC FLAGS
 	SetUInt32Value(UNIT_NPC_FLAGS,proto->NPCFLags);
@@ -1393,6 +1401,16 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 			GetAIInterface()->m_canCallForHelp = true;
 		}
 	}
+
+	if( proto->CanRanged == 1 )
+	{
+		GetAIInterface()->m_canRangedAttack = true;
+	}
+	else
+	{
+		m_aiInterface->m_canRangedAttack = false;
+	}
+
 
 	//SETUP NPC FLAGS
 	SetUInt32Value(UNIT_NPC_FLAGS,proto->NPCFLags);
