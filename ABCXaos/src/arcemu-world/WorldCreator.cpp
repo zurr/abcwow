@@ -39,6 +39,9 @@ void InstanceMgr::Load(TaskList * l)
 {
 	new FormationMgr;
 
+	new WorldStateTemplateManager;
+	sWorldStateTemplateManager.LoadFromDB();
+
 	// Create all non-instance type maps.
 	QueryResult *result = CharacterDatabase.Query( "SELECT MAX(id) FROM instances" );
 	if( result )
@@ -117,7 +120,7 @@ void InstanceMgr::Load(TaskList * l)
 
 InstanceMgr::~InstanceMgr()
 {
-
+	delete WorldStateTemplateManager::getSingletonPtr();
 }
 
 void InstanceMgr::Shutdown()

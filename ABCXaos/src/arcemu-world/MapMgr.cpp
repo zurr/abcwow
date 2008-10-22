@@ -27,8 +27,7 @@
 #define MAPMGR_INACTIVE_MOVE_TIME 30
 extern bool bServerShutdown;
 
-MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>(map), _mapId(mapId), eventHolder(instanceid)
-{
+MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>(map), _mapId(mapId), eventHolder(instanceid), m_stateManager(*this){
 	_shutdown = false;
 	m_instanceID = instanceid;
 	pMapInfo = WorldMapInfoStorage.LookupEntry(mapId);
@@ -146,7 +145,7 @@ MapMgr::~MapMgr()
 
 	Log.Notice("MapMgr", "Instance %u shut down. (%s)" , m_instanceID, GetBaseMap()->GetName());
 }
-
+/*
 WorldPacket* MapMgr::BuildInitialWorldState()
 {
 	WorldPacket * data = new WorldPacket(SMSG_INIT_WORLD_STATES, 99);
@@ -163,7 +162,8 @@ WorldPacket* MapMgr::BuildInitialWorldState()
 
 	return data;
 }
-
+*/
+/*
 void MapMgr::SetWorldState(uint32 state, uint32 value)
 {
 	if(_worldStateSet.find(state) == _worldStateSet.end())
@@ -198,7 +198,7 @@ uint32 MapMgr::GetWorldState(uint32 state)
 
 	return _worldStateSet[state];
 }
-
+*/
 uint32 MapMgr::GetTeamPlayersCount(uint32 teamId)
 {
 	uint32 result = 0;
@@ -1549,6 +1549,9 @@ bool MapMgr::Do()
 	/* load corpses */
 	objmgr.LoadCorpses(this);
 
+	// initialize worldstates
+	sWorldStateTemplateManager.ApplyMapTemplate(this);
+
 	// always declare local variables outside of the loop!
 	// otherwise theres a lot of sub esp; going on.
 
@@ -2073,4 +2076,260 @@ void MapMgr::RemoveForcedCell(MapCell* c)
 {
 	m_forcedcells.erase( c );
 	UpdateCellActivity( c->GetPositionX(), c->GetPositionY(), 1 );
+}
+/*
+void MapMgr::SetWorldState(uint32 zoneid, uint32 index, uint32 value)
+{
+	//do we have a worldstate already?
+	HM_NAMESPACE::hash_map<uint32, WorldState*>::iterator itr=m_worldStates.find(zoneid);
+
+	if(itr != m_worldStates.end())
+	{
+		itr->second->SetState(index, value);
+		return;
+	}
+
+	//we got here, no state set
+	WorldState* ws=new WorldState;
+	ws->SetState(index, value);
+	m_worldStates.insert(std::make_pair<uint32, WorldState*>(zoneid, ws));
+
+	WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
+	data << index << value;
+
+	//update all players in this zone
+	for(PlayerStorageMap::iterator itr=m_PlayerStorage.begin(); itr!=m_PlayerStorage.end(); ++itr)
+		if (itr->second->GetZoneId() == zoneid)
+			itr->second->GetSession()->SendPacket(&data);
+}
+
+void MapMgr::SendInitialStates(Player* plr)
+{
+	uint16 Fields = 0;
+	uint32 mapId = _mapId;
+	uint32 zoneId = plr->GetZoneId();
+	uint32 areaId = GetAreaID(plr->GetPositionX(), plr->GetPositionY());
+	sLog.outBasic("Sending SMSG_INIT_WOLRD_STATES to Map %u, Zone %u", mapId, zoneId);
+	switch(zoneId)
+	{
+	case 0:
+	case 1:
+	case 4:
+	case 8:
+	case 10:
+	case 11:
+	case 12:
+	case 36:
+	case 38:
+	case 40:
+	case 41:
+	case 51:
+	case 267:
+	case 1519:
+	case 1537:
+	case 2257:
+	case 2918:
+		Fields = 7;
+		break;
+	case 2597:
+		Fields = 81;
+		break;
+	case 3277:
+		Fields = 14;
+		break;
+	case 3358:
+	case 3820:
+		Fields = 38;
+		break;
+	case 3483:
+		Fields = 22;
+		break;
+	case 3519:
+		Fields = 36;
+		break;
+	case 3521:
+		Fields = 35;
+		break;
+	case 3698:
+	case 3702:
+	case 3968:
+		Fields = 9;
+		break;
+	case 3703:
+		Fields = 9;
+		break;
+	default:
+		Fields = 10;
+		break;
+	}
+*/
+	/*
+	HM_NAMESPACE::hash_map<uint32, WorldState*>::iterator itr=m_worldStates.find(plr->GetZoneId());
+
+	if(itr == m_worldStates.end())
+		return;
+	*/
+/*
+	WorldPacket data(SMSG_INIT_WORLD_STATES, 16+(Fields) * 8);
+	data << uint32(mapId) << uint32(zoneId) << uint32(areaId) << uint16(Fields);
+*/	/*
+	data << uint32(2264) << uint32(0);				// 1 Eastern Plaguelands under attack
+	data << uint32(2263) << uint32(0);				// 2 Tanaris Desert under attack
+	data << uint32(2262) << uint32(0);				// 3 Burning Steppes under attack
+	data << uint32(2261) << uint32(0);				// 4 Blasted Lands under attack
+	data << uint32(2260) << uint32(0);				// 5 Azshara under attack
+	data << uint32(2259) << uint32(0);				// 6 Winterspring under attack
+	if(mapId == 530)								// Outland
+	{
+		//data << uint32(2495) << uint32(0);			// 7 Progress
+		//data << uint32(2493) << uint32(15);			// 8 Guards Remaining current
+		//data << uint32(2491) << uint32(15);			// 9 Guards Remaining total
+	}
+	switch(zoneId)
+	{
+		case 3483:									// Hellfire Peninsula
+			data << uint32(2490) << uint32(1);		// 10 Last Winner: Alliance ???
+			data << uint32(2489) << uint32(1);		// 11 Last Winner: Horde ???
+			data << uint32(2485) << uint32(1);		// 12 Neutral controlled Broken Hill
+			//data << uint32(2484) << uint32(1);		// 13 Horde controlled Broken Hill
+			//data << uint32(2483) << uint32(0);		// 14 Alliance controlled Broken Hill
+			data << uint32(2482) << uint32(1);		// 15 Neutral controlled Overlook
+			//data << uint32(2481) << uint32(1);		// 16 Horde controlled Overlook
+			//data << uint32(2480) << uint32(0);		// 17 Alliance controlled Overlook
+			data << uint32(2478) << uint32(0);		// 18 horde pvp objectives captured
+			data << uint32(2476) << uint32(0);		// 19 alliance pvp objectives captured
+			data << uint32(2472) << uint32(1);		// 20 Neural controlled The Stadium
+			//data << uint32(2471) << uint32(0);		// 21 Alliance controlled The Stadium
+			//data << uint32(2470) << uint32(1);		// 22 Horde controlled The Stadium
+			break;
+	}*/
+
+	/*
+	for(HM_NAMESPACE::hash_map<uint32, uint32>::iterator itr2=itr->second->m_states.begin(); itr2!=itr->second->m_states.end(); ++itr2)
+		data << itr2->first << itr2->second;
+	*/
+
+//	plr->GetSession()->SendPacket(&data);
+//}
+
+void MapMgr::RemoveAuraFromPlayers(int32 Team, uint32 AuraId)
+{
+	PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
+	for(; itr !=  m_PlayerStorage.end();)
+	{
+		Player *p = itr->second;
+		++itr;
+
+		if( Team != -1 && p->GetTeam() != (uint32)Team )
+			continue;
+
+		p->RemoveAura(AuraId);
+	}
+}
+
+void MapMgr::RemovePositiveAuraFromPlayers(int32 Team, uint32 AuraId)
+{
+	PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
+	for(; itr !=  m_PlayerStorage.end();)
+	{
+		Player *p = itr->second;
+		++itr;
+
+		if( Team != -1 && p->GetTeam() != (uint32)Team )
+			continue;
+
+		//p->RemoveAura(AuraId);
+	}
+}
+
+void MapMgr::AddAuraOnPlayers(int32 Team, int32 Zone, uint32 AuraId)
+{
+	PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
+	SpellEntry * sp = dbcSpell.LookupEntryForced(AuraId);
+	if(!sp)
+		return;
+
+	for(; itr != m_PlayerStorage.end();)
+	{
+		Player *p = itr->second;
+		++itr;
+
+		if(Team != -1 && p->GetTeam() != (uint32)Team)
+			continue;
+
+		if( Zone != ZONE_MASK_ALL && p->GetZoneId() != (uint32)Zone )
+			continue;
+
+		Aura * aur = AuraPool.PooledNew();
+		aur->Init(sp, -1, p, p);
+		//Aura * aur = new Aura(sp, -1, p, p, true);
+		if(aur != NULL)
+			p->AddAura(aur, NULL);
+	}
+}
+
+void MapMgr::CastSpellOnPlayers(int32 Team, uint32 SpellId)
+{
+	PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
+	SpellEntry * sp = dbcSpell.LookupEntryForced(SpellId);
+	if( !sp )
+		return;
+
+	for(; itr !=  m_PlayerStorage.end();)
+	{
+		Player *p = itr->second;
+		++itr;
+
+		if( Team != -1 && p->GetTeam() != (uint32)Team )
+			continue;
+
+		p->CastSpell(p, sp, true);
+	}
+}
+
+void MapMgr::SendPvPCaptureMessage(uint32 ZoneId, const char * Format, ...)
+{
+	va_list ap;
+	va_start(ap,Format);
+
+	WorldPacket data(SMSG_PVP_CAPTURE_STATE_MSG, 208);
+	char msgbuf[200];
+	vsnprintf(msgbuf, 200, Format, ap);
+	va_end(ap);
+
+	data << ZoneId;
+	data << uint32(strlen(msgbuf)+1);
+	data << msgbuf;
+
+	PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
+	for(; itr !=  m_PlayerStorage.end();)
+	{
+		Player *p = itr->second;
+		++itr;
+
+		if( ( ZoneId != -1 && p->GetZoneId() != (uint32)ZoneId) )
+			continue;
+
+		p->GetSession()->SendPacket(&data);
+	}
+}
+
+void MapMgr::SendPacketToPlayers(int32 iZoneMask, int32 iFactionMask, WorldPacket *pData)
+{
+	PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
+	for(; itr !=  m_PlayerStorage.end();)
+	{
+		Player *p = itr->second;
+		++itr;
+		if(p->GetSession())
+		{
+			if( iZoneMask != ZONE_MASK_ALL && p->GetZoneId() != (uint32)iZoneMask )
+				continue;
+
+			if( iFactionMask != ZONE_MASK_ALL && p->GetTeam() != (uint32)iZoneMask )
+				continue;
+
+			p->GetSession()->SendPacket(pData);
+		}
+	}
 }

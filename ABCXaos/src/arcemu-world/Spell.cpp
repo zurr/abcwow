@@ -140,6 +140,8 @@ void Spell::Init(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	m_caster = Caster;
 	duelSpell = false;
 
+	m_spellScript = sScriptMgr.CreateAIScriptClassForSpell(m_spellInfo->Id, this);
+
 	switch( Caster->GetTypeId() )
 	{
 		case TYPEID_PLAYER:
@@ -5355,3 +5357,9 @@ AI_SpellTargetType RecommandAISpellTargetType(SpellEntry *sp)
 	return TTYPE_NULL;// this means a new spell :P
 }
 */
+
+void Spell::ScriptUpdate()
+{
+	ASSERT(m_spellScript);
+	m_spellScript->SpellUpdate();
+}

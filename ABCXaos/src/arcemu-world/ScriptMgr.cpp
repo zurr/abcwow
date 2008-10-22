@@ -960,33 +960,29 @@ void HookInterface::OnAdvanceSkillLine(Player * pPlayer, uint32 SkillLine, uint3
 	OUTER_LOOP_END
 }
 
-SpellScript::SpellScript(Spell *pSpell)
+SpellScript::SpellScript(Spell *pSpell) : _spell(pSpell)
 {
-	_spell = pSpell;
 }
+
 SpellScript::~SpellScript()
 {
 	_spell = NULL;
 	sEventMgr.RemoveEvents(this);
-
-
-
-
 }
 
 void SpellScript::RegisterSpellUpdate(uint32 time)
 {
-	sEventMgr.AddEvent(this, &SpellScript::SpellUpdate, EVENT_SCRIPT_UPDATE_EVENT, time, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	sEventMgr.AddEvent(_spell, &Spell::ScriptUpdate, EVENT_SCRIPT_UPDATE_EVENT, time, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
 
 void SpellScript::RemoveSpellUpdate()
 {
-	sEventMgr.RemoveEvents(this, EVENT_SCRIPT_UPDATE_EVENT);
+	sEventMgr.RemoveEvents(_spell, EVENT_SCRIPT_UPDATE_EVENT);
 }
 
 void SpellScript::ModfiySpellUpdate(uint32 newtime)
 {
-	sEventMgr.ModifyEventTimeAndTimeLeft(this, EVENT_SCRIPT_UPDATE_EVENT, newtime);
+	sEventMgr.ModifyEventTimeAndTimeLeft(_spell, EVENT_SCRIPT_UPDATE_EVENT, newtime);
 }
 
 void SpellScript::AddRef(Aura* obj)

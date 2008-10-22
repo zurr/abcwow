@@ -123,6 +123,7 @@
 #include "NPCHandler.h"
 #include "Pet.h"
 #include "WorldSocket.h"
+#include "WorldStateManager.h"
 #include "WorldSession.h"
 #include "MapMgr.h"
 #include "MapScriptInterface.h"
