@@ -1927,7 +1927,7 @@ public:
 	uint8 extra_cast_number;
 
     void SendCastSuccess(Object * target);
-    void SendCastSuccess(const uint64& guid);
+    void SendCastSuccess(uint64 guid);
 
     bool duelSpell;
 

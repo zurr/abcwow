@@ -671,7 +671,7 @@ public:
 		Caster->SendMessageToSet(&data, true);
 	}
 
-	void SendPeriodicAuraLog(const uint64& CasterGuid, Unit * Target, uint32 SpellID, uint32 School, uint32 Amount, uint32 abs_dmg, uint32 resisted_damage, uint32 Flags)
+	void SendPeriodicAuraLog(uint64 CasterGuid, Unit * Target, uint32 SpellID, uint32 School, uint32 Amount, uint32 abs_dmg, uint32 resisted_damage, uint32 Flags)
 	{
 		WorldPacket data(SMSG_PERIODICAURALOG, 46);
 		data << Target->GetNewGUID();		   // target guid

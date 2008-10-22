@@ -6444,7 +6444,7 @@ bool CombatStatusHandler::InternalIsInCombat()
 	return false;
 }
 
-void CombatStatusHandler::AddAttackTarget(const uint64& guid)
+void CombatStatusHandler::AddAttackTarget(uint64 guid)
 {
 	if(guid == m_Unit->GetGUID())
 		return;
@@ -6526,7 +6526,7 @@ void CombatStatusHandler::RemoveAttackTarget(Unit * pTarget)
 		printf("Cannot remove attack target "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());*/
 }
 
-void CombatStatusHandler::RemoveAttacker(Unit * pAttacker, const uint64& guid)
+void CombatStatusHandler::RemoveAttacker(Unit * pAttacker, uint64 guid)
 {
 	AttackerMap::iterator itr = m_attackers.find(guid);
 	if(itr == m_attackers.end())
@@ -6567,7 +6567,7 @@ void CombatStatusHandler::OnDamageDealt(Unit * pTarget)
 	m_Unit->CombatStatusHandler_ResetPvPTimeout();
 }
 
-void CombatStatusHandler::AddAttacker(const uint64& guid)
+void CombatStatusHandler::AddAttacker(uint64 guid)
 {
 	m_attackers.insert(guid);
 	UpdateFlag();
