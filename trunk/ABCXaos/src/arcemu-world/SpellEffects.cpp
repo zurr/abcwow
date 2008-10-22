@@ -2215,8 +2215,11 @@ void Spell::SpellEffectBlock(uint32 i)
 
 void Spell::SpellEffectCreateItem(uint32 i) // Create item 
 {
-	if(!p_caster)
+	if(u_caster && u_caster->IsCreature() && !playerTarget)
+	{
+		sLog.outBasic("incorrect caster/target for createitem");
 		return;
+	}
 
 	Item* newItem;
 	Item *add;
