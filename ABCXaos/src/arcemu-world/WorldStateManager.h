@@ -1,7 +1,7 @@
 /************************************************
  *	Manager written by Burlex and Summit Team	*
  *			 All Credits go to them				*
- **********************************************/*
+ ***********************************************/
 
 #ifndef __WORLD_STATE_MANAGER_H
 #define __WORLD_STATE_MANAGER_H
