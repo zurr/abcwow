@@ -2107,6 +2107,11 @@ void Player::InitVisibleUpdateBits()
 	{
 		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0 + (i*16))); // visual items for other players
 		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+1 + (i*16))); // visual items for other players
+		for( uint8 x = 2 ; x < 6 ; x ++ )
+		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+x + (i*16))); // First Gem
+			//Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+3 + (i*16))); // Second Gem?
+
+
 	}
 
 	/* fuck i hate const - burlex */
