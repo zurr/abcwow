@@ -609,6 +609,7 @@ Aura::Aura()
 void Aura::Init( SpellEntry* proto, int32 duration, Object* caster, Unit* target, Item* i_caster )
 {
 	m_wasremoved = false;
+	m_spellScript = NULL;
 	m_castInDuel = false;
 	m_spellProto = proto;
 	m_duration = duration;

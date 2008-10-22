@@ -2105,10 +2105,10 @@ void Player::InitVisibleUpdateBits()
 
 	for(uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
 	{
-		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0 + (i*16))); // visual items for other players
-		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+1 + (i*16))); // visual items for other players
+		Player::m_visibleUpdateMask.SetBit((PLAYER_VISIBLE_ITEM_1_0 + (i*16))); // visual items for other players
+		Player::m_visibleUpdateMask.SetBit((PLAYER_VISIBLE_ITEM_1_0+1 + (i*16))); // visual items for other players
 		for( uint8 x = 2 ; x < 6 ; x ++ )
-		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+x + (i*16))); // First Gem
+		Player::m_visibleUpdateMask.SetBit((PLAYER_VISIBLE_ITEM_1_0+x + (i*16))); // First Gem
 			//Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+3 + (i*16))); // Second Gem?
 
 
@@ -7663,6 +7663,9 @@ void Player::ZoneUpdate(uint32 ZoneId)
 	}
 
 	sLog.outDetail("ZONE_UPDATE: Player %s entered zone %s", GetName(), sAreaStore.LookupString((int)p->name));*/
+	if( IsInWorld() )				// should be
+		m_mapMgr->GetStateManager().SendWorldStates(this);
+
 }
 
 void Player::SendTradeUpdate()

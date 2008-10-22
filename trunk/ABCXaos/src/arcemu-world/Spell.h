@@ -1528,6 +1528,8 @@ public:
 	void Virtual_Destructor();		//this makes sure we do not leave events on objects that are supposed to be deleted
 	int32 m_bufferPoolId;
 
+	void ScriptUpdate();
+
     // Fills specified targets at the area of effect
     void FillSpecifiedTargetsInArea(float srcx,float srcy,float srcz,uint32 ind, uint32 specification);
     // Fills specified targets at the area of effect. We suppose we already inited this spell and know the details

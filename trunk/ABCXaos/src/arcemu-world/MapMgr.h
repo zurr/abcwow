@@ -90,6 +90,10 @@ public:
 	//This will be done in regular way soon
 	std::set< MapCell * > m_forcedcells;
 
+//	HM_NAMESPACE::hash_map<uint32, WorldState*> m_worldStates;
+//	void SetWorldState(uint32 zoneid, uint32 index, uint32 value);
+
+
 	void AddForcedCell( MapCell * c );
 	void RemoveForcedCell( MapCell * c );
 
@@ -242,6 +246,15 @@ public:
 	void EventRespawnGameObject(GameObject * o, MapCell * c);
 	void SendMessageToCellPlayers(Object * obj, WorldPacket * packet, uint32 cell_radius = 2);
 	void SendChatMessageToCellPlayers(Object * obj, WorldPacket * packet, uint32 cell_radius, uint32 langpos, int32 lang, WorldSession * originator);
+		
+	void SendPvPCaptureMessage(uint32 ZoneId, const char * Format, ...);
+
+	// auras :< (world pvp)
+	void RemoveAuraFromPlayers(int32 Team, uint32 AuraId);
+	void RemovePositiveAuraFromPlayers(int32 Team, uint32 AuraId);
+	void AddAuraOnPlayers(int32 Team, int32 Zone, uint32 AuraId);
+	void CastSpellOnPlayers(int32 Team, uint32 SpellId);
+
 
 	Instance * pInstance;
 	void BeginInstanceExpireCountdown();
@@ -332,6 +345,17 @@ public:
 	bool forced_expire;
 	bool thread_kill_only;
 	bool thread_running;
+
+	WorldStateManager m_stateManager;
+
+public:
+
+		// get!
+	ARCEMU_INLINE WorldStateManager& GetStateManager() { return m_stateManager; }
+
+	// send packet functions for state manager
+	void SendPacketToPlayers(int32 iZoneMask, int32 iFactionMask, WorldPacket *pData);
+	//void SendPacketToPlayers(int32 iZoneMask, int32 iFactionMask, StackPacket *pData);
 };
 
 #endif
