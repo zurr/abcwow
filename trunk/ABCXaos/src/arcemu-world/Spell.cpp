@@ -5226,7 +5226,7 @@ void Spell::SendCastSuccess(Object * target)
 	plr->GetSession()->SendPacket(&data);
 }
 
-void Spell::SendCastSuccess(const uint64& guid)
+void Spell::SendCastSuccess(uint64 guid)
 {
 	Player * plr = p_caster;
 	if(!plr && u_caster)

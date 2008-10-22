@@ -598,6 +598,7 @@ enum INVIS_FLAG
 	INVIS_FLAG_UNKNOWN7,
 	INVIS_FLAG_SHADOWMOON,
 	INVIS_FLAG_NETHERSTORM,
+	INVIS_FLAG_BASHIR,
 	INVIS_FLAG_TOTAL
 };
 
@@ -640,13 +641,14 @@ class SERVER_DECL CombatStatusHandler
 public:
 	CombatStatusHandler() : m_lastStatus(false), m_primaryAttackTarget(0) {}
 	AttackerMap m_attackers;
-	void AddAttackTarget(const uint64& guid);						// this means we clicked attack, not actually striked yet, so they shouldnt be in combat.
+	void AddAttackTarget(uint64 guid);						// this means we clicked attack, not actually striked yet, so they shouldnt be in combat.
 	void ClearPrimaryAttackTarget();								// means we deselected the unit, stopped attacking it.
 
 	void OnDamageDealt(Unit * pTarget);								// this is what puts the other person in combat.
 	void WeHealed(Unit * pHealTarget);								// called when a player heals another player, regardless of combat state.
 
-	void RemoveAttacker(Unit * pAttacker, const uint64& guid);		// this means we stopped attacking them totally. could be because of deagro, etc.
+	void RemoveAttacker(Unit * pAttacker, uint64 guid);		// this means we stopped attacking them totally. could be because of deagro, etc.
+
 	void RemoveAttackTarget(Unit * pTarget);						// means our DoT expired.
 
 	void UpdateFlag();												// detects if we have changed combat state (in/out), and applies the flag.
@@ -669,7 +671,7 @@ public:
 protected:
 	bool InternalIsInCombat();										// called by UpdateFlag, do not call from anything else!
 	bool IsAttacking(Unit * pTarget);								// internal function used to determine if we are still attacking target x.
-	void AddAttacker(const uint64& guid);							// internal function to add an attacker
+	void AddAttacker(uint64 guid);							// internal function to add an attacker
 	void RemoveHealed(Unit * pHealTarget);							// usually called only by updateflag
 	void ClearHealers();											// this is called on instance change.
 	void ClearAttackers();											// means we vanished, or died.

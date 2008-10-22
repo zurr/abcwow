@@ -669,8 +669,7 @@ void Spell::SpellTargetScriptedEffects(uint32 i, uint32 j)
 /// Spell Target Handling for type 32 / 73: related to summoned pet or creature
 void Spell::SpellTargetSummon(uint32 i, uint32 j)
 {// Minion Target
-
-	if ( m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_PET )
+	if ( m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_PET || m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_OBJECT)
 	{
 		TargetsList *tmpMap=&m_targetUnits[i];
 		if(m_caster->GetUInt64Value(UNIT_FIELD_SUMMON) == 0)
