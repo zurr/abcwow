@@ -614,7 +614,7 @@ protected:
 	void HandleMoveSplineCompleteOpcode(WorldPacket &recvPacket);
 
 	/// Helper functions
-	void SetNpcFlagsForTalkToQuest(const uint64& guid, const uint64& targetGuid);
+	void SetNpcFlagsForTalkToQuest(uint64 guid, uint64 targetGuid);
 
 	//Tutorials
 	void HandleTutorialFlag ( WorldPacket & recv_data );

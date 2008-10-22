@@ -751,7 +751,7 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 	}
 }
 
-void QuestMgr::OnPlayerCast(Player* plr, uint32 spellid, uint64& victimguid)
+void QuestMgr::OnPlayerCast(Player* plr, uint32 spellid, uint64 victimguid)
 {
 	if(!plr || !plr->HasQuestSpell(spellid))
 		return;
