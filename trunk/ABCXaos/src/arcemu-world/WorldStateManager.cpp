@@ -1,7 +1,7 @@
 /************************************************
  *	Manager written by Burlex and Summit Team	*
  *			 All Credits go to them				*
- **********************************************/*
+ ***********************************************/
 
 #include "StdAfx.h"
 initialiseSingleton(WorldStateTemplateManager);
