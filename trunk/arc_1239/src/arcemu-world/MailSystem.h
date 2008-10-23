@@ -61,6 +61,12 @@ enum MailError
 
 struct MailMessage
 {
+	MailMessage() : message_id(0), message_type(0),player_guid(0),sender_guid(0), subject(""),body(""),
+					money(0),cod(0),stationary(0),expire_time(0),delivery_time(0),copy_made(0)
+    {
+		items.clear();
+    }
+
 	uint32 message_id;
 	uint32 message_type;
 	uint64 player_guid;

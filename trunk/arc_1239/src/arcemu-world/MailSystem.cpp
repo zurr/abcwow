@@ -248,7 +248,6 @@ bool MailMessage::AddMessageDataToPacket(WorldPacket& data)
 void MailSystem::SaveMessageToSQL(MailMessage * message)
 {
 	stringstream ss;
-	vector< uint64 >::iterator itr;
 	ss << "REPLACE INTO mailbox VALUES("
 		<< message->message_id << ","
 		<< message->message_type << ","
@@ -258,8 +257,11 @@ void MailSystem::SaveMessageToSQL(MailMessage * message)
 		<< CharacterDatabase.EscapeString(message->body) << "\","
 		<< message->money << ",'";
 
-	for( itr = message->items.begin( ); itr != message->items.end( ); ++itr )
-		ss << (*itr) << ",";
+	if(!message->items.empty())
+	{
+		for(vector< uint64 >::iterator itr = message->items.begin( ); itr != message->items.end( ); ++itr )
+			ss << (*itr) << ",";
+	}
 
 	ss << "'," 
 		<< message->cod << ","
@@ -326,6 +328,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 		return;
 	}
 
+	items.clear();
 	for( i = 0; i < itemcount; ++i )
 	{
 		recv_data >> itemslot;
