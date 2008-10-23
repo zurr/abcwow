@@ -2927,6 +2927,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 		std::vector<Unit*> target_threat;
 		int count = 0;
+		u_caster->AquireInrangeLock();
 		for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
 		{
 			if((*itr)->GetTypeId() != TYPEID_UNIT || !static_cast<Unit *>(*itr)->CombatStatus.IsInCombat() || (static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(u_caster) == 0 && static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(m_target) == 0))
@@ -2935,6 +2936,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 			target_threat.push_back(static_cast<Unit *>(*itr));
 			count++;
 		}
+		u_caster->ReleaseInrangeLock();
 		if (count == 0)
 			return;
 
@@ -5446,6 +5448,7 @@ void Aura::SpellAuraFeignDeath(bool apply)
 //			pTarget->setDeathState(DEAD);
 
 			//now get rid of mobs agro. pTarget->CombatStatus.AttackersForgetHate() - this works only for already attacking mobs
+			pTarget->AquireInrangeLock();
 		    for(std::set<Object*>::iterator itr = pTarget->GetInRangeSetBegin(); itr != pTarget->GetInRangeSetEnd(); itr++ )
 			{
 				if((*itr)->IsUnit() && ((Unit*)(*itr))->isAlive())
@@ -5465,6 +5468,7 @@ void Aura::SpellAuraFeignDeath(bool apply)
 					}
 				}
 			}
+			pTarget->ReleaseInrangeLock();
 			pTarget->setDeathState(ALIVE);
 		}
 		else

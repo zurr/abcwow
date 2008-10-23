@@ -1666,6 +1666,7 @@ Unit* AIInterface::FindTarget()
 	if (m_isNeutralGuard)
 	{
 		Player *tmpPlr;
+		m_Unit->AquireInrangeLock();
 		for (std::set<Player*>::iterator itrPlr = m_Unit->GetInRangePlayerSetBegin(); itrPlr != m_Unit->GetInRangePlayerSetEnd(); ++itrPlr)
 		{
 			tmpPlr = (*itrPlr);
@@ -1712,6 +1713,8 @@ Unit* AIInterface::FindTarget()
 				}
 			}
 		}
+		m_Unit->ReleaseInrangeLock();
+
 		if (target)
 		{
 			m_Unit->m_runSpeed = m_Unit->m_base_runSpeed * 2.0f;
@@ -1728,6 +1731,7 @@ Unit* AIInterface::FindTarget()
 
 	//we have a high chance that we will agro a player
 	//this is slower then oppfaction list BUT it has a lower chance that contains invalid pointers
+	m_Unit->AquireInrangeLock();
 	for( pitr2 = m_Unit->GetInRangePlayerSetBegin(); pitr2 != m_Unit->GetInRangePlayerSetEnd(); )
 	{
 		pitr = pitr2;
@@ -1758,6 +1762,7 @@ Unit* AIInterface::FindTarget()
 			}
 		}
 	}
+	m_Unit->ReleaseInrangeLock();
 
 	//a lot less times are check inter faction mob wars :)
 	if( m_updateTargetsTimer2 < getMSTime() )
@@ -2001,6 +2006,7 @@ bool AIInterface::FindFriends(float dist)
 
 		uint8 spawned = 0;
 	
+		m_Unit->AquireInrangeLock();
 		std::set<Player*>::iterator hostileItr = m_Unit->GetInRangePlayerSetBegin();
 		for(; hostileItr != m_Unit->GetInRangePlayerSetEnd(); hostileItr++)
 		{
@@ -2035,6 +2041,7 @@ bool AIInterface::FindFriends(float dist)
 			sEventMgr.AddEvent(guard, &Creature::SafeDelete, EVENT_CREATURE_SAFE_DELETE, 60*5*1000, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 			spawned++;
 		}
+		m_Unit->ReleaseInrangeLock();
 	}
 
 	return result;
@@ -2283,6 +2290,7 @@ void AIInterface::SendMoveToPacket(float toX, float toY, float toZ, float toO, u
 	if( m_Unit->GetTypeId() == TYPEID_PLAYER )
 		static_cast<Player*>(m_Unit)->GetSession()->SendPacket(&data);
 
+	m_Unit->AquireInrangeLock();
 	for(set<Player*>::iterator itr = m_Unit->GetInRangePlayerSetBegin(); itr != m_Unit->GetInRangePlayerSetEnd(); ++itr)
 	{
 		if( (*itr)->GetPositionNC().Distance2DSq( m_Unit->GetPosition() ) >= World::m_movementCompressThresholdCreatures )
@@ -2290,6 +2298,7 @@ void AIInterface::SendMoveToPacket(float toX, float toY, float toZ, float toO, u
 		else
 			(*itr)->GetSession()->SendPacket(&data);
 	}
+	m_Unit->ReleaseInrangeLock();
 #endif
 }
 

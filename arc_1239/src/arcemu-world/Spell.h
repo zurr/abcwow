@@ -1773,7 +1773,7 @@ public:
 	// It should NOT be used for weapon_damage_type which needs: 0 = MELEE, 1 = OFFHAND, 2 = RANGED
 	ARCEMU_INLINE uint32 GetType() { return ( GetProto()->Spell_Dmg_Type == SPELL_DMG_TYPE_NONE ? SPELL_DMG_TYPE_MAGIC : GetProto()->Spell_Dmg_Type ); }
 
-    std::set<uint64> UniqueTargets;
+    TargetsList UniqueTargets;
     SpellTargetsList    ModeratedTargets;
 
     ARCEMU_INLINE Item* GetItemTarget() { return itemTarget; }
@@ -1989,11 +1989,10 @@ protected:
 	bool m_isCasting;
     //void _DamageRangeUpdate();
 
-	ARCEMU_INLINE bool HasTarget(const uint64& guid, TargetsList* tmpMap)
+	ARCEMU_INLINE bool HasTarget(uint64 guid, TargetsList* tmpMap)
 	{
-		for(TargetsList::iterator itr = tmpMap->begin(); itr != tmpMap->end(); ++itr)
-			if((*itr)==guid)
-				return true;
+		if (tmpMap->end() != tmpMap->find(guid))
+			return true;
 
 		for(SpellTargetsList::iterator itr = ModeratedTargets.begin(); itr != ModeratedTargets.end(); ++itr)
 			if((*itr).TargetGuid==guid)
@@ -2005,8 +2004,6 @@ protected:
 private:
     TargetsList m_targetUnits[3];
     void SafeAddTarget(TargetsList* tgt,uint64 guid);
-    
-    void SafeAddMissedTarget(uint64 guid);
     void SafeAddModeratedTarget(uint64 guid, uint16 type);
 
     friend class DynamicObject;
