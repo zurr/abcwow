@@ -3512,7 +3512,12 @@ void Player::OnPushToWorld()
 		m_FirstLogin = false;
 	}
 
+	// send world states
+	if( m_mapMgr != NULL )
+		m_mapMgr->GetStateManager().SendWorldStates(this);
+
 	sHookInterface.OnEnterWorld(this);
+	//sHookInterface.OnZone(this, m_zoneId, 0);
 
 	if(m_TeleportState == 1)		// First world enter
 		CompleteLoading();
@@ -7613,6 +7618,7 @@ QuestStatus Player::GetQuestStatus( uint32 quest_id )
 
 void Player::ZoneUpdate(uint32 ZoneId)
 {
+	uint32 oldzone = m_zoneId;
 	m_zoneId = ZoneId;
 	/* how the f*ck is this happening */
 	if( m_playerInfo == NULL )
@@ -7626,7 +7632,7 @@ void Player::ZoneUpdate(uint32 ZoneId)
 	}
 
 	m_playerInfo->lastZone = ZoneId;
-	sHookInterface.OnZone(this, ZoneId);
+	sHookInterface.OnZone(this, ZoneId, oldzone);
 
 	AreaTable * at = dbcArea.LookupEntry(GetAreaID());
 	if(at && at->category == AREAC_SANCTUARY || at->AreaFlags & AREA_SANCTUARY)

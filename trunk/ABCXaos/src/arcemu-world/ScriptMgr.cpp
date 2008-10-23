@@ -869,10 +869,10 @@ void HookInterface::OnQuestAccept(Player * pPlayer, Quest * pQuest, Object * pQu
 	OUTER_LOOP_END
 }
 
-void HookInterface::OnZone(Player * pPlayer, uint32 Zone)
+void HookInterface::OnZone(Player * pPlayer, uint32 Zone, uint32 oldZone)
 {
 	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_ZONE, tOnZone)
-		(call)(pPlayer, Zone);
+		(call)(pPlayer, Zone, oldZone);
 	OUTER_LOOP_END
 }
 
