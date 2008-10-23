@@ -1171,6 +1171,7 @@ void MapMgr::_UpdateObjects()
 
 				if( count )
 				{
+					pObj->AquireInrangeLock();
 					it_start = pObj->GetInRangePlayerSetBegin();
 					it_end = pObj->GetInRangePlayerSetEnd();
 					for(itr = it_start; itr != it_end;)
@@ -1181,6 +1182,7 @@ void MapMgr::_UpdateObjects()
 						if( lplr->GetTypeId() == TYPEID_PLAYER && lplr->IsVisible( pObj ) )
 							lplr->PushUpdateData( &update, count );
 					}
+					pObj->ReleaseInrangeLock();
 					update.clear();
 				}
 			}

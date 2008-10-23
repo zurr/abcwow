@@ -440,13 +440,14 @@ public:
 	ARCEMU_INLINE bool RemoveIfInRange( Object * obj )
 	{
 		InRangeSet::iterator itr = m_objectsInRange.find(obj);
+
+		AquireInrangeLock();
 		if( obj->GetTypeId() == TYPEID_PLAYER )
 			m_inRangePlayers.erase( reinterpret_cast< Player* >( obj ) );
 
 		if( itr == m_objectsInRange.end() )
 			return false;
 		
-		AquireInrangeLock();
 		m_objectsInRange.erase( itr );
 		ReleaseInrangeLock();
 		return true;
@@ -459,7 +460,9 @@ public:
 
 	ARCEMU_INLINE void RemoveInRangePlayer( Object * obj )
 	{
+		AquireInrangeLock();
 		m_inRangePlayers.erase( reinterpret_cast< Player* >( obj ) );
+		ReleaseInrangeLock();
 	}
 
 	bool IsInRangeSameFactSet(Object* pObj) { return (m_sameFactsInRange.count(pObj) > 0); }

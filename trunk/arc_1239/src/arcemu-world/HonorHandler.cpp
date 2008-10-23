@@ -180,6 +180,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 			set<Player*> contributors;
 			// First loop: Get all the people in the attackermap.
 			pVictim->UpdateOppFactionSet();
+			pVictim->AquireInrangeLock();
 			for(std::set<Object*>::iterator itr = pVictim->GetInRangeOppFactsSetBegin(); itr != pVictim->GetInRangeOppFactsSetEnd(); itr++)
 			{
 				if(!(*itr)->IsPlayer())
@@ -214,6 +215,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 					}
 				}
 			}
+			pVictim->ReleaseInrangeLock();
 
 			for(set<Player*>::iterator itr = contributors.begin(); itr != contributors.end(); itr++)
 			{

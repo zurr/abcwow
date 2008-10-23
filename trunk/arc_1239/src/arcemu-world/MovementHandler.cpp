@@ -390,6 +390,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Distribute to all inrange players.                                   */
 		/************************************************************************/
+		_player->AquireInrangeLock();
 		for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
 		{
 #ifdef USING_BIG_ENDIAN
@@ -406,6 +407,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), uint16(recv_data.size() + pos), movement_packet);			
 #endif
 		}
+		_player->ReleaseInrangeLock();
 	}
 
 	/************************************************************************/

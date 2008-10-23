@@ -306,7 +306,8 @@ void WorldSession::HandleInrangeQuestgiverQuery(WorldPacket & recv_data)
 	//    64 guid
 	//    8 status
 
-	for( itr = _player->m_objectsInRange.begin(); itr != _player->m_objectsInRange.end(); ++itr )
+	_player->AquireInrangeLock();
+	for( itr = _player->GetInRangeSetBegin(); itr != _player->GetInRangeSetEnd(); ++itr )
 	{
 		pCreature = static_cast<Creature*>(*itr);
 		if( pCreature->GetTypeId() != TYPEID_UNIT )
@@ -319,6 +320,7 @@ void WorldSession::HandleInrangeQuestgiverQuery(WorldPacket & recv_data)
 			++count;
 		}
 	}
+	_player->ReleaseInrangeLock();
 
 	*(uint32*)(data.contents()) = count;
 	SendPacket(&data);
