@@ -7646,6 +7646,57 @@ void Player::ZoneUpdate(uint32 ZoneId)
 		}
 	}
 
+// change local channels
+
+	// thanks Trelorn and MaNGOS
+	if( !m_channels.empty() )
+	{
+		// change to zone name, not area name
+		at = dbcArea.LookupEntryForced( ZoneId );
+		for( std::set<Channel*>::iterator itr = m_channels.begin(),nextitr ; itr != m_channels.end() ; itr = nextitr)
+		{
+			nextitr = itr; ++nextitr;
+			Channel * chn;
+			chn = (*itr);
+			// Check if this is a custom channel (i.e. global)
+			if( !( (*itr)->m_flags & 0x10 ) )
+				continue;
+
+			if( chn->m_flags & 0x40 ) // LookingForGroup - constant among all zones
+				continue;
+
+			char updatedName[95];
+			ChatChannelDBC * pDBC;
+			pDBC = dbcChatChannels.LookupEntryForced( chn->m_id );
+			if( !pDBC )
+			{
+				Log.Error( "ChannelMgr" , "Invalid channel entry %u for %s" , chn->m_id , chn->m_name.c_str() );
+				return;
+			}
+			//for( int i = 0 ; i <= 15 ; i ++ )
+			//	Log.Notice( "asfssdf" , "%u %s" , i , pDBC->name_pattern[i] );
+			snprintf( updatedName , 95 , pDBC->name_pattern[0] , at->name );
+			Channel * newChannel = channelmgr.GetCreateChannel( updatedName , NULL , chn->m_id );
+			if( newChannel == NULL )
+			{
+				Log.Error( "ChannelMgr" , "Could not create channel %s!" , updatedName );
+				return; // whoops?
+			}
+			//Log.Notice( "ChannelMgr" , "LEAVING CHANNEL %s" , chn->m_name.c_str() );
+			//Log.Notice( "ChannelMgr" , "JOINING CHANNEL %s" , newChannel->m_name.c_str() );
+			if( chn != newChannel ) // perhaps there's no need
+			{
+				// join new channel
+				newChannel->AttemptJoin( this , "" );
+				// leave the old channel
+
+				chn->Part( this , false );
+				
+
+
+			}
+		}
+	}
 
 #ifdef OPTIMIZED_PLAYER_SAVING
 	save_Zone();

@@ -96,7 +96,7 @@ const char* charclassFormat = "uxuxsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 const char* creaturefamilyFormat = "ufufuuuusxxxxxxxxxxxxxxxxx";
 const char* mapentryFormat = "usuxsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char* itemrandomsuffixformat = "uxxxxxxxxxxxxxxxxxxuuuuuu";
-const char* chatchannelformat = "uuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char* chatchannelformat = "iixssssssssssssssssxxxxxxxxxxxxxxxxxx";
 const char * durabilityqualityFormat = "uf";
 const char * durabilitycostsFormat = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuu";
 const char* bankslotpriceformat = "uu";
@@ -145,7 +145,7 @@ bool LoadDBCs()
 	LOAD_DBC("DBC/AuctionHouse.dbc", auctionhousedbcFormat, true, dbcAuctionHouse, false);
 	LOAD_DBC("DBC/ItemRandomSuffix.dbc", itemrandomsuffixformat, true, dbcItemRandomSuffix, false);
 	LOAD_DBC("DBC/gtCombatRatings.dbc", gtfloatformat, false, dbcCombatRating, false);
-	LOAD_DBC("DBC/ChatChannels.dbc", chatchannelformat, true, dbcChatChannels, false);
+	LOAD_DBC("DBC/ChatChannels.dbc", chatchannelformat, true, dbcChatChannels, true);
 	LOAD_DBC("DBC/DurabilityQuality.dbc", durabilityqualityFormat, true, dbcDurabilityQuality, false);
 	LOAD_DBC("DBC/DurabilityCosts.dbc", durabilitycostsFormat, true, dbcDurabilityCosts, false);
 	LOAD_DBC("DBC/BankBagSlotPrices.dbc", bankslotpriceformat, true, dbcBankSlotPrices, false);
