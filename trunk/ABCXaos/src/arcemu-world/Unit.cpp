@@ -7178,6 +7178,99 @@ bool Unit::HasAurasOfNameHashWithCaster(uint32 namehash, Unit * caster)
 	return false;
 }
 
+void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply)
+{
+	if(apply)
+	{
+		for(SpellImmuneList::iterator itr = m_spellImmune[op].begin(), next; itr != m_spellImmune[op].end(); itr = next)
+		{
+			next = itr; ++next;
+			if(itr->type == type)
+			{
+				m_spellImmune[op].erase(itr);
+				next = m_spellImmune[op].begin();
+			}
+		}
+		SpellImmune Immune;
+		Immune.spellId = spellId;
+		Immune.type = type;
+		m_spellImmune[op].push_back(Immune);
+	}
+	else
+	{
+		for (SpellImmuneList::iterator itr = m_spellImmune[op].begin(); itr != m_spellImmune[op].end(); ++itr)
+		{
+			if(itr->spellId == spellId)
+			{
+				m_spellImmune[op].erase(itr);
+				break;
+			}
+		}
+	}
+}
+
+bool Unit::IsImmunedToPhysicalDamage() const
+{
+	//If m_immuneToDamage type contain magic, IMMUNE damage.
+	SpellImmuneList const& damageImmList = m_spellImmune[IMMUNITY_DAMAGE];
+	for	(SpellImmuneList::const_iterator itr = damageImmList.begin(); itr != damageImmList.end(); ++itr)
+		if(itr->type & SCHOOL_NORMAL)
+			return true;
+
+	//If m_immuneToSchool type contain this school type, IMMUNE damage.
+	SpellImmuneList const& spellImmList = m_spellImmune[IMMUNITY_SCHOOL];
+	for	(SpellImmuneList::const_iterator itr = spellImmList.begin(); itr != spellImmList.end(); ++itr)
+		if(itr->type & SCHOOL_NORMAL)
+			return true;
+
+	return false;
+}
+
+bool Unit::IsImmunedToSpellDamage(SpellEntry const* spellInfo)
+{
+	//If m_immuneToSchool type contain this school type, IMMUNE damage.
+	SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
+	for(SpellImmuneList::const_iterator itr = schoolList.begin(); itr != schoolList.end(); ++itr)
+		if(itr->type & uint32(1<<spellInfo->School))
+			return true;
+
+	return false;
+}
+
+bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo)
+{
+	if(!spellInfo)
+		return false;
+
+	// don't get feared if stunned
+	if(spellInfo->MechanicsType == MECHANIC_FLEEING)
+		if( hasStateFlag(UNIT_STATE_STUN) )
+			return true;
+
+	SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
+	for(SpellImmuneList::const_iterator itr = dispelList.begin(); itr != dispelList.end(); ++itr)
+		if(itr->type == spellInfo->DispelType)
+			return true;
+
+	return false;
+}
+
+bool Unit::IsImmunedToSpellEffect(uint32 effect, uint32 mechanic) const
+{
+	//If m_immuneToEffect type contain this effect type, IMMUNE effect.
+	SpellImmuneList const& effectList = m_spellImmune[IMMUNITY_EFFECT];
+	for(SpellImmuneList::const_iterator itr = effectList.begin(); itr != effectList.end(); ++itr)
+		if(itr->type == effect)
+			return true;
+
+	SpellImmuneList const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+	for(SpellImmuneList::const_iterator itr = mechanicList.begin(); itr != mechanicList.end(); ++itr)
+		if(itr->type == mechanic)
+			return true;
+
+	return false;
+}
+
 void Unit::EventModelChange()
 {
 	UnitModelSizeEntry  *newmodelhalfsize = NULL;

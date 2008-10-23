@@ -1315,6 +1315,16 @@ enum MECHANICS
 	MECHANIC_SAPPED // 30
 };
 
+enum SpellImmunity
+{
+    IMMUNITY_EFFECT                = 0,// enum SpellEffects
+    IMMUNITY_STATE                 = 1,// enum AuraType
+    IMMUNITY_SCHOOL                = 2,// enum SpellSchoolMask
+    IMMUNITY_DAMAGE                = 3,// enum SpellSchoolMask
+    IMMUNITY_DISPEL                = 4,// enum DispelType
+    IMMUNITY_MECHANIC              = 5 // enum Mechanics
+};
+
 typedef enum {
    EFF_TARGET_NONE										= 0,
    EFF_TARGET_SELF										= 1,

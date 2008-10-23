@@ -46,6 +46,13 @@ struct CreatureInfo;
 struct FactionTemplateDBC;
 struct FactionDBC;
 
+struct SpellImmune
+{
+    uint32 type;
+    uint32 spellId;
+};
+
+typedef std::list<SpellImmune> SpellImmuneList;
 
 struct ReflectSpellSchool
 {
@@ -796,6 +803,13 @@ public:
 	uint8 m_invisFlag;
 	int32 m_invisDetect[INVIS_FLAG_TOTAL];
 
+	SpellImmuneList m_spellImmune[6];
+	void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply);
+	virtual bool IsImmunedToSpell(SpellEntry const* spellInfo);
+	bool IsImmunedToPhysicalDamage() const;
+	bool IsImmunedToSpellDamage(SpellEntry const* spellInfo);
+	virtual bool IsImmunedToSpellEffect(uint32 effect, uint32 mechanic) const;
+
 	bool HasAura(uint32 spellid);
 	bool HasAuraVisual(uint32 visualid);//not spell id!!!
 	bool HasActiveAura(uint32 spelllid);
@@ -1129,6 +1143,8 @@ public:
 	int32 m_fearmodifiers;
 	int64 m_magnetcaster; // Unit who acts as a magnet for this unit
 	//std::set<SpellEntry*> m_onStrikeSpells;
+
+	uint16 m_auracount[251]; //would use TOTAL_SPELL_AURAS, header orders suck :P
 
 	uint16 m_noInterrupt;
 	int32 m_rooted;
