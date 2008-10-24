@@ -3509,6 +3509,12 @@ void Player::OnPushToWorld()
 		sHookInterface.OnFirstEnterWorld(this);
 		LevelInfo * Info = objmgr.GetLevelInfo(getRace(), getClass(), sWorld.start_level);
 		ApplyLevelInfo(Info, sWorld.start_level);
+			
+		/* Invite them to the community channel! */
+		WorldPacket invitation(SMSG_CHANNEL_NOTIFY, 16);
+		invitation << uint8(CHANNEL_NOTICE_INVITE) << "World" << GetGUID();
+		m_session->SendPacket(&invitation);
+
 		m_FirstLogin = false;
 	}
 
