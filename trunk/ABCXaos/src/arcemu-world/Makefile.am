@@ -187,6 +187,7 @@ arcemu_world_SOURCES = \
     WorldSocket.h \
     WorldRunnable.h \
     WorldRunnable.cpp \
+	WorldStateManager.cpp \
     WordFilter.h \
     WordFilter.cpp \
 	Main.cpp \

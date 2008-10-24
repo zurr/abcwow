@@ -939,6 +939,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				break;
 			Unit *targets[3];
 			int targets_got=0;
+			unitTarget->AquireInrangeLock();
 			for(std::set<Object*>::iterator itr = unitTarget->GetInRangeSetBegin(), i2; itr != unitTarget->GetInRangeSetEnd(); )
 			{
 				i2 = itr++;
@@ -952,6 +953,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				if(targets_got==3)
 					break;
 			}
+			unitTarget->ReleaseInrangeLock();
 			for(int i=0;i<targets_got;i++)
 			{
 				//set threat to this target so we are the msot hated
@@ -1110,6 +1112,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			if(!p_caster)
 				return;
 
+			p_caster->AquireInrangeLock();
 			for(Object::InRangeSet::iterator i = p_caster->GetInRangeSetBegin(); i != p_caster->GetInRangeSetEnd(); ++i)
 			{
 				if((*i)->GetTypeId() == TYPEID_UNIT)
@@ -1127,7 +1130,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 					}
 				}
 			}
-			
+			p_caster->ReleaseInrangeLock();
+
 			if(check)
 			{
 				uint32 item, count = 0;
@@ -1256,6 +1260,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			bool check = false;
 			float rad = GetRadius(i);
 			rad *= rad;
+
+			p_caster->AquireInrangeLock();
 			for(Object::InRangeSet::iterator i = p_caster->GetInRangeSetBegin(); i != p_caster->GetInRangeSetEnd(); ++i)
 			{
 				if((*i)->GetTypeId() == TYPEID_UNIT)
@@ -1275,6 +1281,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 					}
 				}
 			}
+			p_caster->ReleaseInrangeLock();
+
 			
 			if(check)
 			{
@@ -2979,6 +2987,7 @@ void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
 
 	float spellRadius = GetRadius(i);
 
+	m_caster->AquireInrangeLock();
 	for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 	{
 		if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
@@ -3004,6 +3013,7 @@ void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
 		tgt.m_unitTarget=(*itr)->GetGUID();
 		sp->prepare(&tgt);
 	}
+	m_caster->ReleaseInrangeLock();
 }
 
 void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
@@ -4985,14 +4995,17 @@ void Spell::SpellEffectSanctuary(uint32 i) // Stop all attacks made to you
 //	Object::InRangeSet::iterator itr = u_caster->GetInRangeOppFactsSetBegin();
 //	Object::InRangeSet::iterator itr_end = u_caster->GetInRangeOppFactsSetEnd();
 	//use these instead
-	Object::InRangeSet::iterator itr = u_caster->GetInRangeSetBegin();
-	Object::InRangeSet::iterator itr_end = u_caster->GetInRangeSetEnd();
+	
 	Unit * pUnit;
 
 	if(u_caster->IsPlayer())
 		static_cast<Player*>(u_caster)->RemoveAllAuraType(SPELL_AURA_MOD_ROOT);
 
+	u_caster->AquireInrangeLock();
+	Object::InRangeSet::iterator itr = u_caster->GetInRangeSetBegin();
+	Object::InRangeSet::iterator itr_end = u_caster->GetInRangeSetEnd();
 	for( ; itr != itr_end; ++itr )
+	{
 		if( (*itr)->IsUnit() )
 		{
 			pUnit = static_cast<Unit*>(*itr);
@@ -5000,6 +5013,9 @@ void Spell::SpellEffectSanctuary(uint32 i) // Stop all attacks made to you
 			if( pUnit && pUnit->GetTypeId() == TYPEID_UNIT )
 				pUnit->GetAIInterface()->RemoveThreatByPtr( unitTarget );
 		}
+	}
+	u_caster->ReleaseInrangeLock();
+
 }
 
 void Spell::SpellEffectAddComboPoints(uint32 i) // Add Combo Points

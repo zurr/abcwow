@@ -3975,7 +3975,8 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 
 			if (ex->deleted) continue;
 
-			for(set<Object*>::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr)
+			AquireInrangeLock();
+			for(set<Object*>::iterator itr = GetInRangeSetBegin(); itr != GetInRangeSetEnd(); ++itr)
 			{
 				if (!(*itr) || (*itr) == pVictim || !(*itr)->IsUnit())
 					continue;
@@ -3990,6 +3991,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 					break;
 				}
 			}
+			ReleaseInrangeLock();
 
 			// Sweeping Strikes charges are used up regardless whether there is a secondary target in range or not. (from wowhead)
 			if (ex->charges > 0)
@@ -6083,7 +6085,9 @@ void Unit::UpdateVisibility()
 	if( m_objectTypeId == TYPEID_PLAYER )
 	{
 		plr = static_cast< Player* >( this );
-		for( Object::InRangeSet::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end();)
+
+		AquireInrangeLock();
+		for( Object::InRangeSet::iterator itr = GetInRangeSetBegin(); itr != GetInRangeSetEnd();)
 		{
 			pObj = (*itr);
 			++itr;
@@ -6134,9 +6138,11 @@ void Unit::UpdateVisibility()
 				}
 			}
 		}
+		ReleaseInrangeLock();
 	}
 	else			// For units we can save a lot of work
 	{
+		AquireInrangeLock();
 		for(set<Player*>::iterator it2 = GetInRangePlayerSetBegin(); it2 != GetInRangePlayerSetEnd(); ++it2)
 		{
 			can_see = (*it2)->CanSee(this);
@@ -6160,6 +6166,7 @@ void Unit::UpdateVisibility()
 				}
 			}
 		}
+		ReleaseInrangeLock();
 	}
 }
 

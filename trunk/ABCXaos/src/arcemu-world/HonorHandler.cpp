@@ -167,8 +167,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 					{
 						// Send PVP credit
 						WorldPacket data(SMSG_PVP_CREDIT, 12);
-						uint32 pvppoints = pts * 10;
-						data << pvppoints << pVictim->GetGUID() << uint32(static_cast< Player* >(pVictim)->GetPVPRank());
+						data << pts << pVictim->GetGUID() << uint32(static_cast< Player* >(pVictim)->GetPVPRank());
 						(*vtr)->GetSession()->SendPacket(&data);
 					}
 				}
@@ -181,6 +180,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 			set<Player*> contributors;
 			// First loop: Get all the people in the attackermap.
 			pVictim->UpdateOppFactionSet();
+			pVictim->AquireInrangeLock();
 			for(std::set<Object*>::iterator itr = pVictim->GetInRangeOppFactsSetBegin(); itr != pVictim->GetInRangeOppFactsSetEnd(); itr++)
 			{
 				if(!(*itr)->IsPlayer())
@@ -215,6 +215,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 					}
 				}
 			}
+			pVictim->ReleaseInrangeLock();
 
 			for(set<Player*>::iterator itr = contributors.begin(); itr != contributors.end(); itr++)
 			{
@@ -233,8 +234,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 					sHookInterface.OnHonorableKill(pAffectedPlayer, (Player*)pVictim);
 
 					WorldPacket data(SMSG_PVP_CREDIT, 12);
-					uint32 pvppoints = contributorpts * 10; // Why *10?
-					data << pvppoints << pVictim->GetGUID() << uint32(static_cast< Player* >(pVictim)->GetPVPRank());
+					data << contributorpts << pVictim->GetGUID() << uint32(static_cast< Player* >(pVictim)->GetPVPRank());
 					pAffectedPlayer->GetSession()->SendPacket(&data);
 				}
 
@@ -304,7 +304,7 @@ bool ChatHandler::HandlePVPCreditCommand(const char* args, WorldSession* m_sessi
 		RedSystemMessage(m_session, "Command must be in format <rank> <points>.");
 		return true;
 	}
-	Points *= 10;
+
 	uint64 Guid = m_session->GetPlayer()->GetSelection();
 	if(Guid == 0)
 	{

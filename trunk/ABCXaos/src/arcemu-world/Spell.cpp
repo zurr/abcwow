@@ -232,9 +232,8 @@ void Spell::Init(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 
 	UniqueTargets.clear();
 	ModeratedTargets.clear();
-	m_targetUnits[0].clear();
-	m_targetUnits[1].clear();
-	m_targetUnits[2].clear();
+	for(uint32 x=0;x<3;x++)
+		m_targetUnits[x].clear();
 }
 
 Spell::~Spell()
@@ -916,6 +915,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 						if ( u_caster != NULL && u_caster->IsCreature() )
 						{
 							//target friendly npcs
+							u_caster->AquireInrangeLock();
 							for( std::set<Object*>::iterator itr = u_caster->GetInRangeSameFactsSetBegin(); itr != u_caster->GetInRangeSameFactsSetEnd(); itr++ )
 							{
 								if ( (*itr) != NULL && ((*itr)->GetTypeId() == TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->IsInWorld() && ((Unit*)*itr)->isAlive() && IsInrange(u_caster, (*itr), r) )
@@ -924,6 +924,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 									break;
 								}
 							}
+							u_caster->ReleaseInrangeLock();
 						}
 					}break;
 				case EFF_TARGET_SINGLE_FRIEND:
@@ -943,6 +944,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 							 else
 							 {
 								//target friendly npcs
+								u_caster->AquireInrangeLock();
 								for( std::set<Object*>::iterator itr = u_caster->GetInRangeSameFactsSetBegin(); itr != u_caster->GetInRangeSameFactsSetEnd(); itr++ )
 								{
 									if ( (*itr) != NULL && ((*itr)->GetTypeId() == TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->IsInWorld() && ((Unit*)*itr)->isAlive() && IsInrange(u_caster, (*itr), r) )
@@ -972,6 +974,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 										break;
 									 }
 								}
+								u_caster->ReleaseInrangeLock();
 							}
 						}
 					}break;
@@ -1040,6 +1043,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 						if ( u_caster != NULL && u_caster->IsCreature() )
 						{
 							//target friendly npcs
+							u_caster->AquireInrangeLock();
 							for( std::set<Object*>::iterator itr = u_caster->GetInRangeSameFactsSetBegin(); itr != u_caster->GetInRangeSameFactsSetEnd(); itr++ )
 							{
 								if ( (*itr) != NULL && ((*itr)->GetTypeId() == TYPEID_UNIT || (*itr)->GetTypeId() == TYPEID_PLAYER) && (*itr)->IsInWorld() && ((Unit*)*itr)->isAlive() && IsInrange(u_caster, (*itr), r) )								{
@@ -1047,6 +1051,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 									break;
 								}
 							}
+							u_caster->ReleaseInrangeLock();
 						}
 					}break;
 				case 38:{//Dummy Target
@@ -1601,7 +1606,7 @@ void Spell::cast(bool check)
 
 			if(!IsReflected() && GetCanReflect() && m_caster->IsInWorld())
 			{
-				for(std::set<uint64>::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+				for(TargetsList::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 				{
 					Unit *Target = m_caster->GetMapMgr()->GetUnit(*i);
 					if(Target)
@@ -1644,7 +1649,7 @@ void Spell::cast(bool check)
                         {
 							HandleEffects(m_caster->GetGUID(),x);
                         }
-						else if (m_targetUnits[x].size()>0)
+						else if (!m_targetUnits[x].empty())
 						{
 							for(TargetsList::iterator t = m_targetUnits[x].begin(); t != m_targetUnits[x].end(); )
                             {
@@ -1671,7 +1676,7 @@ void Spell::cast(bool check)
 				{
 					hadEffect = true; // spell has had an effect (for item removal & possibly other things)
 
-					for(std::set<uint64>::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+					for(TargetsList::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 					{
 						HandleAddAura((*i));
 					}
@@ -1679,7 +1684,7 @@ void Spell::cast(bool check)
 				// spells that proc on spell cast, some talents
 				if(p_caster && p_caster->IsInWorld())
 				{
-					for(std::set<uint64>::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+					for(TargetsList::iterator i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 					{
 						Unit * Target = p_caster->GetMapMgr()->GetUnit((*i));
 
@@ -2164,28 +2169,14 @@ enum SpellGoFlags
 void Spell::SendSpellGo()
 {
 	// Fill UniqueTargets
-	TargetsList::iterator i, j;
 	for( uint32 x = 0; x < 3; x++ )
 	{
-		if( GetProto()->Effect[x] )
+		if( !m_targetUnits[x].empty() && GetProto()->Effect[x] )
 		{
-			bool add = true;
-			for( i = m_targetUnits[x].begin(); i != m_targetUnits[x].end(); i++ )
+			for(TargetsList::iterator i = m_targetUnits[x].begin(); i != m_targetUnits[x].end(); i++ )
 			{
-				add = true;
-				for( j = UniqueTargets.begin(); j != UniqueTargets.end(); j++ )
-				{
-					if( (*j) == (*i) )
-					{
-						add = false;
-						break;
-					}
-				}
-				if( add && (*i) != 0 )
+				if( (*i) != 0 )
 					UniqueTargets.insert( (*i) );
-				//TargetsList::iterator itr = std::unique(m_targetUnits[x].begin(), m_targetUnits[x].end());
-				//UniqueTargets.insert(UniqueTargets.begin(),));
-				//UniqueTargets.insert(UniqueTargets.begin(), itr);
 			}
 		}
 	}
@@ -4827,6 +4818,7 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 	{
 		std::vector<Unit*> target_threat;
 		int count = 0;
+		u_caster->AquireInrangeLock();
 		for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
 		{
 			if((*itr)->GetTypeId() != TYPEID_UNIT || !static_cast<Unit *>(*itr)->CombatStatus.IsInCombat() || (static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(u_caster) == 0 && static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(unitTarget) == 0))
@@ -4835,6 +4827,7 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 			target_threat.push_back(static_cast<Unit *>(*itr));
 			count++;
 		}
+		u_caster->ReleaseInrangeLock();
 		if (count == 0)
 			return;
 
@@ -4903,20 +4896,6 @@ void Spell::SafeAddTarget(TargetsList* tgt,uint64 guid)
 	tgt->insert(guid);
 }
 
-void Spell::SafeAddMissedTarget(uint64 guid)
-{
-
-    for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
-        if((*i).TargetGuid==guid)
-        {
-            //sLog.outDebug("[SPELL] Something goes wrong in spell target system");
-			// this isnt actually wrong, since we only have one missed target map,
-			// whereas hit targets have multiple maps per effect.
-            return;
-        }
-
-    ModeratedTargets.push_back(SpellTargetMod(guid,2));
-}
 
 void Spell::SafeAddModeratedTarget(uint64 guid, uint16 type)
 {

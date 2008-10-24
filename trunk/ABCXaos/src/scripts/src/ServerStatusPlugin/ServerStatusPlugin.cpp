@@ -306,17 +306,13 @@ void StatDumper::DumpStats()
     fprintf(f, "<serverpage>\n");
     fprintf(f, "  <status>\n");
 
-	uint32 races[RACE_DRAENEI+1];
-	uint32 classes[DRUID+1];
-	memset(&races[0], 0, sizeof(uint32)*(RACE_DRAENEI+1));
-	memset(&classes[0], 0, sizeof(uint32)*(RACE_DRAENEI+1));
     std::deque<Player*> gms;
     {
         // Dump server information.
 #ifdef WIN32
 		fprintf(f, "    <platform>ArcEmu/ABCWoW %s r%u/%s-Win-%s</platform>\n", BUILD_TAG, BUILD_REVISION, CONFIG, ARCH);		
 #else
-		fprintf(f, "    <platform>ArcEmu %s r%u/%s-%s (www.arcemu.org)</platform>\n", BUILD_TAG, BUILD_REVISION, PLATFORM_TEXT, ARCH);
+		fprintf(f, "    <platform>ArcEmu/ABCWoW %s r%u/%s-%s</platform>\n", BUILD_TAG, BUILD_REVISION, PLATFORM_TEXT, ARCH);
 #endif
 
         char uptime[80];
@@ -341,8 +337,6 @@ void StatDumper::DumpStats()
                     gm++;
                     gms.push_back(itr->second);
                 }
-				classes[itr->second->getClass()]++;
-				races[itr->second->getRace()]++;
             }            
         }
         objmgr._playerslock.ReleaseReadLock();
@@ -369,50 +363,6 @@ void StatDumper::DumpStats()
 		fprintf(f, "    <cdbquerysize>%u</cdbquerysize>\n", CharacterDatabase.GetQueueSize());
     }
     fprintf(f, "  </status>\n");
-	static const char * race_names[RACE_DRAENEI+1] = {
-		NULL,
-		"human",
-		"orc",
-		"dwarf",
-		"nightelf",
-		"undead",
-		"tauren",
-		"gnome",
-		"troll",
-		NULL,
-		"bloodelf",
-		"draenei",
-	};
-
-	static const char * class_names[DRUID+1] = {
-		NULL,
-		"warrior",
-		"paladin",
-		"hunter",
-		"rogue",
-		"priest",
-		NULL,
-		"shaman",
-		"mage",
-		"warlock",
-		NULL,
-		"druid",
-	};
-	
-	fprintf(f, "  <statsummary>\n");
-	uint32 i;
-	for(i = 0; i <= RACE_DRAENEI; ++i)
-	{
-		if( race_names[i] != NULL )
-			fprintf(f, "    <%s>%u</%s>\n", race_names[i], races[i], race_names[i]);
-	}
-
-	for(i = 0; i <= DRUID; ++i)
-	{
-		if( class_names[i] != NULL )
-			fprintf(f, "    <%s>%u</%s>\n", class_names[i], classes[i], class_names[i]);
-	}
-	fprintf(f, "  </statsummary>\n");
 
     Player * plr;
     uint32 t = (uint32)time(NULL);
@@ -469,6 +419,9 @@ void StatDumper::DumpStats()
             plr = itr->second;
             if(itr->second->GetSession() && itr->second->IsInWorld())
             {
+				if(plr->bGMTagOn)
+					continue;
+
                 FillOnlineTime(t - plr->OnlineTime, otime);
 
                 fprintf(f, "    <plr>\n");
