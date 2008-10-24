@@ -376,7 +376,9 @@ public:
 			printf("!!!!we are in range of self !\n");
 
 		//Zack: as far as i know list inserts do not corrupt iterators
+		AquireInrangeLock();
 		m_objectsInRange.insert( pObj );
+		ReleaseInrangeLock();
 
 		// NOTES: Since someone will come along and try and change it.
 		// Don't reinrepret_cast has to be used static_cast will not work when we are
@@ -384,7 +386,11 @@ public:
 		// chain, as Object has no concept of Player.
 
 		if( pObj->GetTypeId() == TYPEID_PLAYER )
+		{
+			AquireInrangeLock();
 			m_inRangePlayers.insert( reinterpret_cast< Player* >( pObj ) );
+			ReleaseInrangeLock();
+		}
 	}
 
 	Mutex m_inrangechangelock;
@@ -440,13 +446,14 @@ public:
 	ARCEMU_INLINE bool RemoveIfInRange( Object * obj )
 	{
 		InRangeSet::iterator itr = m_objectsInRange.find(obj);
+
+		AquireInrangeLock();
 		if( obj->GetTypeId() == TYPEID_PLAYER )
 			m_inRangePlayers.erase( reinterpret_cast< Player* >( obj ) );
 
 		if( itr == m_objectsInRange.end() )
 			return false;
 		
-		AquireInrangeLock();
 		m_objectsInRange.erase( itr );
 		ReleaseInrangeLock();
 		return true;
@@ -454,12 +461,16 @@ public:
 
 	ARCEMU_INLINE void AddInRangePlayer( Object * obj )
 	{
+		AquireInrangeLock();
 		m_inRangePlayers.insert( reinterpret_cast< Player* >( obj ) );
+		ReleaseInrangeLock();
 	}
 
 	ARCEMU_INLINE void RemoveInRangePlayer( Object * obj )
 	{
+		AquireInrangeLock();
 		m_inRangePlayers.erase( reinterpret_cast< Player* >( obj ) );
+		ReleaseInrangeLock();
 	}
 
 	bool IsInRangeSameFactSet(Object* pObj) { return (m_sameFactsInRange.count(pObj) > 0); }

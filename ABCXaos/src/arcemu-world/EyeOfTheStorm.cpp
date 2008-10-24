@@ -572,9 +572,10 @@ void EyeOfTheStorm::UpdateCPs()
 		playercounts[0] = playercounts[1] = 0;
 		go = m_CPStatusGO[i];
 		disp = &m_CPDisplay[i];
+
+		go->AquireInrangeLock();
 		itr = go->GetInRangePlayerSetBegin();
 		itrend = go->GetInRangePlayerSetEnd();
-
 		for( ; itr != itrend; ++itr )
 		{
 			plr = *itr;
@@ -589,6 +590,7 @@ void EyeOfTheStorm::UpdateCPs()
 				}
 			}
 		}
+		go->ReleaseInrangeLock();
 
 		/* score diff calculation */
 		//printf("EOTS: Playercounts = %u %u\n", playercounts[0], playercounts[1]);

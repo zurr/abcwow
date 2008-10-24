@@ -279,7 +279,9 @@ void Player::UpdateInrangeSetsBasedOnReputation()
 	Unit * pUnit;
 	bool rep_value;
 	bool enemy_current;
-	for( itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); itr++ )
+
+	AquireInrangeLock();
+	for( itr = GetInRangeSetBegin(); itr != GetInRangeSetEnd(); itr++ )
 	{
 		if( (*itr)->GetTypeId() != TYPEID_UNIT )
 			continue;
@@ -296,6 +298,7 @@ void Player::UpdateInrangeSetsBasedOnReputation()
 		else if( !rep_value && enemy_current )
 			m_oppFactsInRange.erase( pUnit );
 	}
+	ReleaseInrangeLock();
 }
 
 void Player::Reputation_OnKilledUnit( Unit * pUnit, bool InnerLoop )

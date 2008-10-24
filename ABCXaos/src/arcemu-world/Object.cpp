@@ -929,9 +929,11 @@ void Object::OutPacketToSet(uint16 Opcode, uint16 Len, const void * Data, bool s
 	if(!IsInWorld())
 		return;
 
+	int gm = ( m_objectTypeId == TYPEID_PLAYER ? static_cast< Player* >( this )->m_isGmInvisible : 0 );
+
+	AquireInrangeLock();
 	std::set<Player*>::iterator itr = m_inRangePlayers.begin();
 	std::set<Player*>::iterator it_end = m_inRangePlayers.end();
-	int gm = ( m_objectTypeId == TYPEID_PLAYER ? static_cast< Player* >( this )->m_isGmInvisible : 0 );
 	for(; itr != it_end; ++itr)
 	{
 		if( gm )
@@ -944,6 +946,7 @@ void Object::OutPacketToSet(uint16 Opcode, uint16 Len, const void * Data, bool s
 			(*itr)->GetSession()->OutPacket(Opcode, Len, Data);
 		}
 	}
+	ReleaseInrangeLock();
 }
 
 void Object::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
@@ -956,9 +959,11 @@ void Object::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 	if(!IsInWorld())
 		return;
 
+	bool gminvis = (m_objectTypeId == TYPEID_PLAYER ? static_cast< Player* >( this )->m_isGmInvisible : false);
+
+	AquireInrangeLock();
 	std::set<Player*>::iterator itr = m_inRangePlayers.begin();
 	std::set<Player*>::iterator it_end = m_inRangePlayers.end();
-	bool gminvis = (m_objectTypeId == TYPEID_PLAYER ? static_cast< Player* >( this )->m_isGmInvisible : false);
 	//Zehamster: Splitting into if/else allows us to avoid testing "gminvis==true" at each loop...
 	//		   saving cpu cycles. Chat messages will be sent to everybody even if player is invisible.
 	if(myteam_only)
@@ -1000,6 +1005,7 @@ void Object::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 			}
 		}
 	}
+	ReleaseInrangeLock();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1876,6 +1882,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				pVictim->BuildFieldUpdatePacket(&buf, UNIT_DYNAMIC_FLAGS, pVictim->m_uint32Values[UNIT_DYNAMIC_FLAGS]);
 
 				// Loop inrange set, append to their update data.
+				AquireInrangeLock();
 				for(std::set<Player*>::iterator itr = m_inRangePlayers.begin(); itr != m_inRangePlayers.end(); ++itr)
 				{
 					if (static_cast< Player* >(plr)->InGroup())
@@ -1895,6 +1902,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 						(*itr)->PushUpdateData(&buf, 1);
 					}
 				}
+				ReleaseInrangeLock();
 
 				// Update ourselves
 				plr->PushUpdateData(&buf1, 1);
@@ -2158,6 +2166,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		pVictim->DropAurasOnDeath();
 
 		/* Stop players from casting */
+		AquireInrangeLock();
 		std::set<Player*>::iterator itr;
 		for( itr = pVictim->GetInRangePlayerSetBegin() ; itr != pVictim->GetInRangePlayerSetEnd() ; itr ++ )
 		{
@@ -2168,6 +2177,8 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 					(*itr)->CancelSpell( NULL ); //cancel current casting spell
 			}
 		}
+		ReleaseInrangeLock();
+
 		/* Stop victim from attacking */
 		if( this->IsUnit() )
 			pVictim->smsg_AttackStop( static_cast< Unit* >( this ) );

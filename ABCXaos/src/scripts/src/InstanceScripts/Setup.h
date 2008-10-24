@@ -52,6 +52,10 @@ void SetupZulAman(ScriptMgr * mgr);
 //void SetupEventDarkPortal(ScriptMgr * mgr);
 
 struct SP_AI_Spell{
+	SP_AI_Spell(): info(NULL),targettype(1),instant(true),perctrigger(0.0f),attackstoptimer(0),
+					soundid(0), speech(""), cooldown(0), casttime(0),reqlvl(0),hpreqtocast(0.0f),
+					mindist2cast(0.0f),maxdist2cast(0.0f),minhp2cast(0),maxhp2cast(0) {}
+
 	SpellEntry *info;		// spell info
 	char targettype;		// 0-self , 1-attaking target, ....
 	bool instant;			// does it is instant or not?
