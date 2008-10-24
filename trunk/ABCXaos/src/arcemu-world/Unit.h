@@ -1230,6 +1230,7 @@ public:
 		case 6491:  // Spirit Healer
 		case 13116: // Alliance Spirit Guide
 		case 13117: // Horde Spirit Guide
+		case 9299:  // Gaeriyan (Qnpc)
 			{
 				return true;
 			}break;
