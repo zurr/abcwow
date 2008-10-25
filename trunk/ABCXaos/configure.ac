@@ -261,11 +261,9 @@ AC_CONFIG_FILES([
    src/scripts/Makefile
    src/scripts/src/Makefile
    src/scripts/src/GossipScripts/Makefile
-   src/scripts/src/ExtraScripts/Makefile
    src/scripts/src/InstanceScripts/Makefile
    src/scripts/src/ServerStatusPlugin/Makefile
    src/scripts/src/SpellHandlers/Makefile
-   src/scripts/src/LUAScripting/Makefile
    src/scripts/src/QuestScripts/Makefile
    src/scripts/src/MiscScripts/Makefile
    extras/Makefile
