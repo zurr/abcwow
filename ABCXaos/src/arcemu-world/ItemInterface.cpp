@@ -1553,6 +1553,9 @@ int8 ItemInterface::CanEquipItemInSlot2(int8 DstInvSlot, int8 slot, Item* item, 
 //-------------------------------------------------------------------//
 int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype* proto, bool ignore_combat /* = false */, bool skip_2h_check /* = false */)
 {
+	if (proto == NULL)
+		return INV_ERR_CANT_CARRY_MORE_OF_THIS;
+
 	uint32 type=proto->InventoryType;
 	
 	if(slot >= INVENTORY_SLOT_BAG_START && slot < INVENTORY_SLOT_BAG_END && DstInvSlot == -1)
