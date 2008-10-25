@@ -1228,6 +1228,9 @@ public:
 
     SpellCastTargets& operator=(const SpellCastTargets &target)
     {
+		if (this == &target)
+			return *this;
+
         m_unitTarget = target.m_unitTarget;
         m_itemTarget = target.m_itemTarget;
 

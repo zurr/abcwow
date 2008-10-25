@@ -857,6 +857,8 @@ CBattleground::~CBattleground()
 		}
 		delete m_groups[i];
 	}
+
+	m_resurrectMap.clear();
 }
 
 void CBattleground::UpdatePvPData()
