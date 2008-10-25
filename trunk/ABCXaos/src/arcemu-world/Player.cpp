@@ -3511,11 +3511,10 @@ void Player::OnPushToWorld()
 		ApplyLevelInfo(Info, sWorld.start_level);
 			
 		/* Invite them to the community channel! */
-		/* !!!  undefined CHANNEL_NOTICE_INVITE
 		WorldPacket invitation(SMSG_CHANNEL_NOTIFY, 16);
-		invitation << uint8(CHANNEL_NOTICE_INVITE) << "public" << GetGUID();
+		invitation << uint8(CHANNEL_NOTIFY_FLAG_INVITED) << "public" << GetGUID();
 		m_session->SendPacket(&invitation);
-		*/
+		
 		m_FirstLogin = false;
 	}
 
