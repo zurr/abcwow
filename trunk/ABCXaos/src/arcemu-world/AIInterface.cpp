@@ -418,6 +418,12 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			{
 				if( pUnit == NULL ) return;
 
+				if( pUnit->IsPlayer() )
+				{
+					if( static_cast<Player*>(pUnit)->m_bg )
+						return;
+				}
+
 				m_FearTimer = 0;
 				SetUnitToFear(pUnit);
 
