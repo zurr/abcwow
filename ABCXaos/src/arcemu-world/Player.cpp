@@ -2105,10 +2105,10 @@ void Player::InitVisibleUpdateBits()
 
 	for(uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
 	{
-		Player::m_visibleUpdateMask.SetBit((PLAYER_VISIBLE_ITEM_1_0 + (i*16))); // visual items for other players
-		Player::m_visibleUpdateMask.SetBit((PLAYER_VISIBLE_ITEM_1_0+1 + (i*16))); // visual items for other players
+		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0 + (i*16))); // visual items for other players
+		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+1 + (i*16))); // visual items for other players
 		for( uint8 x = 2 ; x < 6 ; x ++ )
-		Player::m_visibleUpdateMask.SetBit((PLAYER_VISIBLE_ITEM_1_0+x + (i*16))); // First Gem
+		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+x + (i*16))); // First Gem
 			//Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+3 + (i*16))); // Second Gem?
 
 
@@ -8756,7 +8756,7 @@ void Player::CompleteLoading()
 			continue; //do not load auras that only exist while pet exist. We should recast these when pet is created anyway
 
 		Aura * aura = AuraPool.PooledNew();
-		aura->Init(sp,(*i).dur,this,this);
+		aura->Init(sp,(*i).dur,this,this, false);
 		if ( !(*i).positive ) // do we need this? - vojta
 			aura->SetNegative();
 
@@ -8774,7 +8774,7 @@ void Player::CompleteLoading()
 			for ( uint32 x = 0; x < (*i).charges - 1; x++ )
 			{
 				a = AuraPool.PooledNew();
-				a->Init( sp, (*i).dur, this, this );
+				a->Init( sp, (*i).dur, this, this, false );
 				this->AddAura( a, NULL );
 				a = NULL;
 			}
@@ -9076,27 +9076,27 @@ void Player::SaveAuras(stringstream &ss)
 		if ( m_auras[x] != NULL && m_auras[x]->GetTimeLeft() > 3000 )
 		{
 			Aura * aur = m_auras[x];
-			bool skip = false;
+
+			//if( aur->
+
 			for ( uint32 i = 0; i < 3; ++i )
 			{
 				if(aur->m_spellProto->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA || aur->m_spellProto->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT)
 				{
-					skip = true;
+					continue;
 					break;
 				}
 			}
 
 			if( aur->pSpellId )
-				skip = true; //these auras were gained due to some proc. We do not save these eighter to avoid exploits of not removing them
+				continue; //these auras were gained due to some proc. We do not save these eighter to avoid exploits of not removing them
 
 			if ( aur->m_spellProto->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET )
-				skip = true;
+				continue;
 
 			//we are going to cast passive spells anyway on login so no need to save auras for them
 			if ( aur->IsPassive() && !( aur->GetSpellProto()->AttributesEx & 1024 ) )
-				skip = true;
-
-			if ( skip ) continue;
+				continue;
 
 			if ( charges > 0 && aur->GetSpellId() != m_auras[prevX]->GetSpellId() )
 			{

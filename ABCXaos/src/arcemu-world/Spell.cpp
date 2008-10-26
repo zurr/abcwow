@@ -2852,7 +2852,7 @@ void Spell::HandleAddAura(uint64 guid)
 					if(m_spellScript != NULL)
 						m_spellScript->AddRef(aur);
 
-					aur->Init(itr->second->GetSpellProto(),itr->second->GetDuration(),itr->second->GetCaster(),itr->second->GetTarget(), i_caster);
+					aur->Init(itr->second->GetSpellProto(),itr->second->GetDuration(),itr->second->GetCaster(),itr->second->GetTarget(), m_triggeredSpell, i_caster);
 					Target->AddAura(aur, m_spellScript);
 					aur=NULL;
 				}

@@ -2263,7 +2263,7 @@ void MapMgr::AddAuraOnPlayers(int32 Team, int32 Zone, uint32 AuraId)
 			continue;
 
 		Aura * aur = AuraPool.PooledNew();
-		aur->Init(sp, -1, p, p);
+		aur->Init(sp, -1, p, p, true);
 		//Aura * aur = new Aura(sp, -1, p, p, true);
 		if(aur != NULL)
 			p->AddAura(aur, NULL);

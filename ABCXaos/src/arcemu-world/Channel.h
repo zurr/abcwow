@@ -27,10 +27,10 @@ enum CHANNEL_FLAGS
 {
 	CHANNEL_FLAG_NONE				= 0x00,
 	CHANNEL_FLAG_OWNER				= 0x01,
-	CHANNEL_FLAG_MODERATOR			= 0x02,
-	CHANNEL_FLAG_VOICED				= 0x04,
+	CHANNEL_FLAG_MODERATOR			= 0x02, // "[%s] Moderation privileges given to %s.", "[%s] Moderation privileges removed from %s."
+	CHANNEL_FLAG_VOICED				= 0x04,	// "[%s] Chat permission given to %s.", "[%s] %s lost chat permission."
 	CHANNEL_FLAG_MUTED				= 0x08,
-	CHANNEL_FLAG_CUSTOM				= 0x10,
+	CHANNEL_FLAG_CUSTOM				= 0x10,	// "[%s] Voice permission given to %s.", "[%s] %s lost voice permission."
     CHANNEL_FLAG_MICROPHONE_MUTE	= 0x20,
 };
 

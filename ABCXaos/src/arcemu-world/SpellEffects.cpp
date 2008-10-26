@@ -999,7 +999,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 					if(p_caster->m_TotemSlots[0] && p_caster->m_TotemSlots[1] && p_caster->m_TotemSlots[2] && p_caster->m_TotemSlots[3])
 					{
 						Aura *aur = AuraPool.PooledNew();
-						aur->Init(dbcSpell.LookupEntry(38437), 5000, p_caster, p_caster);
+						aur->Init(dbcSpell.LookupEntry(38437), 5000, p_caster, p_caster, true);
 						for( uint32 i=0; i<3; i++ ) 
 							aur->AddMod( aur->GetSpellProto()->EffectApplyAuraName[i], aur->GetSpellProto()->EffectBasePoints[i]+1, aur->GetSpellProto()->EffectMiscValue[i], i );
 						p_caster->AddAura(aur, m_spellScript);
@@ -1941,9 +1941,9 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 		}
 		pAura=AuraPool.PooledNew();
 		if(g_caster && g_caster->GetUInt32Value(OBJECT_FIELD_CREATED_BY) && g_caster->m_summoner)
-			 pAura->Init(GetProto(), Duration, g_caster->m_summoner, unitTarget, i_caster);
+			 pAura->Init(GetProto(), Duration, g_caster->m_summoner, unitTarget, m_triggeredSpell, i_caster);
 		else
-			pAura->Init(GetProto(), Duration, m_caster, unitTarget, i_caster);
+			pAura->Init(GetProto(), Duration, m_caster, unitTarget, m_triggeredSpell, i_caster);
 
 		pAura->pSpellId = pSpellId; //this is required for triggered spells
 		
@@ -3391,7 +3391,7 @@ void Spell::SpellEffectApplyAA(uint32 i) // Apply Area Aura
 	if(itr==unitTarget->tmpAura.end())
 	{
 		pAura=AuraPool.PooledNew();
-		pAura->Init(GetProto(),GetDuration(),m_caster,unitTarget);
+		pAura->Init(GetProto(),GetDuration(),m_caster,unitTarget, true);
 		
 		unitTarget->tmpAura [GetProto()->Id]= pAura;
 	
@@ -6313,7 +6313,7 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 
 				uint32 aurdur = ( aur->GetDuration()>120000 ? 120000 : aur->GetDuration() );
 				Aura *aura = AuraPool.PooledNew();
-				aura->Init(aur->GetSpellProto(), aurdur, u_caster, u_caster );
+				aura->Init(aur->GetSpellProto(), aurdur, u_caster, u_caster, false );
 				uint32 aur_removed = unitTarget->RemoveAllPosAuraByNameHash( aur->GetSpellProto()->NameHash );
 				for ( uint32 i = 0; i < 3; i++ )
 				{
@@ -6328,7 +6328,7 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 					for(uint32 i = 0; i<aur_removed-1; i++)
 					{
 						aur = AuraPool.PooledNew();
-						aur->Init( aura->GetSpellProto(), aurdur, u_caster, u_caster );
+						aur->Init( aura->GetSpellProto(), aurdur, u_caster, u_caster, false );
 						u_caster->AddAura(aur, m_spellScript);
 						aur = NULL;
 					}
