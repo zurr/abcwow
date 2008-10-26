@@ -606,7 +606,7 @@ Aura::Aura()
 	m_bufferPoolId = OBJECT_WAS_ALLOCATED_STANDARD_WAY;
 }
 
-void Aura::Init( SpellEntry* proto, int32 duration, Object* caster, Unit* target, bool temporary = false, Item* i_caster = NULL )
+void Aura::Init( SpellEntry* proto, int32 duration, Object* caster, Unit* target, bool temporary, Item* i_caster)
 {
 	m_wasremoved = false;
 	m_spellScript = NULL;
