@@ -1967,9 +1967,10 @@ public:
 
 	Spell * m_reflectedParent;
 
+	SpellScript* m_spellScript;
+
 protected:
 
-    SpellScript* m_spellScript;
 
     /// Spell state's
     bool    m_usesMana;
