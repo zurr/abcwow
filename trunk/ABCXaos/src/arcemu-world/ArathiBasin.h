@@ -64,6 +64,7 @@ protected:
 	uint32 m_capturedBases[2];
 	uint32 m_lastHonorGainResources[2];
 	int32 m_basesOwnedBy[AB_NUM_CONTROL_POINTS];
+	int32 m_basesLastOwnedBy[AB_NUM_CONTROL_POINTS];
 	int32 m_basesAssaultedBy[AB_NUM_CONTROL_POINTS];
 	Creature * m_spiritGuides[AB_NUM_CONTROL_POINTS];
 	bool m_nearingVictory[2];
