@@ -238,6 +238,9 @@ void Spell::Init(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 
 Spell::~Spell()
 {
+	if(m_spellScript != NULL)
+		m_spellScript->TryDelete();
+
 	for(uint32 x=0;x<3;x++)
 		 m_targetUnits[x].clear();
 }
@@ -1414,6 +1417,9 @@ void Spell::cast(bool check)
 
 		m_isCasting = true;
 
+		if(m_spellScript != NULL)
+			m_spellScript->OnCast();
+
 		//sLog.outString( "CanCastResult: %u" , cancastresult );
 		if(!m_triggeredSpell)
 			AddCooldown();
@@ -1631,8 +1637,6 @@ void Spell::cast(bool check)
 				u_caster->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_CAST_SPELL, GetProto()->Id);
 
             // call script before doing effects/aura
-			if(m_spellScript != NULL)
-				m_spellScript->OnCast();
 
 			// if the spell is not reflected
 			if(!IsReflected())
