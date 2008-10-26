@@ -2927,11 +2927,11 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 	uint32 vskill            = 0;
 	bool disable_dR			 = false;
 	
-	if(ability)
+	if(ability != NULL )
 		dmg.school_type = ability->School;
 	else
 	{
-		if (GetTypeId() == TYPEID_UNIT)
+		if (GetTypeId() == TYPEID_UNIT && static_cast< Creature* >( this )->BaseAttackType < SCHOOL_COUNT)
 			dmg.school_type = static_cast< Creature* >( this )->BaseAttackType;
 		else
 			dmg.school_type = SCHOOL_NORMAL;

@@ -2225,7 +2225,6 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 {
 	if(u_caster && u_caster->IsCreature() && !playerTarget)
 	{
-		sLog.outBasic("incorrect caster/target for createitem");
 		return;
 	}
 
