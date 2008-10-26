@@ -1653,10 +1653,6 @@ Unit* AIInterface::FindTarget()
 //	float crange;
 //	float z_diff;
 
-	std::set<Object*>::iterator itr, itr2;
-	std::set<Player *>::iterator pitr, pitr2;
-//	Object *pObj;
-	Unit *pUnit;
 	float dist;
 	bool pvp=true;
 	if(m_Unit->GetTypeId()==TYPEID_UNIT&&((Creature*)m_Unit)->GetCreatureInfo()&&((Creature*)m_Unit)->GetCreatureInfo()->Civilian)
@@ -1737,13 +1733,11 @@ Unit* AIInterface::FindTarget()
 
 	//we have a high chance that we will agro a player
 	//this is slower then oppfaction list BUT it has a lower chance that contains invalid pointers
+	Unit* pUnit = NULL;
 	m_Unit->AquireInrangeLock();
-	for( pitr2 = m_Unit->GetInRangePlayerSetBegin(); pitr2 != m_Unit->GetInRangePlayerSetEnd(); )
+	for( std::set<Player *>::iterator pitr2 = m_Unit->GetInRangePlayerSetBegin(); pitr2 != m_Unit->GetInRangePlayerSetEnd(); ++pitr2)
 	{
-		pitr = pitr2;
-		++pitr2;
-
-		pUnit = *pitr;
+		pUnit = *pitr2;
 
 		if( UnsafeCanOwnerAttackUnit( pUnit ) == false )
 			continue;
@@ -1775,11 +1769,8 @@ Unit* AIInterface::FindTarget()
 	{
 		m_updateTargetsTimer2 = getMSTime() + TARGET_UPDATE_INTERVAL;
 		m_Unit->AquireInrangeLock(); //make sure to release lock before exit function !
-		for( itr2 = m_Unit->GetInRangeSetBegin(); itr2 != m_Unit->GetInRangeSetEnd(); )
+		for(std::set<Object*>::iterator itr = m_Unit->GetInRangeSetBegin(); itr != m_Unit->GetInRangeSetEnd(); ++itr)
 		{
-			itr = itr2;
-			++itr2;
-
 			if( !(*itr)->IsUnit() )
 				continue;
 

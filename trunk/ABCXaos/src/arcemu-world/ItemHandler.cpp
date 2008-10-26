@@ -732,7 +732,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
 	ItemPrototype *itemProto = ItemPrototypeStorage.LookupEntry(itemid);
 	if(!itemProto)
 	{
-		sLog.outError( "WORLD: Unknown item id 0x%.8X", itemid );
+		sLog.outError( "WORLD: Unknown item id %d", itemid );
 		return;
 	} 
 
