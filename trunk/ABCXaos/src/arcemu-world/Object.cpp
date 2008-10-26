@@ -2813,11 +2813,11 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	
 	if( this->IsUnit() && allowProc && spellInfo->Id != 25501 && spellInfo->noproc == false)
 	{
-		int32 dmg = float2int32(res);
+		int32 tdmg = float2int32(res);
 
-		pVictim->HandleProc( vproc, static_cast< Unit* >( this ), spellInfo, dmg, abs_dmg);
+		pVictim->HandleProc( vproc, static_cast< Unit* >( this ), spellInfo, tdmg, abs_dmg);
 		pVictim->m_procCounter = 0;
-		static_cast< Unit* >( this )->HandleProc( aproc, pVictim, spellInfo, dmg, abs_dmg);
+		static_cast< Unit* >( this )->HandleProc( aproc, pVictim, spellInfo, tdmg, abs_dmg);
 		static_cast< Unit* >( this )->m_procCounter = 0;
 	}
 	if( this->IsPlayer() )
