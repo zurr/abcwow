@@ -452,6 +452,7 @@ ArathiBasin::ArathiBasin(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : CBa
 		m_spiritGuides[i] = NULL;
 		m_basesAssaultedBy[i] = -1;
 		m_basesOwnedBy[i] = -1;
+		m_basesLastOwnedBy[i] = -1;
 	}
 
 	for(i = 0; i < 2; ++i)
@@ -752,6 +753,7 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 
 	m_basesOwnedBy[Id] = Team;
 	m_basesAssaultedBy[Id]=-1;
+	m_basesLastOwnedBy[Id] = -1;
 
 	// remove the other spirit guide (if it exists) // burlex: shouldnt' happen
 	if(m_spiritGuides[Id] != NULL)
@@ -823,6 +825,7 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 
 		// set it to uncontrolled for now
 		m_basesOwnedBy[Id] = -1;
+		m_basesLastOwnedBy[Id] = Owner;
 
 		// this control point just got taken over by someone! oh noes!
 		if( m_spiritGuides[Id] != NULL )
@@ -886,8 +889,11 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 	// update the client's map with the new assaulting field
 	SetWorldState(AssaultFields[Id][Team], 1);
 
-	// create the 60 second event.
-	sEventMgr.AddEvent(this, &ArathiBasin::CaptureControlPoint, Id, Team, EVENT_AB_CAPTURE_CP_1 + Id, 60000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	// create the 60 second event or capture instant if its a recap
+	if (m_basesLastOwnedBy[Id]!=-1 && m_basesLastOwnedBy == (int32*)Team)
+		CaptureControlPoint(Id, Team);
+	else
+		sEventMgr.AddEvent(this, &ArathiBasin::CaptureControlPoint, Id, Team, EVENT_AB_CAPTURE_CP_1 + Id, 60000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
 
 bool ArathiBasin::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * pSpell)
