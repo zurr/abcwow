@@ -2223,10 +2223,8 @@ void Spell::SpellEffectBlock(uint32 i)
 
 void Spell::SpellEffectCreateItem(uint32 i) // Create item 
 {
-	if(u_caster && u_caster->IsCreature() && !playerTarget)
-	{
+	if(!p_caster)
 		return;
-	}
 
 	Item* newItem;
 	Item *add;
